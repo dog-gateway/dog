@@ -3,7 +3,6 @@
    <implementation class="it.polito.elite.domotics.dog2.modbusnetworkdriver.ModbusDriverImpl"/>
    <service>
       <provide interface="org.osgi.service.cm.ManagedService"/>
-      <provide interface="it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces.ModbusNetwork"/>
    </service>
    <property name="service.pid" type="String" value="ModbusNetworkDriver"/>
 </scr:component>
