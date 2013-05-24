@@ -14,6 +14,7 @@ package it.polito.elite.domotics.dog2.modbusnetworkdriver;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.ModbusRegisterInfo;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces.ModbusNetwork;
+import it.polito.elite.domotics.dog2.modbusnetworkdriver.protocol.ModbusProtocolVariant;
 
 import java.net.InetAddress;
 import java.util.Collections;
@@ -643,6 +644,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		// get the register gateway address
 		InetAddress gwAddress = register.getGatewayIPAddress();
 		String gwPortAsString = register.getGatewayPort();
+		ModbusProtocolVariant gwProtocolVariant = ModbusProtocolVariant.valueOf(register.getGatewayProtocol());
 		
 		int gwPort = Modbus.DEFAULT_PORT;
 		try
@@ -684,7 +686,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		// handle the modbus connection
 		if (!this.connectionPool.containsKey(gwAddress))
 		{
-			this.openTCPConnection(gwAddress, gwPort);
+			this.openConnection(gwAddress, gwPort, gwProtocolVariant);
 		}
 		
 		// add the register entry
@@ -768,7 +770,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	 * @param gwAddress
 	 * @return
 	 */
-	private void openTCPConnection(final InetAddress gwAddress, final int gwPort)
+	private void openConnection(final InetAddress gwAddress, final int gwPort, final ModbusProtocolVariant gwProtocol)
 	{
 		if (!this.connectionPool.containsKey(gwAddress))
 		{
@@ -802,7 +804,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 						@Override
 						public void run()
 						{
-							openTCPConnection(gwAddress, gwPort);
+							openConnection(gwAddress, gwPort, gwProtocol);
 						}
 					}, this.betweenTrialTimeMillis);
 					
@@ -830,7 +832,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	 * @param gwAddress
 	 * @return
 	 */
-	private void closeAndReOpen(final InetAddress gwAddress, final int gwPort)
+	private void closeAndReOpen(final InetAddress gwAddress, final int gwPort, final ModbusProtocolVariant gwProtocol)
 	{
 		TCPMasterConnection connection = this.connectionPool.get(gwAddress);
 		
@@ -845,7 +847,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 			@Override
 			public void run()
 			{
-				openTCPConnection(gwAddress, gwPort);
+				openConnection(gwAddress, gwPort, gwProtocol);
 			}
 		}, this.betweenTrialTimeMillis);
 	}

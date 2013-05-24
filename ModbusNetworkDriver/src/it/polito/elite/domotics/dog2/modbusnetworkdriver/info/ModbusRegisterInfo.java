@@ -32,6 +32,9 @@ public class ModbusRegisterInfo
 	// the modbus port exposed by the gateway
 	private String gatewayPort;
 	
+	// the protocol variant used by the gateway
+	private String gatewayProtocol;
+	
 	// the slave ID of a specific device when connected to the given gateway
 	private int slaveId;
 	
@@ -216,7 +219,21 @@ public class ModbusRegisterInfo
 	{
 		return gatewayPort;
 	}
-	
-	
+
+	/**
+	 * @return the gatewayProtocol
+	 */
+	public String getGatewayProtocol()
+	{
+		return gatewayProtocol;
+	}
+
+	/**
+	 * @param gatewayProtocol the gatewayProtocol to set
+	 */
+	public void setGatewayProtocol(String gatewayProtocol)
+	{
+		this.gatewayProtocol = gatewayProtocol;
+	}
 		
 }

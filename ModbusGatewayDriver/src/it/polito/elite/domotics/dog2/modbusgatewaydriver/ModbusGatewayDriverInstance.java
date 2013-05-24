@@ -35,10 +35,10 @@ public class ModbusGatewayDriverInstance extends ModbusDriver implements ModbusG
 	// the log identifier, unique for the class
 	public static String logId = "[ModbusGatewayDriverInstance]: ";
 
-	public ModbusGatewayDriverInstance(ModbusNetwork network, ControllableDevice controllableDevice, String gatewayAddress, String gatewayPort,
+	public ModbusGatewayDriverInstance(ModbusNetwork network, ControllableDevice controllableDevice, String gatewayAddress, String gatewayPort, String protocolVariant,
 			BundleContext context)
 	{
-		super(network, controllableDevice, gatewayAddress, gatewayPort);
+		super(network, controllableDevice, gatewayAddress, gatewayPort, protocolVariant);
 		
 		// create a logger
 		this.logger = new DogLogInstance(context);

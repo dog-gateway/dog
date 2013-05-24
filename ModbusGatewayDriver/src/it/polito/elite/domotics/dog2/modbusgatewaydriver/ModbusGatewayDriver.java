@@ -140,7 +140,7 @@ public class ModbusGatewayDriver implements Driver// ,
 		this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
 		this.regModbusGateway = this.context.registerService(ModbusGatewayDriver.class.getName(), this, null);
 	}
-		
+	
 	public void removedService(ModbusNetwork networkDriver)
 	{
 		// unregisters this driver from the OSGi framework
@@ -175,19 +175,20 @@ public class ModbusGatewayDriver implements Driver// ,
 		return matchValue;
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public String attach(ServiceReference reference) throws Exception
 	{
 		// get the corresponding end point set
-		@SuppressWarnings("unchecked")
 		Set<String> gatewayAddressSet = ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
 				.getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_ADDRESS);
-		@SuppressWarnings("unchecked")
+		
 		Set<String> gatewayPortSet = ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
 				.getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_PORT);
 		
-		@SuppressWarnings("unchecked")
+		Set<String> gatewayProtocolSet = ((ControllableDevice) this.context.getService(reference))
+				.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.PROTO_ID);
+		
 		String deviceId = ((ControllableDevice) this.context.getService(reference)).getDeviceId();
 		
 		// if not null, it is a singleton
@@ -201,14 +202,18 @@ public class ModbusGatewayDriver implements Driver// ,
 			if ((gatewayPortSet != null) && (!gatewayPortSet.isEmpty()))
 				gatewayPort = gatewayPortSet.iterator().next();
 			
+			// get the gateway protocol if exists
+			String gatewayProtocol = "";
+			if ((gatewayProtocolSet != null) && (!gatewayProtocolSet.isEmpty()))
+				gatewayProtocol = gatewayProtocolSet.iterator().next();
+			
 			// check not null
 			if ((gatewayAddress != null) && (!gatewayAddress.isEmpty()) && !this.isGatewayAvailable(deviceId))
 			{
 				// create a new instance of the gateway driver
-				@SuppressWarnings("unchecked")
 				ModbusGatewayDriverInstance driver = new ModbusGatewayDriverInstance(this.network,
 						(ControllableDevice) this.context.getService(reference), gatewayAddress, gatewayPort,
-						this.context);
+						gatewayProtocol, this.context);
 				
 				synchronized (this.connectedGateways)
 				{

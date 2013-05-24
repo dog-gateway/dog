@@ -34,6 +34,9 @@ public class ModbusInfo
 	// the gateway port
 	public static String GATEWAY_PORT = "port";
 	
+	// the gateway variant
+	public static String PROTO_ID = "protocolVariant";
+	
 	// the register address
 	public static String REGISTER_ADDRESS = "registerAddress";
 	
