@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ModbusGatewayDriver
+Bundle-SymbolicName: ModbusGatewayDriver
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.osgi.framework;version="1.3.0"
+Require-Bundle: Dog2Library;bundle-version="2.2.4",
+ osgi.cmpn;bundle-version="4.2.0",
+ DogOntLibrary;bundle-version="2.1.1",
+ ModbusNetworkDriver;bundle-version="1.0.0"
+Export-Package: it.polito.elite.domotics.dog2.modbusgatewaydriver
+Service-Component: OSGI-INF/component.xml
+Bundle-ActivationPolicy: lazy
