@@ -20,6 +20,7 @@ import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.ModbusInfo;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.CmdNotificationInfo;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.ModbusRegisterInfo;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces.ModbusNetwork;
+import it.polito.elite.domotics.dog2.modbusnetworkdriver.protocol.ModbusProtocolVariant;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.regxlators.RegXlator;
 
 import java.net.InetAddress;
@@ -105,7 +106,7 @@ public abstract class ModbusDriver implements DogDriver
 		this.gwPort = gatewayPort;
 		
 		// store the protocol type for the gateway
-		this.gwProtocol = gatewayProtocol;
+		this.gwProtocol = (gatewayProtocol!=null)? gatewayProtocol : ModbusProtocolVariant.TCP.toString();
 		
 		// create the map needed to associate datapoints to notifications
 		this.register2Notification = new ConcurrentHashMap<ModbusRegisterInfo, Set<CmdNotificationInfo>>();
@@ -275,6 +276,9 @@ public abstract class ModbusDriver implements DogDriver
 				
 				//fill the register gateway port
 				register.setGatewayPort(this.gwPort);
+				
+				//fill the protocol variant associated to the gateway
+				register.setGatewayProtocol(this.gwProtocol);
 				
 				//fill the slave id
 				register.setSlaveId(Integer.valueOf(registerSlaveId));

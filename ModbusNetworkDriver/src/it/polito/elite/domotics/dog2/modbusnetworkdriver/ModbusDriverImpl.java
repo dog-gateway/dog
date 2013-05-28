@@ -30,10 +30,16 @@ import net.wimpi.modbus.Modbus;
 import net.wimpi.modbus.ModbusException;
 import net.wimpi.modbus.ModbusIOException;
 import net.wimpi.modbus.ModbusSlaveException;
+import net.wimpi.modbus.io.ModbusRTUTCPTransaction;
 import net.wimpi.modbus.io.ModbusTCPTransaction;
+import net.wimpi.modbus.io.ModbusTransaction;
+import net.wimpi.modbus.io.ModbusUDPTransaction;
 import net.wimpi.modbus.msg.ModbusRequest;
 import net.wimpi.modbus.msg.ModbusResponse;
+import net.wimpi.modbus.net.MasterConnection;
+import net.wimpi.modbus.net.RTUTCPMasterConnection;
 import net.wimpi.modbus.net.TCPMasterConnection;
+import net.wimpi.modbus.net.UDPMasterConnection;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -91,16 +97,18 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	private ModbusPoller poller;
 	
 	// the modbus connection pool
-	private Map<InetAddress, TCPMasterConnection> connectionPool;
+	private Map<InetAddress, MasterConnection> connectionPool;
 	
 	public ModbusDriverImpl()
 	{
-		//empty wait for a call to the activate method
+		// empty wait for a call to the activate method
 	}
+	
 	/**
 	 * Called when the bundle is activated
 	 * 
-	 * @param bundleContext the OSGi context associated to the bundle
+	 * @param bundleContext
+	 *            the OSGi context associated to the bundle
 	 */
 	public void activate(BundleContext bundleContext)
 	{
@@ -123,10 +131,10 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		this.gatewayAddress2Registers = new ConcurrentHashMap<InetAddress, Set<ModbusRegisterInfo>>();
 		
 		// create the connection pool (one per gateway address)
-		this.connectionPool = new ConcurrentHashMap<InetAddress, TCPMasterConnection>();
+		this.connectionPool = new ConcurrentHashMap<InetAddress, MasterConnection>();
 		
 		// register this bundle as a service that must be configured.
-		//this.registerManagedService();
+		// this.registerManagedService();
 	}
 	
 	/**
@@ -134,21 +142,24 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	 */
 	public void deactivate()
 	{
-		//log
-		this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId+"Deactivated...");
+		// log
+		this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId + "Deactivated...");
 		this.unRegister();
 	}
 	
 	/**
 	 * Register this class as a Managed Service
 	 */
-	/*private void registerManagedService()
-	{
-		Hashtable<String, Object> propManagedService = new Hashtable<String, Object>();
-		propManagedService.put(Constants.SERVICE_PID, this.bundleContext.getBundle().getSymbolicName());
-		this.bundleContext.registerService(ManagedService.class.getName(), this, propManagedService);
-		
-	}*/
+	/*
+	 * private void registerManagedService() { Hashtable<String, Object>
+	 * propManagedService = new Hashtable<String, Object>();
+	 * propManagedService.put(Constants.SERVICE_PID,
+	 * this.bundleContext.getBundle().getSymbolicName());
+	 * this.bundleContext.registerService(ManagedService.class.getName(), this,
+	 * propManagedService);
+	 * 
+	 * }
+	 */
 	
 	/*
 	 * (non-Javadoc)
@@ -338,9 +349,28 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	{
 		// prepare the TCP connection to the gateway offering access to the
 		// given register
-		TCPMasterConnection modbusTCPConnection = this.connectionPool.get(register.getGatewayIPAddress());
+		MasterConnection modbusConnection = this.connectionPool.get(register.getGatewayIPAddress());
 		
-		if (modbusTCPConnection.isConnected())
+		// get the gateway port
+		String gwPortAsString = register.getGatewayPort();
+		
+		// handle the port using defaults
+		int gwPort = Modbus.DEFAULT_PORT;
+		
+		try
+		{
+			gwPort = Integer.valueOf(gwPortAsString);
+		}
+		catch (NumberFormatException e)
+		{
+			// reset to the default
+			gwPort = Modbus.DEFAULT_PORT;
+		}
+		
+		// parse the protocol variant
+		ModbusProtocolVariant variant = ModbusProtocolVariant.valueOf(register.getGatewayProtocol());
+		
+		if (modbusConnection.isConnected())
 		{
 			// successfully connected
 			this.logger.log(LogService.LOG_DEBUG, ModbusDriverImpl.logId
@@ -353,11 +383,8 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 			// set the slave id associated to the given register
 			readRequest.setUnitID(register.getSlaveId());
 			
-			// create a modbus tcp transaction for the just created writeRequest
-			ModbusTCPTransaction transaction = new ModbusTCPTransaction(readRequest);
-			
-			// attach the transaction to the given connection
-			transaction.setConnection(modbusTCPConnection);
+			// create a modbus transaction for the just created readRequest
+			ModbusTransaction transaction = this.getTransaction(readRequest, modbusConnection, variant);
 			
 			// try to execute the transaction and manage possible errors...
 			try
@@ -402,24 +429,11 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		}
 		else
 		{
-			String gwPortAsString = register.getGatewayPort();
-			
-			int gwPort = Modbus.DEFAULT_PORT;
-			;
-			try
-			{
-				gwPort = Integer.valueOf(gwPortAsString);
-			}
-			catch (NumberFormatException e)
-			{
-				// reset to the default
-				gwPort = Modbus.DEFAULT_PORT;
-			}
-			
 			// info on port usage
 			this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId + "Using port: " + gwPort);
 			
-			this.closeAndReOpen(register.getGatewayIPAddress(), gwPort);
+			// close and re-open
+			this.closeAndReOpen(register.getGatewayIPAddress(), gwPort, variant);
 		}
 	}
 	
@@ -441,13 +455,31 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 			// the same for all registers...
 			ModbusRegisterInfo mInfo = registers.iterator().next();
 			InetAddress gwAddress = mInfo.getGatewayIPAddress();
+			
+			// get the gateway port
 			String gwPortAsString = mInfo.getGatewayPort();
+			
+			// handle the port using defaults
+			int gwPort = Modbus.DEFAULT_PORT;
+			
+			try
+			{
+				gwPort = Integer.valueOf(gwPortAsString);
+			}
+			catch (NumberFormatException e)
+			{
+				// reset to the default
+				gwPort = Modbus.DEFAULT_PORT;
+			}
+			
+			// parse the protocol variant
+			ModbusProtocolVariant variant = ModbusProtocolVariant.valueOf(mInfo.getGatewayProtocol());
 			
 			// prepare the TCP connection to the gateway offering access to the
 			// given register
-			TCPMasterConnection modbusTCPConnection = this.connectionPool.get(gwAddress);
+			MasterConnection modbusConnection = this.connectionPool.get(gwAddress);
 			
-			if (modbusTCPConnection.isConnected())
+			if (modbusConnection.isConnected())
 			{
 				// successfully connected
 				this.logger.log(LogService.LOG_DEBUG, ModbusDriverImpl.logId
@@ -465,11 +497,8 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 						readRequest.setUnitID(register.getSlaveId());
 						
 						// create a modbus tcp transaction for the just created
-						// writeRequest
-						ModbusTCPTransaction transaction = new ModbusTCPTransaction(readRequest);
-						
-						// attach the transaction to the given connection
-						transaction.setConnection(modbusTCPConnection);
+						// readRequest
+						ModbusTransaction transaction = this.getTransaction(readRequest, modbusConnection, variant);
 						
 						// try to execute the transaction and manage possible
 						// errors...
@@ -503,7 +532,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 									+ e);
 							
 							// close the connection
-							modbusTCPConnection.close();
+							modbusConnection.close();
 						}
 						catch (ModbusSlaveException e)
 						{
@@ -511,7 +540,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 							this.logger.log(LogService.LOG_ERROR, ModbusDriverImpl.logId
 									+ "Error on Modbus Slave, for register " + register + "\nException: " + e);
 							// close the connection
-							modbusTCPConnection.close();
+							modbusConnection.close();
 						}
 						catch (ModbusException e)
 						{
@@ -519,33 +548,22 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 							this.logger.log(LogService.LOG_ERROR, ModbusDriverImpl.logId
 									+ "Error on Modbus while reading register " + register + "\nException: " + e);
 							// close the connection
-							modbusTCPConnection.close();
+							modbusConnection.close();
 						}
 						
 						// stop this polling cycle if the connection is closed
-						if (!modbusTCPConnection.isConnected())
+						if (!modbusConnection.isConnected())
 							break;
 					}
 				}
 			}
 			else
-			{			
-				int gwPort = Modbus.DEFAULT_PORT;
-
-				try
-				{
-					gwPort = Integer.valueOf(gwPortAsString);
-				}
-				catch (NumberFormatException e)
-				{
-					// reset to the default
-					gwPort = Modbus.DEFAULT_PORT;
-				}
-				
+			{
 				// info on port usage
 				this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId + "Using port: " + gwPort);
 				
-				this.closeAndReOpen(gwAddress, gwPort);
+				// close and re-open
+				this.closeAndReOpen(gwAddress, gwPort, variant);
 			}
 		}
 		
@@ -564,9 +582,28 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	{
 		// prepare the TCP connection to the gateway offering access to the
 		// given register
-		TCPMasterConnection modbusTCPConnection = this.connectionPool.get(register.getGatewayIPAddress());
+		MasterConnection modbusConnection = this.connectionPool.get(register.getGatewayIPAddress());
 		
-		if (modbusTCPConnection.isConnected())
+		// get the gateway port
+		String gwPortAsString = register.getGatewayPort();
+		
+		// handle the port using defaults
+		int gwPort = Modbus.DEFAULT_PORT;
+		
+		try
+		{
+			gwPort = Integer.valueOf(gwPortAsString);
+		}
+		catch (NumberFormatException e)
+		{
+			// reset to the default
+			gwPort = Modbus.DEFAULT_PORT;
+		}
+		
+		// parse the protocol variant
+		ModbusProtocolVariant variant = ModbusProtocolVariant.valueOf(register.getGatewayProtocol());
+		
+		if (modbusConnection.isConnected())
 		{
 			// successfully connected
 			this.logger.log(LogService.LOG_DEBUG, ModbusDriverImpl.logId
@@ -577,10 +614,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 			writeRequest.setTransactionID(1);
 			
 			// create a modbus tcp transaction for the just created writeRequest
-			ModbusTCPTransaction transaction = new ModbusTCPTransaction(writeRequest);
-			
-			// attach the transaction to the given connection
-			transaction.setConnection(modbusTCPConnection);
+			ModbusTransaction transaction = this.getTransaction(writeRequest, modbusConnection, variant);
 			
 			// try to execute the transaction and manage possible errors...
 			try
@@ -608,24 +642,12 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		}
 		else
 		{
-			String gwPortAsString = register.getGatewayPort();
-			
-			int gwPort = Modbus.DEFAULT_PORT;
-
-			try
-			{
-				gwPort = Integer.valueOf(gwPortAsString);
-			}
-			catch (NumberFormatException e)
-			{
-				// reset to the default
-				gwPort = Modbus.DEFAULT_PORT;
-			}
 			
 			// info on port usage
 			this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId + "Using port: " + gwPort);
 			
-			this.closeAndReOpen(register.getGatewayIPAddress(), gwPort);
+			// close and re-open
+			this.closeAndReOpen(register.getGatewayIPAddress(), gwPort, variant);
 		}
 	}
 	
@@ -774,54 +796,96 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	{
 		if (!this.connectionPool.containsKey(gwAddress))
 		{
-			TCPMasterConnection connection = new TCPMasterConnection(gwAddress);
-			connection.setPort(gwPort);
+			// handle the connection type
+			MasterConnection connection = null;
 			
-			// connect to the gateway
-			try
+			switch (gwProtocol)
 			{
-				connection.connect();
-				
-			}
-			catch (Exception e)
-			{
-				// log the connection error
-				this.logger.log(LogService.LOG_ERROR, ModbusDriverImpl.logId
-						+ "Unable to connect to the Modbus TCP Slave with Address: " + gwAddress + "\nException: " + e);
-				
-				if ((this.trialsDone < this.nConnectionTrials) || (this.nConnectionTrials == 0))
+				case TCP:
 				{
-					// log a warning
-					this.logger.log(LogService.LOG_WARNING, ModbusDriverImpl.logId
-							+ "Unable to connect to the given KNX gateway, retrying in " + this.betweenTrialTimeMillis
-							+ " ms");
-					// schedule a new timer to re-call the open function after
-					// the
-					// given trial timeout...
-					connectionTrialsTimer = new Timer();
-					connectionTrialsTimer.schedule(new TimerTask() {
-						
-						@Override
-						public void run()
-						{
-							openConnection(gwAddress, gwPort, gwProtocol);
-						}
-					}, this.betweenTrialTimeMillis);
+					// create the ModbusTCP connection
+					connection = new TCPMasterConnection(gwAddress);
 					
-					// avoid incrementing the number of trials if the
-					// nConnectionTrials is equal to 0 (i.e. infinite re-trial)
-					if (this.nConnectionTrials != 0)
-						this.trialsDone++;
+					// set the port
+					((TCPMasterConnection) connection).setPort(gwPort);
+					
+					break;
 				}
-				else
+				case RTU_TCP:
 				{
-					// log a fatal error
-					this.logger.log(LogService.LOG_ERROR, ModbusDriverImpl.logId
-							+ "Unable to connect to the given KNX gateway");
+					// create the ModbusRTUoverTCP connection
+					connection = new RTUTCPMasterConnection(gwAddress, gwPort);
+					
+					break;
+				}
+				case RTU_UDP:
+				{
+					// create the ModbusRTUoverUDP connection
+					connection = new UDPMasterConnection(gwAddress);
+					((UDPMasterConnection) connection).setPort(gwPort);
+					
+					break;
 				}
 			}
 			
-			this.connectionPool.put(gwAddress, connection);
+			// if not null, otherwise the protocol is not supported
+			if (connection != null)
+			{
+				// connect to the gateway
+				try
+				{
+					connection.connect();
+					
+				}
+				catch (Exception e)
+				{
+					// log the connection error
+					this.logger.log(LogService.LOG_ERROR, ModbusDriverImpl.logId
+							+ "Unable to connect to the Modbus TCP Slave with Address: " + gwAddress + "\nException: "
+							+ e);
+					
+					if ((this.trialsDone < this.nConnectionTrials) || (this.nConnectionTrials == 0))
+					{
+						// log a warning
+						this.logger.log(LogService.LOG_WARNING, ModbusDriverImpl.logId
+								+ "Unable to connect to the given Modbus gateway, retrying in "
+								+ this.betweenTrialTimeMillis + " ms");
+						// schedule a new timer to re-call the open function
+						// after
+						// the
+						// given trial timeout...
+						connectionTrialsTimer = new Timer();
+						connectionTrialsTimer.schedule(new TimerTask() {
+							
+							@Override
+							public void run()
+							{
+								openConnection(gwAddress, gwPort, gwProtocol);
+							}
+						}, this.betweenTrialTimeMillis);
+						
+						// avoid incrementing the number of trials if the
+						// nConnectionTrials is equal to 0 (i.e. infinite
+						// re-trial)
+						if (this.nConnectionTrials != 0)
+							this.trialsDone++;
+					}
+					else
+					{
+						// log a fatal error
+						this.logger.log(LogService.LOG_ERROR, ModbusDriverImpl.logId
+								+ "Unable to connect to the given Modbus gateway");
+					}
+				}
+				
+				this.connectionPool.put(gwAddress, connection);
+			}
+		}
+		else
+		{
+			// log a fatal error
+			this.logger.log(LogService.LOG_ERROR, ModbusDriverImpl.logId + "Protocol variant not supported: "
+					+ gwProtocol.toString());
 		}
 	}
 	
@@ -834,7 +898,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	 */
 	private void closeAndReOpen(final InetAddress gwAddress, final int gwPort, final ModbusProtocolVariant gwProtocol)
 	{
-		TCPMasterConnection connection = this.connectionPool.get(gwAddress);
+		MasterConnection connection = this.connectionPool.get(gwAddress);
 		
 		if ((connection != null) && (!connection.isConnected()))
 			connection.close();
@@ -850,5 +914,48 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 				openConnection(gwAddress, gwPort, gwProtocol);
 			}
 		}, this.betweenTrialTimeMillis);
+	}
+	
+	private ModbusTransaction getTransaction(ModbusRequest request, MasterConnection connection,
+			ModbusProtocolVariant protocol)
+	{
+		ModbusTransaction transaction = null;
+		// handle protocol variants
+		switch (protocol)
+		{
+			case TCP:
+			{
+				// create a modbus tcp transaction for the given request
+				transaction = new ModbusTCPTransaction(request);
+				
+				// attach the transaction to the given connection
+				((ModbusTCPTransaction) transaction).setConnection((TCPMasterConnection) connection);
+				
+				break;
+			}
+			case RTU_TCP:
+			{
+				// create a modbus RTU over TCP transaction for the given
+				// request
+				transaction = new ModbusRTUTCPTransaction(request);
+				
+				// attach the transaction to the given connection
+				((ModbusRTUTCPTransaction) transaction).setConnection((RTUTCPMasterConnection) connection);
+				
+				break;
+			}
+			case RTU_UDP:
+			{
+				// create a modbus RTU over TCP transaction for the given
+				// request
+				transaction = new ModbusUDPTransaction((UDPMasterConnection) connection);
+				
+				// attach the transaction to the given connection
+				((ModbusUDPTransaction) transaction).setRequest(request);
+			}
+		}
+		
+		// return the created transaction
+		return transaction;
 	}
 }

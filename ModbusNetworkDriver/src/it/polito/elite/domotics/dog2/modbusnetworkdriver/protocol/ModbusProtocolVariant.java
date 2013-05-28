@@ -22,7 +22,7 @@ package it.polito.elite.domotics.dog2.modbusnetworkdriver.protocol;
 public enum ModbusProtocolVariant
 {
 	TCP,
-	RTU,
+	//RTU,
 	RTU_TCP,
 	RTU_UDP
 }

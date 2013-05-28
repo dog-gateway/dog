@@ -50,8 +50,12 @@ public class RegXlatorTypes
 	// the already defined types
 	public static int TYPE_BOOLEAN_COIL = 0;
 	public static int TYPE_2BYTE_INTEGER_HOLDING = 2;
+	public static int TYPE_4BYTE_INTEGER_HOLDING_BE = 3;
 	public static int TYPE_4BYTE_INTEGER_HOLDING = 4;
+	public static int TYPE_4BYTE_FLOAT_HOLDING = 5;
 	public static int TYPE_4BYTE_FLOAT_INPUT = 6;
+	public static int TYPE_4BYTE_INTEGER_INPUT = 7;
+	
 	
 	// the class for representing RegXlators and corresponding IDs
 	private static ConcurrentHashMap<Integer, RegXlatorType> types = new ConcurrentHashMap<Integer, RegXlatorType>();
@@ -60,10 +64,16 @@ public class RegXlatorTypes
 	{
 		types.put(TYPE_4BYTE_INTEGER_HOLDING, new RegXlatorType(TYPE_4BYTE_INTEGER_HOLDING, RegXlator4ByteIntegerHolding.class,
 				"Register value translator for 4 Bytes unsigned registers"));
+		types.put(TYPE_4BYTE_INTEGER_HOLDING_BE, new RegXlatorType(TYPE_4BYTE_INTEGER_HOLDING_BE, RegXlator4ByteIntegerHoldingBE.class,
+				"Register value translator for 4 Bytes unsigned registers"));
+		types.put(TYPE_4BYTE_FLOAT_HOLDING, new RegXlatorType(TYPE_4BYTE_FLOAT_HOLDING, RegXlator4ByteFloatHolding.class,
+				"Register value translator for 4 Bytes float holding registers"));
 		types.put(TYPE_BOOLEAN_COIL, new RegXlatorType(TYPE_BOOLEAN_COIL, RegXlatorBooleanCoil.class,
 				"Register value translator for coil registers"));
 		types.put(TYPE_4BYTE_FLOAT_INPUT, new RegXlatorType(TYPE_4BYTE_FLOAT_INPUT, RegXlator4ByteFloatInput.class,
 				"Register value translator for 4 Bytes float input registers"));
+		types.put(TYPE_4BYTE_INTEGER_INPUT, new RegXlatorType(TYPE_4BYTE_INTEGER_INPUT, RegXlator4ByteIntegerInput.class,
+				"Register value translator for 4 Bytes integer input registers"));
 	}
 	
 	/**
