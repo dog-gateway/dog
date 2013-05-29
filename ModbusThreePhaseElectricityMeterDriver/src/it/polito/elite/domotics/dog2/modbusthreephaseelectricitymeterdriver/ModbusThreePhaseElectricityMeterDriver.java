@@ -24,20 +24,22 @@ import java.util.Vector;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
+//import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
+//import org.osgi.util.tracker.ServiceTracker;
+//import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author bonino
  * 
  */
-public class ModbusThreePhaseElectricityMeterDriver implements Driver, ServiceTrackerCustomizer<Object, Object>
+public class ModbusThreePhaseElectricityMeterDriver implements Driver// ,
+																		// ServiceTrackerCustomizer<Object,
+																		// Object>
 {
 	// The OSGi framework context
 	protected BundleContext context;
@@ -78,6 +80,7 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver, ServiceTr
 	{
 		
 	}
+	
 	public void activate(BundleContext context)
 	{
 		// init the logger
@@ -89,23 +92,21 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver, ServiceTr
 		// initialize the connected drivers list
 		this.connectedDrivers = new Vector<ModbusThreePhaseElectricityMeterDriverInstance>();
 		
+		//try to register the service
+		this.register();
+		
 		// start the service tracker...
-		try
-		{
-			// create the service tracker
-			ServiceTracker<?,?> st = new ServiceTracker<Object, Object>(context, this.context.createFilter(filterQuery), this);
-			
-			// open the tracker
-			st.open();
-		}
-		catch (InvalidSyntaxException e)
-		{
-			this.logger
-					.log(LogService.LOG_ERROR,
-							ModbusThreePhaseElectricityMeterDriver.logId
-									+ " wrong syntax in the LDAP filter specified for getting an instance of ModbusNetwork and of ModbusGatewayDriver\nNested Exception: ",
-							e);
-		}
+		/*
+		 * try { // create the service tracker ServiceTracker<?,?> st = new
+		 * ServiceTracker<Object, Object>(context,
+		 * this.context.createFilter(filterQuery), this);
+		 * 
+		 * // open the tracker st.open(); } catch (InvalidSyntaxException e) {
+		 * this.logger .log(LogService.LOG_ERROR,
+		 * ModbusThreePhaseElectricityMeterDriver.logId +
+		 * " wrong syntax in the LDAP filter specified for getting an instance of ModbusNetwork and of ModbusGatewayDriver\nNested Exception: "
+		 * , e); }
+		 */
 	}
 	
 	public void deactivate()
@@ -113,32 +114,82 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver, ServiceTr
 		this.unRegister();
 	}
 	
-	@Override
-	public Object addingService(ServiceReference<Object> reference)
+	/**
+	 * Handles the "availability" of a Modbus network driver (store a reference
+	 * to the driver and try to start).
+	 * 
+	 * @param netDriver
+	 *            The available {@link ModbusNetwork} driver service.
+	 */
+	public void addedNetworkDriver(ModbusNetwork netDriver)
 	{
-		// chek the reference type
-		this.gateway = (ModbusGatewayDriver) this.context.getService(reference);
+		// store a reference to the network driver
+		this.network = netDriver;
 		
-		this.network = this.gateway.getNetwork();
-		if ((this.gateway != null) && (this.network != null))
-			this.register();
-		
-		return null;
+		// try to start service offering
+		this.register();
 	}
 	
-	@Override
-	public void modifiedService(ServiceReference<Object> reference, Object service)
+	/**
+	 * Handles the removal of the connected network driver by unregistering the
+	 * services provided by this driver
+	 */
+	public void removedNetworkDriver()
 	{
-		// empty - modification of tracked services are not handled
-	}
-	
-	@Override
-	public void removedService(ServiceReference<Object> reference, Object service)
-	{
-		// remove the service from the OSGi framework
+		// un-register this service
 		this.unRegister();
+		
+		// null the reference to the network driver
+		this.network = null;
 	}
 	
+	/**
+	 * Handles the "availability" of a Modbus gateway driver (store a reference
+	 * to the driver and try to start).
+	 * 
+	 * @param gwDriver
+	 *            The available {@link ModbusGatewayDriver} service.
+	 */
+	public void addedGatewayDriver(ModbusGatewayDriver gwDriver)
+	{
+		// store a reference to the gateway driver
+		this.gateway = gwDriver;
+		
+		// try to start service offering
+		this.register();
+	}
+	
+	/**
+	 * Handles the removal of the connected network driver by unregistering the
+	 * services provided by this driver
+	 */
+	public void removedGatewayDriver()
+	{
+		// un-register this service
+		this.unRegister();
+		
+		// null the reference to the network driver
+		this.gateway = null;
+	}
+	
+	/*
+	 * @Override public Object addingService(ServiceReference<Object> reference)
+	 * { // chek the reference type this.gateway = (ModbusGatewayDriver)
+	 * this.context.getService(reference);
+	 * 
+	 * this.network = this.gateway.getNetwork(); if ((this.gateway != null) &&
+	 * (this.network != null)) this.register();
+	 * 
+	 * return null; }
+	 * 
+	 * @Override public void modifiedService(ServiceReference<Object> reference,
+	 * Object service) { // empty - modification of tracked services are not
+	 * handled }
+	 * 
+	 * @Override public void removedService(ServiceReference<Object> reference,
+	 * Object service) { // remove the service from the OSGi framework
+	 * this.unRegister(); }
+	 */
 	@SuppressWarnings("rawtypes")
 	@Override
 	public int match(ServiceReference reference) throws Exception
@@ -164,7 +215,7 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver, ServiceTr
 					&& (manifacturer.equals(ModbusInfo.MANUFACTURER))
 					&& (deviceCategory.equals(ThreePhaseElectricityMeter.class.getName()) && (this.gateway
 							.isGatewayAvailable(gateway))
-
+					
 					))
 			{
 				matchValue = ThreePhaseElectricityMeter.MATCH_MANUFACTURER + ThreePhaseElectricityMeter.MATCH_TYPE;
@@ -185,9 +236,10 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver, ServiceTr
 		// create a new driver instance
 		ModbusThreePhaseElectricityMeterDriverInstance driverInstance = new ModbusThreePhaseElectricityMeterDriverInstance(
 				network, (ControllableDevice) this.context.getService(reference), this.gateway.getSpecificGateway(
-						gateway).getGatewayAddress(), this.gateway.getSpecificGateway(gateway).getGatewayPort(), this.gateway.getSpecificGateway(gateway).getGwProtocol(), this.context);
+						gateway).getGatewayAddress(), this.gateway.getSpecificGateway(gateway).getGatewayPort(),
+				this.gateway.getSpecificGateway(gateway).getGwProtocol(), this.context);
 		
-		((ControllableDevice)context.getService(reference)).setDriver(driverInstance);
+		((ControllableDevice) context.getService(reference)).setDriver(driverInstance);
 		
 		synchronized (this.connectedDrivers)
 		{
@@ -202,14 +254,17 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver, ServiceTr
 	 */
 	private void register()
 	{
-		// create a new property object describing this driver
-		Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-		
-		// add the id of this driver to the properties
-		propDriver.put(DogDeviceCostants.DRIVER_ID, "Modbus_ModbusThreePhaseElectricityMeter_driver");
-		
-		// register this driver in the OSGi framework
-		this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
+		if ((this.network != null) && (this.gateway != null) && (this.context != null) && (this.regDriver == null))
+		{
+			// create a new property object describing this driver
+			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
+			
+			// add the id of this driver to the properties
+			propDriver.put(DogDeviceCostants.DRIVER_ID, "Modbus_ModbusThreePhaseElectricityMeter_driver");
+			
+			// register this driver in the OSGi framework
+			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
+		}
 		
 	}
 	
