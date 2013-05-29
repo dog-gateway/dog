@@ -11,14 +11,13 @@
  */
 package it.polito.elite.domotics.dog2.modbusthreephaseelectricitymeterdriver;
 
-import it.polito.elite.domotics.model.DeviceStatus;
 import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.dog2.doglibrary.util.PhaseTriple;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.ModbusDriver;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.CmdNotificationInfo;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.ModbusRegisterInfo;
 import it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces.ModbusNetwork;
+import it.polito.elite.domotics.model.DeviceStatus;
 import it.polito.elite.domotics.model.devicecategory.ThreePhaseElectricityMeter;
 import it.polito.elite.domotics.model.notification.FrequencyMeasurementNotification;
 import it.polito.elite.domotics.model.notification.SinglePhaseActiveEnergyMeasurementNotification;
@@ -38,8 +37,19 @@ import it.polito.elite.domotics.model.state.ThreePhaseApparentPowerMeasurementSt
 import it.polito.elite.domotics.model.state.ThreePhaseCurrentState;
 import it.polito.elite.domotics.model.state.ThreePhaseReactivePowerMeasurementState;
 import it.polito.elite.domotics.model.state.ThreePhaseVoltageState;
+import it.polito.elite.domotics.model.statevalue.ActiveEnergyStateValue;
+import it.polito.elite.domotics.model.statevalue.ActivePowerStateValue;
+import it.polito.elite.domotics.model.statevalue.ApparentPowerStateValue;
+import it.polito.elite.domotics.model.statevalue.CurrentStateValue;
+import it.polito.elite.domotics.model.statevalue.FrequencyStateValue;
+import it.polito.elite.domotics.model.statevalue.PowerFactorStateValue;
+import it.polito.elite.domotics.model.statevalue.ReactiveEnergyStateValue;
+import it.polito.elite.domotics.model.statevalue.ReactivePowerStateValue;
+import it.polito.elite.domotics.model.statevalue.StateValue;
+import it.polito.elite.domotics.model.statevalue.VoltageStateValue;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.measure.DecimalMeasure;
@@ -85,41 +95,40 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public Measure<?, ?> getReactiveEnergyValue()
 	{
 		return (Measure<?, ?>) this.currentState.getState(SinglePhaseReactiveEnergyState.class.getName())
-				.getCurrentState();
+				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getReactivePower(String phaseID)
 	{
-		return (Measure<?, ?>) ((PhaseTriple) this.currentState.getState(
-				ThreePhaseReactivePowerMeasurementState.class.getName()).getCurrentState()).getL(phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseReactivePowerMeasurementState.class.getName(), phaseID);
 	}
 	
 	@Override
 	public Measure<?, ?> getFrequency()
 	{
-		return (Measure<?, ?>) this.currentState.getState(FrequencyMeasurementState.class.getName()).getCurrentState();
+		return (Measure<?, ?>) this.currentState.getState(FrequencyMeasurementState.class.getName())
+				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getPowerFactor()
 	{
 		return (Measure<?, ?>) this.currentState.getState(PowerFactorMeasurementState.class.getName())
-				.getCurrentState();
+				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getActiveEnergyValue()
 	{
 		return (Measure<?, ?>) this.currentState.getState(SinglePhaseActiveEnergyState.class.getName())
-				.getCurrentState();
+				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getLNVoltageValue(String phaseID)
 	{
-		return (Measure<?, ?>) ((PhaseTriple) this.currentState.getState(ThreePhaseVoltageState.class.getName())
-				.getCurrentState()).getL(phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseVoltageState.class.getName(), phaseID);
 	}
 	
 	@Override
@@ -128,29 +137,25 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		// TODO: fix this....
 		String phaseID = phaseID1 + phaseID2.substring(1);
 		
-		return (Measure<?, ?>) ((PhaseTriple) this.currentState.getState(ThreePhaseVoltageState.class.getName() + "LL")
-				.getCurrentState()).getL(phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseVoltageState.class.getName() + "LL", phaseID);
 	}
 	
 	@Override
 	public Measure<?, ?> getElectricCurrentValue(String phaseID)
 	{
-		return (Measure<?, ?>) ((PhaseTriple) this.currentState.getState(ThreePhaseCurrentState.class.getName())
-				.getCurrentState()).getL(phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseCurrentState.class.getName(), phaseID);
 	}
 	
 	@Override
 	public Measure<?, ?> getApparentPower(String phaseID)
 	{
-		return (Measure<?, ?>) ((PhaseTriple) this.currentState.getState(
-				ThreePhaseApparentPowerMeasurementState.class.getName()).getCurrentState()).getL(phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseApparentPowerMeasurementState.class.getName(), phaseID);
 	}
 	
 	@Override
 	public Measure<?, ?> getActivePower(String phaseID)
 	{
-		return (Measure<?, ?>) ((PhaseTriple) this.currentState.getState(
-				ThreePhaseActivePowerMeasurementState.class.getName()).getCurrentState()).getL(phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseActivePowerMeasurementState.class.getName(), phaseID);
 	}
 	
 	@Override
@@ -163,7 +168,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewFrequencyValue(Measure<?, ?> frequency)
 	{
 		// update the state
-		this.currentState.setState(FrequencyMeasurementState.class.getName(), new FrequencyMeasurementState(frequency));
+		((FrequencyMeasurementState) this.currentState.getState(FrequencyMeasurementState.class.getName()))
+				.getCurrentStateValue()[0].setValue(frequency);
 		
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device).notifyNewFrequencyValue(frequency);
@@ -182,8 +188,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewReactivePowerValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
-		((PhaseTriple) this.currentState.getState(ThreePhaseReactivePowerMeasurementState.class.getName())
-				.getCurrentState()).setL(phaseID, DecimalMeasure.valueOf(value.toString()));
+		this.updateThreePhaseStateValue(ThreePhaseReactivePowerMeasurementState.class.getName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewReactivePowerValue(phaseID, value);
 		
@@ -193,8 +198,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewReactiveEnergyValue(Measure<?, ?> value)
 	{
 		// update the state
-		this.currentState.setState(SinglePhaseReactiveEnergyState.class.getName(), new SinglePhaseReactiveEnergyState(
-				value));
+		this.currentState.getState(SinglePhaseReactiveEnergyState.class.getName()).getCurrentStateValue()[0]
+				.setValue(value);
 		
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device).notifyNewReactiveEnergyValue(value);
@@ -205,8 +210,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewActiveEnergyValue(Measure<?, ?> value)
 	{
 		// update the state
-		this.currentState.setState(SinglePhaseActiveEnergyState.class.getName(),
-				new SinglePhaseActiveEnergyState(value));
+		((SinglePhaseActiveEnergyState) this.currentState.getState(SinglePhaseActiveEnergyState.class.getName()))
+				.getCurrentStateValue()[0].setValue(value);
 		
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device).notifyNewActiveEnergyValue(value);
@@ -216,9 +221,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewPhaseNeutralVoltageValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
-		
-		((PhaseTriple) this.currentState.getState(ThreePhaseVoltageState.class.getName()).getCurrentState()).setL(
-				phaseID, DecimalMeasure.valueOf(value.toString()));
+		this.updateThreePhaseStateValue(ThreePhaseVoltageState.class.getName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewPhaseNeutralVoltageValue(phaseID, value);
 		
@@ -228,8 +231,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewPhasePhaseVoltageValue(String phaseID, Measure<?, ?> value)
 	{
 		
-		((PhaseTriple) this.currentState.getState(ThreePhaseVoltageState.class.getName() + "LL").getCurrentState())
-				.setL(phaseID, DecimalMeasure.valueOf(value.toString()));
+		this.updateThreePhaseStateValue(ThreePhaseVoltageState.class.getName() + "LL", phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewPhasePhaseVoltageValue(phaseID, value);
 		
@@ -240,8 +242,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	{
 		// update the state....
 		
-		((PhaseTriple) this.currentState.getState(ThreePhaseApparentPowerMeasurementState.class.getName())
-				.getCurrentState()).setL(phaseID, DecimalMeasure.valueOf(value.toString()));
+		this.updateThreePhaseStateValue(ThreePhaseApparentPowerMeasurementState.class.getName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewApparentPowerValue(phaseID, value);
 		
@@ -251,8 +252,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewPowerFactorValue(Measure<?, ?> powerFactor)
 	{
 		// update the state
-		this.currentState.setState(PowerFactorMeasurementState.class.getName(), new PowerFactorMeasurementState(
-				powerFactor));
+		this.currentState.getState(PowerFactorMeasurementState.class.getName()).getCurrentStateValue()[0]
+				.setValue(powerFactor);
 		
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device).notifyNewPowerFactorValue(powerFactor);
@@ -263,21 +264,16 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewActivePowerValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
-		
-		((PhaseTriple) this.currentState.getState(ThreePhaseActivePowerMeasurementState.class.getName())
-				.getCurrentState()).setL(phaseID, DecimalMeasure.valueOf(value.toString()));
+		this.updateThreePhaseStateValue(ThreePhaseActivePowerMeasurementState.class.getName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewActivePowerValue(phaseID, value);
-		
 	}
 	
 	@Override
 	public void notifyNewCurrentValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
-		
-		((PhaseTriple) this.currentState.getState(ThreePhaseCurrentState.class.getName()).getCurrentState()).setL(
-				phaseID, DecimalMeasure.valueOf(value.toString()));
+		this.updateThreePhaseStateValue(ThreePhaseCurrentState.class.getName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewCurrentValue(phaseID, value);
 		
@@ -433,33 +429,187 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		}
 		
 		// create all the states
+		
+		// ------------ Three Phase Active Power
+		// --------------------------------
+		ActivePowerStateValue activePowerStateL1 = new ActivePowerStateValue();
+		activePowerStateL1.setFeature("phaseID", "L1");
+		activePowerStateL1.setValue(DecimalMeasure.valueOf("0 " + activePowerUOM));
+		
+		ActivePowerStateValue activePowerStateL2 = new ActivePowerStateValue();
+		activePowerStateL2.setFeature("phaseID", "L2");
+		activePowerStateL2.setValue(DecimalMeasure.valueOf("0 " + activePowerUOM));
+		
+		ActivePowerStateValue activePowerStateL3 = new ActivePowerStateValue();
+		activePowerStateL3.setFeature("phaseID", "L3");
+		activePowerStateL3.setValue(DecimalMeasure.valueOf("0 " + activePowerUOM));
+		
 		this.currentState.setState(ThreePhaseActivePowerMeasurementState.class.getName(),
-				new ThreePhaseActivePowerMeasurementState(new PhaseTriple("L1", 0, "L2", 0, "L3", 0, activePowerUOM)));
+				new ThreePhaseActivePowerMeasurementState(activePowerStateL1, activePowerStateL2, activePowerStateL3));
+		// --------------------------------------------------------------------------
+		
+		// ------------- Frequency -----------------------------------------
+		FrequencyStateValue frequencyStateValue = new FrequencyStateValue();
+		frequencyStateValue.setValue(DecimalMeasure.valueOf("0 " + frequencyUOM));
 		this.currentState.setState(FrequencyMeasurementState.class.getName(), new FrequencyMeasurementState(
-				DecimalMeasure.valueOf("0 " + frequencyUOM)));
+				frequencyStateValue));
+		// -----------------------------------------------------------------
+		
+		// -------------- SinglePhaseActivePower ---------------------------
+		ActiveEnergyStateValue activeEnergyStateValue = new ActiveEnergyStateValue();
+		activeEnergyStateValue.setValue(DecimalMeasure.valueOf("0 " + activeEnergyUOM));
 		this.currentState.setState(SinglePhaseActiveEnergyState.class.getName(), new SinglePhaseActiveEnergyState(
-				DecimalMeasure.valueOf("0 " + activeEnergyUOM)));
-		this.currentState.setState(ThreePhaseCurrentState.class.getName(), new ThreePhaseCurrentState(new PhaseTriple(
-				"L1", 0, "L2", 0, "L3", 0, currentUOM)));
+				activeEnergyStateValue));
+		// ------------------------------------------------------------------
+		
+		// -------------- ThreePhaseCurrent ---------------------------------
+		CurrentStateValue currentStateL1 = new CurrentStateValue();
+		currentStateL1.setFeature("phaseID", "L1");
+		currentStateL1.setValue(DecimalMeasure.valueOf("0 " + currentUOM));
+		
+		CurrentStateValue currentStateL2 = new CurrentStateValue();
+		currentStateL2.setFeature("phaseID", "L2");
+		currentStateL2.setValue(DecimalMeasure.valueOf("0 " + currentUOM));
+		
+		CurrentStateValue currentStateL3 = new CurrentStateValue();
+		currentStateL3.setFeature("phaseID", "L3");
+		currentStateL3.setValue(DecimalMeasure.valueOf("0 " + currentUOM));
+		
+		this.currentState.setState(ThreePhaseCurrentState.class.getName(), new ThreePhaseCurrentState(currentStateL1,
+				currentStateL2, currentStateL3));
+		// -------------------------------------------------------------------
+		
+		// ------------- ThreePhaseReactivePower -----------------------------
+		ReactivePowerStateValue reactivePowerStateL1 = new ReactivePowerStateValue();
+		reactivePowerStateL1.setFeature("phaseID", "L1");
+		reactivePowerStateL1.setValue(DecimalMeasure.valueOf("0 " + reactivePowerUOM));
+		
+		ReactivePowerStateValue reactivePowerStateL2 = new ReactivePowerStateValue();
+		reactivePowerStateL2.setFeature("phaseID", "L2");
+		reactivePowerStateL2.setValue(DecimalMeasure.valueOf("0 " + reactivePowerUOM));
+		
+		ReactivePowerStateValue reactivePowerStateL3 = new ReactivePowerStateValue();
+		reactivePowerStateL3.setFeature("phaseID", "L3");
+		reactivePowerStateL3.setValue(DecimalMeasure.valueOf("0 " + reactivePowerUOM));
+		
 		this.currentState.setState(ThreePhaseReactivePowerMeasurementState.class.getName(),
-				new ThreePhaseReactivePowerMeasurementState(
-						new PhaseTriple("L1", 0, "L2", 0, "L3", 0, reactivePowerUOM)));
+				new ThreePhaseReactivePowerMeasurementState(reactivePowerStateL1, reactivePowerStateL2,
+						reactivePowerStateL3));
+		// --------------------------------------------------------------------
+		
+		// ---------------------- Power Factor --------------------------------
+		PowerFactorStateValue powerFactorStateValue = new PowerFactorStateValue();
+		powerFactorStateValue.setValue(DecimalMeasure.valueOf("0 " + Unit.ONE));
+		
 		this.currentState.setState(PowerFactorMeasurementState.class.getCanonicalName(),
-				new PowerFactorMeasurementState(DecimalMeasure.valueOf("0 " + Unit.ONE)));
+				new PowerFactorMeasurementState(powerFactorStateValue));
+		// --------------------------------------------------------------------
+		
+		// ---------------------- ThreePhaseApparentPower ---------------------
+		ApparentPowerStateValue apparentPowerStateL1 = new ApparentPowerStateValue();
+		apparentPowerStateL1.setFeature("phaseID", "L1");
+		apparentPowerStateL1.setValue(DecimalMeasure.valueOf("0 " + apparentPowerUOM));
+		
+		ApparentPowerStateValue apparentPowerStateL2 = new ApparentPowerStateValue();
+		apparentPowerStateL2.setFeature("phaseID", "L2");
+		apparentPowerStateL2.setValue(DecimalMeasure.valueOf("0 " + apparentPowerUOM));
+		
+		ApparentPowerStateValue apparentPowerStateL3 = new ApparentPowerStateValue();
+		apparentPowerStateL3.setFeature("phaseID", "L3");
+		apparentPowerStateL3.setValue(DecimalMeasure.valueOf("0 " + apparentPowerUOM));
+		
 		this.currentState.setState(ThreePhaseApparentPowerMeasurementState.class.getName(),
-				new ThreePhaseApparentPowerMeasurementState(
-						new PhaseTriple("L1", 0, "L2", 0, "L3", 0, apparentPowerUOM)));
+				new ThreePhaseApparentPowerMeasurementState(apparentPowerStateL1, apparentPowerStateL2,
+						apparentPowerStateL3));
+		// ----------------------------------------------------------------------
+		
+		// ------------------------ Single Phase Reactive Energy
+		ReactiveEnergyStateValue reactiveEnergyStateValue = new ReactiveEnergyStateValue();
+		reactiveEnergyStateValue.setValue(DecimalMeasure.valueOf("0 " + reactiveEnergyUOM));
 		this.currentState.setState(SinglePhaseReactiveEnergyState.class.getName(), new SinglePhaseReactiveEnergyState(
-				DecimalMeasure.valueOf("0 " + reactiveEnergyUOM)));
-		this.currentState.setState(ThreePhaseVoltageState.class.getName(), new ThreePhaseVoltageState(new PhaseTriple(
-				"L1", 0, "L2", 0, "L3", 0, voltageUOM)));
+				reactiveEnergyStateValue));
+		// -----------------------------------------------------------------------
+		
+		// ------------------------ ThreePhaseLNVoltage
+		VoltageStateValue voltageStateL1N = new VoltageStateValue();
+		voltageStateL1N.setFeature("phaseID", "L1");
+		voltageStateL1N.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
+		
+		VoltageStateValue voltageStateL2N = new VoltageStateValue();
+		voltageStateL2N.setFeature("phaseID", "L2");
+		voltageStateL2N.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
+		
+		VoltageStateValue voltageStateL3N = new VoltageStateValue();
+		voltageStateL3N.setFeature("phaseID", "L3");
+		voltageStateL3N.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
+		
+		this.currentState.setState(ThreePhaseVoltageState.class.getName(), new ThreePhaseVoltageState(voltageStateL1N,
+				voltageStateL2N, voltageStateL3N));
+		// ----------------------------------------------------------
+		
+		// ------------------------ ThreePhaseLLVoltage
+		VoltageStateValue voltageStateL12 = new VoltageStateValue();
+		voltageStateL12.setFeature("phaseID", "L12");
+		voltageStateL12.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
+		
+		VoltageStateValue voltageStateL23 = new VoltageStateValue();
+		voltageStateL23.setFeature("phaseID", "L23");
+		voltageStateL23.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
+		
+		VoltageStateValue voltageStateL31 = new VoltageStateValue();
+		voltageStateL31.setFeature("phaseID", "L31");
+		voltageStateL31.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
+		
 		this.currentState.setState(ThreePhaseVoltageState.class.getName() + "LL", new ThreePhaseVoltageState(
-				new PhaseTriple("L12", 0, "L23", 0, "L31", 0, voltageUOM)));
+				voltageStateL12, voltageStateL23, voltageStateL31));
 		
 		// read the initial state
 		this.network.readAll(this.register2Notification.keySet());
 		
+	}
+	
+	private Measure<?, ?> getThreePhaseStateValue(String stateClass, String phaseID)
+	{
+		// the measure
+		Measure<?, ?> value = null;
 		
+		// get the current state value
+		StateValue currentStateValue[] = ((State) this.currentState.getState(stateClass)).getCurrentStateValue();
+		
+		// check which state value matches the given phase ID
+		for (int i = 0; i < currentStateValue.length; i++)
+		{
+			// find the matching state value
+			HashMap<String, Object> features = currentStateValue[i].getFeatures();
+			
+			// if matches, extract the power value and break the cycle
+			if ((features.containsKey("phaseID")) && (((String) features.get("phaseID")).equalsIgnoreCase(phaseID)))
+			{
+				// extract the power value
+				value = (Measure<?, ?>) currentStateValue[i].getValue();
+				
+				// break
+				i = currentStateValue.length;
+			}
+		}
+		return value;
+	}
+	
+	private void updateThreePhaseStateValue(String stateClass, String phaseID, Measure<?, ?> value)
+	{
+		// update the state....
+		StateValue currentStateValue[] = ((State) this.currentState.getState(stateClass)).getCurrentStateValue();
+		for (int i = 0; i < currentStateValue.length; i++)
+		{
+			// find the matching state value
+			HashMap<String, Object> features = currentStateValue[i].getFeatures();
+			
+			if ((features.containsKey("phaseID")) && (((String) features.get("phaseID")).equalsIgnoreCase(phaseID)))
+			{
+				// set the new value
+				currentStateValue[i].setValue(DecimalMeasure.valueOf(value.toString()));
+			}
+		}
 	}
 	
 	@Override
