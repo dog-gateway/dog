@@ -5,7 +5,8 @@
          point="org.eclipse.equinox.http.registry.servlets">
       <servlet
             alias="/status"
-            class="it.polito.elite.dog.web.admin.ui.StatusServlet">
+            class="it.polito.elite.dog.web.admin.ui.StatusServlet"
+            load-on-startup="false">
       </servlet>
    </extension>
    <extension
