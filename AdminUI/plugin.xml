@@ -16,16 +16,8 @@
    <extension
          point="org.eclipse.equinox.http.registry.resources">
       <resource
-            alias="/img"
-            base-name="resources/img">
-      </resource>
-      <resource
-            alias="/css"
-            base-name="resources/css">
-      </resource>
-      <resource
-            alias="/js"
-            base-name="resources/js">
+            alias="/"
+            base-name="/resources">
       </resource>
    </extension>
 
