@@ -5,6 +5,7 @@ package it.polito.elite.dog.web.admin.ui;
 
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,9 +37,61 @@ public class StatusServlet extends HttpServlet
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
 	{
+		RequestDispatcher dispatcher = req.getRequestDispatcher("template");
+		req.setAttribute("part", TemplatePartEnum.HEADER);
+		dispatcher.include(req, resp);
 		// TODO Auto-generated method stub
 		//super.doGet(req, resp);
-		resp.getOutputStream().println("<h1>Hello world</h1><img src=\"img/glyphicons-halflings.png\"><p>"+(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()));
+		resp.getOutputStream().println(this.getBody());
+		
+		req.setAttribute("part", TemplatePartEnum.FOOTER);
+		dispatcher.include(req, resp);
+	}
+
+	private String getBody()
+	{
+		StringBuffer responseBuffer = new StringBuffer();
+		responseBuffer.append("\t\t<div class=\"navbar\">\n");
+		responseBuffer.append("\t\t\t<div class=\"navbar-inner\">\n");
+		responseBuffer.append("\t\t\t\t<a class=\"brand\" href=\"#\">Domotic OSGi Gateway</a>\n");
+		responseBuffer.append("\t\t\t\t<ul class=\"nav pull-right\">\n");
+		responseBuffer.append("\t\t\t\t\t<li><a href=\"#\">Login</a></li>\n");
+		responseBuffer.append("\t\t\t\t</ul>\n");
+		responseBuffer.append("\t\t\t</div>\n");
+		responseBuffer.append("\t\t</div>\n");
+		responseBuffer.append("\t\t<!-- Body views -->\n");
+		responseBuffer.append("\t\t<div class=\"container-fluid\">\n");
+		responseBuffer.append("\t\t\t<!-- Content -->\n");
+		responseBuffer.append("\t\t\t<div class=\"row-fluid\">\n");
+		responseBuffer.append("\t\t\t\t<div class=\"span12\">\n");
+		responseBuffer.append("\t\t\t\t\t<ul class=\"nav nav-tabs\">\n");
+		responseBuffer.append("\t\t\t\t\t\t<li class=\"active\">\n");
+		responseBuffer.append("\t\t\t\t\t\t\t<a href=\"#\">Status</a>\n");
+		responseBuffer.append("\t\t\t\t\t\t</li>\n");
+		responseBuffer.append("\t\t\t\t\t\t<li><a href=\"#\">Monitor</a></li>\n");
+		responseBuffer.append("\t\t\t\t\t\t<li><a href=\"#\">...</a></li>\n");
+		responseBuffer.append("\t\t\t\t\t</ul>\n");
+		responseBuffer.append("\t\t\t\t</div>\n");
+		responseBuffer.append("\t\t\t</div>\n");
+		responseBuffer.append("\t\t\t<div class=\"row-fluid\">\n");
+		responseBuffer.append("\t\t\t\t<div class=\"span6\">\n");
+		responseBuffer.append("\t\t\t\t\t<div class=\"well\">\n");
+		responseBuffer.append("\t\t\t\t\t\t<p>Dog status: <span class=\"label label-success pull-right\">Running</span></p>\n");
+		responseBuffer.append("\t\t\t\t\t\t<p>System memory: <span class=\"label label-info pull-right\">512 MBytes</span></p>\n");
+		responseBuffer.append("\t\t\t\t\t\t<p>Current memory usage: <span class=\"label label-warning pull-right\">45 MBytes</span></p>\n");
+		responseBuffer.append("\t\t\t\t\t\t<p>Free memory: <span class=\"label label-success pull-right\">400 MBytes</span></p>\n");
+		responseBuffer.append("\t\t\t\t\t</div>\n");
+		responseBuffer.append("\t\t\t\t</div>\n");
+		responseBuffer.append("\t\t\t\t<div class=\"span6\"></div>\n");
+		responseBuffer.append("\t\t\t</div>\n");
+		responseBuffer.append("\t\t\t<div class=\"row-fluid\">\n");
+		responseBuffer.append("\t\t\t\t<div class=\"span12\">\n");
+		responseBuffer.append("\t\t\t\t\t<!-- Footer -->\n");
+		responseBuffer.append("\t\t\t\t</div>\n");
+		responseBuffer.append("\t\t\t</div>\n");
+		responseBuffer.append("\t\t</div>\n");
+		
+		return responseBuffer.toString();
 	}
 	
 	

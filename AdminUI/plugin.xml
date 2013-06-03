@@ -8,6 +8,10 @@
             class="it.polito.elite.dog.web.admin.ui.StatusServlet"
             load-on-startup="false">
       </servlet>
+      <servlet
+            alias="/template"
+            class="it.polito.elite.dog.web.admin.ui.TemplateServlet">
+      </servlet>
    </extension>
    <extension
          point="org.eclipse.equinox.http.registry.resources">
@@ -15,16 +19,10 @@
             alias="/img"
             base-name="resources/img">
       </resource>
-   </extension>
-   <extension
-         point="org.eclipse.equinox.http.registry.resources">
       <resource
             alias="/css"
             base-name="resources/css">
       </resource>
-   </extension>
-   <extension
-         point="org.eclipse.equinox.http.registry.resources">
       <resource
             alias="/js"
             base-name="resources/js">
