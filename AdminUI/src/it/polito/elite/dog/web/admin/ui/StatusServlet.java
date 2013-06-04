@@ -84,9 +84,10 @@ public class StatusServlet extends HttpServlet
 				+ this.getFreeMemory() + " MBytes</span></p>\n");
 		responseBuffer.append("\t\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t\t</div>\n");
-		responseBuffer.append("\t\t\t\t<div class=\"span6\" id=\"bundles\">\n");
-		resp.getOutputStream().println(responseBuffer.toString());
-		responseBuffer = new StringBuffer();
+		responseBuffer.append("\t\t\t\t<div class=\"span6\">\n");
+		responseBuffer.append("\t\t\t\t\t<div class=\"well\" data-load=\"ajax\" href=\"services/system/bundles\">\n");
+		responseBuffer.append("\t\t\t\t\t\t<p>Loading system bundles...</p>");
+		responseBuffer.append("\t\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t<div class=\"row-fluid\">\n");
@@ -95,9 +96,6 @@ public class StatusServlet extends HttpServlet
 		responseBuffer.append("\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t</div>\n");
 		responseBuffer.append("\t\t</div>\n");
-		responseBuffer.append("<script type=\"text/javascript\">");
-		responseBuffer.append("$('#bundles').load('services/system/bundles');");
-		responseBuffer.append("</script>");
 		
 		resp.getOutputStream().println(responseBuffer.toString());
 		

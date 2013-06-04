@@ -92,6 +92,7 @@ public class TemplateServlet extends HttpServlet
 		StringBuffer responseBuffer = new StringBuffer();
 		responseBuffer.append("\n");
 		responseBuffer.append("\t\t<script src=\"js/jquery.js\"></script>\n");
+		responseBuffer.append("\t\t<script src=\"js/ajax.js\"></script>\n");
 		responseBuffer.append("\t\t<script src=\"js/bootstrap.js\"></script>\n");
 		responseBuffer.append("\t</body>\n</html>\n");
 		return responseBuffer.toString();
