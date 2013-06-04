@@ -3,6 +3,11 @@
  */
 package it.polito.elite.dog.system;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
+import it.polito.elite.dog.system.api.SystemMonitorInterface;
+import it.polito.elite.dog.system.util.BundleNameComparator;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 
 import javax.ws.rs.GET;
@@ -19,7 +24,7 @@ import org.osgi.service.log.LogService;
  * 
  */
 @Path("/system/")
-public class SystemMonitor
+public class SystemMonitor implements SystemMonitorInterface
 {
 	// the service logger
 	private LogService logger;
@@ -71,40 +76,41 @@ public class SystemMonitor
 		// null the logger
 		this.logger = null;
 	}
-	
+	@Override
 	@GET
-	@Path("/bundles/installed")
+	@Path("/bundles")
 	@Produces(MediaType.TEXT_HTML)
-	public String getInstalledBundles()
+	public String getBundles()
 	{
 		//get all the installed bundles
 		Bundle allBundles[] = this.context.getBundles();
+		Arrays.sort(allBundles, new BundleNameComparator());
 		
 		//the output buffer
 		StringBuffer htmlOut = new StringBuffer();
 		
 		//append the unordered list header
-		htmlOut.append("<ul>\n");
+		htmlOut.append("<ul class=\"unstyled\">\n");
 		
 		//generate a list of bundles
 		for(int i=0; i<allBundles.length; i++)
 		{
-			htmlOut.append("<li>"+allBundles[i].getSymbolicName()+"("+allBundles[i].getVersion()+")");
+			htmlOut.append("<li>"+allBundles[i].getSymbolicName()+" ("+allBundles[i].getVersion()+") ");
 			switch(allBundles[i].getState())
 			{
 				case Bundle.ACTIVE:
 				{
-					htmlOut.append("<span class=\"label label-success\">Active</span>");
+					htmlOut.append("<span class=\"label label-success pull-right\">Active</span>");
 					break;
 				}
 				case Bundle.INSTALLED:
 				{
-					htmlOut.append("<span class=\"label label-info\">Installed</span>");
+					htmlOut.append("<span class=\"label label-info pull-right\">Installed</span>");
 					break;
 				}
 				case Bundle.RESOLVED:
 				{
-					htmlOut.append("<span class=\"label label-warning\">Resolved</span>");
+					htmlOut.append("<span class=\"label label-warning pull-right\">Resolved</span>");
 					break;
 				}
 			}
