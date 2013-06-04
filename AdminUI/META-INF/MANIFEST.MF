@@ -7,5 +7,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
 Import-Package: javax.servlet;version="2.6.0",
  javax.servlet.http;version="2.6.0",
- org.osgi.framework
+ org.osgi.framework,
+ org.osgi.service.http;version="1.2.1"
 Require-Bundle: org.eclipse.equinox.http.registry
+Bundle-ActivationPolicy: lazy
