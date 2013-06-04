@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SystemMonitor
+Bundle-SymbolicName: SystemMonitor
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: it.polito.elite
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Service-Component: OSGI-INF/component.xml
+Import-Package: javax.ws.rs,
+ javax.ws.rs.core,
+ javax.ws.rs.ext,
+ org.codehaus.jettison.json,
+ org.osgi.framework,
+ org.osgi.service.log;version="1.3.0"
+Require-Bundle: DogLogger;bundle-version="2.1.0",
+ Dog2Library;bundle-version="2.2.4"
