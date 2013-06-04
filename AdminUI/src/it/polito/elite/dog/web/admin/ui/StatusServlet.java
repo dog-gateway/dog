@@ -6,6 +6,7 @@ package it.polito.elite.dog.web.admin.ui;
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,17 +42,8 @@ public class StatusServlet extends HttpServlet
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
 	{
-		RequestDispatcher dispatcher = req.getRequestDispatcher("template?part=" + TemplatePartEnum.HEADER);
-		dispatcher.include(req, resp);
+		this.include(req, resp,"template?part=" + TemplatePartEnum.HEADER);
 		
-		resp.getOutputStream().println(this.getBody());
-		
-		dispatcher = req.getRequestDispatcher("template?part=" + TemplatePartEnum.FOOTER);
-		dispatcher.include(req, resp);
-	}
-	
-	private String getBody()
-	{
 		StringBuffer responseBuffer = new StringBuffer();
 		responseBuffer.append("\t\t<div class=\"navbar\">\n");
 		responseBuffer.append("\t\t\t<div class=\"navbar-inner\">\n");
@@ -92,7 +84,10 @@ public class StatusServlet extends HttpServlet
 				+ this.getFreeMemory() + " MBytes</span></p>\n");
 		responseBuffer.append("\t\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t\t</div>\n");
-		responseBuffer.append("\t\t\t\t<div class=\"span6\"></div>\n");
+		responseBuffer.append("\t\t\t\t<div class=\"span6\" id=\"bundles\">\n");
+		resp.getOutputStream().println(responseBuffer.toString());
+		responseBuffer = new StringBuffer();
+		responseBuffer.append("\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t<div class=\"row-fluid\">\n");
 		responseBuffer.append("\t\t\t\t<div class=\"span12\">\n");
@@ -100,8 +95,13 @@ public class StatusServlet extends HttpServlet
 		responseBuffer.append("\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t</div>\n");
 		responseBuffer.append("\t\t</div>\n");
+		responseBuffer.append("<script type=\"text/javascript\">");
+		responseBuffer.append("$('#bundles').load('services/system/bundles');");
+		responseBuffer.append("</script>");
 		
-		return responseBuffer.toString();
+		resp.getOutputStream().println(responseBuffer.toString());
+		
+		this.include(req, resp,"template?part=" + TemplatePartEnum.FOOTER);
 	}
 	
 	private long getFreeMemory()
@@ -124,5 +124,11 @@ public class StatusServlet extends HttpServlet
 			return "label-error";
 		else
 			return "label-warning";
+	}
+	
+	private void include(HttpServletRequest req, HttpServletResponse resp, String pathToInclude) throws ServletException, IOException
+	{
+		RequestDispatcher dispatcher = req.getRequestDispatcher(pathToInclude);
+		dispatcher.include(req, resp);
 	}
 }
