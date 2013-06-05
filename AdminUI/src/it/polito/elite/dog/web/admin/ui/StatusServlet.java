@@ -74,18 +74,13 @@ public class StatusServlet extends HttpServlet
 		responseBuffer.append("\t\t\t\t\t<div class=\"well\">\n");
 		responseBuffer
 				.append("\t\t\t\t\t\t<p>Dog status: <span class=\"label label-success pull-right\">Running</span></p>\n");
-		responseBuffer.append("\t\t\t\t\t\t<p>System memory: <span class=\"label label-info pull-right\">"
-				+ this.getSystemMemory() + " MBytes</span></p>\n");
-		responseBuffer.append("\t\t\t\t\t\t<p>Current memory usage: <span class=\"label "
-				+ this.getLabelClass((getSystemMemory() - getFreeMemory()), getSystemMemory(), false)
-				+ " pull-right\">" + (this.getSystemMemory() - this.getFreeMemory()) + " MBytes</span></p>\n");
-		responseBuffer.append("\t\t\t\t\t\t<p>Free memory: <span class=\"label "
-				+ this.getLabelClass(getFreeMemory(), getSystemMemory(), true) + " pull-right\">"
-				+ this.getFreeMemory() + " MBytes</span></p>\n");
+		responseBuffer.append("\t\t\t\t\t\t<p>System memory: <span data-load=\"ajax\" data-src=\"services/system/memory/runtime\" data-refresh=\"1000\"></span></p>\n");
+		responseBuffer.append("\t\t\t\t\t\t<p>Current memory usage: <span data-load=\"ajax\" data-src=\"services/system/memory/used\" data-refresh=\"1000\"></span></p>\n");
+		responseBuffer.append("\t\t\t\t\t\t<p>Free memory: <span data-load=\"ajax\" data-src=\"services/system/memory/free\" data-refresh=\"1000\"></span></p>\n");
 		responseBuffer.append("\t\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t\t<div class=\"span6\">\n");
-		responseBuffer.append("\t\t\t\t\t<div class=\"well\" data-load=\"ajax\" href=\"services/system/bundles\">\n");
+		responseBuffer.append("\t\t\t\t\t<div class=\"well\" data-load=\"ajax\" data-src=\"services/system/bundles\" data-refresh=\"1000\">\n");
 		responseBuffer.append("\t\t\t\t\t\t<p>Loading system bundles...</p>");
 		responseBuffer.append("\t\t\t\t\t</div>\n");
 		responseBuffer.append("\t\t\t\t</div>\n");
@@ -100,28 +95,6 @@ public class StatusServlet extends HttpServlet
 		resp.getOutputStream().println(responseBuffer.toString());
 		
 		this.include(req, resp,"template?part=" + TemplatePartEnum.FOOTER);
-	}
-	
-	private long getFreeMemory()
-	{
-		return Runtime.getRuntime().freeMemory() / (1024 * 1024);
-	}
-	
-	private long getSystemMemory()
-	{
-		return Runtime.getRuntime().totalMemory() / (1024 * 1024);
-	}
-	
-	private String getLabelClass(long value, long maximumValue, boolean inverse)
-	{
-		double percent = (double) value / (double) maximumValue;
-		
-		if (((!inverse) && (percent < 0.33)) || ((inverse) && (percent > 0.66)))
-			return "label-success";
-		else if (((inverse) && (percent < 0.33)) || ((!inverse) && (percent > 0.66)))
-			return "label-error";
-		else
-			return "label-warning";
 	}
 	
 	private void include(HttpServletRequest req, HttpServletResponse resp, String pathToInclude) throws ServletException, IOException
