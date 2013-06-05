@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="BundleManager">
+   <implementation class="it.polito.elite.dog.system.bundle.BundleManager"/>
+   <service>
+      <provide interface="it.polito.elite.dog.system.bundle.api.BundleManagerInterface"/>
+   </service>
+</scr:component>

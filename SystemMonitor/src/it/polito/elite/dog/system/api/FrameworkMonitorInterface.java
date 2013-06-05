@@ -14,12 +14,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/system/")
 public interface FrameworkMonitorInterface
-{
-	@GET
-	@Path("/bundles")
-	@Produces(MediaType.TEXT_HTML)
-	public String getBundles();
-	
+{	
 	@GET
 	@Path("/memory/runtime")
 	@Produces(MediaType.TEXT_HTML)

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.polito.elite.dog.system.util;
+package it.polito.elite.dog.system.bundle.util;
 
 import java.util.Comparator;
 
