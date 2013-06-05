@@ -19,4 +19,19 @@ public interface SystemMonitorInterface
 	@Path("/bundles")
 	@Produces(MediaType.TEXT_HTML)
 	public String getBundles();
+	
+	@GET
+	@Path("/memory/runtime")
+	@Produces(MediaType.TEXT_HTML)
+	public String getRuntimeMemory();
+	
+	@GET
+	@Path("/memory/free")
+	@Produces(MediaType.TEXT_HTML)
+	public String getFreeMemory();
+	
+	@GET
+	@Path("/memory/used")
+	@Produces(MediaType.TEXT_HTML)
+	public String getUsedMemory();
 }
