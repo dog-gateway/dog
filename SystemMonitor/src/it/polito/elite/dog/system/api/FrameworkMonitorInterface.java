@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType;
  *
  */
 @Path("/system/")
-public interface SystemMonitorInterface
+public interface FrameworkMonitorInterface
 {
 	@GET
 	@Path("/bundles")

@@ -3,7 +3,7 @@
  */
 package it.polito.elite.dog.system;
 
-import it.polito.elite.dog.system.api.SystemMonitorInterface;
+import it.polito.elite.dog.system.api.FrameworkMonitorInterface;
 import it.polito.elite.dog.system.util.BundleNameComparator;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 
@@ -23,7 +23,7 @@ import org.osgi.service.log.LogService;
  * 
  */
 @Path("/system/")
-public class SystemMonitor implements SystemMonitorInterface
+public class FrameworkMonitor implements FrameworkMonitorInterface
 {
 	// the service logger
 	private LogService logger;
@@ -38,7 +38,7 @@ public class SystemMonitor implements SystemMonitorInterface
 	/**
 	 * 
 	 */
-	public SystemMonitor()
+	public FrameworkMonitor()
 	{
 		// TODO Auto-generated constructor stub
 	}
@@ -58,7 +58,7 @@ public class SystemMonitor implements SystemMonitorInterface
 		this.logger = new DogLogInstance(this.context);
 		
 		// log the activation
-		this.logger.log(LogService.LOG_INFO, SystemMonitor.logId + "Activated....");
+		this.logger.log(LogService.LOG_INFO, FrameworkMonitor.logId + "Activated....");
 	}
 	
 	/**
@@ -70,7 +70,7 @@ public class SystemMonitor implements SystemMonitorInterface
 		this.context = null;
 		
 		// log deactivation
-		this.logger.log(LogService.LOG_INFO, SystemMonitor.logId+"Deactivated...");
+		this.logger.log(LogService.LOG_INFO, FrameworkMonitor.logId+"Deactivated...");
 		
 		// null the logger
 		this.logger = null;

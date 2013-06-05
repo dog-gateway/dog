@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SystemMonitor
-Bundle-SymbolicName: SystemMonitor
+Bundle-SymbolicName: FrameworkMonitor
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: it.polito.elite
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

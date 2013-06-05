@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" name="SystemMonitor">
-   <implementation class="it.polito.elite.dog.system.SystemMonitor"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" name="FrameworkMonitor">
+   <implementation class="it.polito.elite.dog.system.FrameworkMonitor"/>
    <service>
-      <provide interface="it.polito.elite.dog.system.api.SystemMonitorInterface"/>
+      <provide interface="it.polito.elite.dog.system.api.FrameworkMonitorInterface"/>
    </service>
 </scr:component>
