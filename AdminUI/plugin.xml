@@ -2,18 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.equinox.http.registry.servlets">
-      <servlet
-            alias="/status"
-            class="it.polito.elite.dog.web.admin.ui.StatusServlet"
-            load-on-startup="false">
-      </servlet>
-      <servlet
-            alias="/template"
-            class="it.polito.elite.dog.web.admin.ui.TemplateServlet">
-      </servlet>
-   </extension>
-   <extension
          point="org.eclipse.equinox.http.registry.resources">
       <resource
             alias="/"
