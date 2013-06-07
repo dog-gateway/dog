@@ -111,7 +111,7 @@ public class FrameworkMonitor implements FrameworkMonitorInterface
 			response.append(" label-error\">");
 		}
 	
-		response.append(+freeMemory+" MBytes</span>");
+		response.append(freeMemory+" MBytes</span>");
 		
 		
 		return response.toString();
@@ -148,7 +148,7 @@ public class FrameworkMonitor implements FrameworkMonitorInterface
 			response.append(" label-success\">");
 		}
 	
-		response.append(+freeMemory+" MBytes</span>");
+		response.append(usedMemory+" MBytes</span>");
 		
 		
 		return response.toString();
