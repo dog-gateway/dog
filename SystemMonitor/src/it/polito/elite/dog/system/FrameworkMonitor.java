@@ -17,7 +17,7 @@ import org.osgi.service.log.LogService;
  * @author bonino
  * 
  */
-@Path("/system/")
+@Path("/framework/")
 public class FrameworkMonitor implements FrameworkMonitorInterface
 {
 	// the service logger
