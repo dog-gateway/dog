@@ -208,27 +208,29 @@ public class ModbusGatewayDriver implements Driver// ,
 				gatewayProtocol = gatewayProtocolSet.iterator().next();
 			
 			// check not null
-			if ((gatewayAddress != null) && (!gatewayAddress.isEmpty()) && !this.isGatewayAvailable(deviceId))
+			if ((gatewayAddress != null) && (!gatewayAddress.isEmpty()))
 			{
-				// create a new instance of the gateway driver
-				ModbusGatewayDriverInstance driver = new ModbusGatewayDriverInstance(this.network,
-						(ControllableDevice) this.context.getService(reference), gatewayAddress, gatewayPort,
-						gatewayProtocol, this.context);
-				
-				synchronized (this.connectedGateways)
+				if (!this.isGatewayAvailable(deviceId))
 				{
-					// store a reference to the gateway driver
-					this.connectedGateways.put(deviceId, driver);
+					// create a new instance of the gateway driver
+					ModbusGatewayDriverInstance driver = new ModbusGatewayDriverInstance(this.network,
+							(ControllableDevice) this.context.getService(reference), gatewayAddress, gatewayPort,
+							gatewayProtocol, this.context);
+					
+					synchronized (this.connectedGateways)
+					{
+						// store a reference to the gateway driver
+						this.connectedGateways.put(deviceId, driver);
+					}
+					
+					// modify the service description causing a forcing the
+					// framework to send a modified service notification
+					final Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
+					propDriver.put(DogDeviceCostants.DRIVER_ID, "Modbus_ModbusGateway_driver");
+					propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
+					
+					this.regDriver.setProperties(propDriver);
 				}
-				
-				// modify the service description causing a forcing the
-				// framework to send a modified service notification
-				final Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-				propDriver.put(DogDeviceCostants.DRIVER_ID, "Modbus_ModbusGateway_driver");
-				propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
-				
-				this.regDriver.setProperties(propDriver);
-				
 				return null;
 			}
 			else

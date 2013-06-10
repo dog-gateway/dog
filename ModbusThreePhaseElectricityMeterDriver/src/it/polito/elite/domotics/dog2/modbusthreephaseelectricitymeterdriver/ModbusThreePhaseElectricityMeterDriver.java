@@ -29,7 +29,6 @@ import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
 import org.osgi.service.log.LogService;
 
-
 /**
  * @author bonino
  * 
@@ -60,7 +59,6 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 	// unregister the service).
 	private ServiceRegistration<?> regDriver;
 	
-	
 	/**
 	 * The class constructor, creates an instance of the
 	 * {@link ModbusThreePhaseElectricityMeterDriver} given the OSGi context to
@@ -84,7 +82,7 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 		// initialize the connected drivers list
 		this.connectedDrivers = new Vector<ModbusThreePhaseElectricityMeterDriverInstance>();
 		
-		//try to register the service
+		// try to register the service
 		this.register();
 	}
 	
@@ -151,38 +149,40 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 		this.gateway = null;
 	}
 	
-	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
 		
-		// get the given device category
-		String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
-		
-		// get the given device manufacturer
-		String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
-		
-		// get the gateway to which the device is connected
-		@SuppressWarnings("unchecked")
-		String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-				.getGateway();
-		
-		// compute the matching score between the given device and this driver
-		if (deviceCategory != null)
+		if (this.context.getService(reference) instanceof ControllableDevice)
 		{
-			if (manifacturer != null
-					&& (gateway != null)
-					&& (manifacturer.equals(ModbusInfo.MANUFACTURER))
-					&& (deviceCategory.equals(ThreePhaseElectricityMeter.class.getName()) && (this.gateway
-							.isGatewayAvailable(gateway))
-					
-					))
-			{
-				matchValue = ThreePhaseElectricityMeter.MATCH_MANUFACTURER + ThreePhaseElectricityMeter.MATCH_TYPE;
-			}
+			// get the given device category
+			String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
 			
+			// get the given device manufacturer
+			String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+			
+			// get the gateway to which the device is connected
+			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
+					.getGateway();
+			
+			// compute the matching score between the given device and this
+			// driver
+			if (deviceCategory != null)
+			{
+				if (manifacturer != null
+						&& (gateway != null)
+						&& (manifacturer.equals(ModbusInfo.MANUFACTURER))
+						&& (deviceCategory.equals(ThreePhaseElectricityMeter.class.getName()) && (this.gateway
+								.isGatewayAvailable(gateway))
+						
+						))
+				{
+					matchValue = ThreePhaseElectricityMeter.MATCH_MANUFACTURER + ThreePhaseElectricityMeter.MATCH_TYPE;
+				}
+				
+			}
 		}
 		return matchValue;
 	}
