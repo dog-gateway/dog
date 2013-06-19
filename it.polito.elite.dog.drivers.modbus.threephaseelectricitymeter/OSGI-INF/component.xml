@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" enabled="true" name="ModbusThreePhaseElectricityMeterDriver">
-   <implementation class="it.polito.elite.domotics.dog2.modbusthreephaseelectricitymeterdriver.ModbusThreePhaseElectricityMeterDriver"/>
-   <reference bind="addedNetworkDriver" cardinality="1..1" interface="it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces.ModbusNetwork" name="ModbusNetwork" policy="dynamic" unbind="removedNetworkDriver"/>
-   <reference bind="addedGatewayDriver" cardinality="1..1" interface="it.polito.elite.domotics.dog2.modbusgatewaydriver.ModbusGatewayDriver" name="ModbusGatewayDriver" policy="dynamic" unbind="removedGatewayDriver"/>
+   <implementation class="it.polito.elite.dog.drivers.modbus.threephaseelectricitymeter.ModbusThreePhaseElectricityMeterDriver"/>
+   <reference bind="addedNetworkDriver" cardinality="1..1" interface="it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork" name="ModbusNetwork" policy="dynamic" unbind="removedNetworkDriver"/>
+   <reference bind="addedGatewayDriver" cardinality="1..1" interface="it.polito.elite.dog.drivers.modbus.gateway.ModbusGatewayDriver" name="ModbusGatewayDriver" policy="dynamic" unbind="removedGatewayDriver"/>
 </scr:component>

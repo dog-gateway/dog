@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ModbusNetworkDriver
-Bundle-SymbolicName: ModbusNetworkDriver
+Bundle-SymbolicName: it.polito.elite.dog.drivers.modbus.network
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.osgi.framework;version="1.3.0"
@@ -11,9 +11,9 @@ Require-Bundle: Dog2Library;bundle-version="2.2.3",
  DogOntLibrary;bundle-version="2.1.1"
 Bundle-ClassPath: lib/jamod.jar,
  .
-Export-Package: it.polito.elite.domotics.dog2.modbusnetworkdriver,
- it.polito.elite.domotics.dog2.modbusnetworkdriver.info,
- it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces,
- it.polito.elite.domotics.dog2.modbusnetworkdriver.regxlators
+Export-Package: it.polito.elite.dog.drivers.modbus.network,
+ it.polito.elite.dog.drivers.modbus.network.info,
+ it.polito.elite.dog.drivers.modbus.network.interfaces,
+ it.polito.elite.dog.drivers.modbus.network.regxlators
 Service-Component: OSGI-INF/component.xml
 Bundle-ActivationPolicy: lazy
