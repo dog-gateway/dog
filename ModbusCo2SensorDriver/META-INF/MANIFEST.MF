@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ModbusCo2SensorDriver
-Bundle-SymbolicName: ModbusCo2SensorDriver
+Bundle-SymbolicName: it.polito.elite.dog.drivers.modbus.co2sensor
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: polito
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

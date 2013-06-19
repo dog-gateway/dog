@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ModbusCo2SensorDriver</name>
+	<name>it.polito.elite.dog.drivers.modbus.co2sensor</name>
 	<comment></comment>
 	<projects>
 	</projects>
