@@ -9,7 +9,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
  * See the License for the specific language governing permissions and limitations under the License. 
  */
-package modbus.co2sensor.driver;
+package it.polito.elite.dog.drivers.modbus.co2sensor;
 
 import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
