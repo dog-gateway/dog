@@ -1,0 +1,1 @@
+A bundle implementing the Device Manager bundle defined in the OSGi Device Access Specification. It mainly stems from the Apache Felix DAS bundle, where dependencies have been removed and service activation has been ported to the declarative services pattern.
