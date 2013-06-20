@@ -4,9 +4,10 @@ Bundle-Name: ModbusNetworkDriver
 Bundle-SymbolicName: it.polito.elite.dog.drivers.modbus.network
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.osgi.framework;version="1.3.0"
+Import-Package: org.osgi.framework;version="1.3.0",
+ org.osgi.service.cm;version="1.4.0",
+ org.osgi.service.log;version="1.3.0"
 Require-Bundle: Dog2Library;bundle-version="2.2.3",
- osgi.cmpn;bundle-version="4.2.0",
  MeasureLibrary;bundle-version="5.0.0",
  DogOntLibrary;bundle-version="2.1.1"
 Bundle-ClassPath: lib/jamod.jar,
