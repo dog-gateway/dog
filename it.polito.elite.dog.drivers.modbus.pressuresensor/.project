@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ModbusPressureSensorDriver</name>
+	<name>it.polito.elite.dog.drivers.modbus.pressuresensor</name>
 	<comment></comment>
 	<projects>
 	</projects>
