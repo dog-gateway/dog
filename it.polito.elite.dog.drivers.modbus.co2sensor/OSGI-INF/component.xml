@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="ModbusCo2SensorDriver">
    <implementation class="it.polito.elite.dog.drivers.modbus.co2sensor.ModbusCo2SensorDriver"/>
-   <reference bind="addedNetworkDriver" cardinality="1..1" interface="it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces.ModbusNetwork" name="ModbusNetwork" policy="dynamic" unbind="removedNetworkDriver"/>
-   <reference bind="addedGatewayDriver" cardinality="1..1" interface="it.polito.elite.domotics.dog2.modbusgatewaydriver.ModbusGatewayDriver" name="ModbusGatewayDriver" policy="dynamic" unbind="removedGatewayDriver"/>
+   <reference bind="addedNetworkDriver" cardinality="1..1" interface="it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork" name="ModbusNetwork" policy="dynamic" unbind="removedNetworkDriver"/>
+   <reference bind="addedGatewayDriver" cardinality="1..1" interface="it.polito.elite.dog.drivers.modbus.gateway.ModbusGatewayDriver" name="ModbusGatewayDriver" policy="dynamic" unbind="removedGatewayDriver"/>
 </scr:component>

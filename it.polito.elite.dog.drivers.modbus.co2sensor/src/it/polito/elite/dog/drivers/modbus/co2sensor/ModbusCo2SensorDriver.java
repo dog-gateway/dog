@@ -11,12 +11,12 @@
  */
 package it.polito.elite.dog.drivers.modbus.co2sensor;
 
+import it.polito.elite.dog.drivers.modbus.gateway.ModbusGatewayDriver;
+import it.polito.elite.dog.drivers.modbus.network.info.ModbusInfo;
+import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
 import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
 import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.dog2.modbusgatewaydriver.ModbusGatewayDriver;
-import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.ModbusInfo;
-import it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces.ModbusNetwork;
 import it.polito.elite.domotics.model.devicecategory.Co2Sensor;
 
 import java.util.Hashtable;

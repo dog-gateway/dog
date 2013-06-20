@@ -11,12 +11,12 @@
  */
 package it.polito.elite.dog.drivers.modbus.co2sensor;
 
+import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
+import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
+import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
+import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
 import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.dog2.modbusnetworkdriver.ModbusDriver;
-import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.CmdNotificationInfo;
-import it.polito.elite.domotics.dog2.modbusnetworkdriver.info.ModbusRegisterInfo;
-import it.polito.elite.domotics.dog2.modbusnetworkdriver.interfaces.ModbusNetwork;
 import it.polito.elite.domotics.model.DeviceStatus;
 import it.polito.elite.domotics.model.devicecategory.Co2Sensor;
 import it.polito.elite.domotics.model.notification.Co2MeasurementNotification;
@@ -130,9 +130,9 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriver implements Co2Se
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see it.polito.elite.domotics.dog2.modbusnetworkdriver.ModbusDriver#
+	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
 	 * newMessageFromHouse
-	 * (it.polito.elite.domotics.dog2.modbusnetworkdriver.info
+	 * (it.polito.elite.dog.drivers.modbus.network.info
 	 * .ModbusRegisterInfo, java.lang.String)
 	 */
 	@Override
@@ -182,7 +182,7 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriver implements Co2Se
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see it.polito.elite.domotics.dog2.modbusnetworkdriver.ModbusDriver#
+	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
 	 * specificConfiguration()
 	 */
 	@Override
@@ -196,9 +196,9 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriver implements Co2Se
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see it.polito.elite.domotics.dog2.modbusnetworkdriver.ModbusDriver#
+	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
 	 * addToNetworkDriver
-	 * (it.polito.elite.domotics.dog2.modbusnetworkdriver.info.
+	 * (it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo)
 	 */
 	@Override
