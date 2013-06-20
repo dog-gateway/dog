@@ -26,12 +26,12 @@ import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -184,11 +184,10 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 		 */
 	}
 	
-	@SuppressWarnings("unused")
 	private void start()
 	{
-		m_drivers = new HashMap<ServiceReference<Driver>, DriverAttributes>();
-		m_devices = new HashMap<ServiceReference<Device>, Object>();
+		m_drivers = new ConcurrentHashMap<ServiceReference<Driver>, DriverAttributes>();
+		m_devices = new ConcurrentHashMap<ServiceReference<Device>, Object>();
 		submit(new WaitForStartFramework());
 	}
 	
