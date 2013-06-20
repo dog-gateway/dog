@@ -209,24 +209,25 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 				// parse the string
 				this.nConnectionTrials = Integer.valueOf(numTryAsString);
 			}
+			
+			// in any case, as the polling time has a default, init the poller
+			// thread and start it
+			this.poller = new ModbusPoller(this);
+			
+			// start the poller
+			poller.start();
+			
+			// log the driver start
+			this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId
+					+ "Started the driver poller thread, ready to handle register sampling, reading and setting...");
+			
+			// register the service
+			// register the driver service if not already registered
+			if (this.regServiceModbusDriverImpl == null)
+				this.regServiceModbusDriverImpl = this.bundleContext.registerService(ModbusNetwork.class.getName(),
+						this, null);
 		}
 		
-		// in any case, as the polling time has a default, init the poller
-		// thread and start it
-		this.poller = new ModbusPoller(this);
-		
-		// start the poller
-		poller.start();
-		
-		// log the driver start
-		this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId
-				+ "Started the driver poller thread, ready to handle register sampling, reading and setting...");
-		
-		// register the service
-		// register the driver service if not already registered
-		if (this.regServiceModbusDriverImpl == null)
-			this.regServiceModbusDriverImpl = this.bundleContext.registerService(ModbusNetwork.class.getName(), this,
-					null);
 	}
 	
 	/**
@@ -339,8 +340,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
+	 * @see it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
 	 * #read(it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo)
 	 */
@@ -440,11 +440,9 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
-	 * #
-	 * readAll(java.util.Set<it.polito.elite.dog.drivers.modbus.network.
-	 * info . ModbusRegisterInfo>)
+	 * @see it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
+	 * # readAll(java.util.Set<it.polito.elite.dog.drivers.modbus.network. info
+	 * . ModbusRegisterInfo>)
 	 */
 	@Override
 	public void readAll(final Set<ModbusRegisterInfo> registers)
@@ -572,8 +570,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
+	 * @see it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
 	 * #write(it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo, java.lang.String)
 	 */
@@ -654,8 +651,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
+	 * @see it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
 	 * #addDriver(it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo,
 	 * it.polito.elite.dog.drivers.modbus.network.ModbusDriver)
@@ -719,8 +715,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
+	 * @see it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork
 	 * #removeDriver(it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo)
 	 */
