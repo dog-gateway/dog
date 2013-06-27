@@ -145,6 +145,21 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		// log
 		this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId + "Deactivated...");
 		this.unRegister();
+		
+		// store the bundle context
+		this.bundleContext = null;
+		
+		// create the register to driver map
+		this.register2Driver = null;
+		
+		// create the driver to register map
+		this.driver2Register = null;
+		
+		// create the gateway address to register map
+		this.gatewayAddress2Registers = null;
+		
+		// create the connection pool (one per gateway address)
+		this.connectionPool = null;
 	}
 	
 	/**
@@ -219,7 +234,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 			
 			// log the driver start
 			this.logger.log(LogService.LOG_INFO, ModbusDriverImpl.logId
-					+ "Started the driver poller thread, ready to handle register sampling, reading and setting...");
+					+ "Started the driver poller thread, ready to handle register sampling at:"+this.pollingTimeMillis+", reading and setting...");
 			
 			// register the service
 			// register the driver service if not already registered
@@ -245,6 +260,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		if (this.regServiceModbusDriverImpl != null)
 		{
 			this.regServiceModbusDriverImpl.unregister();
+			this.regServiceModbusDriverImpl = null;
 		}
 		
 	}

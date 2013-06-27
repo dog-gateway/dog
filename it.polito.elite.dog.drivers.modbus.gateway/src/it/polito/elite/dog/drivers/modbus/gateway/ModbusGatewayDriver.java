@@ -100,6 +100,11 @@ public class ModbusGatewayDriver implements Driver// ,
 			this.registerDriver();
 	}
 	
+	public void deactivate()
+	{
+		this.unRegister();
+	}
+	
 	public void unRegister()
 	{
 		// un-registers this driver
@@ -179,59 +184,72 @@ public class ModbusGatewayDriver implements Driver// ,
 	@Override
 	public String attach(ServiceReference reference) throws Exception
 	{
-		// get the corresponding end point set
-		Set<String> gatewayAddressSet = ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-				.getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_ADDRESS);
-		
-		Set<String> gatewayPortSet = ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-				.getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_PORT);
-		
-		Set<String> gatewayProtocolSet = ((ControllableDevice) this.context.getService(reference))
-				.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.PROTO_ID);
-		
-		String deviceId = ((ControllableDevice) this.context.getService(reference)).getDeviceId();
-		
-		// if not null, it is a singleton
-		if (gatewayAddressSet != null)
-		{
-			// get the endpoint address of the connecting gateway
-			String gatewayAddress = gatewayAddressSet.iterator().next();
+			// get the corresponding end point set
+			Set<String> gatewayAddressSet = ((ControllableDevice) this.context.getService(reference))
+					.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_ADDRESS);
 			
-			// get the gateway port if exists
-			String gatewayPort = "";
-			if ((gatewayPortSet != null) && (!gatewayPortSet.isEmpty()))
-				gatewayPort = gatewayPortSet.iterator().next();
+			Set<String> gatewayPortSet = ((ControllableDevice) this.context.getService(reference))
+					.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_PORT);
 			
-			// get the gateway protocol if exists
-			String gatewayProtocol = "";
-			if ((gatewayProtocolSet != null) && (!gatewayProtocolSet.isEmpty()))
-				gatewayProtocol = gatewayProtocolSet.iterator().next();
+			Set<String> gatewayProtocolSet = ((ControllableDevice) this.context.getService(reference))
+					.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.PROTO_ID);
 			
-			// check not null
-			if ((gatewayAddress != null) && (!gatewayAddress.isEmpty()))
+			String deviceId = ((ControllableDevice) this.context.getService(reference)).getDeviceId();
+			
+			// if not null, it is a singleton
+			if (gatewayAddressSet != null)
 			{
-				if (!this.isGatewayAvailable(deviceId))
+				// get the endpoint address of the connecting gateway
+				String gatewayAddress = gatewayAddressSet.iterator().next();
+				
+				// get the gateway port if exists
+				String gatewayPort = "";
+				if ((gatewayPortSet != null) && (!gatewayPortSet.isEmpty()))
+					gatewayPort = gatewayPortSet.iterator().next();
+				
+				// get the gateway protocol if exists
+				String gatewayProtocol = "";
+				if ((gatewayProtocolSet != null) && (!gatewayProtocolSet.isEmpty()))
+					gatewayProtocol = gatewayProtocolSet.iterator().next();
+				
+				// check not null
+				if ((gatewayAddress != null) && (!gatewayAddress.isEmpty()))
 				{
-					// create a new instance of the gateway driver
-					ModbusGatewayDriverInstance driver = new ModbusGatewayDriverInstance(this.network,
-							(ControllableDevice) this.context.getService(reference), gatewayAddress, gatewayPort,
-							gatewayProtocol, this.context);
-					
-					synchronized (this.connectedGateways)
+					if (!this.isGatewayAvailable(deviceId))
 					{
-						// store a reference to the gateway driver
-						this.connectedGateways.put(deviceId, driver);
+						// create a new instance of the gateway driver
+						ModbusGatewayDriverInstance driver = new ModbusGatewayDriverInstance(this.network,
+								(ControllableDevice) this.context.getService(reference), gatewayAddress, gatewayPort,
+								gatewayProtocol, this.context);
+						
+						synchronized (this.connectedGateways)
+						{
+							// store a reference to the gateway driver
+							this.connectedGateways.put(deviceId, driver);
+						}
+						
+						// modify the service description causing a forcing the
+						// framework to send a modified service notification
+						final Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
+						propDriver.put(DogDeviceCostants.DRIVER_ID, "Modbus_ModbusGateway_driver");
+						propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
+						
+						this.regDriver.setProperties(propDriver);
+						
 					}
 					
-					// modify the service description causing a forcing the
-					// framework to send a modified service notification
-					final Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-					propDriver.put(DogDeviceCostants.DRIVER_ID, "Modbus_ModbusGateway_driver");
-					propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
-					
-					this.regDriver.setProperties(propDriver);
 				}
-				return null;
+				else
+				{
+					// do not attach, log and throw exception
+					this.logger
+							.log(LogService.LOG_WARNING,
+									ModbusGatewayDriver.logId
+											+ "Unable to get the current gateway address (empty set), this prevents the device from being attached!");
+					throw new Exception(
+							ModbusGatewayDriver.logId
+									+ "Unable to get the current gateway address, this prevents the device from being attached!");
+				}
 			}
 			else
 			{
@@ -239,21 +257,12 @@ public class ModbusGatewayDriver implements Driver// ,
 				this.logger
 						.log(LogService.LOG_WARNING,
 								ModbusGatewayDriver.logId
-										+ "Unable to get the current gateway address (empty set), this prevents the device from being attached!");
+										+ "Unable to get the current gateway address (missing parameter), this prevents the device from being attached!");
 				throw new Exception(ModbusGatewayDriver.logId
 						+ "Unable to get the current gateway address, this prevents the device from being attached!");
 			}
-		}
-		else
-		{
-			// do not attach, log and throw exception
-			this.logger
-					.log(LogService.LOG_WARNING,
-							ModbusGatewayDriver.logId
-									+ "Unable to get the current gateway address (missing parameter), this prevents the device from being attached!");
-			throw new Exception(ModbusGatewayDriver.logId
-					+ "Unable to get the current gateway address, this prevents the device from being attached!");
-		}
+			
+			return null;
 	}
 	
 	/**

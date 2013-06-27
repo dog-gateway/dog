@@ -159,7 +159,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	}
 	
 	@Override
-	public DeviceStatus getState()
+	public synchronized DeviceStatus getState()
 	{
 		return this.currentState;
 	}

@@ -111,7 +111,7 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 	 * Handles the removal of the connected network driver by unregistering the
 	 * services provided by this driver
 	 */
-	public void removedNetworkDriver()
+	public void removedNetworkDriver(ModbusNetwork netDriver)
 	{
 		// un-register this service
 		this.unRegister();
@@ -140,7 +140,7 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 	 * Handles the removal of the connected network driver by unregistering the
 	 * services provided by this driver
 	 */
-	public void removedGatewayDriver()
+	public void removedGatewayDriver(ModbusGatewayDriver gwDriver)
 	{
 		// un-register this service
 		this.unRegister();
@@ -154,7 +154,6 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 	public int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
-		
 		if (this.context.getService(reference) instanceof ControllableDevice)
 		{
 			// get the given device category
@@ -173,6 +172,7 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 			{
 				if (manifacturer != null
 						&& (gateway != null)
+						&& (this.gateway!=null)
 						&& (manifacturer.equals(ModbusInfo.MANUFACTURER))
 						&& (deviceCategory.equals(ThreePhaseElectricityMeter.class.getName()) && (this.gateway
 								.isGatewayAvailable(gateway))
@@ -184,6 +184,7 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 				
 			}
 		}
+		
 		return matchValue;
 	}
 	

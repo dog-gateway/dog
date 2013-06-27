@@ -59,7 +59,7 @@ public class ModbusGatewayDriverInstance extends ModbusDriver implements ModbusG
 	}
 	
 	@Override
-	public DeviceStatus getState()
+	public synchronized DeviceStatus getState()
 	{
 		return this.currentState;
 	}
