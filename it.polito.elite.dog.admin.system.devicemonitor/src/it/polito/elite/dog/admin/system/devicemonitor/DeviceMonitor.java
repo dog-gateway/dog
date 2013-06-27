@@ -3,7 +3,13 @@
  */
 package it.polito.elite.dog.admin.system.devicemonitor;
 
+import java.util.Map;
+
 import it.polito.elite.dog.admin.system.devicemonitor.api.DeviceMonitorInterface;
+import it.polito.elite.domotics.model.DeviceStatus;
+import it.polito.elite.domotics.model.devicecategory.Controllable;
+import it.polito.elite.domotics.model.state.State;
+import it.polito.elite.domotics.model.statevalue.StateValue;
 import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
 import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
@@ -93,7 +99,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 		StringBuffer htmlOut = new StringBuffer();
 		
 		// append the unordered list header
-		htmlOut.append("<ul class=\"unstyled\">\n");
+		//htmlOut.append("<ul class=\"unstyled\">\n");
 		
 		// get all the installed device services
 		try
@@ -110,14 +116,16 @@ public class DeviceMonitor implements DeviceMonitorInterface
 						ControllableDevice currentDevice = (ControllableDevice) device;
 						
 						// start the list item for the current device
-						htmlOut.append("<li>");
+						htmlOut.append("<div class=\"row-fluid\"><div class=\"well\"");
 						
 						// get the device icon...
 						String category = currentDevice.getDeviceDescriptor().getDevCategory();
-						htmlOut.append("<i class=\"device-"+category.toLowerCase() + "\"></i>");
+						htmlOut.append("<p><i class=\"device-"+category.toLowerCase() + "\"></i>");
 						
 						// print the device identifier
 						htmlOut.append(currentDevice.getDeviceId() + " ");
+						
+						
 						
 						// get the device activation status
 						String active = (String) allDevices[i].getProperty(DogDeviceCostants.ACTIVE);
@@ -127,7 +135,8 @@ public class DeviceMonitor implements DeviceMonitorInterface
 						{
 							if (active.equals("true"))
 							{
-								htmlOut.append("<span class=\"label label-success pull-right\">Active</span>");
+								htmlOut.append("<span class=\"label label-success pull-right\">Active</span></p>");
+								htmlOut.append("<ul style=\"list-style-type: none\"><li> Current State: "+this.getDeviceState(currentDevice)+"</li></ul>");
 							}
 							else
 							{
@@ -136,7 +145,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 						}
 						
 						// close the device-related list item
-						htmlOut.append("</li>");
+						htmlOut.append("</div></div>");
 					}
 				}
 			}
@@ -150,5 +159,33 @@ public class DeviceMonitor implements DeviceMonitorInterface
 		htmlOut.append("</ul>\n");
 		
 		return htmlOut.toString();
+	}
+
+	private String getDeviceState(ControllableDevice currentDevice)
+	{
+		StringBuffer stateAsString = new StringBuffer();
+		DeviceStatus state = ((Controllable)currentDevice).getState();
+		Map<String,State> allStates = state.getStates();
+		
+		//iterate over all states
+		for(String stateKey : allStates.keySet())
+		{
+			//get the current state
+			State currentState = allStates.get(stateKey);
+			
+			//get the values associate to the current state
+			StateValue currentStateValues[] = currentState.getCurrentStateValue();
+			
+			//iterate over the values
+			int i;
+			for(i=0; i<currentStateValues.length; i++)
+			{
+				stateAsString.append("<span class=\"label label-info\">"+currentStateValues[i].getValue()+"</span>");
+			}
+			
+			if(i>1)
+				stateAsString.append("<br/>");
+		}
+		return stateAsString.toString();
 	}
 }
