@@ -100,28 +100,44 @@ public class DeviceMonitor implements DeviceMonitorInterface
 		{
 			ServiceReference<?>[] allDevices = this.context.getAllServiceReferences(Device.class.getName(), null);
 			
-			for (int i = 0; i < allDevices.length; i++)
+			if (allDevices != null)
 			{
-				Object device = this.context.getService(allDevices[i]);
-				if (device instanceof ControllableDevice)
+				for (int i = 0; i < allDevices.length; i++)
 				{
-					ControllableDevice currentDevice = (ControllableDevice) device;
-					
-					htmlOut.append("<li>" + currentDevice.getDeviceId()+" ");
-					String active = (String) allDevices[i].getProperty(DogDeviceCostants.ACTIVE);
-					if ((active != null) && (!active.isEmpty()))
+					Object device = this.context.getService(allDevices[i]);
+					if (device instanceof ControllableDevice)
 					{
-						if(active.equals("true"))
+						ControllableDevice currentDevice = (ControllableDevice) device;
+						
+						// start the list item for the current device
+						htmlOut.append("<li>");
+						
+						// get the device icon...
+						String category = currentDevice.getDeviceDescriptor().getDevCategory();
+						htmlOut.append("<i class=\"device-"+category.toLowerCase() + "\"></i>");
+						
+						// print the device identifier
+						htmlOut.append(currentDevice.getDeviceId() + " ");
+						
+						// get the device activation status
+						String active = (String) allDevices[i].getProperty(DogDeviceCostants.ACTIVE);
+						
+						// render the activation status
+						if ((active != null) && (!active.isEmpty()))
 						{
-							htmlOut.append("<span class=\"label label-success pull-right\">Active</span>");
+							if (active.equals("true"))
+							{
+								htmlOut.append("<span class=\"label label-success pull-right\">Active</span>");
+							}
+							else
+							{
+								htmlOut.append("<span class=\"label label-warning pull-right\">Not Active</span>");
+							}
 						}
-						else
-						{
-							htmlOut.append("<span class=\"label label-warning pull-right\">Not Active</span>");
-						}
+						
+						// close the device-related list item
+						htmlOut.append("</li>");
 					}
-					
-					htmlOut.append("</li>");
 				}
 			}
 		}
