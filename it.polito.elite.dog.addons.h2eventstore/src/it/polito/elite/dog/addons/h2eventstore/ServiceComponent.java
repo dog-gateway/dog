@@ -92,6 +92,7 @@ public class ServiceComponent implements EventHandler, ManagedService {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.log(LogService.LOG_ERROR, e.getMessage());
 		}
 	}
 
@@ -193,7 +194,7 @@ public class ServiceComponent implements EventHandler, ManagedService {
 						dao.insert(desc.getUid(), value, timestamp);
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.log(LogService.LOG_ERROR, e.getMessage());
 					}
 				} else {
 
