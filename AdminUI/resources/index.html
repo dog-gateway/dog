@@ -4,6 +4,7 @@
 <title></title>
 <meta name="description" content="" />
 <meta name="author" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- HTML5 shim, for IE6-8 support of HTML elements -->
 <!--[if lt IE 9]>
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -12,6 +13,7 @@
 <!-- CSS Styles -->
 <link href="./css/bootstrap.css" rel="stylesheet" />
 <link href="./css/bootstrap-responsive.css" rel="stylesheet" />
+<link href="./css/devices.css" rel="stylesheet" />
 
 <!-- Fav and touch icons
 <link rel="shortcut icon" href="img/favicon.ico"/>
@@ -46,6 +48,7 @@
 			<div class="span6">
 				<div class="row-fluid">
 					<div class="span 6">
+					<h6>System Status</h6>
 						<div class="well">
 							<p>
 								Dog status: <span class="label label-success pull-right">Running</span>
@@ -69,14 +72,16 @@
 				</div>
 				<div class="row-fluid">
 					<div class="span 6">
+						<h6>Available Devices</h6>
 						<div class="well" data-load="ajax"
-					data-src="services/system/devices" data-refresh="1000">
-					<p>Loading system bundles..</p>
-				</div>
-				</div>
+							data-src="services/system/devices" data-refresh="1000">
+							<p>Loading available devices..</p>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="span6">
+				<h6>Installed Bundles</h6>
 				<div class="well" data-load="ajax"
 					data-src="services/system/bundles" data-refresh="1000">
 					<p>Loading system bundles..</p>
