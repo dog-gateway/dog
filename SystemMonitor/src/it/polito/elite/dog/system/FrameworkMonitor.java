@@ -24,7 +24,7 @@ public class FrameworkMonitor implements FrameworkMonitorInterface
 	private LogService logger;
 	
 	// the log id
-	public static final String logId = "[SystemManager]: ";
+	public static final String logId = "[FrameworkMonitor]: ";
 	
 	// the bundle context reference to extract information on the entire Dog
 	// status

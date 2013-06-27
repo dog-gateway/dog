@@ -6,11 +6,10 @@ Bundle-Version: 1.0.0
 Bundle-Vendor: it.polito.elite
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
-Import-Package: javax.ws.rs,
+Import-Package: it.polito.elite.domotics.dog2.doglibrary.util,
+ javax.ws.rs,
  javax.ws.rs.core,
  javax.ws.rs.ext,
  org.codehaus.jettison.json,
  org.osgi.framework,
  org.osgi.service.log;version="1.3.0"
-Require-Bundle: DogLogger;bundle-version="2.1.0",
- Dog2Library;bundle-version="2.2.4"

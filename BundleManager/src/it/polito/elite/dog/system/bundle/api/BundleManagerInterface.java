@@ -12,11 +12,11 @@ import javax.ws.rs.core.MediaType;
  * @author bonino
  *
  */
-@Path("/system/")
+@Path("/system/bundles/")
 public interface BundleManagerInterface
 {
 	@GET
-	@Path("/bundles/")
+	@Path("/")
 	@Produces(MediaType.TEXT_HTML)
 	public String getBundles();
 }
