@@ -5,3 +5,4 @@ Bundle-SymbolicName: it.polito.elite.dog.addons.h2eventstore.test
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: it.polito.elite.dog.addons.h2eventstore;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.junit
