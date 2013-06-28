@@ -28,7 +28,7 @@ import org.osgi.service.log.LogService;
  * @author bonino
  * 
  */
-@Path("/system/devices/")
+@Path("/system/devicemonitor/")
 public class DeviceMonitor implements DeviceMonitorInterface
 {
 	// the service logger
@@ -91,7 +91,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 	 */
 	@Override
 	@GET
-	@Path("/")
+	@Path("/devices")
 	@Produces("text/html")
 	public String getInstalledDevices()
 	{

@@ -12,11 +12,11 @@ import javax.ws.rs.core.MediaType;
  * @author bonino
  * 
  */
-@Path("/system/devices/")
+@Path("/system/devicemonitor/")
 public interface DeviceMonitorInterface
 {
 	@GET
-	@Path("/")
+	@Path("/devices")
 	@Produces(MediaType.TEXT_HTML)
 	public String getInstalledDevices();
 	

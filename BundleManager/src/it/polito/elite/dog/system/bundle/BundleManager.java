@@ -22,7 +22,7 @@ import org.osgi.service.log.LogService;
  * @author bonino
  * 
  */
-@Path("/system/bundles/")
+@Path("/system/bundlemanager/")
 public class BundleManager implements BundleManagerInterface
 {
 	// the service logger
@@ -84,7 +84,7 @@ public class BundleManager implements BundleManagerInterface
 	 */
 	@Override
 	@GET
-	@Path("/")
+	@Path("/bundles")
 	@Produces(MediaType.TEXT_HTML)
 	public String getBundles()
 	{
