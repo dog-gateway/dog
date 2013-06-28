@@ -102,7 +102,16 @@ public class ModbusGatewayDriver implements Driver// ,
 	
 	public void deactivate()
 	{
+		// log deactivation
+		this.logger.log(LogService.LOG_DEBUG, ModbusGatewayDriver.logId + " Deactivation required");
+		
 		this.unRegister();
+		
+		// null the inner data structures
+		this.context = null;
+		this.logger = null;
+		this.network = null;
+		
 	}
 	
 	public void unRegister()
@@ -159,23 +168,27 @@ public class ModbusGatewayDriver implements Driver// ,
 	{
 		int matchValue = Device.MATCH_NONE;
 		
-		// get the given device category
-		String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
-		
-		// get the given device manufacturer
-		String manufacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
-		
-		// compute the matching score between the given device and this driver
-		if (deviceCategory != null)
+		if (this.regDriver != null)
 		{
-			if (manufacturer != null && manufacturer.equals(ModbusInfo.MANUFACTURER)
-					&& (deviceCategory.equals(ModbusGateway.class.getName())
-					
-					))
-			{
-				matchValue = ModbusGateway.MATCH_MANUFACTURER + ModbusGateway.MATCH_TYPE;
-			}
+			// get the given device category
+			String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
 			
+			// get the given device manufacturer
+			String manufacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+			
+			// compute the matching score between the given device and this
+			// driver
+			if (deviceCategory != null)
+			{
+				if (manufacturer != null && manufacturer.equals(ModbusInfo.MANUFACTURER)
+						&& (deviceCategory.equals(ModbusGateway.class.getName())
+						
+						))
+				{
+					matchValue = ModbusGateway.MATCH_MANUFACTURER + ModbusGateway.MATCH_TYPE;
+				}
+				
+			}
 		}
 		return matchValue;
 	}
@@ -184,6 +197,8 @@ public class ModbusGatewayDriver implements Driver// ,
 	@Override
 	public String attach(ServiceReference reference) throws Exception
 	{
+		if (this.regDriver != null)
+		{
 			// get the corresponding end point set
 			Set<String> gatewayAddressSet = ((ControllableDevice) this.context.getService(reference))
 					.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_ADDRESS);
@@ -261,8 +276,8 @@ public class ModbusGatewayDriver implements Driver// ,
 				throw new Exception(ModbusGatewayDriver.logId
 						+ "Unable to get the current gateway address, this prevents the device from being attached!");
 			}
-			
-			return null;
+		}
+		return null;
 	}
 	
 	/**

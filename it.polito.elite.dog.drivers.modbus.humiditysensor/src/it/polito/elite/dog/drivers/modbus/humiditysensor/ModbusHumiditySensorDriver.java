@@ -92,7 +92,21 @@ public class ModbusHumiditySensorDriver implements Driver
 	
 	public void deactivate()
 	{
+		// log deactivation
+		this.logger.log(LogService.LOG_DEBUG, ModbusHumiditySensorDriver.logId + " Deactivation required");
+		
+		// unregister from the network driver
+		for (ModbusHumiditySensorDriverInstance instance : this.connectedDrivers)
+			this.network.removeDriver(instance);
+		
 		this.unRegister();
+		
+		// null the inner data structures
+		this.context = null;
+		this.logger = null;
+		this.network = null;
+		this.gateway = null;
+		this.connectedDrivers = null;
 	}
 	
 	/**
@@ -159,31 +173,35 @@ public class ModbusHumiditySensorDriver implements Driver
 	{
 		int matchValue = Device.MATCH_NONE;
 		
-		// get the given device category
-		String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
-		
-		// get the given device manufacturer
-		String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
-		
-		// get the gateway to which the device is connected
-		@SuppressWarnings("unchecked")
-		String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-				.getGateway();
-		
-		// compute the matching score between the given device and this driver
-		if (deviceCategory != null)
+		if (this.regDriver != null)
 		{
-			if (manifacturer != null
-					&& (gateway != null)
-					&& (manifacturer.equals(ModbusInfo.MANUFACTURER))
-					&& (deviceCategory.equals(HumiditySensor.class.getName()) && (this.gateway
-							.isGatewayAvailable(gateway))
-					
-					))
-			{
-				matchValue = HumiditySensor.MATCH_MANUFACTURER + HumiditySensor.MATCH_TYPE;
-			}
+			// get the given device category
+			String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
 			
+			// get the given device manufacturer
+			String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+			
+			// get the gateway to which the device is connected
+			@SuppressWarnings("unchecked")
+			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
+					.getGateway();
+			
+			// compute the matching score between the given device and this
+			// driver
+			if (deviceCategory != null)
+			{
+				if (manifacturer != null
+						&& (gateway != null)
+						&& (manifacturer.equals(ModbusInfo.MANUFACTURER))
+						&& (deviceCategory.equals(HumiditySensor.class.getName()) && (this.gateway
+								.isGatewayAvailable(gateway))
+						
+						))
+				{
+					matchValue = HumiditySensor.MATCH_MANUFACTURER + HumiditySensor.MATCH_TYPE;
+				}
+				
+			}
 		}
 		return matchValue;
 	}
@@ -192,21 +210,24 @@ public class ModbusHumiditySensorDriver implements Driver
 	@Override
 	public String attach(ServiceReference reference) throws Exception
 	{
-		// get the gateway to which the device is connected
-		String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-				.getGateway();
-		
-		// create a new driver instance
-		ModbusHumiditySensorDriverInstance driverInstance = new ModbusHumiditySensorDriverInstance(network,
-				(ControllableDevice) this.context.getService(reference), this.gateway.getSpecificGateway(gateway)
-						.getGatewayAddress(), this.gateway.getSpecificGateway(gateway).getGatewayPort(), this.gateway
-						.getSpecificGateway(gateway).getGwProtocol(), this.context);
-		
-		((ControllableDevice) context.getService(reference)).setDriver(driverInstance);
-		
-		synchronized (this.connectedDrivers)
+		if (this.regDriver != null)
 		{
-			this.connectedDrivers.add(driverInstance);
+			// get the gateway to which the device is connected
+			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
+					.getGateway();
+			
+			// create a new driver instance
+			ModbusHumiditySensorDriverInstance driverInstance = new ModbusHumiditySensorDriverInstance(network,
+					(ControllableDevice) this.context.getService(reference), this.gateway.getSpecificGateway(gateway)
+							.getGatewayAddress(), this.gateway.getSpecificGateway(gateway).getGatewayPort(),
+					this.gateway.getSpecificGateway(gateway).getGwProtocol(), this.context);
+			
+			((ControllableDevice) context.getService(reference)).setDriver(driverInstance);
+			
+			synchronized (this.connectedDrivers)
+			{
+				this.connectedDrivers.add(driverInstance);
+			}
 		}
 		return null;
 	}
