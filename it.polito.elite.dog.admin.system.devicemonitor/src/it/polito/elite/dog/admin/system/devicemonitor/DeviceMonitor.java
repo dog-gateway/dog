@@ -136,7 +136,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 							if (active.equals("true"))
 							{
 								htmlOut.append("<span class=\"label label-success pull-right\">Active</span></p>");
-								htmlOut.append("<ul style=\"list-style-type: none\"><li> Current State: "+this.getDeviceState(currentDevice)+"</li></ul>");
+								htmlOut.append("<ul style=\"list-style-type: none\"><li>"+this.getDeviceState(currentDevice)+"</li></ul>");
 							}
 							else
 							{
@@ -177,14 +177,12 @@ public class DeviceMonitor implements DeviceMonitorInterface
 			StateValue currentStateValues[] = currentState.getCurrentStateValue();
 			
 			//iterate over the values
-			int i;
-			for(i=0; i<currentStateValues.length; i++)
+			stateAsString.append("<p>");
+			for(int i=0; i<currentStateValues.length; i++)
 			{
 				stateAsString.append("<span class=\"label label-info\">"+currentStateValues[i].getValue()+"</span>");
 			}
-			
-			if(i>1)
-				stateAsString.append("<br/>");
+			stateAsString.append("<p/>");
 		}
 		return stateAsString.toString();
 	}
