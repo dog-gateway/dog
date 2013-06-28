@@ -21,7 +21,7 @@
 
 .device-mainspoweroutlet,
 .device-onoffoutput,
-.device-powermeteringpoweroutlet
+.device-meteringpoweroutlet
 {
 	background-image: url("../img/devices/plug.png");
 }
