@@ -21,12 +21,65 @@
 
 .device-mainspoweroutlet,
 .device-onoffoutput,
-.device-meteringpoweroutlet
+.device-meteringpoweroutlet,
+.device-energymeteringpoweroutlet,
+.device-powermeteringpoweroutlet
 {
 	background-image: url("../img/devices/plug.png");
 }
 
-.device-washingmachine
+.device-washingmachine,
+.device-appliances
 {
 	background-image: url("../img/devices/washing_machine.png");
 }
+
+.device-activepowermeter,
+.device-apparentpowermeter,
+.device-currentmeter,
+.device-electricitymeter,
+.device-energymeter,
+.device-energyandpowermeter,
+.device-multitariffenergymeter,
+.device-multitariffsinglephaseenergymeter,
+.device-multitariffthreephaseenergymeter,
+.device-reactivepowermeter,
+.device-singlephaseactivepowermeter,
+.device-singlephaseapparentpowermeter,
+.device-singlephasecurrentmeter,
+.device-singlephaseelectricitymeter,
+.device-singlephaseenergymeter,
+.device-singlephasereactivepowermeter
+.device-singlephasevoltagemeter,
+.device-singletariffenergymeter,
+.device-threephaseactivepowermeter,
+.device-threephaseapparentpowermeter,
+.device-threephasecurrentmeter,
+.device-threephaseelectricitymeter,
+.device-threephaseenergymeter,
+.device-threephasereactivepowermeter,
+.device-threephasevoltagemeter
+{
+	background-image: url("../img/devices/meter.png");
+}
+
+.device-microwaveoven
+{
+	background-image: url("../img/devices/microwave.png");
+}
+
+.device-cooker,
+.device-electricalcooker,
+.device-gascooker,
+.device-hotplate
+{
+	background-image: url("../img/devices/cooker.png");
+}
+
+.device-fridge,
+.device-deepfreezer
+{
+	background-image: url("../img/devices/fridge.png");
+}
+
+
