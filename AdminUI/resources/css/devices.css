@@ -14,7 +14,12 @@
 .device-modbusgateway,
 .device-knxnetipgateway,
 .device-elitegateway,
-.device-bticinogateway
+.device-bticinogateway,
+.device-echelonlilon100gateway,
+.device-homegateway,
+.device-konnexgateway,
+.device-texasinstrumentsgateway,
+.device-zwavegateway
 {
 	background-image: url("../img/devices/gateway.png");	
 }
@@ -60,7 +65,8 @@
 .device-threephasereactivepowermeter,
 .device-threephasevoltagemeter
 {
-	background-image: url("../img/devices/meter.png");
+	background-image: url("../img/devices/electricity-meter.png");
+	width: 31px;
 }
 
 .device-microwaveoven
@@ -81,5 +87,13 @@
 {
 	background-image: url("../img/devices/fridge.png");
 }
+
+.device-singletemperaturesensor,
+.device-temperaturesensor
+{
+	background-image: url("../img/devices/temperature.png");
+}
+
+
 
 
