@@ -17,6 +17,7 @@ import it.polito.elite.dog.drivers.modbus.network.protocol.ModbusProtocolVariant
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 
 import java.net.InetAddress;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -152,16 +153,28 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		// store the bundle context
 		this.bundleContext = null;
 		
-		// create the register to driver map
+		// delete the register to driver map
 		this.register2Driver = null;
 		
-		// create the driver to register map
+		// delete the driver to register map
 		this.driver2Register = null;
 		
-		// create the gateway address to register map
+		// delete the gateway address to register map
 		this.gatewayAddress2Registers = null;
+				
+		//close connections
+		Collection<MasterConnection> connections = this.connectionPool.values();
 		
-		// create the connection pool (one per gateway address)
+		if(connections!=null)
+		{
+			for(MasterConnection connection: connections)
+			{
+				if(connection.isConnected())
+					connection.close();
+			}
+		}
+		
+		// delete the connection pool (one per gateway address)
 		this.connectionPool = null;
 	}
 	
