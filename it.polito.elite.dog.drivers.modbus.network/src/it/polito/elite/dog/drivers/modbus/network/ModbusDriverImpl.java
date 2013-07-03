@@ -135,6 +135,9 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		
 		// register this bundle as a service that must be configured.
 		// this.registerManagedService();
+		
+		//log the activation
+		this.logger.log(LogService.LOG_DEBUG, ModbusDriverImpl.logId+"Activated...");
 	}
 	
 	/**
