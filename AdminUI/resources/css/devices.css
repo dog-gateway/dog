@@ -36,7 +36,7 @@
 .device-washingmachine,
 .device-appliances
 {
-	background-image: url("../img/devices/washing_machine.png");
+	background-image: url("../img/devices/washing-machine.png");
 }
 
 .device-activepowermeter,
@@ -94,6 +94,80 @@
 	background-image: url("../img/devices/temperature.png");
 }
 
+.device-accesscontrolsystem
+{
+	background-image: url("../img/devices/access-control.png");
+}
 
+.device-acoustic
+{
+	background-image: url("../img/devices/speaker.png");
+}
 
+.device-actuator,
+.device-awningactuator
+{
+	background-image: url("../img/devices/actuator.png");
+}
 
+.device-airconditioningsystem
+{
+	background-image: url("../img/devices/cold.png");
+}
+
+.device-alarmclock
+{
+	background-image: url("../img/devices/alarm-clock.png");
+}
+
+.device-answeringmachine
+{
+	background-image: url("../img/devices/phone.png");
+	
+}
+
+.device-antiintrusionsystem
+{
+	background-image: url("../img/devices/anti-intrusion.png");
+}
+
+.device-boiler,
+.device-hottube
+{
+	background-image: url("../img/devices/hot-tube.png");
+}
+
+.device-browngoods
+{
+	background-image: url("../img/devices/radio.png");
+}
+
+.device-button
+{
+	background-image: url("../img/devices/tap.png");
+}
+
+.device-buzzer
+{
+	background-image: url("../img/devices/bell.png");
+}
+
+.device-clock
+{
+	background-image: url("../img/devices/clock.png");	
+}
+
+.device-co2sensor
+{
+	background-image: url("../img/devices/co2sensor.png");	
+}
+
+.device-coffeemaker
+{
+	background-image: url("../img/devices/coffee-maker.png");	
+}
+
+.device-colordimmablelight
+{
+	background-image: url("../img/devices/color-dimmable-lamp.png");
+}
