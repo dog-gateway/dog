@@ -13,6 +13,7 @@
  */
 package it.polito.elite.dog.addons.rules;
 
+import it.polito.elite.dog.addons.rules.api.RuleEngineApi;
 import it.polito.elite.dog.addons.rules.schemalibrary.ObjectFactory;
 import it.polito.elite.dog.addons.rules.schemalibrary.Rule;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
@@ -152,11 +153,11 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	 */
 	public RuleEngine()
 	{
-		//intentionally left empty
-		//System.err.println("Created an instance of RuleEngine");
+		// intentionally left empty
+		// System.err.println("Created an instance of RuleEngine");
 	}
 	
-	public void activate (BundleContext context)
+	public void activate(BundleContext context)
 	{
 		
 		// initialize the context
@@ -177,17 +178,16 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		this.thMessageQueue = new Thread(this.messageQueue);
 		this.thMessageQueue.start();
 		
-		//debug
-		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId+"Activated...");
+		// debug
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Activated...");
 	}
-	
 	
 	public void deactivate()
 	{
-		//unregister provided services
+		// unregister provided services
 		this.unregisterServices();
 		
-		//TODO: complete deactivation tasks
+		// TODO: complete deactivation tasks
 	}
 	
 	// SETTERS AND GETTERS
@@ -290,8 +290,8 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		this.runtimeRuleSession.setGlobal("timeConverter", converter);
 		
 		// debug
-		this.logger
-				.log(LogService.LOG_DEBUG, "[DogRulesBundle]: runtime session created... " + this.runtimeRuleSession);
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " runtime session created... "
+				+ this.runtimeRuleSession);
 	}
 	
 	/**
@@ -313,7 +313,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		p.put(EventConstants.EVENT_TOPIC, new String[] { "org/osgi/service/monitor",
 				TimedTriggerNotification.notificationTopic, "it/polito/elite/domotics/model/notification/*" });
 		this.srEventHandler = this.context.registerService(EventHandler.class.getName(), this, p);
-		this.srDogRulesService = this.context.registerService(DogRulesService.class.getName(), this, null);
+		this.srDogRulesService = this.context.registerService(RuleEngineApi.class.getName(), this, null);
 		
 	}
 	
@@ -387,10 +387,19 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	@Override
 	public void addRule(String xmlRule)
 	{
-		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: received request to add a new rule:\n" + xmlRule);
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to add a new rule:\n" + xmlRule);
 		
 		// the DRL rules
 		RuleList rules = this.parseXMLRule(xmlRule);
+		
+		// add the rule(s)
+		this.addRule(rules);
+	}
+	
+	public void addRule(RuleList rules)
+	{
+		
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Adding new rules...");
 		
 		// filter out duplicate rules....
 		this.localRuleBaseJAXB = this.mergeRules(rules);
@@ -408,8 +417,8 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		if (drlRules != null)
 		{
 			// debug
-			this.logger.log(LogService.LOG_DEBUG,
-					"[DogRulesBundle]: merged existing and new rules and translated them to DRL:\n" + drlRules);
+			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
+					+ " Merged existing and new rules and translated them to DRL:\n" + drlRules);
 			
 			// here we parse the just created DRL specification and load it into
 			// the rules bundle knowledge base
@@ -433,14 +442,15 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 			this.scheduleTimedEvents(timedEvents);
 			
 			// debug
-			this.logger.log(LogService.LOG_DEBUG,
-					"[DogRulesBundle]: new rules have been added to the current rule base");
+			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
+					+ " new rules have been added to the current rule base");
 			
 			// save
 			this.saveRules(this.localRuleBasePath);
 			
 			// debug
-			this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: new rules have been save to the rule repository");
+			this.logger
+					.log(LogService.LOG_DEBUG, RuleEngine.logId + " new rules have been save to the rule repository");
 		}
 		
 	}
@@ -479,7 +489,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	public void removeRule(String ruleName)
 	{
 		
-		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: received request to remove a rule:\n" + ruleName);
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to remove a rule:\n" + ruleName);
 		
 		// remove the rule from the knowledge base (i.e., from all the knowledge
 		// packages
@@ -507,12 +517,20 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	@Override
 	public void setRules(String xmlRules)
 	{
-		
-		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: received request to set the engine rules:\n"
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to set the engine rules:\n"
 				+ xmlRules);
 		
 		// the DRL rules
 		RuleList rules = this.parseXMLRule(xmlRules);
+		
+		// set the new rules
+		this.setRules(rules);
+	}
+	
+	public void setRules(RuleList rules)
+	{
+		// debug
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Replacing rules...");
 		
 		// preprocess timed e-blocks
 		TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
@@ -527,7 +545,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		if (drlRules != null)
 		{
 			// debug
-			this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: translated the new rule to DRL:\n" + drlRules);
+			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " translated the new rule to DRL:\n" + drlRules);
 			
 			// set the new rules
 			// here we parse the just created DRL specification and load it into
@@ -541,8 +559,8 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 			kBuilder.add(ResourceFactory.newReaderResource(drlReader), ResourceType.DRL);
 			
 			if (kBuilder.hasErrors())
-				this.logger.log(LogService.LOG_ERROR,
-						"[DogRulesBundle]: Error while loading DRL from local rule store:" + kBuilder.getErrors());
+				this.logger.log(LogService.LOG_ERROR, RuleEngine.logId
+						+ " Error while loading DRL from local rule store:" + kBuilder.getErrors());
 			
 			// create the knowledge base to which rules shall be added
 			KnowledgeBase ruleBase = KnowledgeBaseFactory.newKnowledgeBase();
@@ -556,13 +574,15 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 			this.scheduleTimedEvents(timedEvents);
 			
 			// debug
-			this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: new rules have been set as the current rule base");
+			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
+					+ " new rules have been set as the current rule base");
 			
 			// save the rules on the local rule store...
 			this.saveRules(this.localRuleBasePath);
 			
 			// debug
-			this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: new rules have been save to the rule repository");
+			this.logger
+					.log(LogService.LOG_DEBUG, RuleEngine.logId + " new rules have been save to the rule repository");
 		}
 		
 	}
@@ -571,7 +591,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	public void loadRules(URI location)
 	{
 		
-		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: received request to load rules from:\n" + location);
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to load rules from:\n" + location);
 		
 		// check if the URI is local otherwise log the error and fail
 		File checkFile = new File(location);
@@ -583,7 +603,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	public void loadRules(String location)
 	{
 		
-		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: received request to load rules from:\n" + location);
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to load rules from:\n" + location);
 		
 		// check if the URI is local otherwise log the error and fail
 		File checkFile = new File(location);
@@ -603,7 +623,8 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		{
 			this.logger
 					.log(LogService.LOG_ERROR,
-							"[DogRulesBundle]: the rule file to load cannot be read, is it on the local machine? URIs cannot point to on-line resources...");
+							RuleEngine.logId
+									+ " the rule file to load cannot be read, is it on the local machine? URIs cannot point to on-line resources...");
 		}
 	}
 	
@@ -611,7 +632,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	public void saveRules(URI location)
 	{
 		
-		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: received request to save rules in:\n" + location);
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to save rules in:\n" + location);
 		File checkFile = new File(location);
 		this.saveRules(checkFile);
 	}
@@ -619,7 +640,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	@Override
 	public void saveRules(String location)
 	{
-		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: received request to save rules in:\n" + location);
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to save rules in:\n" + location);
 		File checkFile = new File(location);
 		this.saveRules(checkFile);
 	}
@@ -657,7 +678,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, "[DogRulesBundle]: the rule file cannot be saved where specified\n"
+			this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " the rule file cannot be saved where specified\n"
 					+ e);
 		}
 	}
@@ -693,9 +714,11 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		catch (JAXBException e)
 		{
 			// log the error
-			this.logger.log(LogService.LOG_ERROR,
-					"[DogRulesBundle]: error while unmrashalling the received xml rules, checking if a single rule has been provided.\n"
-							+ e);
+			this.logger
+					.log(LogService.LOG_ERROR,
+							RuleEngine.logId
+									+ " error while unmrashalling the received xml rules, checking if a single rule has been provided.\n"
+									+ e);
 		}
 		
 		return rules;
@@ -708,7 +731,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		String eventTopic = event.getTopic();
 		
 		// Debug
-		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: received event of topic: " + eventTopic);
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received event of topic: " + eventTopic);
 		
 		Notification receivedNotification = null;
 		
@@ -728,7 +751,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 			
 			catch (Exception e)
 			{
-				this.logger.log(LogService.LOG_ERROR, "[DogRulesBundle]: device status deserialization error "
+				this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error "
 						+ e.getClass().getSimpleName());
 			}
 			
@@ -743,7 +766,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 					receivedNotification.setDeviceUri(currentDeviceStatus.getDeviceURI());
 					
 					// debug
-					this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: handling state change notification(s): "
+					this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " handling state change notification(s): "
 							+ receivedNotification);
 					
 					// insert the notification in the working memory
@@ -767,7 +790,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 						.equals(TimedTriggerNotification.notificationTopic)))
 		{
 			// debug
-			this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: trigger event: " + event);
+			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " trigger event: " + event);
 			
 			// handle Notification
 			Object eventContent = event.getProperty(EventConstants.EVENT);
@@ -778,7 +801,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 				receivedNotification = (Notification) eventContent;
 				
 				// debug
-				this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: handling notification: "
+				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " handling notification: "
 						+ receivedNotification);
 				
 				// insert the notification in the working memory
@@ -826,7 +849,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, "[DogRulesBundle]: device status deserialization error "
+			this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error "
 					+ e.getClass().getSimpleName());
 			return returningState;
 		}
@@ -904,7 +927,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 				timedCmd.setStartTime(startTime);
 				
 				// debug
-				this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: scheduled command " + commandName + " at "
+				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " scheduled command " + commandName + " at "
 						+ startTime.getTime());
 				
 				// create the schedule request
@@ -939,7 +962,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 				this.scheduler.scheduleMessage(eventToSchedule);
 				
 				// debug
-				this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: Scheduled timed event: " + eventToSchedule);
+				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " Scheduled timed event: " + eventToSchedule);
 			}
 			
 		}

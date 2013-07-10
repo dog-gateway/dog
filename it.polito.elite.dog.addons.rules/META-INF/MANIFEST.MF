@@ -31,3 +31,5 @@ Bundle-ClassPath: lib/drools/drools-core-5.4.0.Final.jar,
  lib/jdt/org.eclipse.jdt.core_3.6.1.v_A68_R36x.jar
 Service-Component: OSGI-INF/component.xml
 Bundle-Vendor: eLite - Politecnico di Torino (http://elite.polito.it)
+Export-Package: it.polito.elite.dog.addons.rules.api,
+ it.polito.elite.dog.addons.rules.schemalibrary
