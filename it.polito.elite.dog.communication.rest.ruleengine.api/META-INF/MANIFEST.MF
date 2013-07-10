@@ -3,10 +3,13 @@ Bundle-ManifestVersion: 2
 Bundle-Name: RuleEngineRESTEndpoint
 Bundle-SymbolicName: it.polito.elite.dog.communication.rest.ruleengine.api
 Bundle-Version: 1.0.0
-Bundle-Vendor: it.polito.elite
+Bundle-Vendor: eLite - Politecnico di Torino (http://elite.polito.it)
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
-Import-Package: it.polito.elite.domotics.dog2.doglibrary.util,
+Import-Package: it.polito.elite.dog.addons.rules.api,
+ it.polito.elite.dog.addons.rules.schemalibrary,
+ it.polito.elite.domotics.dog2.doglibrary.interfaces,
+ it.polito.elite.domotics.dog2.doglibrary.util,
  javax.ws.rs,
  javax.ws.rs.core,
  javax.ws.rs.ext,
