@@ -3,6 +3,8 @@
  */
 package it.polito.elite.dog.communication.rest.ruleengine;
 
+import it.polito.elite.dog.addons.rules.api.RuleEngineApi;
+import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
 import it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 
@@ -29,8 +31,11 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	// the log id
 	public static final String logId = "[RuleEngineRESTApi]: ";
 	
-	// the bundle context reference 
+	// the bundle context reference
 	private BundleContext context;
+	
+	// the rule service for which this bundle offers a rest interface
+	private RuleEngineApi ruleEngine;
 	
 	/**
 	 * 
@@ -38,6 +43,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public RuleEngineRESTEndpoint()
 	{
 		// TODO Auto-generated constructor stub
+		System.out.println("Created RuleEngineRESTEndpoint");
 	}
 	
 	/**
@@ -73,6 +79,24 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		this.logger = null;
 	}
 	
+	public void addedRuleService(RuleEngineApi ruleEngine)
+	{
+		// store a reference to the rule service
+		this.ruleEngine = ruleEngine;
+		
+		// debug
+		this.logger.log(LogService.LOG_DEBUG, RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
+	}
+	
+	public void removedRuleService(RuleEngineApi ruleEngine)
+	{
+		// remove the reference to the rule service
+		this.ruleEngine = null;
+		
+		// debug
+		this.logger.log(LogService.LOG_DEBUG, RuleEngineRESTEndpoint.logId + "Disconnected from the RuleEngineApi");
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -84,9 +108,14 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	@POST
 	@Path("/add")
 	@Consumes({ MediaType.APPLICATION_XML })
-	public void addRulesXML(String xmlRules)
+	public void addRulesXML(RuleList xmlRules)
 	{
-		// TODO Auto-generated method stub
+		//check not null
+		if(this.ruleEngine!=null)
+		{
+			//add the received rules
+			this.ruleEngine.addRule(xmlRules);
+		}
 		
 	}
 	
@@ -103,7 +132,12 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	@Path("/remove/{ruleId}")
 	public void removeRule(String ruleId)
 	{
-		// TODO Auto-generated method stub
+		//check not null
+		if(this.ruleEngine!=null)
+		{
+			//add received rules
+			this.ruleEngine.removeRule(ruleId);
+		}
 		
 	}
 	
@@ -118,9 +152,14 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	@POST
 	@Path("/set")
 	@Consumes({ MediaType.APPLICATION_XML })
-	public void setRulesXML(String xmlRules)
+	public void setRulesXML(RuleList xmlRules)
 	{
-		// TODO Auto-generated method stub
+		//check not null
+		if(this.ruleEngine!=null)
+		{
+			//add received rules
+			this.ruleEngine.setRules(xmlRules);
+		}
 		
 	}
 	
