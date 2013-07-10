@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="it.polito.elite.dog.communication.rest.ruleengine.api">
+   <implementation class="it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTEndpoint"/>
+   <service>
+      <provide interface="it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi"/>
+   </service>
+</scr:component>
