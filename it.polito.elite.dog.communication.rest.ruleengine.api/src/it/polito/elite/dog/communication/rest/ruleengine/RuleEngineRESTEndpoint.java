@@ -43,7 +43,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public RuleEngineRESTEndpoint()
 	{
 		// TODO Auto-generated constructor stub
-		System.out.println("Created RuleEngineRESTEndpoint");
+		System.out.println(RuleEngineRESTEndpoint.logId +"Created RuleEngineRESTEndpoint");
 	}
 	
 	/**
@@ -79,16 +79,19 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		this.logger = null;
 	}
 	
-	public void addedRuleService(RuleEngineApi ruleEngine)
+	public void addedRuleEngine(RuleEngineApi ruleEngine)
 	{
 		// store a reference to the rule service
 		this.ruleEngine = ruleEngine;
 		
 		// debug
-		this.logger.log(LogService.LOG_DEBUG, RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
+		if(this.logger!=null)
+			this.logger.log(LogService.LOG_DEBUG, RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
+		else
+			System.out.println(RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
 	}
 	
-	public void removedRuleService(RuleEngineApi ruleEngine)
+	public void removedRuleEngine(RuleEngineApi ruleEngine)
 	{
 		// remove the reference to the rule service
 		this.ruleEngine = null;

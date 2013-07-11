@@ -4,4 +4,5 @@
    <service>
       <provide interface="it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi"/>
    </service>
+   <reference bind="addedRuleEngine" cardinality="1..1" interface="it.polito.elite.dog.addons.rules.api.RuleEngineApi" name="RuleEngineApi" policy="dynamic" unbind="removedRuleEngine"/>
 </scr:component>
