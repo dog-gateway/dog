@@ -181,7 +181,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// debug
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Activated...");
 		
-		//check if it can start
+		// check if it can start
 		this.checkAndRegisterServices();
 	}
 	
@@ -318,8 +318,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		this.srEventHandler = this.context.registerService(EventHandler.class.getName(), this, p);
 		this.srDogRulesService = this.context.registerService(RuleEngineApi.class.getName(), this, null);
 		
-		//debug
-		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId+"Registered services... now ready to execute rules!");
+		// debug
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Registered services... now ready to execute rules!");
 		
 	}
 	
@@ -382,8 +382,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	public synchronized void initEnded()
 	{
 		this.setRulesAreReady(true);
-		//if (this.isServicesHaveBeenMatched())
-		//	this.registerServices();
+		// if (this.isServicesHaveBeenMatched())
+		// this.registerServices();
 	}
 	
 	/****************************************************************************************************************
@@ -442,7 +442,6 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			
 			// add the just read DRL rules
 			ruleBase.addKnowledgePackages(kBuilder.getKnowledgePackages());
-			
 			this.setRuleBase(ruleBase);
 			
 			// schedule timed events if any available
@@ -689,6 +688,76 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " the rule file cannot be saved where specified\n"
 					+ e);
 		}
+	}
+	
+	/**
+	 * Get the local rule base encoded as DRL
+	 * 
+	 * @return A {@link String} representation of the local rule base using the
+	 *         DRL language (DSL)
+	 */
+	@Override
+	public String getDRLRules()
+	{
+		String drlRules = "Rule base currently empty";
+		
+		if (this.localRuleBaseJAXB != null)
+		{
+			// translator from xml to drl
+			Xml2DrlTranslator translator = new Xml2DrlTranslator();
+			drlRules = translator.xml2drl(this.localRuleBaseJAXB);
+		}
+		
+		return drlRules;
+	}
+	
+	/**
+	 * Get the local rule base encoded as XML
+	 * 
+	 * @return an XML {@link String} encoding the local rule base according to
+	 *         the Dog rule schema.
+	 */
+	@Override
+	public String getXMLRules()
+	{
+		String drlRules = "<error>Rule base currently empty</error>";
+		
+		// if a rule base exists, marshall the rule base as an XML string
+		if (this.localRuleBaseJAXB != null)
+		{
+			// create the JAXB context for parsing the local rule store (in xml)
+			StringWriter sw = new StringWriter();
+			try
+			{
+				// get the JAXB context for marshalling
+				JAXBContext ctx = JAXBContext.newInstance("it.polito.elite.dog.addons.rules.schemalibrary");
+				
+				// create the marshaller
+				Marshaller m = ctx.createMarshaller();
+				
+				// set-up the output
+				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+				m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+						"http://elite.polito.it/domotics/dog/rules/rule_definition rule_definition.xsd ");
+				
+				// Object that maps prefixes
+				PreferredMapper pm = new PreferredMapper();
+				m.setProperty("com.sun.xml.bind.namespacePrefixMapper", pm);
+				
+				// marshall to a string
+				m.marshal(this.localRuleBaseJAXB, sw);
+			}
+			catch (JAXBException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			// get the marshalled string
+			drlRules = sw.toString() != null ? sw.toString() : drlRules;
+		}
+		
+		return drlRules;
 	}
 	
 	/**
@@ -1075,7 +1144,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	 */
 	private void checkAndRegisterServices()
 	{
-		if (this.monitorAdmin != null && this.scheduler != null && this.executor != null && this.context!=null)
+		if (this.monitorAdmin != null && this.scheduler != null && this.executor != null && this.context != null)
 		{ // all the needed services are up and running?
 		
 			// if the needed services have been matched and the rule base has
@@ -1084,8 +1153,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			// flag the serviceMatch and defer
 			// the service registration to the end of the initialization phase
 			this.setServicesHaveBeenMatched(true);
-			//if (this.isRulesAreReady())
-				this.registerServices();
+			// if (this.isRulesAreReady())
+			this.registerServices();
 		}
 	}
 	

@@ -23,4 +23,20 @@ public interface RuleEngineApi extends DogRulesService
 	 * @param rules
 	 */
 	public void setRules(RuleList rules);
+	
+	/**
+	 * Get the locakl rule base encoded as DRL
+	 * 
+	 * @return A {@link String} representation of the local rule base using the
+	 *         DRL language (DSL)
+	 */
+	public String getDRLRules();
+	
+	/**
+	 * Get the local rule base encoded as XML
+	 * 
+	 * @return an XML {@link String} encoding the local rule base according to
+	 *         the Dog rule schema.
+	 */
+	public String getXMLRules();
 }
