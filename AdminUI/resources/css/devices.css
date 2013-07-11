@@ -120,7 +120,8 @@
 	background-image: url("../img/devices/alarm-clock.png");
 }
 
-.device-answeringmachine
+.device-answeringmachine,
+.device-communication
 {
 	background-image: url("../img/devices/phone.png");
 	
@@ -170,4 +171,20 @@
 .device-colordimmablelight
 {
 	background-image: url("../img/devices/color-dimmable-lamp.png");
+}
+
+.device-colordimmableswitch
+{
+	background-image: url("../img/devices/color-dimmable-switch.png");
+}
+
+.device-computer
+{
+	background-image: url("../img/devices/notebook.png");
+}
+
+.device-control,
+.device-switch
+{
+	background-image: url("../img/devices/switch.png");
 }
