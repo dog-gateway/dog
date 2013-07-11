@@ -133,7 +133,6 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	 */
 	@Override
 	@POST
-	// TODO: check the right rest syntax
 	@Path("/remove/{ruleId}")
 	public void removeRule(String ruleId)
 	{
@@ -187,7 +186,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	
 	@Override
 	@GET
-	@Path("/rules/drl")
+	@Path("/rules/xml")
 	@Produces({ MediaType.APPLICATION_XML })
 	public String getXMLRules()
 	{

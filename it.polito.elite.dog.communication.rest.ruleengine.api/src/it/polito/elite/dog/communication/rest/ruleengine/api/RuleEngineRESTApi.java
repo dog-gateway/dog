@@ -39,7 +39,7 @@ public interface RuleEngineRESTApi
 	public String getDRLRules();
 	
 	@GET
-	@Path("/rules/drl")
+	@Path("/rules/xml")
 	@Produces({ MediaType.APPLICATION_XML })
 	public String getXMLRules();
 }
