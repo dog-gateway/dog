@@ -3,7 +3,6 @@
    <implementation class="it.polito.elite.dog.addons.rules.RuleEngine"/>
    <service>
       <provide interface="org.osgi.service.cm.ManagedService"/>
-      <provide interface="org.osgi.service.event.EventHandler"/>
    </service>
    <property name="service.pid" type="String" value="it.polito.elite.dog.addons.rules"/>
    <reference bind="addedMonitorAdmin" cardinality="1..1" interface="org.osgi.service.monitor.MonitorAdmin" name="MonitorAdmin" policy="dynamic" unbind="removedMonitorAdmin"/>

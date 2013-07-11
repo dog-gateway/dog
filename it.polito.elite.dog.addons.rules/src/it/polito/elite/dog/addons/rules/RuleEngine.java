@@ -94,7 +94,7 @@ import com.sun.xml.bind.v2.WellKnownNamespace;
  * @autor (minor tweaks) Luigi De Russis
  * 
  */
-public class RuleEngine implements ManagedService, DogRulesService, EventHandler
+public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 {
 	/** OSGi framework reference */
 	private BundleContext context;
@@ -180,6 +180,9 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		
 		// debug
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Activated...");
+		
+		//check if it can start
+		this.checkAndRegisterServices();
 	}
 	
 	public void deactivate()
@@ -315,6 +318,9 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		this.srEventHandler = this.context.registerService(EventHandler.class.getName(), this, p);
 		this.srDogRulesService = this.context.registerService(RuleEngineApi.class.getName(), this, null);
 		
+		//debug
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId+"Registered services... now ready to execute rules!");
+		
 	}
 	
 	/**
@@ -376,8 +382,8 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	public synchronized void initEnded()
 	{
 		this.setRulesAreReady(true);
-		if (this.isServicesHaveBeenMatched())
-			this.registerServices();
+		//if (this.isServicesHaveBeenMatched())
+		//	this.registerServices();
 	}
 	
 	/****************************************************************************************************************
@@ -396,6 +402,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		this.addRule(rules);
 	}
 	
+	@Override
 	public void addRule(RuleList rules)
 	{
 		
@@ -527,6 +534,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 		this.setRules(rules);
 	}
 	
+	@Override
 	public void setRules(RuleList rules)
 	{
 		// debug
@@ -1067,7 +1075,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 	 */
 	private void checkAndRegisterServices()
 	{
-		if (this.monitorAdmin != null && this.scheduler != null && this.executor != null)
+		if (this.monitorAdmin != null && this.scheduler != null && this.executor != null && this.context!=null)
 		{ // all the needed services are up and running?
 		
 			// if the needed services have been matched and the rule base has
@@ -1076,7 +1084,7 @@ public class RuleEngine implements ManagedService, DogRulesService, EventHandler
 			// flag the serviceMatch and defer
 			// the service registration to the end of the initialization phase
 			this.setServicesHaveBeenMatched(true);
-			if (this.isRulesAreReady())
+			//if (this.isRulesAreReady())
 				this.registerServices();
 		}
 	}
