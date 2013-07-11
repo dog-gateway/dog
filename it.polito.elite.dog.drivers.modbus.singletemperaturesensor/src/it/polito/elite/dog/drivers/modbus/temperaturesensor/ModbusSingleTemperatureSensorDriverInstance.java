@@ -73,7 +73,7 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriver im
 	@Override
 	public Measure<?, ?> getTemperature()
 	{
-		return (Measure<?, ?>) this.currentState.getState(TemperatureState.class.getName()).getCurrentStateValue()[0]
+		return (Measure<?, ?>) this.currentState.getState(TemperatureState.class.getSimpleName()).getCurrentStateValue()[0]
 				.getValue();
 	}
 	
@@ -118,7 +118,7 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriver im
 		// update the state
 		TemperatureStateValue tValue = new TemperatureStateValue();
 		tValue.setValue(temperatureValue);
-		this.currentState.setState(TemperatureState.class.getName(), new TemperatureState(tValue));
+		this.currentState.setState(TemperatureState.class.getSimpleName(), new TemperatureState(tValue));
 		
 		// notify the new measure
 		((SingleTemperatureSensor) this.device).notifyNewTemperatureValue(temperatureValue);
@@ -264,7 +264,7 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriver im
 		// create all the states
 		TemperatureStateValue tValue = new TemperatureStateValue();
 		tValue.setValue(DecimalMeasure.valueOf("0 " + temperatureUOM));
-		this.currentState.setState(TemperatureState.class.getName(), new TemperatureState(tValue));
+		this.currentState.setState(TemperatureState.class.getSimpleName(), new TemperatureState(tValue));
 		
 		// read the initial state
 		this.network.readAll(this.register2Notification.keySet());

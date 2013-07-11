@@ -85,7 +85,7 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriver implements 
 	@Override
 	public Measure<?, ?> getPressure()
 	{
-		return (Measure<?, ?>) this.currentState.getState(PressureState.class.getName()).getCurrentStateValue()[0]
+		return (Measure<?, ?>) this.currentState.getState(PressureState.class.getSimpleName()).getCurrentStateValue()[0]
 				.getValue();
 	}
 	
@@ -127,7 +127,7 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriver implements 
 		// update the state
 		PressureStateValue pValue = new PressureStateValue();
 		pValue.setValue(pressureValue);
-		this.currentState.setState(PressureState.class.getName(), new PressureState(pValue));
+		this.currentState.setState(PressureState.class.getSimpleName(), new PressureState(pValue));
 		
 		// notify the new measure
 		((PressureSensor) this.device).notifyNewPressureValue(pressureValue);
@@ -244,7 +244,7 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriver implements 
 		// create all the states
 		PressureStateValue pValue = new PressureStateValue();
 		pValue.setValue(DecimalMeasure.valueOf("0 " + pressureUOM));
-		this.currentState.setState(PressureState.class.getName(), new PressureState(pValue));
+		this.currentState.setState(PressureState.class.getSimpleName(), new PressureState(pValue));
 		
 		// read the initial state
 		this.network.readAll(this.register2Notification.keySet());

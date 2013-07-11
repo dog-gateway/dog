@@ -80,7 +80,7 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriver implements Co2Se
 	@Override
 	public Measure<?, ?> getCo2Concentration()
 	{
-		return (Measure<?, ?>) this.currentState.getState(Co2MeasurementState.class.getName()).getCurrentStateValue()[0]
+		return (Measure<?, ?>) this.currentState.getState(Co2MeasurementState.class.getSimpleName()).getCurrentStateValue()[0]
 				.getValue();
 	}
 	
@@ -121,7 +121,7 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriver implements Co2Se
 		// update the state
 		Co2MeasurementStateValue pValue = new Co2MeasurementStateValue();
 		pValue.setValue(co2Concentration);
-		this.currentState.setState(Co2MeasurementState.class.getName(), new Co2MeasurementState(pValue));
+		this.currentState.setState(Co2MeasurementState.class.getSimpleName(), new Co2MeasurementState(pValue));
 		
 		// notify the new measure
 		((Co2Sensor) this.device).notifyChangedCo2Concentration(co2Concentration);
@@ -234,7 +234,7 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriver implements Co2Se
 		// create all the states
 		Co2MeasurementStateValue pValue = new Co2MeasurementStateValue();
 		pValue.setValue(DecimalMeasure.valueOf("0 " + Co2UOM));
-		this.currentState.setState(Co2MeasurementState.class.getName(), new Co2MeasurementState(pValue));
+		this.currentState.setState(Co2MeasurementState.class.getSimpleName(), new Co2MeasurementState(pValue));
 		
 		// read the initial state
 		this.network.readAll(this.register2Notification.keySet());

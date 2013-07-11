@@ -79,7 +79,7 @@ public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDrive
 	@Override
 	public Measure<?, ?> getActivePower()
 	{
-		return (Measure<?, ?>) this.currentState.getState(SinglePhaseActivePowerMeasurementState.class.getName())
+		return (Measure<?, ?>) this.currentState.getState(SinglePhaseActivePowerMeasurementState.class.getSimpleName())
 				.getCurrentStateValue()[0].getValue();
 	}
 	
@@ -109,7 +109,7 @@ public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDrive
 		// update the state
 		ActivePowerStateValue pValue = new ActivePowerStateValue();
 		pValue.setValue(powerValue);
-		this.currentState.setState(SinglePhaseActivePowerMeasurementState.class.getName(),
+		this.currentState.setState(SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
 				new SinglePhaseActivePowerMeasurementState(pValue));
 		
 		// notify the new measure
@@ -238,7 +238,7 @@ public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDrive
 		// create all the states
 		ActivePowerStateValue pValue = new ActivePowerStateValue();
 		pValue.setValue(DecimalMeasure.valueOf("0 " + activePowerUOM));
-		this.currentState.setState(SinglePhaseActivePowerMeasurementState.class.getName(),
+		this.currentState.setState(SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
 				new SinglePhaseActivePowerMeasurementState(pValue));
 		
 		// read the initial state

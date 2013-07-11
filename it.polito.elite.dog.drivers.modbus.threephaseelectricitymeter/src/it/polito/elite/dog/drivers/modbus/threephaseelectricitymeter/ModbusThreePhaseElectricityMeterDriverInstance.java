@@ -94,41 +94,41 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	@Override
 	public Measure<?, ?> getReactiveEnergyValue()
 	{
-		return (Measure<?, ?>) this.currentState.getState(SinglePhaseReactiveEnergyState.class.getName())
+		return (Measure<?, ?>) this.currentState.getState(SinglePhaseReactiveEnergyState.class.getSimpleName())
 				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getReactivePower(String phaseID)
 	{
-		return this.getThreePhaseStateValue(ThreePhaseReactivePowerMeasurementState.class.getName(), phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseReactivePowerMeasurementState.class.getSimpleName(), phaseID);
 	}
 	
 	@Override
 	public Measure<?, ?> getFrequency()
 	{
-		return (Measure<?, ?>) this.currentState.getState(FrequencyMeasurementState.class.getName())
+		return (Measure<?, ?>) this.currentState.getState(FrequencyMeasurementState.class.getSimpleName())
 				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getPowerFactor()
 	{
-		return (Measure<?, ?>) this.currentState.getState(PowerFactorMeasurementState.class.getName())
+		return (Measure<?, ?>) this.currentState.getState(PowerFactorMeasurementState.class.getSimpleName())
 				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getActiveEnergyValue()
 	{
-		return (Measure<?, ?>) this.currentState.getState(SinglePhaseActiveEnergyState.class.getName())
+		return (Measure<?, ?>) this.currentState.getState(SinglePhaseActiveEnergyState.class.getSimpleName())
 				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getLNVoltageValue(String phaseID)
 	{
-		return this.getThreePhaseStateValue(ThreePhaseVoltageState.class.getName(), phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseVoltageState.class.getSimpleName(), phaseID);
 	}
 	
 	@Override
@@ -137,25 +137,25 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		// TODO: fix this....
 		String phaseID = phaseID1 + phaseID2.substring(1);
 		
-		return this.getThreePhaseStateValue(ThreePhaseVoltageState.class.getName() + "LL", phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseVoltageState.class.getSimpleName() + "LL", phaseID);
 	}
 	
 	@Override
 	public Measure<?, ?> getElectricCurrentValue(String phaseID)
 	{
-		return this.getThreePhaseStateValue(ThreePhaseCurrentState.class.getName(), phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseCurrentState.class.getSimpleName(), phaseID);
 	}
 	
 	@Override
 	public Measure<?, ?> getApparentPower(String phaseID)
 	{
-		return this.getThreePhaseStateValue(ThreePhaseApparentPowerMeasurementState.class.getName(), phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseApparentPowerMeasurementState.class.getSimpleName(), phaseID);
 	}
 	
 	@Override
 	public Measure<?, ?> getActivePower(String phaseID)
 	{
-		return this.getThreePhaseStateValue(ThreePhaseActivePowerMeasurementState.class.getName(), phaseID);
+		return this.getThreePhaseStateValue(ThreePhaseActivePowerMeasurementState.class.getSimpleName(), phaseID);
 	}
 	
 	@Override
@@ -168,7 +168,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewFrequencyValue(Measure<?, ?> frequency)
 	{
 		// update the state
-		((FrequencyMeasurementState) this.currentState.getState(FrequencyMeasurementState.class.getName()))
+		((FrequencyMeasurementState) this.currentState.getState(FrequencyMeasurementState.class.getSimpleName()))
 				.getCurrentStateValue()[0].setValue(frequency);
 		
 		// notify the new measure
@@ -188,7 +188,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewReactivePowerValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
-		this.updateThreePhaseStateValue(ThreePhaseReactivePowerMeasurementState.class.getName(), phaseID, value);
+		this.updateThreePhaseStateValue(ThreePhaseReactivePowerMeasurementState.class.getSimpleName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewReactivePowerValue(phaseID, value);
 		
@@ -198,7 +198,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewReactiveEnergyValue(Measure<?, ?> value)
 	{
 		// update the state
-		this.currentState.getState(SinglePhaseReactiveEnergyState.class.getName()).getCurrentStateValue()[0]
+		this.currentState.getState(SinglePhaseReactiveEnergyState.class.getSimpleName()).getCurrentStateValue()[0]
 				.setValue(value);
 		
 		// notify the new measure
@@ -210,7 +210,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewActiveEnergyValue(Measure<?, ?> value)
 	{
 		// update the state
-		((SinglePhaseActiveEnergyState) this.currentState.getState(SinglePhaseActiveEnergyState.class.getName()))
+		((SinglePhaseActiveEnergyState) this.currentState.getState(SinglePhaseActiveEnergyState.class.getSimpleName()))
 				.getCurrentStateValue()[0].setValue(value);
 		
 		// notify the new measure
@@ -221,7 +221,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewPhaseNeutralVoltageValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
-		this.updateThreePhaseStateValue(ThreePhaseVoltageState.class.getName(), phaseID, value);
+		this.updateThreePhaseStateValue(ThreePhaseVoltageState.class.getSimpleName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewPhaseNeutralVoltageValue(phaseID, value);
 		
@@ -231,7 +231,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewPhasePhaseVoltageValue(String phaseID, Measure<?, ?> value)
 	{
 		
-		this.updateThreePhaseStateValue(ThreePhaseVoltageState.class.getName() + "LL", phaseID, value);
+		this.updateThreePhaseStateValue(ThreePhaseVoltageState.class.getSimpleName() + "LL", phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewPhasePhaseVoltageValue(phaseID, value);
 		
@@ -242,7 +242,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	{
 		// update the state....
 		
-		this.updateThreePhaseStateValue(ThreePhaseApparentPowerMeasurementState.class.getName(), phaseID, value);
+		this.updateThreePhaseStateValue(ThreePhaseApparentPowerMeasurementState.class.getSimpleName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewApparentPowerValue(phaseID, value);
 		
@@ -252,7 +252,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewPowerFactorValue(Measure<?, ?> powerFactor)
 	{
 		// update the state
-		this.currentState.getState(PowerFactorMeasurementState.class.getName()).getCurrentStateValue()[0]
+		this.currentState.getState(PowerFactorMeasurementState.class.getSimpleName()).getCurrentStateValue()[0]
 				.setValue(powerFactor);
 		
 		// notify the new measure
@@ -264,7 +264,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewActivePowerValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
-		this.updateThreePhaseStateValue(ThreePhaseActivePowerMeasurementState.class.getName(), phaseID, value);
+		this.updateThreePhaseStateValue(ThreePhaseActivePowerMeasurementState.class.getSimpleName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewActivePowerValue(phaseID, value);
 	}
@@ -273,7 +273,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	public void notifyNewCurrentValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
-		this.updateThreePhaseStateValue(ThreePhaseCurrentState.class.getName(), phaseID, value);
+		this.updateThreePhaseStateValue(ThreePhaseCurrentState.class.getSimpleName(), phaseID, value);
 		
 		((ThreePhaseElectricityMeter) this.device).notifyNewCurrentValue(phaseID, value);
 		
@@ -444,21 +444,21 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		activePowerStateL3.setFeature("phaseID", "L3");
 		activePowerStateL3.setValue(DecimalMeasure.valueOf("0 " + activePowerUOM));
 		
-		this.currentState.setState(ThreePhaseActivePowerMeasurementState.class.getName(),
+		this.currentState.setState(ThreePhaseActivePowerMeasurementState.class.getSimpleName(),
 				new ThreePhaseActivePowerMeasurementState(activePowerStateL1, activePowerStateL2, activePowerStateL3));
 		// --------------------------------------------------------------------------
 		
 		// ------------- Frequency -----------------------------------------
 		FrequencyStateValue frequencyStateValue = new FrequencyStateValue();
 		frequencyStateValue.setValue(DecimalMeasure.valueOf("0 " + frequencyUOM));
-		this.currentState.setState(FrequencyMeasurementState.class.getName(), new FrequencyMeasurementState(
+		this.currentState.setState(FrequencyMeasurementState.class.getSimpleName(), new FrequencyMeasurementState(
 				frequencyStateValue));
 		// -----------------------------------------------------------------
 		
 		// -------------- SinglePhaseActivePower ---------------------------
 		ActiveEnergyStateValue activeEnergyStateValue = new ActiveEnergyStateValue();
 		activeEnergyStateValue.setValue(DecimalMeasure.valueOf("0 " + activeEnergyUOM));
-		this.currentState.setState(SinglePhaseActiveEnergyState.class.getName(), new SinglePhaseActiveEnergyState(
+		this.currentState.setState(SinglePhaseActiveEnergyState.class.getSimpleName(), new SinglePhaseActiveEnergyState(
 				activeEnergyStateValue));
 		// ------------------------------------------------------------------
 		
@@ -475,7 +475,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		currentStateL3.setFeature("phaseID", "L3");
 		currentStateL3.setValue(DecimalMeasure.valueOf("0 " + currentUOM));
 		
-		this.currentState.setState(ThreePhaseCurrentState.class.getName(), new ThreePhaseCurrentState(currentStateL1,
+		this.currentState.setState(ThreePhaseCurrentState.class.getSimpleName(), new ThreePhaseCurrentState(currentStateL1,
 				currentStateL2, currentStateL3));
 		// -------------------------------------------------------------------
 		
@@ -492,7 +492,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		reactivePowerStateL3.setFeature("phaseID", "L3");
 		reactivePowerStateL3.setValue(DecimalMeasure.valueOf("0 " + reactivePowerUOM));
 		
-		this.currentState.setState(ThreePhaseReactivePowerMeasurementState.class.getName(),
+		this.currentState.setState(ThreePhaseReactivePowerMeasurementState.class.getSimpleName(),
 				new ThreePhaseReactivePowerMeasurementState(reactivePowerStateL1, reactivePowerStateL2,
 						reactivePowerStateL3));
 		// --------------------------------------------------------------------
@@ -518,7 +518,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		apparentPowerStateL3.setFeature("phaseID", "L3");
 		apparentPowerStateL3.setValue(DecimalMeasure.valueOf("0 " + apparentPowerUOM));
 		
-		this.currentState.setState(ThreePhaseApparentPowerMeasurementState.class.getName(),
+		this.currentState.setState(ThreePhaseApparentPowerMeasurementState.class.getSimpleName(),
 				new ThreePhaseApparentPowerMeasurementState(apparentPowerStateL1, apparentPowerStateL2,
 						apparentPowerStateL3));
 		// ----------------------------------------------------------------------
@@ -526,7 +526,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		// ------------------------ Single Phase Reactive Energy
 		ReactiveEnergyStateValue reactiveEnergyStateValue = new ReactiveEnergyStateValue();
 		reactiveEnergyStateValue.setValue(DecimalMeasure.valueOf("0 " + reactiveEnergyUOM));
-		this.currentState.setState(SinglePhaseReactiveEnergyState.class.getName(), new SinglePhaseReactiveEnergyState(
+		this.currentState.setState(SinglePhaseReactiveEnergyState.class.getSimpleName(), new SinglePhaseReactiveEnergyState(
 				reactiveEnergyStateValue));
 		// -----------------------------------------------------------------------
 		
@@ -543,7 +543,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		voltageStateL3N.setFeature("phaseID", "L3");
 		voltageStateL3N.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
 		
-		this.currentState.setState(ThreePhaseVoltageState.class.getName(), new ThreePhaseVoltageState(voltageStateL1N,
+		this.currentState.setState(ThreePhaseVoltageState.class.getSimpleName(), new ThreePhaseVoltageState(voltageStateL1N,
 				voltageStateL2N, voltageStateL3N));
 		// ----------------------------------------------------------
 		
@@ -560,7 +560,7 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		voltageStateL31.setFeature("phaseID", "L31");
 		voltageStateL31.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
 		
-		this.currentState.setState(ThreePhaseVoltageState.class.getName() + "LL", new ThreePhaseVoltageState(
+		this.currentState.setState(ThreePhaseVoltageState.class.getSimpleName() + "LL", new ThreePhaseVoltageState(
 				voltageStateL12, voltageStateL23, voltageStateL31));
 		
 		// read the initial state

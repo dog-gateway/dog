@@ -82,7 +82,7 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriver implements
 	@Override
 	public Measure<?, ?> getRelativeHumidity() {
 		return (Measure<?, ?>) this.currentState.getState(
-				HumidityMeasurementState.class.getName())
+				HumidityMeasurementState.class.getSimpleName())
 				.getCurrentStateValue()[0].getValue();
 	}
 
@@ -121,7 +121,7 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriver implements
 		// update the state
 		HumidityStateValue pValue = new HumidityStateValue();
 		pValue.setValue(humidityValue);
-		this.currentState.setState(HumidityMeasurementState.class.getName(),
+		this.currentState.setState(HumidityMeasurementState.class.getSimpleName(),
 				new HumidityMeasurementState(pValue));
 
 		// notify the new measure
@@ -235,7 +235,7 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriver implements
 		// create all the states
 		HumidityStateValue pValue = new HumidityStateValue();
 		pValue.setValue(DecimalMeasure.valueOf("0 " + humidityUOM));
-		this.currentState.setState(HumidityMeasurementState.class.getName(),
+		this.currentState.setState(HumidityMeasurementState.class.getSimpleName(),
 				new HumidityMeasurementState(pValue));
 
 		// read the initial state
