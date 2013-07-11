@@ -6,9 +6,11 @@ package it.polito.elite.dog.communication.rest.ruleengine.api;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 /**
  * @author bonino
@@ -30,4 +32,14 @@ public interface RuleEngineRESTApi
 	@Path("/set")
 	@Consumes({ MediaType.APPLICATION_XML })
 	public void setRulesXML(RuleList xmlRules);
+	
+	@GET
+	@Path("/rules/drl")
+	@Produces({MediaType.TEXT_PLAIN})
+	public String getDRLRules();
+	
+	@GET
+	@Path("/rules/drl")
+	@Produces({ MediaType.APPLICATION_XML })
+	public String getXMLRules();
 }

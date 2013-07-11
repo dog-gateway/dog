@@ -9,8 +9,10 @@ import it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.osgi.framework.BundleContext;
@@ -43,7 +45,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public RuleEngineRESTEndpoint()
 	{
 		// TODO Auto-generated constructor stub
-		System.out.println(RuleEngineRESTEndpoint.logId +"Created RuleEngineRESTEndpoint");
+		System.out.println(RuleEngineRESTEndpoint.logId + "Created RuleEngineRESTEndpoint");
 	}
 	
 	/**
@@ -85,7 +87,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		this.ruleEngine = ruleEngine;
 		
 		// debug
-		if(this.logger!=null)
+		if (this.logger != null)
 			this.logger.log(LogService.LOG_DEBUG, RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
 		else
 			System.out.println(RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
@@ -113,10 +115,10 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	@Consumes({ MediaType.APPLICATION_XML })
 	public void addRulesXML(RuleList xmlRules)
 	{
-		//check not null
-		if(this.ruleEngine!=null)
+		// check not null
+		if (this.ruleEngine != null)
 		{
-			//add the received rules
+			// add the received rules
 			this.ruleEngine.addRule(xmlRules);
 		}
 		
@@ -135,10 +137,10 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	@Path("/remove/{ruleId}")
 	public void removeRule(String ruleId)
 	{
-		//check not null
-		if(this.ruleEngine!=null)
+		// check not null
+		if (this.ruleEngine != null)
 		{
-			//add received rules
+			// add received rules
 			this.ruleEngine.removeRule(ruleId);
 		}
 		
@@ -157,13 +159,47 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	@Consumes({ MediaType.APPLICATION_XML })
 	public void setRulesXML(RuleList xmlRules)
 	{
-		//check not null
-		if(this.ruleEngine!=null)
+		// check not null
+		if (this.ruleEngine != null)
 		{
-			//add received rules
+			// add received rules
 			this.ruleEngine.setRules(xmlRules);
 		}
 		
+	}
+	
+	@Override
+	@GET
+	@Path("/rules/drl")
+	@Produces({ MediaType.TEXT_PLAIN })
+	public String getDRLRules()
+	{
+		// no rules at the beginning
+		String drlRules = "";
+		
+		// extract the rule from the rule engine in the DRL format
+		if (this.ruleEngine != null)
+			drlRules = this.ruleEngine.getDRLRules();
+		
+		//return existing rules
+		return drlRules;
+	}
+	
+	@Override
+	@GET
+	@Path("/rules/drl")
+	@Produces({ MediaType.APPLICATION_XML })
+	public String getXMLRules()
+	{
+		// no rules at the beginning
+		String drlRules = "";
+		
+		// extract the rule from the rule engine in the DRL format
+		if (this.ruleEngine != null)
+			drlRules = this.ruleEngine.getXMLRules();
+		
+		//return existing rules
+		return drlRules;
 	}
 	
 }
