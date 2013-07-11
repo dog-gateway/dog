@@ -5,5 +5,7 @@
 // Generated on: 2011.03.07 at 11:46:33 AM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://elite.polito.it/domotics/dog/rules/rule_definition", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://elite.polito.it/domotics/dog/rules/rule_definition", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED, xmlns={@XmlNs(prefix="dogrules", namespaceURI="http://elite.polito.it/domotics/dog/rules/rule_definition")})
 package it.polito.elite.dog.addons.rules.schemalibrary;
+
+import javax.xml.bind.annotation.*;

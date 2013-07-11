@@ -4,7 +4,9 @@ Bundle-Name: RuleEngine
 Bundle-SymbolicName: it.polito.elite.dog.addons.rules.ruleengine
 Bundle-Version: 1.0.1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: it.polito.elite.domotics.dog2.doglibrary,
+Import-Package: com.sun.xml.bind.marshaller,
+ com.sun.xml.bind.v2,
+ it.polito.elite.domotics.dog2.doglibrary,
  it.polito.elite.domotics.dog2.doglibrary.corenotifications,
  it.polito.elite.domotics.dog2.doglibrary.interfaces,
  it.polito.elite.domotics.dog2.doglibrary.message,
@@ -13,6 +15,8 @@ Import-Package: it.polito.elite.domotics.dog2.doglibrary,
  it.polito.elite.domotics.model.notification,
  it.polito.elite.domotics.model.state,
  it.polito.elite.domotics.model.statevalue,
+ javax.measure,
+ javax.measure.unit,
  org.osgi.framework,
  org.osgi.service.cm,
  org.osgi.service.event,

@@ -23,6 +23,7 @@ import it.polito.elite.dog.addons.rules.util.TimedNotificationsPreProcessor;
 import it.polito.elite.dog.addons.rules.util.Xml2DrlTranslator;
 import it.polito.elite.domotics.dog2.doglibrary.DogCommand;
 import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
+import it.polito.elite.domotics.dog2.doglibrary.corenotifications.TimedTriggerNotification;
 import it.polito.elite.domotics.dog2.doglibrary.interfaces.DogExecutorInterface;
 import it.polito.elite.domotics.dog2.doglibrary.interfaces.DogRulesService;
 import it.polito.elite.domotics.dog2.doglibrary.interfaces.DogSchedulerInterface;
@@ -40,7 +41,6 @@ import it.polito.elite.domotics.model.DeviceStatus;
 import it.polito.elite.domotics.model.notification.Notification;
 import it.polito.elite.domotics.model.notification.StateChangeNotification;
 import it.polito.elite.domotics.model.state.State;
-import it.polito.elite.domotics.dog2.doglibrary.corenotifications.TimedTriggerNotification;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -57,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.measure.DecimalMeasure;
+import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -82,9 +84,6 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 import org.osgi.service.monitor.MonitorAdmin;
 import org.osgi.service.monitor.StatusVariable;
-
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-import com.sun.xml.bind.v2.WellKnownNamespace;
 
 /**
  * At last Dog can do something smart!
@@ -671,9 +670,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 					"http://elite.polito.it/domotics/dog/rules/rule_definition rule_definition.xsd ");
 			
 			StringWriter sw = new StringWriter();
-			// Object that maps prefixes
-			PreferredMapper pm = new PreferredMapper();
-			m.setProperty("com.sun.xml.bind.namespacePrefixMapper", pm);
+			
 			m.marshal(this.localRuleBaseJAXB, sw);
 			
 			// save the file
@@ -739,10 +736,6 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
 						"http://elite.polito.it/domotics/dog/rules/rule_definition rule_definition.xsd ");
-				
-				// Object that maps prefixes
-				PreferredMapper pm = new PreferredMapper();
-				m.setProperty("com.sun.xml.bind.namespacePrefixMapper", pm);
 				
 				// marshall to a string
 				m.marshal(this.localRuleBaseJAXB, sw);
@@ -908,9 +901,11 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		return stringCurrentState;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public double getCurrentDStateOf(String deviceURI, String stateClass)
 	{
-		return ((Double) this.getCurrentStateOf(deviceURI, stateClass)).doubleValue();
+		DecimalMeasure <?> stateValue = ((DecimalMeasure <?>) this.getCurrentStateOf(deviceURI, stateClass));
+		return stateValue.doubleValue((Unit) stateValue.getUnit());
 	}
 	
 	private Object getCurrentStateOf(String deviceURI, String stateClass)
@@ -1158,32 +1153,4 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		}
 	}
 	
-	/**
-	 * Inner Class for setting the correct prefixes and namespaces
-	 * 
-	 * @author Castellina Emiliano
-	 * 
-	 */
-	public static class PreferredMapper extends NamespacePrefixMapper
-	{
-		@Override
-		public String[] getPreDeclaredNamespaceUris()
-		{
-			return new String[] { WellKnownNamespace.XML_SCHEMA_INSTANCE };
-		}
-		
-		@Override
-		public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix)
-		{
-			if (namespaceUri.equals(WellKnownNamespace.XML_SCHEMA_INSTANCE))
-				return "xsi";
-			if (namespaceUri.equals(WellKnownNamespace.XML_SCHEMA))
-				return "xs";
-			if (namespaceUri.equals(WellKnownNamespace.XML_MIME_URI))
-				return "xmime";
-			return "dogrules";
-			
-		}
-		
-	}
 }
