@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FrameworkMonitor
-Bundle-SymbolicName: it.polito.elite.dog.system.frameworkmonitor
+Bundle-SymbolicName: it.polito.elite.dog.admin.system.frameworkmonitor
 Bundle-Version: 1.0.0
 Bundle-Vendor: it.polito.elite
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

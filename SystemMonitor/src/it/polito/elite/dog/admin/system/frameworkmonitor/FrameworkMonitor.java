@@ -1,9 +1,9 @@
 /**
  * 
  */
-package it.polito.elite.dog.system.frameworkmonitor;
+package it.polito.elite.dog.admin.system.frameworkmonitor;
 
-import it.polito.elite.dog.system.frameworkmonitor.api.FrameworkMonitorInterface;
+import it.polito.elite.dog.admin.system.frameworkmonitor.api.FrameworkMonitorInterface;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 
 import javax.ws.rs.GET;
