@@ -1,12 +1,12 @@
 /**
  * 
  */
-package it.polito.elite.dog.system.bundle;
+package it.polito.elite.dog.system.bundlemanager;
 
 import java.util.Arrays;
 
-import it.polito.elite.dog.system.bundle.api.BundleManagerInterface;
-import it.polito.elite.dog.system.bundle.util.BundleNameComparator;
+import it.polito.elite.dog.system.bundlemanager.api.BundleManagerInterface;
+import it.polito.elite.dog.system.bundlemanager.util.BundleNameComparator;
 import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 
 import javax.ws.rs.GET;
@@ -80,7 +80,7 @@ public class BundleManager implements BundleManagerInterface
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * it.polito.elite.dog.system.bundle.BundleManagerInterface#getBundles()
+	 * it.polito.elite.dog.system.bundlemanager.BundleManagerInterface#getBundles()
 	 */
 	@Override
 	@GET

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.polito.elite.dog.system.bundle.api;
+package it.polito.elite.dog.system.bundlemanager.api;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
