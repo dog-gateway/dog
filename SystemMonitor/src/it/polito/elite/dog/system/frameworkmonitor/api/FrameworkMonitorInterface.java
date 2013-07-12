@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.polito.elite.dog.system.api;
+package it.polito.elite.dog.system.frameworkmonitor.api;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
