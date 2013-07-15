@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" enabled="true" name="it.polito.elite.dog.drivers.knx.network">
+   <implementation class="it.polito.elite.dog.drivers.knx.network.KnxIpDriverImpl"/>
+
+   <property name="service.pid" type="String" value="it.polito.elite.dog.drivers.knx.network"/>
+   <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
+   </service></scr:component>
