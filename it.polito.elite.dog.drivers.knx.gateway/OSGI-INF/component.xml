@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" enabled="true" name="it.polito.elite.dog.drivers.knx.gateway">
+   <implementation class="it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriver"/>
+   <reference bind="addedNetworkService" cardinality="1..1" interface="it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork" name="KnxIPNetwork" policy="dynamic" unbind="removedNetworkService"/>
+</scr:component>
