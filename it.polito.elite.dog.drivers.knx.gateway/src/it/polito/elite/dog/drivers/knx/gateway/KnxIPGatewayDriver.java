@@ -89,7 +89,7 @@ public class KnxIPGatewayDriver implements Driver
 		this.context = bundleContext;
 		
 		// if ready, try to register offered services
-		if ((this.network != null) && (this.regDriver == null)&&(this.context!=null))
+		if ((this.network != null) && (this.regDriver == null) && (this.context != null))
 			this.registerDriver();
 	}
 	
@@ -117,8 +117,7 @@ public class KnxIPGatewayDriver implements Driver
 		this.network = network;
 		
 		// if ready, try to register offered services
-		if ((this.network != null) && (this.regDriver == null)&&(this.context!=null))
-			this.registerDriver();
+		this.registerDriver();
 	}
 	
 	public void removedNetworkService(KnxIPNetwork network)
@@ -132,11 +131,14 @@ public class KnxIPGatewayDriver implements Driver
 	
 	private void registerDriver()
 	{
-		Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-		propDriver.put(DogDeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
-		propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
-		this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
-		this.regKnxIPGateway = this.context.registerService(KnxIPGatewayDriver.class.getName(), this, null);
+		if ((this.network != null) && (this.regDriver == null) && (this.context != null))
+		{
+			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
+			propDriver.put(DogDeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
+			propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
+			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
+			this.regKnxIPGateway = this.context.registerService(KnxIPGatewayDriver.class.getName(), this, null);
+		}
 	}
 	
 	@SuppressWarnings("rawtypes")
