@@ -34,7 +34,8 @@
 }
 
 .device-washingmachine,
-.device-appliances
+.device-appliances,
+.device-dishwasher
 {
 	background-image: url("../img/devices/washing-machine.png");
 }
@@ -77,7 +78,8 @@
 .device-cooker,
 .device-electricalcooker,
 .device-gascooker,
-.device-hotplate
+.device-hotplate,
+.device-electricaloven
 {
 	background-image: url("../img/devices/cooker.png");
 }
@@ -121,7 +123,8 @@
 }
 
 .device-answeringmachine,
-.device-communication
+.device-communication,
+.device-fax
 {
 	background-image: url("../img/devices/phone.png");
 	
@@ -153,7 +156,8 @@
 	background-image: url("../img/devices/bell.png");
 }
 
-.device-clock
+.device-clock,
+.device-ez430chronos
 {
 	background-image: url("../img/devices/clock.png");	
 }
@@ -184,7 +188,96 @@
 }
 
 .device-control,
+.device-controllable,
 .device-switch
 {
 	background-image: url("../img/devices/switch.png");
+}
+
+.device-dimmablelight,
+.device-dimmerlamp
+{
+	background-image: url("../img/devices/dimmable-lamp.png");
+}
+
+.device-dimmerswitch
+{
+	background-image: url("../img/devices/dimmable-switch.png");
+}
+
+.device-dooractuator,
+.device-doorsensor
+{
+	background-image: url("../img/devices/door.png");
+}
+
+.device-dvd
+{
+	background-image: url("../img/devices/dvd.png");
+}
+
+.device-electricalsystem
+{
+	background-image: url("../img/devices/electrical.png");
+}
+
+.device-entertainment
+{
+	background-image: url("../img/devices/entertainment.png");
+}
+
+.device-fan
+{
+	background-image: url("../img/devices/fan.png");
+}
+
+.device-firesystem
+{
+	background-image: url("../img/devices/fire.png");
+}
+
+.device-flashinglamp
+{
+	background-image: url("../img/devices/flashing-lamp.png");
+}
+
+.device-floodsensor,
+.device-floodsystem
+{
+	background-image: url("../img/devices/sink.png");
+}
+
+.device-flowsensor,
+.device-gasmeter
+{
+	background-image: url("../img/devices/pressure.png");
+}
+
+.device-frequencymeter
+{
+	background-image: url("../img/devices/frequency-meter.png");
+}
+
+.device-gasheater,
+.device-gasoilheater
+.device-gassystem,
+.device-heater,
+.device-heatingsystem
+{
+	background-image: url("../img/devices/heater.png");
+}
+
+.device-gassensor
+{
+	background-image: url("../img/devices/smoking.png");
+}
+
+.device-gateactuator
+{
+	background-image: url("../img/devices/gate-actuator.png");
+}
+
+.device-heatingandcoolingunit
+{
+	background-image: url("../img/devices/heating-and-cooling.png");
 }
