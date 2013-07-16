@@ -53,7 +53,12 @@ public interface KnxIPNetwork
 	/**
 	 * Removes a device-specific driver for the given device
 	 * @param device device the KnxIPDeviceInfo describing the device.
-	 * @param driver driver the {@link KnxIPDriver} instance to remove.
 	 */
 	public void removeDriver(KnxIPDeviceInfo device);
+	
+	/**
+	 * Removes a device-specific driver 
+	 * @param driver driver the {@link KnxIPDriver} instance to remove.
+	 */
+	public void removeDriver(KnxIPDriver driver);
 }

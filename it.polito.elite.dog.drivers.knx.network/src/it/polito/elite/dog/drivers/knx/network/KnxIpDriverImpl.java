@@ -402,6 +402,51 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 		this.knxDeviceInfo2Driver.remove(device);
 	}
 	
+	
+	public void removeDriver(KnxIPDriver driver)
+	{
+		//create the set of device info to remove as consequence of driver removal
+		Set<KnxIPDeviceInfo> toRemove =  new HashSet<KnxIPDeviceInfo>();
+		
+		//fill the set of device info to remove
+		for(KnxIPDeviceInfo devInfo : this.knxDeviceInfo2Driver.keySet())
+		{
+			if(this.knxDeviceInfo2Driver.get(devInfo).equals(driver))
+				toRemove.add(devInfo);
+		}
+		
+		//remove all
+		for(KnxIPDeviceInfo devInfo : toRemove)
+		{
+			this.knxDeviceInfo2Driver.remove(devInfo);
+			this.knxDeviceInfo2DPT.remove(devInfo);
+			
+			//search for entries in the gateway maps
+			InetAddress gwAddress = devInfo.getGatewayIPAddress();
+			
+			//get the corresponding socket address
+			InetSocketAddress sockGwAddress = this.ip2sock.get(gwAddress);
+			
+			//remove the entries
+			Set<KnxIPDeviceInfo> gwDevices = this.gateway2Device.get(sockGwAddress);
+			gwDevices.remove(devInfo);
+			
+			//check if empty
+			if(gwDevices.isEmpty())
+			{
+				//remove the gateway entry
+				this.gateway2Device.remove(sockGwAddress);
+				this.gateway2ProcessCommunicator.get(sockGwAddress);
+				this.gateway2ProcessCommunicator.remove(sockGwAddress);
+				this.gateway2IPLink.get(sockGwAddress).close();
+				this.gateway2IPLink.remove(sockGwAddress);
+			}
+		}
+		
+		
+		
+	}
+	
 	/************************* KnxIp Communication Stuff ***********************/
 	private void openKnxIPTunnel(final InetSocketAddress gwIpAddress)
 	{

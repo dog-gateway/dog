@@ -140,7 +140,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	}
 	
 	/**
-	 * Handles the "availability" of a Modbus network driver (store a reference
+	 * Handles the "availability" of a KnxIP network driver (store a reference
 	 * to the driver and try to start).
 	 * 
 	 * @param netDriver
@@ -156,7 +156,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	}
 	
 	/**
-	 * Handles the removal of the connected network driver by unregistering the
+	 * Handles the removal of the connected KnxIP network driver by unregistering the
 	 * services provided by this driver
 	 */
 	public void removedNetworkDriver(KnxIPNetwork network)
@@ -169,7 +169,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	}
 	
 	/**
-	 * Handles the "availability" of a Modbus gateway driver (store a reference
+	 * Handles the "availability" of a KnxIP gateway driver (store a reference
 	 * to the driver and try to start).
 	 * 
 	 * @param gwDriver
@@ -185,7 +185,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	}
 	
 	/**
-	 * Handles the removal of the connected network driver by unregistering the
+	 * Handles the removal of the connected KnxIP gateway driver by unregistering the
 	 * services provided by this driver
 	 */
 	public void removedGatewayDriver(KnxIPGatewayDriver gateway)
