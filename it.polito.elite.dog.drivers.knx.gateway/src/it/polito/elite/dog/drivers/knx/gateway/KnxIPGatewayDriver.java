@@ -82,15 +82,30 @@ public class KnxIPGatewayDriver implements Driver
 	
 	public void activate(BundleContext bundleContext)
 	{
-		// init the logger
-		this.logger = new DogLogInstance(context);
-		
 		// store the context
 		this.context = bundleContext;
+		
+		// init the logger
+		this.logger = new DogLogInstance(this.context);
 		
 		// if ready, try to register offered services
 		if ((this.network != null) && (this.regDriver == null) && (this.context != null))
 			this.registerDriver();
+	}
+	
+	public void deactivate()
+	{
+		// unregister the driver
+		this.unRegister();
+		
+		// null the context
+		this.context = null;
+		
+		// null the logger
+		this.logger = null;
+		
+		// clear the map of connected gateways
+		this.connectedGateways.clear();
 	}
 	
 	public void unRegister()
@@ -192,25 +207,28 @@ public class KnxIPGatewayDriver implements Driver
 				String gatewayAddress = gatewayAddressSet.iterator().next();
 				
 				// check not null
-				if ((gatewayAddress != null) && (!gatewayAddress.isEmpty()) && !this.isGatewayAvailable(deviceId))
+				if ((gatewayAddress != null) && (!gatewayAddress.isEmpty()))
 				{
-					// create a new instance of the gateway driver
-					KnxIPGatewayDriverInstance driver = new KnxIPGatewayDriverInstance(this.network,
-							(ControllableDevice) this.context.getService(reference), gatewayAddress, this.context);
-					
-					synchronized (this.connectedGateways)
+					if (!this.isGatewayAvailable(deviceId))
 					{
-						// store a reference to the gateway driver
-						this.connectedGateways.put(deviceId, driver);
+						// create a new instance of the gateway driver
+						KnxIPGatewayDriverInstance driver = new KnxIPGatewayDriverInstance(this.network,
+								(ControllableDevice) this.context.getService(reference), gatewayAddress, this.context);
+						
+						synchronized (this.connectedGateways)
+						{
+							// store a reference to the gateway driver
+							this.connectedGateways.put(deviceId, driver);
+						}
+						
+						// modify the service description causing a forcing the
+						// framework to send a modified service notification
+						final Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
+						propDriver.put(DogDeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
+						propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
+						
+						this.regDriver.setProperties(propDriver);
 					}
-					
-					// modify the service description causing a forcing the
-					// framework to send a modified service notification
-					final Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-					propDriver.put(DogDeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
-					propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
-					
-					this.regDriver.setProperties(propDriver);
 				}
 				else
 				{
