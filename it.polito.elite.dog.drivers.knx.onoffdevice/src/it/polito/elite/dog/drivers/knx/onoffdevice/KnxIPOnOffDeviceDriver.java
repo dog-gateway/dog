@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -51,11 +52,11 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIpOnOffDeviceDriver]: ";
 	
-	// a reference to the network driver interface to allow network-level access
-	private KnxIPNetwork network;
+	// a reference to the network driver
+	private AtomicReference<KnxIPNetwork> network;
 	
 	// a reference to the gateway driver
-	private KnxIPGatewayDriver gateway;
+	private AtomicReference<KnxIPGatewayDriver> gateway;
 	
 	// the registration object needed to handle the lifespan of this bundle in
 	// the OSGi framework (it is a ServiceRegistration object for use by the
@@ -74,7 +75,9 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	 */
 	public KnxIPOnOffDeviceDriver()
 	{
-		// intentionally left empty
+		// initialize atomic references
+		this.network = new AtomicReference<KnxIPNetwork>();
+		this.gateway = new AtomicReference<KnxIPGatewayDriver>();
 	}
 	
 	public void activate(BundleContext context)
@@ -134,9 +137,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 		{
 			this.regDriver.unregister();
 			this.regDriver = null;
-		}
-		this.network = null;
-		
+		}		
 	}
 	
 	/**
@@ -149,15 +150,15 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	public void addedNetworkDriver(KnxIPNetwork netDriver)
 	{
 		// store a reference to the network driver
-		this.network = netDriver;
+		this.network.set(netDriver);
 		
 		// try to start service offering
-		this.register();
+		// this.register();
 	}
 	
 	/**
-	 * Handles the removal of the connected KnxIP network driver by unregistering the
-	 * services provided by this driver
+	 * Handles the removal of the connected KnxIP network driver by
+	 * unregistering the services provided by this driver
 	 */
 	public void removedNetworkDriver(KnxIPNetwork network)
 	{
@@ -165,7 +166,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 		this.unRegister();
 		
 		// null the reference to the network driver
-		this.network = null;
+		this.network.compareAndSet(network, null);
 	}
 	
 	/**
@@ -178,15 +179,15 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	public void addedGatewayDriver(KnxIPGatewayDriver gwDriver)
 	{
 		// store a reference to the gateway driver
-		this.gateway = gwDriver;
+		this.gateway.set(gwDriver);
 		
 		// try to start service offering
-		this.register();
+		// this.register();
 	}
 	
 	/**
-	 * Handles the removal of the connected KnxIP gateway driver by unregistering the
-	 * services provided by this driver
+	 * Handles the removal of the connected KnxIP gateway driver by
+	 * unregistering the services provided by this driver
 	 */
 	public void removedGatewayDriver(KnxIPGatewayDriver gateway)
 	{
@@ -194,7 +195,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 		this.unRegister();
 		
 		// null the reference to the network driver
-		this.gateway = null;
+		this.gateway.compareAndSet(gateway, null);
 	}
 	
 	/**
@@ -243,7 +244,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 			{
 				if ((manufacturer != null) && (gateway != null) && (manufacturer.equals(KnxIPInfo.MANUFACTURER))
 						&& (OnOffDeviceCategories.contains(deviceCategory))
-						&& (this.gateway.isGatewayAvailable(gateway)))
+						&& (this.gateway.get().isGatewayAvailable(gateway)))
 				{
 					// use Lamp as a generic on/off device, for its match
 					// values...
@@ -275,9 +276,9 @@ public class KnxIPOnOffDeviceDriver implements Driver
 			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
 					.getGateway();
 			
-			KnxIPGatewayDriverInstance gwInstance = this.gateway.getSpecificGateway(gateway);
+			KnxIPGatewayDriverInstance gwInstance = this.gateway.get().getSpecificGateway(gateway);
 			
-			KnxIPOnOffDeviceDriverInstance instance = new KnxIPOnOffDeviceDriverInstance(network,
+			KnxIPOnOffDeviceDriverInstance instance = new KnxIPOnOffDeviceDriverInstance(this.network.get(),
 					(ControllableDevice) this.context.getService(reference), gwInstance.getGatewayAddress(),
 					this.context);
 			
