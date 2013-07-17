@@ -144,7 +144,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	 * to the driver and try to start).
 	 * 
 	 * @param netDriver
-	 *            The available {@link ModbusNetwork} driver service.
+	 *            The available {@link KnxIPNetwork} driver service.
 	 */
 	public void addedNetworkDriver(KnxIPNetwork netDriver)
 	{
@@ -173,7 +173,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	 * to the driver and try to start).
 	 * 
 	 * @param gwDriver
-	 *            The available {@link ModbusGatewayDriver} service.
+	 *            The available {@link KnxIPGatewayDriver} service.
 	 */
 	public void addedGatewayDriver(KnxIPGatewayDriver gwDriver)
 	{
