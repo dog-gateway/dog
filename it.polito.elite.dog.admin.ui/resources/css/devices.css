@@ -124,7 +124,8 @@
 
 .device-answeringmachine,
 .device-communication,
-.device-fax
+.device-fax,
+.device-interphone
 {
 	background-image: url("../img/devices/phone.png");
 	
@@ -200,7 +201,8 @@
 	background-image: url("../img/devices/dimmable-lamp.png");
 }
 
-.device-dimmerswitch
+.device-dimmerswitch,
+.device-levelcontrolswitch
 {
 	background-image: url("../img/devices/dimmable-switch.png");
 }
@@ -221,7 +223,8 @@
 	background-image: url("../img/devices/electrical.png");
 }
 
-.device-entertainment
+.device-entertainment,
+.device-hifi
 {
 	background-image: url("../img/devices/entertainment.png");
 }
@@ -277,7 +280,55 @@
 	background-image: url("../img/devices/gate-actuator.png");
 }
 
-.device-heatingandcoolingunit
+.device-heatingandcoolingunit,
+.device-hvacsystem
 {
 	background-image: url("../img/devices/heating-and-cooling.png");
+}
+
+.device-heatingenergymeter
+{
+	background-image: url("../img/devices/heating-meter.png");
+}
+
+.device-houseplants
+{
+	background-image: url("../img/devices/home.png");
+}
+
+.device-humiditysensor
+{
+	background-image: url("../img/devices/humidity-sensor.png");
+}
+
+.device-infraredsensor
+{
+	background-image: url("../img/devices/infrared-sensor.png");
+}
+
+.device-knob
+{
+	background-image: url("../img/devices/knob.png");
+}
+
+.device-lamp,
+.device-lampholder,
+.device-lighting
+{
+	background-image: url("../img/devices/lamp.png");
+}
+
+.device-levelcontrollableoutput
+{
+	background-image: url("../img/devices/level-out.png");
+}
+
+.device-lightsensor
+{
+	background-image: url("../img/devices/light-sensor.png");
+}
+
+.device-meter
+{
+	background-image: url("../img/devices/speed.png");
 }
