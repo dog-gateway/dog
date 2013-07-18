@@ -22,6 +22,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -56,7 +57,7 @@ public class KnxIPGatewayDriver implements Driver
 	// a reference to the network driver (currently not used by this driver
 	// version, in the future it will be used to implement gateway-specific
 	// functionalities).
-	private KnxIPNetwork network;
+	private AtomicReference<KnxIPNetwork> network;
 	
 	// the registration object needed to handle the life span of this bundle in
 	// the OSGi framework (it is a ServiceRegistration object for use by the
@@ -76,8 +77,8 @@ public class KnxIPGatewayDriver implements Driver
 	
 	public KnxIPGatewayDriver()
 	{
-		// initialize the map of connected gateways
-		this.connectedGateways = new ConcurrentHashMap<String, KnxIPGatewayDriverInstance>();
+		// initialize atomic references
+		this.network = new AtomicReference<KnxIPNetwork>();
 	}
 	
 	public void activate(BundleContext bundleContext)
@@ -88,9 +89,11 @@ public class KnxIPGatewayDriver implements Driver
 		// init the logger
 		this.logger = new DogLogInstance(this.context);
 		
+		// initialize the map of connected gateways
+		this.connectedGateways = new ConcurrentHashMap<String, KnxIPGatewayDriverInstance>();
+		
 		// if ready, try to register offered services
-		if ((this.network != null) && (this.regDriver == null) && (this.context != null))
-			this.registerDriver();
+		this.registerDriver();
 	}
 	
 	public void deactivate()
@@ -129,10 +132,7 @@ public class KnxIPGatewayDriver implements Driver
 	public void addedNetworkService(KnxIPNetwork network)
 	{
 		// store a reference to the network service
-		this.network = network;
-		
-		// if ready, try to register offered services
-		this.registerDriver();
+		this.network.set(network);
 	}
 	
 	public void removedNetworkService(KnxIPNetwork network)
@@ -141,7 +141,7 @@ public class KnxIPGatewayDriver implements Driver
 		this.unRegister();
 		
 		// null the network reference
-		this.network = null;
+		this.network.compareAndSet(network, null);
 	}
 	
 	private void registerDriver()
@@ -212,7 +212,7 @@ public class KnxIPGatewayDriver implements Driver
 					if (!this.isGatewayAvailable(deviceId))
 					{
 						// create a new instance of the gateway driver
-						KnxIPGatewayDriverInstance driver = new KnxIPGatewayDriverInstance(this.network,
+						KnxIPGatewayDriverInstance driver = new KnxIPGatewayDriverInstance(this.network.get(),
 								(ControllableDevice) this.context.getService(reference), gatewayAddress, this.context);
 						
 						synchronized (this.connectedGateways)
@@ -280,14 +280,6 @@ public class KnxIPGatewayDriver implements Driver
 	public KnxIPGatewayDriverInstance getSpecificGateway(String gatewayId)
 	{
 		return this.connectedGateways.get(gatewayId);
-	}
-	
-	/**
-	 * @return the network
-	 */
-	public KnxIPNetwork getNetwork()
-	{
-		return network;
 	}
 	
 }
