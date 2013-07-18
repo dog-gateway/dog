@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xmldog:dogHomeConfiguration
+	xsi:schemaLocation="http://www.example.org/xmldog xmldog.xsd "
+	xmlns:xmldog="http://elite.polito.it/dogHomeConfiguration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<xmldog:controllables>
+		<xmldog:device domoticSystem="ELITE" name="oven1" class="ElectricalOven">
+			<xmldog:param name="powerConsumption" value="200.0 W" type="Measure" />
+		</xmldog:device>
+		<xmldog:device domoticSystem="ELITE" name="ShutterActuator_sh2_living"
+			class="ShutterActuator">
+			<xmldog:param name="powerConsumption" value="150.0 W" type="Measure" />
+		</xmldog:device>
+		<xmldog:device domoticSystem="ELITE" name="Switch_b3_lobby"
+			class="OnOffSwitch">
+			<xmldog:param name="powerConsumption" value="60.0 W" type="Measure" />
+		</xmldog:device>
+		<xmldog:device domoticSystem="ELITE" name="SimpleLamp_lamp4_lobby"
+			class="SimpleLamp">
+			<xmldog:param name="powerConsumption" value="250.0 W" type="Measure" />
+		</xmldog:device>
+		<xmldog:device domoticSystem="ELITE" name="DoorActuator_d7_kitchen"
+			class="DoorActuator">
+			<xmldog:param name="powerConsumption" value="10.0 W" type="Measure" />
+		</xmldog:device>
+		<xmldog:device domoticSystem="ELITE" name="MainsPowerOutlet_p16_kitchen"
+			class="MainsPowerOutlet">
+			<xmldog:param name="powerConsumption" value="1000.0 W" type="Measure" />
+		</xmldog:device>
+		<xmldog:device domoticSystem="ELITE" name="InfraredSensor_IR1_bed"
+			class="InfraredSensor">
+			<xmldog:param name="powerConsumption" value="100.0 W" type="Measure" />
+		</xmldog:device>
+		<xmldog:device domoticSystem="ELITE" name="WindowActuator_w3_bath"
+			class="WindowActuator">
+			<xmldog:param name="powerConsumption" value="237.0 W" type="Measure" />
+		</xmldog:device>
+		<xmldog:device domoticSystem="ELITE" name="SmokeSensor_smoke_storage"
+			class="SmokeSensor">
+			<xmldog:param name="powerConsumption" value="350.0 W" type="Measure" />
+		</xmldog:device>
+	</xmldog:controllables>
+</xmldog:dogHomeConfiguration>
