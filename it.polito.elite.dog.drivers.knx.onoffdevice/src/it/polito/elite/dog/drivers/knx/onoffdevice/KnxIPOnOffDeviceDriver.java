@@ -137,7 +137,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 		{
 			this.regDriver.unregister();
 			this.regDriver = null;
-		}		
+		}
 	}
 	
 	/**
@@ -222,7 +222,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	 * @see
 	 * org.osgi.service.device.Driver#match(org.osgi.framework.ServiceReference)
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public int match(ServiceReference reference) throws Exception
 	{
@@ -230,30 +230,33 @@ public class KnxIPOnOffDeviceDriver implements Driver
 		
 		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
 		{
-			// the device category for this device
-			String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
-			// the manufacturer
-			String manufacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
-			
-			// get the gateway to which the device is connected
-			@SuppressWarnings("unchecked")
-			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-					.getGateway();
-			
-			if (deviceCategory != null)
+			if (this.context.getService(reference) instanceof ControllableDevice)
 			{
-				if ((manufacturer != null) && (gateway != null) && (manufacturer.equals(KnxIPInfo.MANUFACTURER))
-						&& (OnOffDeviceCategories.contains(deviceCategory))
-						&& (this.gateway.get().isGatewayAvailable(gateway)))
-				{
-					// use Lamp as a generic on/off device, for its match
-					// values...
-					// TODO: evaluate if it is better to store this information
-					// in
-					// DogDeviceConstant, to be general...
-					matchValue = Lamp.MATCH_MANUFACTURER + Lamp.MATCH_TYPE;
-				}
+				// the device category for this device
+				String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
+				// the manufacturer
+				String manufacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
 				
+				// get the gateway to which the device is connected
+				String gateway = (String) ((ControllableDevice) this.context.getService(reference))
+						.getDeviceDescriptor().getGateway();
+				
+				if (deviceCategory != null)
+				{
+					if ((manufacturer != null) && (gateway != null) && (manufacturer.equals(KnxIPInfo.MANUFACTURER))
+							&& (OnOffDeviceCategories.contains(deviceCategory))
+							&& (this.gateway.get().isGatewayAvailable(gateway)))
+					{
+						// use Lamp as a generic on/off device, for its match
+						// values...
+						// TODO: evaluate if it is better to store this
+						// information
+						// in
+						// DogDeviceConstant, to be general...
+						matchValue = Lamp.MATCH_MANUFACTURER + Lamp.MATCH_TYPE;
+					}
+					
+				}
 			}
 		}
 		return matchValue;

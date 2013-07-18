@@ -200,7 +200,7 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 		this.unRegister();
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public int match(ServiceReference reference) throws Exception
 	{
@@ -208,29 +208,31 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 		
 		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
 		{
-			// get the given device category
-			String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
-			
-			// get the given device manufacturer
-			String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
-			
-			// get the gateway to which the device is connected
-			@SuppressWarnings("unchecked")
-			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-					.getGateway();
-			
-			// compute the matching score between the given device and this
-			// driver
-			if (deviceCategory != null)
+			if (this.context.getService(reference) instanceof ControllableDevice)
 			{
-				if (manifacturer != null && manifacturer.equals(KnxIPInfo.MANUFACTURER)
-						&& (deviceCategory.equals(SinglePhaseElectricityMeter.class.getName()))
-						&& (this.gateway.get().isGatewayAvailable(gateway)))
-				{
-					matchValue = SinglePhaseElectricityMeter.MATCH_MANUFACTURER
-							+ SinglePhaseElectricityMeter.MATCH_TYPE;
-				}
+				// get the given device category
+				String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
 				
+				// get the given device manufacturer
+				String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+				
+				// get the gateway to which the device is connected
+				String gateway = (String) ((ControllableDevice) this.context.getService(reference))
+						.getDeviceDescriptor().getGateway();
+				
+				// compute the matching score between the given device and this
+				// driver
+				if (deviceCategory != null)
+				{
+					if (manifacturer != null && manifacturer.equals(KnxIPInfo.MANUFACTURER)
+							&& (deviceCategory.equals(SinglePhaseElectricityMeter.class.getName()))
+							&& (this.gateway.get().isGatewayAvailable(gateway)))
+					{
+						matchValue = SinglePhaseElectricityMeter.MATCH_MANUFACTURER
+								+ SinglePhaseElectricityMeter.MATCH_TYPE;
+					}
+					
+				}
 			}
 		}
 		return matchValue;

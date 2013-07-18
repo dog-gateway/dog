@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdm:sourceDeviceMapping
+	xmlns:sdm="http://elite.polito.it/xml/schema/sourceDeviceMapping"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://elite.polito.it/xml/schema/sourceDeviceMapping ../../../StreamProcessingBlocks - Addons/spec/xml/sourceDeviceMapping.xsd ">
+
+	<!-- Moxa 1 -->
+
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-1-ai-DP-Vent-Man-00" uid="moxa-1-ai-DP-Vent-Man-00" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-1-ai-DP-Vent-Rip-01" uid="moxa-1-ai-DP-Vent-Rip-01" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-1-ai-DP-Fil-Fine-02" uid="moxa-1-ai-DP-Fil-Fine-02" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-1-ai-DP-Pref-Est-03" uid="moxa-1-ai-DP-Pref-Est-03" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-1-ai-DP-Pref-Ric-04" uid="moxa-1-ai-DP-Pref-Ric-04" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-1-ai-DP-Rip-SX-05" uid="moxa-1-ai-DP-Rip-SX-05" />
+	<sdm:sensor sensorQFParams=""
+		sensorQFunctionality="TemperatureMeasurementNotification" sensorURI="moxa-1-ai-T-Rip-SX-05"
+		uid="moxa-1-ai-T-Rip-SX-05" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-1-ai-DP-Man-07" uid="moxa-1-ai-DP-Man-07" />
+
+	<!-- Moxa 2 -->
+
+	<sdm:sensor sensorQFParams=""
+		sensorQFunctionality="TemperatureMeasurementNotification" sensorURI="moxa-2-ai-t-air500-mand"
+		uid="moxa-2-ai-t-air500-mand" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-2-ai-dp-rip-dx" uid="moxa-2-ai-dp-rip-dx" />
+	<sdm:sensor sensorQFParams=""
+		sensorQFunctionality="TemperatureMeasurementNotification" sensorURI="moxa-2-ai-temp-rip-dx"
+		uid="moxa-2-ai-temp-rip-dx" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="Co2MeasurementNotification"
+		sensorURI="moxa-2-ai-co2-iaq-u1-rip" uid="moxa-2-ai-co2-iaq-u1-rip" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="HumidityMeasurementNotification"
+		sensorURI="moxa-2-ai-humidity-iaq-u2-rip" uid="moxa-2-ai-humidity-iaq-u2-rip" />
+	<sdm:sensor sensorQFParams=""
+		sensorQFunctionality="TemperatureMeasurementNotification" sensorURI="moxa-2-ai-temp-iaq-u3-rip"
+		uid="moxa-2-ai-temp-iaq-u3-rip" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="Co2MeasurementNotification"
+		sensorURI="moxa-2-ai-co2-iaq-u1-mand" uid="moxa-2-ai-co2-iaq-u1-mand" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="HumidityMeasurementNotification"
+		sensorURI="moxa-2-ai-humidity-iaq-u2-mand" uid="moxa-2-ai-humidity-iaq-u2-mand" />
+
+	<!-- Moxa 3 -->
+
+	<sdm:sensor sensorQFParams=""
+		sensorQFunctionality="TemperatureMeasurementNotification" sensorURI="moxa-3-ai-IAQ-Temp-Mand-00"
+		uid="moxa-3-ai-IAQ-Temp-Mand-00" />
+	<sdm:sensor sensorQFParams=""
+		sensorQFunctionality="TemperatureMeasurementNotification" sensorURI="moxa-3-ai-Temp-Air-ex-out-02"
+		uid="moxa-3-ai-Temp-Air-ex-out-02" />
+	<sdm:sensor sensorQFParams=""
+		sensorQFunctionality="TemperatureMeasurementNotification" sensorURI="moxa-3-ai-Temp-Air-ex-inp-04"
+		uid="moxa-3-ai-Temp-Air-ex-inp-04" />
+	<sdm:sensor sensorQFParams=""
+		sensorQFunctionality="SinglePhaseActivePowerMeasurementNotification"
+		sensorURI="moxa-3-ai-batteria-caldo-05" uid="moxa-3-ai-batteria-caldo-05" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-3-ai-DP-Air-ex-out-01" uid="moxa-3-ai-DP-Air-ex-out-01" />
+	<sdm:sensor sensorQFParams="" sensorQFunctionality="PressureMeasurementNotification"
+		sensorURI="moxa-3-ai-DP-Air-ex-inp-03" uid="moxa-3-ai-DP-Air-ex-inp-03" />
+</sdm:sourceDeviceMapping>

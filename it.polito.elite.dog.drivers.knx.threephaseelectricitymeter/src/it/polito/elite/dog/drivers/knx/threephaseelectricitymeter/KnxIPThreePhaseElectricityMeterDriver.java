@@ -92,7 +92,7 @@ public class KnxIPThreePhaseElectricityMeterDriver implements Driver
 		// create a logger
 		this.logger = new DogLogInstance(bundleContext);
 		
-		//register the service
+		// register the service
 		this.register();
 	}
 	
@@ -119,7 +119,7 @@ public class KnxIPThreePhaseElectricityMeterDriver implements Driver
 		{
 			this.regDriver.unregister();
 			this.regDriver = null;
-		}	
+		}
 	}
 	
 	/**
@@ -197,7 +197,7 @@ public class KnxIPThreePhaseElectricityMeterDriver implements Driver
 		this.gateway.compareAndSet(gateway, null);
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public int match(ServiceReference reference) throws Exception
 	{
@@ -205,28 +205,31 @@ public class KnxIPThreePhaseElectricityMeterDriver implements Driver
 		
 		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
 		{
-			// get the given device category
-			String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
-			
-			// get the given device manufacturer
-			String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
-			
-			// get the gateway to which the device is connected
-			@SuppressWarnings("unchecked")
-			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-					.getGateway();
-			
-			// compute the matching score between the given device and this
-			// driver
-			if (deviceCategory != null)
+			if (this.context.getService(reference) instanceof ControllableDevice)
 			{
-				if (manifacturer != null && manifacturer.equals(KnxIPInfo.MANUFACTURER)
-						&& (deviceCategory.equals(ThreePhaseElectricityMeter.class.getName()))
-						&& (this.gateway.get().isGatewayAvailable(gateway)))
-				{
-					matchValue = ThreePhaseElectricityMeter.MATCH_MANUFACTURER + ThreePhaseElectricityMeter.MATCH_TYPE;
-				}
+				// get the given device category
+				String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
 				
+				// get the given device manufacturer
+				String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+				
+				// get the gateway to which the device is connected
+				String gateway = (String) ((ControllableDevice) this.context.getService(reference))
+						.getDeviceDescriptor().getGateway();
+				
+				// compute the matching score between the given device and this
+				// driver
+				if (deviceCategory != null)
+				{
+					if (manifacturer != null && manifacturer.equals(KnxIPInfo.MANUFACTURER)
+							&& (deviceCategory.equals(ThreePhaseElectricityMeter.class.getName()))
+							&& (this.gateway.get().isGatewayAvailable(gateway)))
+					{
+						matchValue = ThreePhaseElectricityMeter.MATCH_MANUFACTURER
+								+ ThreePhaseElectricityMeter.MATCH_TYPE;
+					}
+					
+				}
 			}
 		}
 		return matchValue;
