@@ -5,7 +5,7 @@
 	<dhc:buildingEnvironment>
 		<dhc:building name="KNX">
 			<dhc:flat class="Flat" name="KNX_DemoBox">
-				<dhc:room class="StorageRoom" name="KNX_DemoBox">
+				<dhc:room class="StorageRoom" name="storageroom">
 					<dhc:ceiling class="Ceiling" name="ceiling" />
 					<dhc:floor class="Floor" name="floor" />
 					<dhc:wall class="Wall" name="wall" />
@@ -878,6 +878,7 @@
 
 		<!-- ZigBee devices -->
 
+		
 		<dhc:device domoticSystem="ZigBee" name="MainsPowerOutlet_ZigBee"
 			class="MeteringPowerOutlet">
 			<dhc:description>A MeteringPowerOutlet instance named
@@ -1022,7 +1023,7 @@
 				</dhc:statevalues>
 			</dhc:state>
 		</dhc:device>
-
+		
 
 
 		<dhc:device domoticSystem="ZigBee" name="SmartInfoEmulator"
@@ -1063,7 +1064,7 @@
 			</dhc:controlFunctionality>
 			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
 				<dhc:notifications>
-					<dhc:notification name="StateChangeNotification_1_ZB"
+					<dhc:notification name="StateChangeNotification__SmartInfoEmulator"
 						class="StateChangeNotification">
 						<dhc:param value="1" name="nParams" />
 						<dhc:param value="stateChanged" name="notificationName" />
@@ -1135,6 +1136,114 @@
 				</dhc:statevalues>
 			</dhc:state>
 		</dhc:device>
+		
+		<!--  
+		<dhc:device domoticSystem="ZigBee" name="MainsPowerOutlet_ZigBee_2"
+			class="MeteringPowerOutlet">
+			<dhc:description>A MainsPowerOutlet instance named MainsPowerOutlet_3
+			</dhc:description>
+			<dhc:isIn>storageroom</dhc:isIn>
+			<dhc:hasMeter>energy_meter_2</dhc:hasMeter>
+			<dhc:param value="3521399293210525902" name="serialNumber" />
+			<dhc:controlFunctionality class="OnOffFunctionality">
+				<dhc:commands>
+					<dhc:command id="OffCommand_ZigBee_2" name="OffCommand_ZigBee_2"
+						class="OffCommand">
+						<dhc:param value="off" name="realCommandName" />
+					</dhc:command>
+					<dhc:command id="OnCommand_ZigBee_2" name="OnCommand_ZigBee_2" class="OnCommand">
+						<dhc:param value="on" name="realCommandName" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification name="StateChangeNotification_ZigBee_2"
+						class="StateChangeNotification">
+						<dhc:param value="1" name="nParams" />
+						<dhc:param value="stateChanged" name="notificationName" />
+						<dhc:param value="3/0/3" name="groupAddress" />
+						<dhc:param type="State" value="newState" name="notificationParamName" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality
+				class="SinglePhaseReactiveEnergyMeasurementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification
+						name="TotalReactiveEnergyMeasurementNotification_MainsPowerOutlet_ZigBee_2"
+						class="SinglePhaseReactiveEnergyMeasurementNotification">
+						<dhc:param value="newReactiveEnergyValue" name="notificationName" />
+						<dhc:param name="unitOfMeasure" value="Varh" />
+						<dhc:param type="Measure" value="value" name="notificationParamName" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality
+				class="SinglePhaseActiveEnergyMeasurementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification
+						name="TotalActiveEnergyMeasurementNotification_MainsPowerOutlet_ZigBee_2"
+						class="SinglePhaseActiveEnergyMeasurementNotification">
+						<dhc:param value="newActiveEnergyValue" name="notificationName" />
+						<dhc:param name="unitOfMeasure" value="Wh" />
+						<dhc:param type="Measure" value="value" name="notificationParamName" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality
+				class="PowerFactorMeasurementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification
+						name="PowerFactorMeasurementNotification_MainsPowerOutlet_ZigBee_2"
+						class="PowerFactorMeasurementNotification">
+						<dhc:param value="newPowerFactorValue" name="notificationName" />
+						<dhc:param type="Measure" value="powerfactor" name="notificationParamName" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality
+				class="SinglePhaseActivePowerMeasurementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification
+						name="SinglePhaseActivePowerMeasurementNotification_MainsPowerOutlet_ZigBee_2"
+						class="SinglePhaseActivePowerMeasurementNotification">
+						<dhc:param value="2" name="nParams" />
+						<dhc:param value="newActivePowerValue" name="notificationName" />
+						<dhc:param name="unitOfMeasure" value="W" />
+						<dhc:param type="Measure" value="powerValue" name="notificationParamName" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:state class="OnOffState">
+				<dhc:statevalues>
+					<dhc:statevalue name="off" class="OffStateValue" />
+					<dhc:statevalue name="on" class="OnStateValue" />
+				</dhc:statevalues>
+			</dhc:state>
+			<dhc:state class="SinglePhaseActivePowerMeasurementState">
+				<dhc:statevalues>
+					<dhc:statevalue name="" class="ActivePowerStateValue" />
+				</dhc:statevalues>
+			</dhc:state>
+			<dhc:state class="SinglePhaseActiveEnergyState">
+				<dhc:statevalues>
+					<dhc:statevalue name="" class="ActiveEnergyStateValue" />
+				</dhc:statevalues>
+			</dhc:state>
+			<dhc:state class="SinglePhaseReactiveEnergyState">
+				<dhc:statevalues>
+					<dhc:statevalue name="" class="ReactiveEnergyStateValue" />
+				</dhc:statevalues>
+			</dhc:state>
+			<dhc:state class="PowerFactorMeasurementState">
+				<dhc:statevalues>
+					<dhc:statevalue name="" class="PowerFactorStateValue" />
+				</dhc:statevalues>
+			</dhc:state>
+		</dhc:device>
+		-->
+		
 	</dhc:controllables>
 </dhc:dhc>
 
