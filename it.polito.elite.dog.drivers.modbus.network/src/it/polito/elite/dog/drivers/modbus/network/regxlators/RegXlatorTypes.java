@@ -49,6 +49,7 @@ public class RegXlatorTypes
 {
 	// the already defined types
 	public static int TYPE_BOOLEAN_COIL = 0;
+	public static int TYPE_2BYTE_FLOAT_HOLDING = 1;
 	public static int TYPE_2BYTE_INTEGER_HOLDING = 2;
 	public static int TYPE_4BYTE_INTEGER_HOLDING_BE = 3;
 	public static int TYPE_4BYTE_INTEGER_HOLDING = 4;
@@ -74,6 +75,8 @@ public class RegXlatorTypes
 				"Register value translator for 4 Bytes float input registers"));
 		types.put(TYPE_4BYTE_INTEGER_INPUT, new RegXlatorType(TYPE_4BYTE_INTEGER_INPUT, RegXlator4ByteIntegerInput.class,
 				"Register value translator for 4 Bytes integer input registers"));
+		types.put(TYPE_2BYTE_FLOAT_HOLDING, new RegXlatorType(TYPE_2BYTE_FLOAT_HOLDING, RegXlator2ByteFloatHolding.class,
+				"Register value translator for 2 Bytes integer input registers"));
 	}
 	
 	/**
