@@ -81,10 +81,10 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends ZWaveDriver implem
 		uf.label(SI.KILO(VAR.times(NonSI.HOUR)), "kVarh");
 		
 		// initialize the state
-		// this.currentState.setState(EnergyMeasurementState.class.getSimpleName(),
-		// new EnergyMeasurementState(new ActiveEnergyStateValue()));
-		// this.currentState.setState(ActivePowerMeasurementState.class.getSimpleName(),
-		// new ActivePowerMeasurementState(new ActivePowerStateValue()));
+		this.currentState.setState(SinglePhaseActiveEnergyState.class.getSimpleName(),
+		new SinglePhaseActiveEnergyState(new ActiveEnergyStateValue()));
+		this.currentState.setState(SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
+		new SinglePhaseActivePowerMeasurementState(new ActivePowerStateValue()));
 		
 		// get the initial state of the device
 		Runnable worker = new Runnable() {
