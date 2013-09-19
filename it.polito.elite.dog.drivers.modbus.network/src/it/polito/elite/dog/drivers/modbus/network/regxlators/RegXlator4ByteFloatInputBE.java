@@ -1,5 +1,5 @@
 /*
- * Dog 2.0 - Modbus Network Driver
+ * Dog 2.0 - Modbus Device Driver
  * 
  * Copyright [2012] 
  * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
@@ -15,26 +15,16 @@ import java.nio.ByteBuffer;
 import java.util.Locale;
 
 import net.wimpi.modbus.msg.ModbusRequest;
-import net.wimpi.modbus.msg.ReadMultipleRegistersRequest;
-import net.wimpi.modbus.msg.ReadMultipleRegistersResponse;
-import net.wimpi.modbus.msg.WriteMultipleRegistersRequest;
+import net.wimpi.modbus.msg.ReadInputRegistersRequest;
+import net.wimpi.modbus.msg.ReadInputRegistersResponse;
+import net.wimpi.modbus.procimg.InputRegister;
 import net.wimpi.modbus.procimg.Register;
 import net.wimpi.modbus.procimg.SimpleRegister;
 
-/**
- * Handles translation of 4 bytes integer values...
- * 
- * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>, Politecnico
- *         di Torino
- * @author <a href="mailto:muhammad.sanaullah@polito.it">Muhammad Sanaullah</a>,
- *         Politecnico di Torino
- * 
- * @since Feb 27, 2012
- */
-public class RegXlator4ByteIntegerHoldingBE extends RegXlator
+public class RegXlator4ByteFloatInputBE extends RegXlator
 {
 	
-	public RegXlator4ByteIntegerHoldingBE()
+	public RegXlator4ByteFloatInputBE()
 	{
 		super();
 		this.typeSize = 4;
@@ -46,10 +36,10 @@ public class RegXlator4ByteIntegerHoldingBE extends RegXlator
 	 * 
 	 * TODO: check if it works...
 	 * 
-	 * @param registers
+	 * @param inputRegisters
 	 * @return
 	 */
-	public int fromRegister(Register[] registers)
+	public float fromRegister(InputRegister[] inputRegisters)
 	{
 		byte bytes[] = new byte[this.typeSize];
 		/*
@@ -65,8 +55,8 @@ public class RegXlator4ByteIntegerHoldingBE extends RegXlator
 		*/
 		
 		//swap bytes
-		byte highWord[] = registers[1].toBytes();
-		byte lowWord[] = registers[0].toBytes();
+		byte highWord[] = inputRegisters[1].toBytes();
+		byte lowWord[] = inputRegisters[0].toBytes();
 		
 		//copy the two byte in the response byte array
 		bytes[3] = highWord[1];
@@ -77,7 +67,7 @@ public class RegXlator4ByteIntegerHoldingBE extends RegXlator
 		//wrap the byte array
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		
-		return buffer.getInt();
+		return buffer.getFloat();
 	}
 	
 	/**
@@ -86,13 +76,13 @@ public class RegXlator4ByteIntegerHoldingBE extends RegXlator
 	 * @param value
 	 * @return
 	 */
-	public Register[] toRegister(int value)
+	public Register[] toRegister(float value)
 	{
 		byte bytes[] = new byte[this.typeSize];
 		
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		
-		buffer.putInt(value);
+		buffer.putFloat(value);
 		
 		Register registers[] = new SimpleRegister[2];
 		registers[1] = new SimpleRegister(bytes[0], bytes[1]);
@@ -104,13 +94,13 @@ public class RegXlator4ByteIntegerHoldingBE extends RegXlator
 	public String getValue()
 	{
 		String value = null;
-		if ((this.readResponse != null)&&(this.readResponse instanceof ReadMultipleRegistersResponse))
+		if ((this.readResponse != null)&&(this.readResponse instanceof ReadInputRegistersResponse))
 		{
 			//get the integer value contained in the received readResponse
-			int valueAsInt = this.fromRegister(((ReadMultipleRegistersResponse) this.readResponse).getRegisters());
+			float valueAsFloat = this.fromRegister(((ReadInputRegistersResponse) this.readResponse).getRegisters());
 			
 			//format and scale the value according to the inner scaling parameter
-			value = String.format(Locale.US,"%f", valueAsInt*this.scaleFactor);
+			value = String.format(Locale.US,"%f", valueAsFloat*this.scaleFactor);
 			
 			//add the unit of measure if needed
 			if ((this.unitOfMeasure != null) && (!this.unitOfMeasure.isEmpty()))
@@ -122,17 +112,16 @@ public class RegXlator4ByteIntegerHoldingBE extends RegXlator
 	@Override
 	public ModbusRequest getWriteRequest(int address, String value)
 	{
-		// Set the given value as writeRequest value
-		Register registers[] = this.toRegister((int)(Double.valueOf(value)*(1/this.scaleFactor)));
-		this.writeRequest = new WriteMultipleRegistersRequest(address, registers);
-		((WriteMultipleRegistersRequest)this.writeRequest).setReference(address);
-		return this.writeRequest;
+		//not supported for input registers
+		return null;
 	}
 
 	@Override
 	public ModbusRequest getReadRequest(int address)
 	{
-		this.readRequest = new ReadMultipleRegistersRequest(address, this.typeSize/2);
+		this.readRequest = new ReadInputRegistersRequest(address, this.typeSize/2);
 		return this.readRequest;
 	}
+	
 }
+
