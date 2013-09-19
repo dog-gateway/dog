@@ -930,6 +930,9 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		if ((connection != null) && (!connection.isConnected()))
 			connection.close();
 		
+		//remove the connection from the pool
+		this.connectionPool.remove(gwAddress);
+		
 		// schedule a new timer to re-call the open function after the
 		// given trial timeout...
 		connectionTrialsTimer = new Timer();
