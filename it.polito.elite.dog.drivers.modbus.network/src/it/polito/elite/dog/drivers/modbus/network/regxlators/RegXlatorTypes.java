@@ -56,11 +56,11 @@ public class RegXlatorTypes
 	public static int TYPE_4BYTE_INTEGER_HOLDING = 4;
 	public static int TYPE_4BYTE_INTEGER_HOLDING_BE = 3;
 	public static int TYPE_4BYTE_FLOAT_HOLDING = 5;
-	public static int TYPE_4BYTE_FLOAT_HOLDING_BE = 9;
+	public static int TYPE_4BYTE_FLOAT_HOLDING_BE = 10;
 	public static int TYPE_4BYTE_FLOAT_INPUT = 6;
-	public static int TYPE_4BYTE_FLOAT_INPUT_BE = 6;
+	public static int TYPE_4BYTE_FLOAT_INPUT_BE = 8;
 	public static int TYPE_4BYTE_INTEGER_INPUT = 7;
-	public static int TYPE_4BYTE_INTEGER_INPUT_BE = 8;
+	public static int TYPE_4BYTE_INTEGER_INPUT_BE = 9;
 	
 	// the class for representing RegXlators and corresponding IDs
 	private static ConcurrentHashMap<Integer, RegXlatorType> types = new ConcurrentHashMap<Integer, RegXlatorType>();
