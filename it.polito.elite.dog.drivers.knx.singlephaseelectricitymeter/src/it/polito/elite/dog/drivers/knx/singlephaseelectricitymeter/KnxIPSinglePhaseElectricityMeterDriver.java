@@ -1,24 +1,30 @@
 /*
- * Dog 2.0 - Device Driver
+ * Dog - Device Driver
  * 
- * Copyright [2012]
- * [Luigi De Russis (luigi.derussis@polito.it), Politecnico di Torino]  
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2012 Luigi De Russis
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.knx.singlephaseelectricitymeter;
 
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.devicecategory.SinglePhaseElectricityMeter;
 import it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriver;
 import it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.devicecategory.SinglePhaseElectricityMeter;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -30,12 +36,12 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
-import org.osgi.service.log.LogService;
 
 /**
  * The driver for KNX 1-phase electricity multi-meters
  * 
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
@@ -44,7 +50,7 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 	BundleContext context;
 	
 	// the driver logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIPSinglePhaseElectricityMeterDriver]: ";
@@ -86,7 +92,7 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 		this.connectedDrivers = new Vector<KnxIPSinglePhaseElectricityMeterDriverInstance>();
 		
 		// create a logger
-		this.logger = new DogLogInstance(bundleContext);
+		this.logger = new LogHelper(bundleContext);
 		
 		// try to register the service
 		this.register();
@@ -188,7 +194,7 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
 			
 			// add the id of this driver to the properties
-			propDriver.put(DogDeviceCostants.DRIVER_ID, "KnxIP_SinglePhaseElectricityMeter_driver");
+			propDriver.put(DeviceCostants.DRIVER_ID, "KnxIP_SinglePhaseElectricityMeter_driver");
 			
 			// register this driver in the OSGi framework
 			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
@@ -211,10 +217,10 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 			if (this.context.getService(reference) instanceof ControllableDevice)
 			{
 				// get the given device category
-				String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
+				String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
 				
 				// get the given device manufacturer
-				String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+				String manifacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
 				
 				// get the gateway to which the device is connected
 				String gateway = (String) ((ControllableDevice) this.context.getService(reference))

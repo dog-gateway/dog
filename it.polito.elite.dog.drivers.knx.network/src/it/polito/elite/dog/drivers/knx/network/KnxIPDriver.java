@@ -1,24 +1,29 @@
 /*
- * Dog 2.0 - Network Driver
+ * Dog - Network Driver
  * 
- * Copyright [2011] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * [Luigi De Russis (luigi.derussis@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2011 Dario Bonino and Luigi De Russis
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.knx.network;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.StatefulDevice;
+import it.polito.elite.dog.core.library.util.ElementDescription;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.dog2.doglibrary.DogDriver;
-import it.polito.elite.domotics.dog2.doglibrary.DogElementDescription;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
 
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -31,9 +36,10 @@ import java.util.Set;
  * driver developers to avoid dealing with common network operations.
  * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public abstract class KnxIPDriver implements DogDriver
+public abstract class KnxIPDriver implements StatefulDevice
 {
 	// a reference to the network driver interface to allow network-level access
 	// for sub-classes
@@ -179,18 +185,18 @@ public abstract class KnxIPDriver implements DogDriver
 			this.globalGroupAddress = this.groupAddressSet.iterator().next();
 		
 		// get parameters associated to each device command (if any)
-		Set<DogElementDescription> commandsSpecificParameters = this.device.getDeviceDescriptor()
+		Set<ElementDescription> commandsSpecificParameters = this.device.getDeviceDescriptor()
 				.getDevCommandSpecificParams();
 		
 		// get parameters associated to each device notification (if any)
-		Set<DogElementDescription> notificationsSpecificParameters = this.device.getDeviceDescriptor()
+		Set<ElementDescription> notificationsSpecificParameters = this.device.getDeviceDescriptor()
 				.getDevNotificationSpecificParams();
 		
 		/*************** HANDLE COMMAND SPECIFICATIONS **************************/
 		
 		// fill the groupAddress2Command map, adding command details whenever
 		// needed
-		for (DogElementDescription commandSpec : commandsSpecificParameters)
+		for (ElementDescription commandSpec : commandsSpecificParameters)
 		{
 			try
 			{
@@ -239,7 +245,7 @@ public abstract class KnxIPDriver implements DogDriver
 		/*************** HANDLE NOTIFICATION SPECIFICATIONS **************************/
 		
 		// fill the groupAddress2NotificationMap
-		for (DogElementDescription notificationSpec : notificationsSpecificParameters)
+		for (ElementDescription notificationSpec : notificationsSpecificParameters)
 		{
 			try
 			{
@@ -289,13 +295,6 @@ public abstract class KnxIPDriver implements DogDriver
 	 * associating the device-specific driver to the network driver
 	 */
 	protected abstract void specificConfiguration();
-	
-	@Override
-	public void detachDriver(String id)
-	{
-		// intentionally left empty
-		
-	}
 	
 	/**
 	 * Handles the groupAddress2NotificationMap filling where multiple

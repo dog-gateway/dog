@@ -1,25 +1,30 @@
 /*
- * Dog 2.0 - Device Driver
+ * Dog - Device Driver
  * 
- * Copyright [2011] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * [Luigi De Russis (luigi.derussis@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2011 Luigi De Russis and Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.knx.onoffdevice;
 
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
 import it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriver;
 import it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.devicecategory.Lamp;
 
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -32,13 +37,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
-import org.osgi.service.log.LogService;
 
 /**
  * The (standard) class for creating and handling the registration/removal
  * process of the driver in the OSGi framework.
  * 
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class KnxIPOnOffDeviceDriver implements Driver
@@ -47,7 +52,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	BundleContext context;
 	
 	// System logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIpOnOffDeviceDriver]: ";
@@ -83,7 +88,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	public void activate(BundleContext context)
 	{
 		// init the logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
 		// store the context
 		this.context = context;
@@ -209,7 +214,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
 			
 			// add the id of this driver to the properties
-			propDriver.put(DogDeviceCostants.DRIVER_ID, "KnxIP_ONOFF_driver");
+			propDriver.put(DeviceCostants.DRIVER_ID, "KnxIP_ONOFF_driver");
 			
 			// register this driver in the OSGi framework
 			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
@@ -233,9 +238,9 @@ public class KnxIPOnOffDeviceDriver implements Driver
 			if (this.context.getService(reference) instanceof ControllableDevice)
 			{
 				// the device category for this device
-				String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
+				String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
 				// the manufacturer
-				String manufacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+				String manufacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
 				
 				// get the gateway to which the device is connected
 				String gateway = (String) ((ControllableDevice) this.context.getService(reference))

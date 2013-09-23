@@ -1,56 +1,61 @@
 /*
- * Dog 2.0 - Device Driver
+ * Dog - Device Driver
  * 
- * Copyright [2011] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * [Luigi De Russis (luigi.derussis@polito.it), Politecnico di Torino]  
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2011 Dario Bonino and Luigi De Russis
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.knx.threephaseelectricitymeter;
 
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.ThreePhaseElectricityMeter;
+import it.polito.elite.dog.core.library.model.notification.FrequencyMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.PowerFactorMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.SinglePhaseActiveEnergyMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.SinglePhaseActivePowerMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.SinglePhaseReactiveEnergyMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.StateChangeNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseActivePowerMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseApparentPowerMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseCurrentMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseLLVoltageMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseLNVoltageMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseReactivePowerMeasurementNotification;
+import it.polito.elite.dog.core.library.model.state.FrequencyMeasurementState;
+import it.polito.elite.dog.core.library.model.state.PowerFactorMeasurementState;
+import it.polito.elite.dog.core.library.model.state.SinglePhaseActiveEnergyState;
+import it.polito.elite.dog.core.library.model.state.SinglePhaseReactiveEnergyState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseActivePowerMeasurementState;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseApparentPowerMeasurementState;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseCurrentState;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseReactivePowerMeasurementState;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseVoltageState;
+import it.polito.elite.dog.core.library.model.statevalue.ActiveEnergyStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ApparentPowerStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.CurrentStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.FrequencyStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.PowerFactorStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ReactiveEnergyStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ReactivePowerStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.StateValue;
+import it.polito.elite.dog.core.library.model.statevalue.VoltageStateValue;
 import it.polito.elite.dog.drivers.knx.network.KnxIPDriver;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.model.devicecategory.ThreePhaseElectricityMeter;
-import it.polito.elite.domotics.model.notification.FrequencyMeasurementNotification;
-import it.polito.elite.domotics.model.notification.PowerFactorMeasurementNotification;
-import it.polito.elite.domotics.model.notification.SinglePhaseActiveEnergyMeasurementNotification;
-import it.polito.elite.domotics.model.notification.SinglePhaseActivePowerMeasurementNotification;
-import it.polito.elite.domotics.model.notification.SinglePhaseReactiveEnergyMeasurementNotification;
-import it.polito.elite.domotics.model.notification.StateChangeNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseActivePowerMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseApparentPowerMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseCurrentMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseLLVoltageMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseLNVoltageMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseReactivePowerMeasurementNotification;
-import it.polito.elite.domotics.model.state.FrequencyMeasurementState;
-import it.polito.elite.domotics.model.state.PowerFactorMeasurementState;
-import it.polito.elite.domotics.model.state.SinglePhaseActiveEnergyState;
-import it.polito.elite.domotics.model.state.SinglePhaseReactiveEnergyState;
-import it.polito.elite.domotics.model.state.State;
-import it.polito.elite.domotics.model.state.ThreePhaseActivePowerMeasurementState;
-import it.polito.elite.domotics.model.state.ThreePhaseApparentPowerMeasurementState;
-import it.polito.elite.domotics.model.state.ThreePhaseCurrentState;
-import it.polito.elite.domotics.model.state.ThreePhaseReactivePowerMeasurementState;
-import it.polito.elite.domotics.model.state.ThreePhaseVoltageState;
-import it.polito.elite.domotics.model.statevalue.ActiveEnergyStateValue;
-import it.polito.elite.domotics.model.statevalue.ActivePowerStateValue;
-import it.polito.elite.domotics.model.statevalue.ApparentPowerStateValue;
-import it.polito.elite.domotics.model.statevalue.CurrentStateValue;
-import it.polito.elite.domotics.model.statevalue.FrequencyStateValue;
-import it.polito.elite.domotics.model.statevalue.PowerFactorStateValue;
-import it.polito.elite.domotics.model.statevalue.ReactiveEnergyStateValue;
-import it.polito.elite.domotics.model.statevalue.ReactivePowerStateValue;
-import it.polito.elite.domotics.model.statevalue.StateValue;
-import it.polito.elite.domotics.model.statevalue.VoltageStateValue;
 
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -73,7 +78,8 @@ import tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator4ByteInteger;
 
 /**
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  *         TODO: Add support to total power (active, reactive, apparent...),
  *         must come from DogOnt2Dog
@@ -85,7 +91,7 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriver i
 	private Map<String, DPT> notification2DPT;
 	
 	// the driver logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIPThreePhaseElectricityMeterDriverInstance]: ";
@@ -107,7 +113,7 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriver i
 		super(network, device, gatewayAddress);
 		
 		// create a logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
 		// connect this driver instance with the device
 		this.device.setDriver(this);
@@ -420,7 +426,7 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriver i
 						{
 							// do nothing and log the error...
 							this.logger.log(
-									DogLogInstance.LOG_ERROR,
+									LogService.LOG_ERROR,
 									KnxIPThreePhaseElectricityMeterDriverInstance.logId
 											+ "Found Incompatible DPTs for the same group address "
 											+ deviceInfo.getGroupAddress() + "ignoring the corresponding notification");

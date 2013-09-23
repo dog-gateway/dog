@@ -1,22 +1,28 @@
 /*
- * Dog 2.0 - Gateway Driver
+ * Dog - Gateway Driver
  * 
- * Copyright [2012] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2012 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.knx.gateway;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.devicecategory.KNXNetIPGateway;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.devicecategory.KNXNetIPGateway;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -40,7 +46,8 @@ import org.osgi.service.log.LogService;
  * releases functionalities offered by the real devices will be modeled and
  * implemented here.
  * 
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class KnxIPGatewayDriver implements Driver
@@ -49,7 +56,7 @@ public class KnxIPGatewayDriver implements Driver
 	protected BundleContext context;
 	
 	// System logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIPGatewayDriver]: ";
@@ -87,7 +94,7 @@ public class KnxIPGatewayDriver implements Driver
 		this.context = bundleContext;
 		
 		// init the logger
-		this.logger = new DogLogInstance(this.context);
+		this.logger = new LogHelper(this.context);
 		
 		// initialize the map of connected gateways
 		this.connectedGateways = new ConcurrentHashMap<String, KnxIPGatewayDriverInstance>();
@@ -146,11 +153,11 @@ public class KnxIPGatewayDriver implements Driver
 	
 	private void registerDriver()
 	{
-		if ((this.network != null) && (this.regDriver == null) && (this.context != null))
+		if ((this.network.get() != null) && (this.regDriver == null) && (this.context != null))
 		{
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-			propDriver.put(DogDeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
-			propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
+			propDriver.put(DeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
+			propDriver.put(DeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
 			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
 			this.regKnxIPGateway = this.context.registerService(KnxIPGatewayDriver.class.getName(), this, null);
 		}
@@ -165,10 +172,10 @@ public class KnxIPGatewayDriver implements Driver
 		if ((this.regDriver != null) && (this.regKnxIPGateway != null))
 		{
 			// get the given device category
-			String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
+			String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
 			
 			// get the given device manufacturer
-			String manufacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+			String manufacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
 			
 			// compute the matching score between the given device and this
 			// driver
@@ -224,8 +231,8 @@ public class KnxIPGatewayDriver implements Driver
 						// modify the service description causing a forcing the
 						// framework to send a modified service notification
 						final Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-						propDriver.put(DogDeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
-						propDriver.put(DogDeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
+						propDriver.put(DeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
+						propDriver.put(DeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
 						
 						this.regDriver.setProperties(propDriver);
 					}

@@ -2,19 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KnxIPSinglePhaseElectricityMeterDriver
 Bundle-SymbolicName: it.polito.elite.dog.drivers.knx.singlephaseelectricitymeter
-Bundle-Version: 1.0.0
-Import-Package: it.polito.elite.dog.drivers.knx.gateway,
+Bundle-Version: 1.1.1
+Import-Package: it.polito.elite.dog.core.library.model,
+ it.polito.elite.dog.core.library.model.devicecategory,
+ it.polito.elite.dog.core.library.model.notification,
+ it.polito.elite.dog.core.library.model.state,
+ it.polito.elite.dog.core.library.model.statevalue,
+ it.polito.elite.dog.core.library.util,
+ it.polito.elite.dog.drivers.knx.gateway,
  it.polito.elite.dog.drivers.knx.network,
  it.polito.elite.dog.drivers.knx.network.info,
  it.polito.elite.dog.drivers.knx.network.interfaces,
- it.polito.elite.domotics.dog2.doglibrary,
- it.polito.elite.domotics.dog2.doglibrary.devicecategory,
- it.polito.elite.domotics.dog2.doglibrary.util,
- it.polito.elite.domotics.model,
- it.polito.elite.domotics.model.devicecategory,
- it.polito.elite.domotics.model.notification,
- it.polito.elite.domotics.model.state,
- it.polito.elite.domotics.model.statevalue,
  javax.measure,
  javax.measure.quantity,
  javax.measure.unit,

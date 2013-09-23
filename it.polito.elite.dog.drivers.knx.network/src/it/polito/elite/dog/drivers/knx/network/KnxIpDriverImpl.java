@@ -1,21 +1,26 @@
 /*
- * Dog 2.0 - Network Driver
+ * Dog - Network Driver
  * 
- * Copyright [2011] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * [Luigi De Russis (luigi.derussis@polito.it), Politecnico di Torino]  
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2011 Dario Bonino and Luigi De Russis
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.knx.network;
 
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -57,6 +62,7 @@ import tuwien.auto.calimero.process.ProcessListener;
  * The network driver for KNX networks using the KNXNet/IP protocol
  * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessListener
@@ -106,7 +112,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 	private ServiceRegistration<?> regServiceKnxIp;
 	
 	// the driver logger
-	private LogService logger;
+	private LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIpDriverImpl]: ";
@@ -119,7 +125,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 	public void activate(BundleContext bundleContext)
 	{
 		// create a logger
-		this.logger = new DogLogInstance(bundleContext);
+		this.logger = new LogHelper(bundleContext);
 		
 		// set the number of done trials to 0
 		this.trialsDone = 0;

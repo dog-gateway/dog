@@ -1,32 +1,37 @@
 /*
- * Dog 2.0 - Device Driver
+ * Dog - Device Driver
  * 
- * Copyright [2011] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * [Luigi De Russis (luigi.derussis@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2011 Luigi De Russis and Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.knx.onoffdevice;
 
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
+import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
+import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
+import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
+import it.polito.elite.dog.core.library.model.state.OnOffState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
 import it.polito.elite.dog.drivers.knx.network.KnxIPDriver;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.devicecategory.Buzzer;
-import it.polito.elite.domotics.model.devicecategory.ElectricalSystem;
-import it.polito.elite.domotics.model.devicecategory.Lamp;
-import it.polito.elite.domotics.model.devicecategory.MainsPowerOutlet;
-import it.polito.elite.domotics.model.devicecategory.SimpleLamp;
-import it.polito.elite.domotics.model.state.OnOffState;
-import it.polito.elite.domotics.model.state.State;
-import it.polito.elite.domotics.model.statevalue.OffStateValue;
-import it.polito.elite.domotics.model.statevalue.OnStateValue;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -41,12 +46,13 @@ import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
  * KNXIPDriver abstract class that performs common network operations for such a driver.
  * 
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriver implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet
 {
 	// the driver logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIPOnOffDriverInstance]: ";
@@ -68,7 +74,7 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriver implements Lamp,
 		super(network, device, gatewayAddress);
 		
 		// init the logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
 		// set default initial state to off...
 		currentState = new DeviceStatus(device.getDeviceId());
