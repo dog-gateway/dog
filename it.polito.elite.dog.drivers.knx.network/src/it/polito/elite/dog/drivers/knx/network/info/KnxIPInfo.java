@@ -1,7 +1,7 @@
 /*
  * Dog - Network Driver
  * 
- * Copyright (c) 2011 Dario Bonino
+ * Copyright (c) 2011-2013 Dario Bonino
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

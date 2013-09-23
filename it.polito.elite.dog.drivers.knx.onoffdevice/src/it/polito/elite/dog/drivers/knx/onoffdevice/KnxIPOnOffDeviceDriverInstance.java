@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2011 Luigi De Russis and Dario Bonino
+ * Copyright (c) 2011-2013 Luigi De Russis and Dario Bonino
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
