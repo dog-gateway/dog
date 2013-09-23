@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: RXTX
+Bundle-SymbolicName: org.rxtx
+Bundle-Version: 2.1.7
+Bundle-ClassPath: lib/RXTXcomm.jar
+Export-Package: gnu.io;version="2.1.7"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-NativeCode: 
+ nativelib/linux/i686-unknown-linux-gnu/librxtxParallel.so;
+ nativelib/linux/i686-unknown-linux-gnu/librxtxSerial.so;
+ osname=Linux; processor=x86,
+ 
+ nativelib/linux/ia64-unknown-linux-gnu/librxtxSerial.so;
+ osname=Linux; processor=ia64,
+ 
+ nativelib/linux/x86_64-unknown-linux-gnu/librxtxSerial.so;
+ osname=Linux; processor=x86_64,
+ 
+ nativelib/windows/i368-mingw32/rxtxParallel.dll;
+ nativelib/windows/i368-mingw32/rxtxSerial.dll;
+ osname=Win32; processor=x86,
+ 
+ nativelib/windows/x86_64/rxtxParallel.dll;
+ nativelib/windows/x86_64/rxtxSerial.dll;
+ osname=Win32; processor=x86_64,
+ 
+ 
+ nativelib/macosx/librxtxSerial.jnilib;
+ osname=macosx; processor=x86,
+ nativelib/macosx/librxtxSerial.jnilib;
+ osname=macosx; processor=x86_64
+
