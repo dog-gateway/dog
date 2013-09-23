@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" configuration-policy="require" deactivate="deactivate" name="it.polito.elite.dog.core.log.console">
+   <implementation class="it.polito.elite.dog.core.log.console.ConsoleLog"/>
+   <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
+   </service>
+   <property name="service.pid" type="String" value="it.polito.elite.core.log.console"/>
+   <reference bind="addedLogReaderService" cardinality="1..1" interface="org.osgi.service.log.LogReaderService" name="LogReaderService" policy="dynamic" unbind="removedLogReaderService"/>
+</scr:component>
