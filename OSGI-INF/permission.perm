@@ -1,0 +1,16 @@
+# MonitorAdmin permissions
+# OSGi core packages import
+(org.osgi.framework.PackagePermission "org.osgi.framework" "IMPORT")
+(org.osgi.framework.PackagePermission "org.osgi.util.tracker" "IMPORT")
+# LogService permissions
+(org.osgi.framework.ServicePermission "org.osgi.service.log.LogService" "GET")
+(org.osgi.framework.PackagePermission "org.osgi.service.log" "IMPORT")
+# EventAdmin permissions
+(org.osgi.framework.ServicePermission "org.osgi.service.event.EventAdmin" "GET")
+(org.osgi.framework.PackagePermission "org.osgi.service.event" "IMPORT")
+(org.osgi.service.event.TopicPermission "org/osgi/service/monitor" "PUBLISH")
+# MonitorAdmin permissions
+(org.osgi.framework.ServicePermission "org.osgi.service.monitor.Monitorable" "GET")
+(org.osgi.framework.ServicePermission "org.osgi.service.monitor.MonitorAdmin" "REGISTER")
+(org.osgi.framework.ServicePermission "org.osgi.service.monitor.MonitorListener" "REGISTER")
+(org.osgi.framework.PackagePermission "org.osgi.service.monitor" "IMPORT,EXPORTONLY")
