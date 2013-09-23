@@ -3,16 +3,13 @@ Bundle-ManifestVersion: 2
 Bundle-Name: DeviceMonitor
 Bundle-SymbolicName: it.polito.elite.dog.admin.system.devicemonitor
 Bundle-Version: 1.0.0
-Bundle-Vendor: it.polito.elite
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
-Import-Package: it.polito.elite.domotics.dog2.doglibrary,
- it.polito.elite.domotics.dog2.doglibrary.devicecategory,
- it.polito.elite.domotics.dog2.doglibrary.util,
- it.polito.elite.domotics.model,
- it.polito.elite.domotics.model.devicecategory,
- it.polito.elite.domotics.model.state,
- it.polito.elite.domotics.model.statevalue,
+Import-Package: it.polito.elite.dog.core.library.model,
+ it.polito.elite.dog.core.library.model.devicecategory,
+ it.polito.elite.dog.core.library.model.state,
+ it.polito.elite.dog.core.library.model.statevalue,
+ it.polito.elite.dog.core.library.util,
  javax.ws.rs,
  javax.ws.rs.core,
  javax.ws.rs.ext,

@@ -4,7 +4,7 @@ Bundle-Name: BundleManager
 Bundle-SymbolicName: it.polito.elite.dog.admin.system.bundlemanager
 Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: it.polito.elite.domotics.dog2.doglibrary.util,
+Import-Package: it.polito.elite.dog.core.library.util,
  javax.ws.rs,
  javax.ws.rs.core,
  javax.ws.rs.ext,

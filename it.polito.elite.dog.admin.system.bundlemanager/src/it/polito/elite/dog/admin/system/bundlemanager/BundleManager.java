@@ -1,5 +1,19 @@
-/**
+/*
+ * Dog - Admin
  * 
+ * Copyright (c) 2013 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.admin.system.bundlemanager;
 
@@ -7,7 +21,7 @@ import java.util.Arrays;
 
 import it.polito.elite.dog.admin.system.bundlemanager.api.BundleManagerInterface;
 import it.polito.elite.dog.admin.system.bundlemanager.util.BundleNameComparator;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,17 +33,15 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 @Path("/system/bundlemanager/")
 public class BundleManager implements BundleManagerInterface
 {
 	// the service logger
-	private LogService logger;
-	
-	// the log id
-	public static final String logId = "[BundleManager]: ";
+	private LogHelper logger;
 	
 	// the bundle context reference to extract information on the entire Dog
 	// status
@@ -55,10 +67,10 @@ public class BundleManager implements BundleManagerInterface
 		this.context = context;
 		
 		// init the logger with a null logger
-		this.logger = new DogLogInstance(this.context);
+		this.logger = new LogHelper(this.context);
 		
 		// log the activation
-		this.logger.log(LogService.LOG_INFO, BundleManager.logId + "Activated....");
+		this.logger.log(LogService.LOG_INFO, "Activated....");
 	}
 	
 	/**
@@ -70,7 +82,7 @@ public class BundleManager implements BundleManagerInterface
 		this.context = null;
 		
 		// log deactivation
-		this.logger.log(LogService.LOG_INFO, BundleManager.logId + "Deactivated...");
+		this.logger.log(LogService.LOG_INFO, "Deactivated...");
 		
 		// null the logger
 		this.logger = null;
