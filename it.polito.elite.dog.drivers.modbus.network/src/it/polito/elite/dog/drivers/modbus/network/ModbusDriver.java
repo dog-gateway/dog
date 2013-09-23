@@ -1,27 +1,32 @@
 /*
- * Dog 2.0 - Modbus Network Driver
+ * Dog - Network Driver
  * 
- * Copyright [2012] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * [Muhammad Sanaullah (muhammad.sanaullah@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2012-2013 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.modbus.network;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.StatefulDevice;
+import it.polito.elite.dog.core.library.util.ElementDescription;
 import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
 import it.polito.elite.dog.drivers.modbus.network.protocol.ModbusProtocolVariant;
 import it.polito.elite.dog.drivers.modbus.network.regxlators.RegXlator;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.dog2.doglibrary.DogDriver;
-import it.polito.elite.domotics.dog2.doglibrary.DogElementDescription;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
 
 import java.net.InetAddress;
 import java.util.HashSet;
@@ -30,14 +35,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>, Politecnico
- *         di Torino
- * @author <a href="mailto:muhammad.sanaullah@polito.it">Muhammad Sanaullah</a>,
- *         Politecnico di Torino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  * @since Jan 18, 2012
  */
-public abstract class ModbusDriver implements DogDriver
+public abstract class ModbusDriver implements StatefulDevice
 {
 	// a reference to the network driver interface to allow network-level access
 	// for sub-classes
@@ -162,15 +165,15 @@ public abstract class ModbusDriver implements DogDriver
 		// command/notification while no common parameters are defined/handled
 		
 		// get parameters associated to each device command (if any)
-		Set<DogElementDescription> commandsSpecificParameters = this.device.getDeviceDescriptor()
+		Set<ElementDescription> commandsSpecificParameters = this.device.getDeviceDescriptor()
 				.getDevCommandSpecificParams();
 		
 		// get parameters associated to each device notification (if any)
-		Set<DogElementDescription> notificationsSpecificParameters = this.device.getDeviceDescriptor()
+		Set<ElementDescription> notificationsSpecificParameters = this.device.getDeviceDescriptor()
 				.getDevNotificationSpecificParams();
 		
 		// --------------- Handle command specific parameters ----------------
-		for (DogElementDescription parameter : commandsSpecificParameters)
+		for (ElementDescription parameter : commandsSpecificParameters)
 		{
 			try
 			{
@@ -238,7 +241,7 @@ public abstract class ModbusDriver implements DogDriver
 		
 		// --------------- Handle notification specific parameters
 		// ----------------
-		for (DogElementDescription parameter : notificationsSpecificParameters)
+		for (ElementDescription parameter : notificationsSpecificParameters)
 		{
 			try
 			{

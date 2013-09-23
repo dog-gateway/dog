@@ -1,36 +1,43 @@
 /*
- * Dog 2.0 - Gateway Driver
+ * Dog - Gateway Driver
  * 
- * Copyright [2012] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2012-2013 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.modbus.gateway;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.ModbusGateway;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.devicecategory.ModbusGateway;
-import it.polito.elite.domotics.model.state.State;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  *
  */
 public class ModbusGatewayDriverInstance extends ModbusDriver implements ModbusGateway
 {
 	// the driver logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String logId = "[ModbusGatewayDriverInstance]: ";
@@ -41,7 +48,7 @@ public class ModbusGatewayDriverInstance extends ModbusDriver implements ModbusG
 		super(network, controllableDevice, gatewayAddress, gatewayPort, protocolVariant);
 		
 		// create a logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
 		// create a new device state (according to the current DogOnt model, no
 		// state is actually associated to a Modbus gateway)
@@ -67,20 +74,9 @@ public class ModbusGatewayDriverInstance extends ModbusDriver implements ModbusG
 	//getGatewayAddress already implemented by the superclass...
 
 	@Override
-	public void detachDriver(String deviceID)
-	{
-		// do nothing, shall remove the driver reference from the
-		// EchelonIlon100GatewayDriver hashtable
-		// TODO: check when this method is called by the OSGi framework
-		
-	}
-
-	
-
-	@Override
 	public void newMessageFromHouse(ModbusRegisterInfo registerInfo, String string)
 	{
-		// currently no functionalities are associated to echelon ilon gateways
+		// currently no functionalities are associated to modbus gateways
 		// therefore they do not use any datapoint and they do not listen to the
 		// house messages...
 		

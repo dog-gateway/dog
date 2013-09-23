@@ -1,52 +1,58 @@
 /*
- * Dog 2.0 - Modbus Device Driver
+ * Dog - Device Driver
  * 
- * Copyright [2012] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2012-2013 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.modbus.threephaseelectricitymeter;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.ThreePhaseElectricityMeter;
+import it.polito.elite.dog.core.library.model.notification.FrequencyMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.SinglePhaseActiveEnergyMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.SinglePhaseReactiveEnergyMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseActivePowerMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseApparentPowerMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseCurrentMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseLNVoltageMeasurementNotification;
+import it.polito.elite.dog.core.library.model.notification.ThreePhaseReactivePowerMeasurementNotification;
+import it.polito.elite.dog.core.library.model.state.FrequencyMeasurementState;
+import it.polito.elite.dog.core.library.model.state.PowerFactorMeasurementState;
+import it.polito.elite.dog.core.library.model.state.SinglePhaseActiveEnergyState;
+import it.polito.elite.dog.core.library.model.state.SinglePhaseReactiveEnergyState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseActivePowerMeasurementState;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseApparentPowerMeasurementState;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseCurrentState;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseReactivePowerMeasurementState;
+import it.polito.elite.dog.core.library.model.state.ThreePhaseVoltageState;
+import it.polito.elite.dog.core.library.model.statevalue.ActiveEnergyStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ApparentPowerStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.CurrentStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.FrequencyStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.PowerFactorStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ReactiveEnergyStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ReactivePowerStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.StateValue;
+import it.polito.elite.dog.core.library.model.statevalue.VoltageStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
 import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.model.devicecategory.ThreePhaseElectricityMeter;
-import it.polito.elite.domotics.model.notification.FrequencyMeasurementNotification;
-import it.polito.elite.domotics.model.notification.SinglePhaseActiveEnergyMeasurementNotification;
-import it.polito.elite.domotics.model.notification.SinglePhaseReactiveEnergyMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseActivePowerMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseApparentPowerMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseCurrentMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseLNVoltageMeasurementNotification;
-import it.polito.elite.domotics.model.notification.ThreePhaseReactivePowerMeasurementNotification;
-import it.polito.elite.domotics.model.state.FrequencyMeasurementState;
-import it.polito.elite.domotics.model.state.PowerFactorMeasurementState;
-import it.polito.elite.domotics.model.state.SinglePhaseActiveEnergyState;
-import it.polito.elite.domotics.model.state.SinglePhaseReactiveEnergyState;
-import it.polito.elite.domotics.model.state.State;
-import it.polito.elite.domotics.model.state.ThreePhaseActivePowerMeasurementState;
-import it.polito.elite.domotics.model.state.ThreePhaseApparentPowerMeasurementState;
-import it.polito.elite.domotics.model.state.ThreePhaseCurrentState;
-import it.polito.elite.domotics.model.state.ThreePhaseReactivePowerMeasurementState;
-import it.polito.elite.domotics.model.state.ThreePhaseVoltageState;
-import it.polito.elite.domotics.model.statevalue.ActiveEnergyStateValue;
-import it.polito.elite.domotics.model.statevalue.ActivePowerStateValue;
-import it.polito.elite.domotics.model.statevalue.ApparentPowerStateValue;
-import it.polito.elite.domotics.model.statevalue.CurrentStateValue;
-import it.polito.elite.domotics.model.statevalue.FrequencyStateValue;
-import it.polito.elite.domotics.model.statevalue.PowerFactorStateValue;
-import it.polito.elite.domotics.model.statevalue.ReactiveEnergyStateValue;
-import it.polito.elite.domotics.model.statevalue.ReactivePowerStateValue;
-import it.polito.elite.domotics.model.statevalue.StateValue;
-import it.polito.elite.domotics.model.statevalue.VoltageStateValue;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -64,13 +70,14 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver implements ThreePhaseElectricityMeter
 {
 	// the class logger
-	private LogService logger;
+	private LogHelper logger;
 	
 	public ModbusThreePhaseElectricityMeterDriverInstance(ModbusNetwork network, ControllableDevice device,
 			String gatewayAddress, String gatewayPort, String gatewayProtocol, BundleContext context)
@@ -78,17 +85,11 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		super(network, device, gatewayAddress, gatewayPort, gatewayProtocol);
 		
 		// create a logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
 		// TODO: get the initial state of the device....(states can be updated
 		// by reading notification group addresses)
 		this.initializeStates();
-	}
-	
-	@Override
-	public void detachDriver(String deviceID)
-	{
-		// nothing to do by now... will be handled in the future... may be...
 	}
 	
 	@Override

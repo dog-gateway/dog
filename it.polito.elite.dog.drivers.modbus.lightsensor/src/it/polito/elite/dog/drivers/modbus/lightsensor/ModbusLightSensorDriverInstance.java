@@ -1,29 +1,35 @@
 /*
- * Dog 2.0 - Modbus Device Driver
+ * Dog - Device Driver
  * 
- * Copyright [2012] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2013 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.modbus.lightsensor;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.LightSensor;
+import it.polito.elite.dog.core.library.model.notification.LuminosityMeasurementNotification;
+import it.polito.elite.dog.core.library.model.state.HumidityMeasurementState;
+import it.polito.elite.dog.core.library.model.state.LightIntensityState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.LevelStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
 import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.model.devicecategory.LightSensor;
-import it.polito.elite.domotics.model.notification.LuminosityMeasurementNotification;
-import it.polito.elite.domotics.model.state.HumidityMeasurementState;
-import it.polito.elite.domotics.model.state.LightIntensityState;
-import it.polito.elite.domotics.model.state.State;
-import it.polito.elite.domotics.model.statevalue.LevelStateValue;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -31,13 +37,20 @@ import java.util.Set;
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
 import javax.measure.unit.SI;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
+/**
+ * 
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
+ *
+ */
 public class ModbusLightSensorDriverInstance extends ModbusDriver implements LightSensor
 {
 	// the class logger
-	private LogService logger;
+	private LogHelper logger;
 	
 	/**
 	 * @param network
@@ -51,24 +64,11 @@ public class ModbusLightSensorDriverInstance extends ModbusDriver implements Lig
 		super(network, device, gatewayAddress, gatewayPort, gatewayProtocol);
 		
 		// create a logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
 		// TODO: get the initial state of the device....(states can be updated
 		// by reading notification group addresses)
 		this.initializeStates();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * it.polito.elite.domotics.dog2.doglibrary.DogDriver#detachDriver(java.
-	 * lang.String)
-	 */
-	@Override
-	public void detachDriver(String deviceID)
-	{
-		// nothing to do by now... will be handled in the future... may be...
 	}
 	
 	/*

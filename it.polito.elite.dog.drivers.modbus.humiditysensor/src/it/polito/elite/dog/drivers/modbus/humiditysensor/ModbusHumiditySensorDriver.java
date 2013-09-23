@@ -1,23 +1,29 @@
 /*
- * Dog 2.0 - Modbus Device Driver
+ * Dog - Device Driver
  * 
- * Copyright [2012] 
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2012-2013 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.modbus.humiditysensor;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.devicecategory.HumiditySensor;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.gateway.ModbusGatewayDriver;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.devicecategory.HumiditySensor;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -33,7 +39,8 @@ import org.osgi.service.log.LogService;
  * 
  * A class for representing the driver of a Modbus humidity sensor.
  * 
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class ModbusHumiditySensorDriver implements Driver
@@ -42,7 +49,7 @@ public class ModbusHumiditySensorDriver implements Driver
 	protected BundleContext context;
 	
 	// System logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String logId = "[ModbusHumiditySensorDriver]: ";
@@ -78,7 +85,7 @@ public class ModbusHumiditySensorDriver implements Driver
 	public void activate(BundleContext context)
 	{
 		// init the logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
 		// store the context
 		this.context = context;
@@ -176,10 +183,10 @@ public class ModbusHumiditySensorDriver implements Driver
 		if (this.regDriver != null)
 		{
 			// get the given device category
-			String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
+			String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
 			
 			// get the given device manufacturer
-			String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+			String manifacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
 			
 			// get the gateway to which the device is connected
 			@SuppressWarnings("unchecked")
@@ -244,7 +251,7 @@ public class ModbusHumiditySensorDriver implements Driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
 			
 			// add the id of this driver to the properties
-			propDriver.put(DogDeviceCostants.DRIVER_ID, "Modbus_ModbusHumiditySensor_driver");
+			propDriver.put(DeviceCostants.DRIVER_ID, "Modbus_ModbusHumiditySensor_driver");
 			
 			// register this driver in the OSGi framework
 			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
