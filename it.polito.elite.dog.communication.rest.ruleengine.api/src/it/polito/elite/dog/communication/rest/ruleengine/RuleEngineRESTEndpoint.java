@@ -1,12 +1,26 @@
-/**
+/*
+ * Dog - Communication
  * 
+ * Copyright (c) 2013 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.communication.rest.ruleengine;
 
 import it.polito.elite.dog.addons.rules.api.RuleEngineApi;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
 import it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,7 +33,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  *         TODO: check if string parameters are right or if JAXB objects are
  *         preferred, in such case amend the rules bundle
@@ -28,7 +43,7 @@ import org.osgi.service.log.LogService;
 public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 {
 	// the service logger
-	private LogService logger;
+	private LogHelper logger;
 	
 	// the log id
 	public static final String logId = "[RuleEngineRESTApi]: ";
@@ -60,10 +75,10 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		this.context = context;
 		
 		// init the logger with a null logger
-		this.logger = new DogLogInstance(this.context);
+		this.logger = new LogHelper(this.context);
 		
 		// log the activation
-		this.logger.log(LogService.LOG_INFO, RuleEngineRESTEndpoint.logId + "Activated....");
+		this.logger.log(LogService.LOG_INFO, "Activated....");
 	}
 	
 	/**
@@ -75,7 +90,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		this.context = null;
 		
 		// log deactivation
-		this.logger.log(LogService.LOG_INFO, RuleEngineRESTEndpoint.logId + "Deactivated...");
+		this.logger.log(LogService.LOG_INFO, "Deactivated...");
 		
 		// null the logger
 		this.logger = null;
@@ -88,7 +103,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		
 		// debug
 		if (this.logger != null)
-			this.logger.log(LogService.LOG_DEBUG, RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
+			this.logger.log(LogService.LOG_DEBUG, "Connected to the RuleEngineApi");
 		else
 			System.out.println(RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
 	}
