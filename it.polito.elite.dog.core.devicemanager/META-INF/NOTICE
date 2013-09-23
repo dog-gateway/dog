@@ -1,0 +1,7 @@
+This version of the software is derived from
+the Apache Felix DAS bundle, implementing the
+OSGi Device Access Specification, where dependencies
+have been removed and service activation has been ported
+to the declarative services pattern.
+It significantly differs from the original version provided by the ASF.
+Licensed under the Apache License 2.0 

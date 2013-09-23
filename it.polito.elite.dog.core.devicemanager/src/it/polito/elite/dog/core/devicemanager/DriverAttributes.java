@@ -1,23 +1,24 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Dog - Core
+ * 
+ * Copyright (c) 2013 Dario Bonino and Luigi De Russis
+ * 
+ * This software is based on a bundle of the Apache Felix project.
+ * See the NOTICE file distributed with this work for additional information.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.core.devicemanager;
-
 
 import it.polito.elite.dog.core.devicemanager.util.DriverLoader;
 import it.polito.elite.dog.core.devicemanager.util.Util;
@@ -28,47 +29,53 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.device.Constants;
 import org.osgi.service.device.Driver;
 
-
 /**
- * TODO: add javadoc
+ * This class represents the attributes of a driver in OSGi.
  * 
  * @author <a href="mailto:dev@felix.apache.org">Felix Project Team</a>
+ *         (original version)
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a> (successive
+ *         modifications)
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
+ *         (successive modifications)
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
+ * 
  */
 public class DriverAttributes
 {
 
-    private final Bundle m_bundle;
+    private final Bundle bundle;
 
-    private final ServiceReference m_ref;
+    private final ServiceReference<?> ref;
 
-    private final Driver m_driver;
+    private final Driver driver;
 
-    private final boolean m_dynamic;
+    private final boolean dynamic;
 
-    public DriverAttributes( ServiceReference ref, Driver driver )
+    public DriverAttributes( ServiceReference<?> ref, Driver driver )
     {
-        m_ref = ref;
-        m_driver = driver;
-        m_bundle = ref.getBundle();
-        m_dynamic = m_bundle.getLocation().startsWith( DriverLoader.DRIVER_LOCATION_PREFIX );
+    	this.ref = ref;
+    	this.driver = driver;
+    	this.bundle = ref.getBundle();
+    	this.dynamic = this.bundle.getLocation().startsWith( DriverLoader.DRIVER_LOCATION_PREFIX );
     }
 
 
-    public ServiceReference getReference()
+    public ServiceReference<?> getReference()
     {
-        return m_ref;
+        return this.ref;
     }
 
 
     public String getDriverId()
     {
-        return m_ref.getProperty( Constants.DRIVER_ID ).toString();
+        return this.ref.getProperty( Constants.DRIVER_ID ).toString();
     }
 
 
-    public int match( ServiceReference ref ) throws Exception
+    public int match( ServiceReference<?> ref ) throws Exception
     {
-        return m_driver.match( ref );
+        return this.driver.match( ref );
     }
 
 
@@ -79,13 +86,13 @@ public class DriverAttributes
      */
     private boolean isInUse()
     {
-        ServiceReference[] used = m_bundle.getServicesInUse();
+        ServiceReference<?>[] used = this.bundle.getServicesInUse();
         if ( used == null || used.length == 0 )
         {
             return false;
         }
 
-        for ( ServiceReference ref : used )
+        for ( ServiceReference<?> ref : used )
         {
             if ( Util.isDevice( ref ) )
             {
@@ -96,19 +103,19 @@ public class DriverAttributes
     }
 
 
-    public String attach( ServiceReference ref ) throws Exception
+    public String attach( ServiceReference<?> ref ) throws Exception
     {
-        return m_driver.attach( ref );
+        return this.driver.attach( ref );
     }
 
 
     public void tryUninstall() throws BundleException
     {
     	
-        // only install if _we_ loaded the driver
-        if ( !isInUse() && m_dynamic )
+        // only install if the driver has been loaded
+        if ( !isInUse() && dynamic )
         {
-        	m_bundle.uninstall();
+        	this.bundle.uninstall();
         }
     }
 

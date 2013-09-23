@@ -1,27 +1,29 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Dog - Core
+ * 
+ * Copyright (c) 2013 Dario Bonino and Luigi De Russis
+ * 
+ * This software is based on a bundle of the Apache Felix project.
+ * See the NOTICE file distributed with this work for additional information.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.core.devicemanager;
 
 import it.polito.elite.dog.core.devicemanager.util.DriverLoader;
 import it.polito.elite.dog.core.devicemanager.util.DriverMatcher;
 import it.polito.elite.dog.core.devicemanager.util.Util;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,11 +58,18 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
- * This class represents the Apache Felix implementation of the device access
- * specification. It is based on version 1.1 of the spec.
+ * This class represents the implementation of the device access specification.
+ * It is based on version 1.1 of the spec.
  * 
  * 
  * @author <a href="mailto:dev@felix.apache.org">Felix Project Team</a>
+ *         (original version)
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a> (successive
+ *         modifications)
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
+ *         (successive modifications)
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
+ * 
  */
 public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Object>
 {
@@ -68,34 +77,34 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	private final long DEFAULT_TIMEOUT_SEC = 1;
 	
 	// the logger
-	private volatile LogService m_log;
+	private volatile LogHelper logger;
 	
 	// the bundle context
-	private BundleContext m_context;
+	private BundleContext bundleContext;
 	
 	// the driver selector
-	private volatile DriverSelector m_selector;
+	private volatile DriverSelector driverSelector;
 	
 	// the driver locators
-	private List<DriverLocator> m_locators;
+	private List<DriverLocator> driverLocators;
 	
 	// the devices
-	private Map<ServiceReference<Device>, Object> m_devices;
+	private Map<ServiceReference<Object>, Object> devices;
 	
 	// the drivers
-	private Map<ServiceReference<Driver>, DriverAttributes> m_drivers;
+	private Map<ServiceReference<Object>, DriverAttributes> drivers;
 	
 	// performs all the background actions
-	private ExecutorService m_worker;
+	private ExecutorService worker;
 	
 	// used to add delayed actions
-	private ScheduledExecutorService m_delayed;
+	private ScheduledExecutorService delayed;
 	
 	// the devices filter
-	private Filter m_deviceImplFilter;
+	private Filter deviceImplFilter;
 	
 	// the drivers filter
-	private Filter m_driverImplFilter;
+	private Filter driverImplFilter;
 	
 	/**
 	 * Public constructor. Used by the Activator in this <code>Bundle</code> to
@@ -112,22 +121,23 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 		}
 		catch (InvalidSyntaxException e)
 		{
-			this.m_log.log(LogService.LOG_ERROR, "Exception during the service tracker creation: ", e);
+			// the logger is still null at this point...
+			System.err.println("Exception during the service tracker creation: " + e);
 		}
 	}
 	
 	public void activate(BundleContext context)
 	{
-		m_context = context;
+		this.bundleContext = context;
 		
-		m_log = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
-		// this.init();
 		this.start();
-		ServiceTracker<Object, Object> devTracker = new ServiceTracker<Object, Object>(context, m_deviceImplFilter,
+		
+		ServiceTracker<Object, Object> devTracker = new ServiceTracker<Object, Object>(context, this.deviceImplFilter,
 				this);
 		devTracker.open();
-		ServiceTracker<Object, Object> driverTracker = new ServiceTracker<Object, Object>(context, m_driverImplFilter,
+		ServiceTracker<Object, Object> driverTracker = new ServiceTracker<Object, Object>(context, this.driverImplFilter,
 				this);
 		driverTracker.open();
 		
@@ -135,20 +145,20 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	
 	public void debug(String message)
 	{
-		if (m_log != null)
-			m_log.log(LogService.LOG_DEBUG, message);
+		if (this.logger != null)
+			this.logger.log(LogService.LOG_DEBUG, message);
 	}
 	
 	public void info(String message)
 	{
-		if (m_log != null)
-			m_log.log(LogService.LOG_INFO, message);
+		if (this.logger != null)
+			this.logger.log(LogService.LOG_INFO, message);
 	}
 	
 	public void warning(String message)
 	{
-		if (m_log != null)
-			m_log.log(LogService.LOG_WARNING, message);
+		if (this.logger != null)
+			this.logger.log(LogService.LOG_WARNING, message);
 	}
 	
 	public void error(String message, Throwable e)
@@ -158,37 +168,27 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 		{
 			e.printStackTrace();
 		}
-		if (m_log != null)
-			m_log.log(LogService.LOG_ERROR, message, e);
+		if (this.logger != null)
+			this.logger.log(LogService.LOG_ERROR, message, e);
 	}
 	
-	// dependency manager methods
-	@SuppressWarnings("unused")
 	private void init() throws InvalidSyntaxException
 	{
-		m_locators = Collections.synchronizedList(new ArrayList<DriverLocator>());
-		m_worker = Executors.newSingleThreadExecutor(new NamedThreadFactory("Apache Felix Device Manager"));
-		m_delayed = Executors
-				.newScheduledThreadPool(1, new NamedThreadFactory("Apache Felix Device Manager - delayed"));
-		m_driverImplFilter = Util.createFilter("(%s=%s)", new String[] { Constants.DRIVER_ID, "*" });
+		this.driverLocators = Collections.synchronizedList(new ArrayList<DriverLocator>());
+		this.worker = Executors.newSingleThreadExecutor(new NamedThreadFactory("Device Manager"));
+		this.delayed = Executors.newScheduledThreadPool(1, new NamedThreadFactory("Device Manager - delayed"));
+		this.driverImplFilter = Util.createFilter("(%s=%s)", new String[] { Constants.DRIVER_ID, "*" });
 		
-		m_deviceImplFilter = Util.createFilter("(|(%s=%s)(&(%s=%s)(%s=%s)))", new String[] {
+		this.deviceImplFilter = Util.createFilter("(|(%s=%s)(&(%s=%s)(%s=%s)))", new String[] {
 				org.osgi.framework.Constants.OBJECTCLASS, Device.class.getName(),
 				org.osgi.framework.Constants.OBJECTCLASS, "*", Constants.DEVICE_CATEGORY, "*" });
-		
-		/*
-		 * m_deviceImplFilter = Util.createFilter("(%s=%s)", new Object[] {
-		 * org.osgi.framework.Constants.OBJECTCLASS, Device.class.getName() });
-		 * m_driverImplFilter = Util.createFilter("(%s=%s)", new Object[] {
-		 * org.osgi.framework.Constants.OBJECTCLASS, Driver.class.getName() });
-		 */
 	}
 	
 	private void start()
 	{
-		m_drivers = new ConcurrentHashMap<ServiceReference<Driver>, DriverAttributes>();
-		m_devices = new ConcurrentHashMap<ServiceReference<Device>, Object>();
-		submit(new WaitForStartFramework());
+		this.drivers = new ConcurrentHashMap<ServiceReference<Object>, DriverAttributes>();
+		this.devices = new ConcurrentHashMap<ServiceReference<Object>, Object>();
+		this.submit(new WaitForStartFramework());
 	}
 	
 	public void stop()
@@ -198,90 +198,89 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	
 	public void destroy()
 	{
-		m_worker.shutdownNow();
-		m_delayed.shutdownNow();
+		this.worker.shutdownNow();
+		this.delayed.shutdownNow();
 	}
 	
 	// callback methods
 	
 	public void selectorAdded(DriverSelector selector)
 	{
-		m_selector = selector;
-		debug("driver selector appeared");
+		this.driverSelector = selector;
+		this.debug("driver selector appeared");
 	}
 	
 	public void selectorRemoved(DriverSelector selector)
 	{
-		m_selector = null;
-		debug("driver selector lost");
+		this.driverSelector = null;
+		this.debug("driver selector lost");
 	}
 	
 	public void locatorAdded(DriverLocator locator)
 	{
-		m_locators.add(locator);
-		debug("driver locator appeared");
+		this.driverLocators.add(locator);
+		this.debug("driver locator appeared");
 	}
 	
 	public void locatorRemoved(DriverLocator locator)
 	{
-		m_locators.remove(locator);
-		debug("driver locator lost");
+		this.driverLocators.remove(locator);
+		this.debug("driver locator lost");
 	}
 	
-	public void driverAdded(ServiceReference ref, Object obj)
+	public void driverAdded(ServiceReference<Object> ref, Object obj)
 	{
 		final Driver driver = Driver.class.cast(obj);
-		m_drivers.put(ref, new DriverAttributes(ref, driver));
+		this.drivers.put(ref, new DriverAttributes(ref, driver));
 		
-		debug("driver appeared: " + Util.showDriver(ref));
+		this.debug("driver appeared: " + Util.showDriver(ref));
 		
 		// immediately check for idle devices
-		submit(new CheckForIdleDevices());
+		this.submit(new CheckForIdleDevices());
 	}
 	
-	public void driverModified(ServiceReference ref, Object obj)
+	public void driverModified(ServiceReference<Object> ref, Object obj)
 	{
 		final Driver driver = Driver.class.cast(obj);
 		
-		debug("driver modified: " + Util.showDriver(ref));
-		m_drivers.remove(ref);
-		m_drivers.put(ref, new DriverAttributes(ref, driver));
+		this.debug("driver modified: " + Util.showDriver(ref));
+		this.drivers.remove(ref);
+		this.drivers.put(ref, new DriverAttributes(ref, driver));
+		
+		// check if devices have become idle after some time
+		this.schedule(new CheckForIdleDevices());
+	}
+	
+	public void driverRemoved(ServiceReference<Object> ref)
+	{
+		this.debug("driver lost: " + Util.showDriver(ref));
+		this.drivers.remove(ref);
 		
 		// check if devices have become idle
 		// after some time
-		schedule(new CheckForIdleDevices());
-	}
-	
-	public void driverRemoved(ServiceReference ref)
-	{
-		debug("driver lost: " + Util.showDriver(ref));
-		m_drivers.remove(ref);
-		
-		// check if devices have become idle
-		// after some time
-		schedule(new CheckForIdleDevices());
+		this.schedule(new CheckForIdleDevices());
 		
 	}
 	
-	public void deviceAdded(ServiceReference ref, Object device)
+	public void deviceAdded(ServiceReference<Object> ref, Object device)
 	{
-		m_devices.put(ref, device);
-		debug("device appeared: " + Util.showDevice(ref));
-		submit(new DriverAttachAlgorithm(ref, device));
+		this.devices.put(ref, device);
+		this.debug("device appeared: " + Util.showDevice(ref));
+		this.submit(new DriverAttachAlgorithm(ref, device));
 	}
 	
-	public void deviceModified(ServiceReference ref, Object device)
+	public void deviceModified(ServiceReference<Object> ref, Object device)
 	{
-		debug("device modified: " + Util.showDevice(ref));
+		this.debug("device modified: " + Util.showDevice(ref));
 		// nothing further to do ?
-		// DeviceAttributes da = m_devices.get(ref);
+		// DeviceAttributes da = this.devices.get(ref);
 		// submit(new DriverAttachAlgorithm(da));
 	}
 	
-	public void deviceRemoved(ServiceReference ref)
+	public void deviceRemoved(ServiceReference<Object> ref)
 	{
-		debug("device removed: " + Util.showDevice(ref));
-		m_devices.remove(ref);
+		this.debug("device removed: " + Util.showDevice(ref));
+		this.devices.remove(ref);
 		// nothing further to do ?
 		// the services that use this
 		// device should track it.
@@ -295,7 +294,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	 */
 	private void submit(Callable<Object> task)
 	{
-		m_worker.submit(new LoggedCall(task));
+		this.worker.submit(new LoggedCall(task));
 	}
 	
 	/**
@@ -306,7 +305,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	 */
 	private void schedule(Callable<Object> task)
 	{
-		m_delayed.schedule(new DelayedCall(task), DEFAULT_TIMEOUT_SEC, TimeUnit.SECONDS);
+		this.delayed.schedule(new DelayedCall(task), DEFAULT_TIMEOUT_SEC, TimeUnit.SECONDS);
 	}
 	
 	// worker callables
@@ -321,32 +320,32 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	private class WaitForStartFramework implements Callable<Object>, FrameworkListener
 	{
 		
-		private final CountDownLatch m_latch = new CountDownLatch(1);
+		private final CountDownLatch latch = new CountDownLatch(1);
 		
 		public Object call() throws Exception
 		{
 			boolean addedAsListener = false;
-			if (m_context.getBundle(0).getState() == Bundle.ACTIVE)
+			if (bundleContext.getBundle(0).getState() == Bundle.ACTIVE)
 			{
-				m_latch.countDown();
+				this.latch.countDown();
 				debug("Starting Device Manager immediately");
 			}
 			else
 			{
-				m_context.addFrameworkListener(this);
+				bundleContext.addFrameworkListener(this);
 				addedAsListener = true;
 				debug("Waiting for framework to start");
 			}
 			
-			m_latch.await();
-			for (Map.Entry<ServiceReference<Device>, Object> entry : m_devices.entrySet())
+			this.latch.await();
+			for (Map.Entry<ServiceReference<Object>, Object> entry : devices.entrySet())
 			{
 				submit(new DriverAttachAlgorithm(entry.getKey(), entry.getValue()));
 			}
 			// cleanup
 			if (addedAsListener)
 			{
-				m_context.removeFrameworkListener(this);
+				bundleContext.removeFrameworkListener(this);
 			}
 			return null;
 		}
@@ -358,7 +357,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 			{
 				case FrameworkEvent.STARTED:
 					debug("Framework has started");
-					m_latch.countDown();
+					this.latch.countDown();
 					break;
 			}
 		}
@@ -373,16 +372,16 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	private class LoggedCall implements Callable<Object>
 	{
 		
-		private final Callable<Object> m_call;
+		private final Callable<Object> call;
 		
 		public LoggedCall(Callable<Object> call)
 		{
-			m_call = call;
+			this.call = call;
 		}
 		
 		private String getName()
 		{
-			return m_call.getClass().getSimpleName();
+			return this.call.getClass().getSimpleName();
 		}
 		
 		public Object call() throws Exception
@@ -390,7 +389,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 			
 			try
 			{
-				return m_call.call();
+				return this.call.call();
 			}
 			catch (Exception e)
 			{
@@ -409,22 +408,22 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	private class DelayedCall implements Callable<Object>
 	{
 		
-		private final Callable<Object> m_call;
+		private final Callable<Object> call;
 		
 		public DelayedCall(Callable<Object> call)
 		{
-			m_call = call;
+			this.call = call;
 		}
 		
 		private String getName()
 		{
-			return m_call.getClass().getSimpleName();
+			return this.call.getClass().getSimpleName();
 		}
 		
 		public Object call() throws Exception
 		{
 			info("Delayed call: " + getName());
-			return m_worker.submit(m_call);
+			return worker.submit(this.call);
 		}
 	}
 	
@@ -439,10 +438,10 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 		public Object call() throws Exception
 		{
 			debug("START - check for idle devices");
-			for (ServiceReference ref : getIdleDevices())
+			for (ServiceReference<?> ref : getIdleDevices())
 			{
 				info("IDLE: " + ref.getBundle().getSymbolicName());
-				submit(new DriverAttachAlgorithm(ref, m_devices.get(ref)));
+				submit(new DriverAttachAlgorithm(ref, devices.get(ref)));
 			}
 			
 			submit(new IdleDriverUninstallAlgorithm());
@@ -455,11 +454,11 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 		 * 
 		 * @return
 		 */
-		private List<ServiceReference> getIdleDevices()
+		private List<ServiceReference<?>> getIdleDevices()
 		{
-			List<ServiceReference> list = new ArrayList<ServiceReference>();
+			List<ServiceReference<?>> list = new ArrayList<ServiceReference<?>>();
 			
-			for (ServiceReference ref : m_devices.keySet())
+			for (ServiceReference<?> ref : devices.keySet())
 			{
 				info("checking if idle: " + ref.getBundle().getSymbolicName());
 				
@@ -483,16 +482,16 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	
 	private boolean isDriverBundle(Bundle bundle)
 	{
-		ServiceReference[] refs = bundle.getRegisteredServices();
+		ServiceReference<?>[] refs = bundle.getRegisteredServices();
 		
 		if (refs == null)
 		{
 			return false;
 		}
 		
-		for (ServiceReference ref : refs)
+		for (ServiceReference<?> ref : refs)
 		{
-			if (m_driverImplFilter.match(ref))
+			if (driverImplFilter.match(ref))
 			{
 				return true;
 			}
@@ -513,7 +512,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 		{
 			
 			info("cleaning driver cache");
-			for (DriverAttributes da : m_drivers.values())
+			for (DriverAttributes da : drivers.values())
 			{
 				// just call the tryUninstall; the da itself
 				// will know if it should really uninstall the driver.
@@ -534,35 +533,34 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	private class DriverAttachAlgorithm implements Callable<Object>
 	{
 		
-		private final ServiceReference m_ref;
+		private final ServiceReference<?> ref;
 		
-		private final Device m_device;
+		private final Device device;
 		
-		private List<DriverAttributes> m_included;
+		private List<DriverAttributes> included;
 		
-		private List<DriverAttributes> m_excluded;
+		private List<DriverAttributes> excluded;
 		
-		private final DriverLoader m_driverLoader;
+		private final DriverLoader driverLoader;
 		
-		private DriverAttributes m_finalDriver;
+		private DriverAttributes finalDriver;
 		
-		public DriverAttachAlgorithm(ServiceReference ref, Object obj)
+		public DriverAttachAlgorithm(ServiceReference<?> ref, Object obj)
 		{
-			m_ref = ref;
-			if (m_deviceImplFilter.match(ref))
+			this.ref = ref;
+			if (deviceImplFilter.match(ref))
 			{
-				m_device = Device.class.cast(obj);
+				this.device = Device.class.cast(obj);
 			}
 			else
 			{
-				m_device = null;
+				this.device = null;
 			}
 			
-			m_driverLoader = new DriverLoader(DeviceManager.this, m_context);
+			this.driverLoader = new DriverLoader(DeviceManager.this, bundleContext);
 		}
 		
-		@SuppressWarnings("all")
-		private Dictionary createDictionary(ServiceReference ref)
+		private Dictionary<?,?> createDictionary(ServiceReference<?> ref)
 		{
 			final Properties p = new Properties();
 			
@@ -573,72 +571,70 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 			return p;
 		}
 		
-		@SuppressWarnings("all")
 		public Object call() throws Exception
 		{
-			info("finding suitable driver for: " + Util.showDevice(m_ref));
+			info("finding suitable driver for: " + Util.showDevice(this.ref));
 			
-			final Dictionary dict = createDictionary(m_ref);
+			final Dictionary<?,?> dict = createDictionary(this.ref);
 			
 			// first create a copy of all the drivers that are already there.
 			// during the process, drivers will be added, but also excluded.
-			m_included = new ArrayList<DriverAttributes>(m_drivers.values());
-			m_excluded = new ArrayList<DriverAttributes>();
+			this.included = new ArrayList<DriverAttributes>(drivers.values());
+			this.excluded = new ArrayList<DriverAttributes>();
 			
 			// first find matching driver bundles
 			// if there are no driver locators
 			// we'll have to do with the drivers that were
 			// added 'manually'
-			Set<String> driverIds = m_driverLoader.findDrivers(m_locators, dict);
+			Set<String> driverIds = this.driverLoader.findDrivers(driverLocators, dict);
 			
 			// remove the driverIds that are already available
-			for (DriverAttributes da : m_drivers.values())
+			for (DriverAttributes da : drivers.values())
 			{
 				driverIds.remove(da.getDriverId());
 			}
-			driverIds.removeAll(m_drivers.keySet());
+			driverIds.removeAll(drivers.keySet());
 			try
 			{
-				debug("entering attach phase for " + Util.showDevice(m_ref));
+				debug("entering attach phase for " + Util.showDevice(this.ref));
 				return driverAttachment(dict, driverIds.toArray(new String[0]));
 			}
 			finally
 			{
 				// unload loaded drivers
 				// that were unnecessarily loaded
-				m_driverLoader.unload(m_finalDriver);
+				this.driverLoader.unload(this.finalDriver);
 			}
 		}
 		
-		@SuppressWarnings("all")
-		private Object driverAttachment(Dictionary dict, String[] driverIds) throws Exception
+		private Object driverAttachment(Dictionary<?,?> dict, String[] driverIds) throws Exception
 		{
-			m_finalDriver = null;
+			this.finalDriver = null;
 			
 			// remove the excluded drivers
-			m_included.removeAll(m_excluded);
+			this.included.removeAll(this.excluded);
 			
 			// now load the drivers
-			List<ServiceReference> driverRefs = m_driverLoader.loadDrivers(m_locators, driverIds);
+			List<ServiceReference<?>> driverRefs = this.driverLoader.loadDrivers(driverLocators, driverIds);
 			// these are the possible driver references that have been added
 			// add them to the list of included drivers
-			for (ServiceReference serviceReference : driverRefs)
+			for (ServiceReference<?> serviceReference : driverRefs)
 			{
-				DriverAttributes da = m_drivers.get(serviceReference);
+				DriverAttributes da = drivers.get(serviceReference);
 				if (da != null)
 				{
-					m_included.add(da);
+					this.included.add(da);
 				}
 			}
 			
 			// now start matching all drivers
 			final DriverMatcher mi = new DriverMatcher(DeviceManager.this);
 			
-			for (DriverAttributes driver : m_included)
+			for (DriverAttributes driver : this.included)
 			{
 				try
 				{
-					int match = driver.match(m_ref);
+					int match = driver.match(this.ref);
 					if (match <= Device.MATCH_NONE)
 					{
 						continue;
@@ -655,11 +651,11 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 			Match bestMatch = null;
 			
 			// local copy
-			final DriverSelector selector = m_selector;
+			final DriverSelector selector = driverSelector;
 			
 			if (selector != null)
 			{
-				bestMatch = mi.selectBestMatch(m_ref, selector);
+				bestMatch = mi.selectBestMatch(this.ref, selector);
 				if (bestMatch != null)
 				{
 					debug(String.format("DriverSelector (%s) found best match: %s", selector.getClass().getName(),
@@ -682,9 +678,9 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 			String driverId = String.class.cast(bestMatch.getDriver().getProperty(Constants.DRIVER_ID));
 			
 			debug("best match: " + driverId);
-			m_finalDriver = m_drivers.get(bestMatch.getDriver());
+			this.finalDriver = drivers.get(bestMatch.getDriver());
 			
-			if (m_finalDriver == null)
+			if (this.finalDriver == null)
 			{
 				error("we found a driverId, but not the corresponding driver: " + driverId, null);
 				noDriverFound();
@@ -695,7 +691,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 			try
 			{
 				debug("attaching to: " + driverId);
-				String newDriverId = m_finalDriver.attach(m_ref);
+				String newDriverId = this.finalDriver.attach(this.ref);
 				if (newDriverId == null)
 				{
 					// successful attach
@@ -703,23 +699,23 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 				}
 				// its a referral
 				info("attach led to a referral to: " + newDriverId);
-				m_excluded.add(m_finalDriver);
+				this.excluded.add(this.finalDriver);
 				return driverAttachment(dict, new String[] { newDriverId });
 			}
 			catch (Throwable t)
 			{
 				error("attach failed due to an exception", t);
 			}
-			m_excluded.add(m_finalDriver);
+			this.excluded.add(this.finalDriver);
 			return driverAttachment(dict, driverIds);
 		}
 		
 		private void noDriverFound()
 		{
-			debug("no suitable driver found for: " + Util.showDevice(m_ref));
-			if (m_device != null)
+			debug("no suitable driver found for: " + Util.showDevice(this.ref));
+			if (this.device != null)
 			{
-				m_device.noDriverFound();
+				this.device.noDriverFound();
 			}
 		}
 		
@@ -727,7 +723,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 		public String toString()
 		{
 			return getClass().getSimpleName();// + ": " +
-			// Util.showDevice(m_ref);
+			// Util.showDevice(this.ref);
 		}
 		
 	}
@@ -735,7 +731,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	@Override
 	public Object addingService(ServiceReference<Object> reference)
 	{
-		Object service = this.m_context.getService(reference);
+		Object service = this.bundleContext.getService(reference);
 		if (service instanceof Device)
 			this.deviceAdded(reference, service);
 		else if (service instanceof Driver)
@@ -746,7 +742,7 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 	@Override
 	public void modifiedService(ServiceReference<Object> reference, Object service)
 	{
-		Object modifiedService = this.m_context.getService(reference);
+		Object modifiedService = this.bundleContext.getService(reference);
 		if (modifiedService instanceof Device)
 			this.deviceModified(reference, modifiedService);
 		else if (modifiedService instanceof Driver)
@@ -762,4 +758,5 @@ public class DeviceManager implements Log, ServiceTrackerCustomizer<Object, Obje
 			this.driverRemoved(reference);
 		
 	}
+	
 }
