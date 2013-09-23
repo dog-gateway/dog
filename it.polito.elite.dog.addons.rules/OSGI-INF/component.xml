@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" enabled="true" name="DogRulesBundle">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" enabled="true" name="RuleEngine">
    <implementation class="it.polito.elite.dog.addons.rules.RuleEngine"/>
    <service>
       <provide interface="org.osgi.service.cm.ManagedService"/>
    </service>
    <property name="service.pid" type="String" value="it.polito.elite.dog.addons.rules"/>
    <reference bind="addedMonitorAdmin" cardinality="1..1" interface="org.osgi.service.monitor.MonitorAdmin" name="MonitorAdmin" policy="dynamic" unbind="removedMonitorAdmin"/>
-   <reference bind="addedScheduler" cardinality="1..1" interface="it.polito.elite.domotics.dog2.doglibrary.interfaces.DogSchedulerInterface" name="DogSchedulerInterface" policy="dynamic" unbind="removedScheduler"/>
-   <reference bind="addedExecutor" cardinality="1..1" interface="it.polito.elite.domotics.dog2.doglibrary.interfaces.DogExecutorInterface" name="DogExecutorInterface" policy="dynamic" unbind="removedExecutor"/>
-   <reference bind="addedXmlRPCMessageForwarder" cardinality="1..1" interface="it.polito.elite.domotics.dog2.doglibrary.interfaces.XmlRpcMessageForwarder" name="XmlRpcMessageForwarder" policy="dynamic" unbind="removedXmlRPCMessageForwarder"/>
 </scr:component>

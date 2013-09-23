@@ -2,26 +2,23 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RuleEngine
 Bundle-SymbolicName: it.polito.elite.dog.addons.rules.ruleengine
-Bundle-Version: 1.0.1
+Bundle-Version: 1.1.0.unstable
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.sun.xml.bind.marshaller,
- com.sun.xml.bind.v2,
- it.polito.elite.domotics.dog2.doglibrary,
- it.polito.elite.domotics.dog2.doglibrary.corenotifications,
- it.polito.elite.domotics.dog2.doglibrary.interfaces,
- it.polito.elite.domotics.dog2.doglibrary.message,
- it.polito.elite.domotics.dog2.doglibrary.util,
- it.polito.elite.domotics.model,
- it.polito.elite.domotics.model.notification,
- it.polito.elite.domotics.model.state,
- it.polito.elite.domotics.model.statevalue,
+Import-Package: it.polito.elite.dog.core.library.model,
+ it.polito.elite.dog.core.library.model.notification,
+ it.polito.elite.dog.core.library.model.notification.core,
+ it.polito.elite.dog.core.library.model.state,
+ it.polito.elite.dog.core.library.model.statevalue,
+ it.polito.elite.dog.core.library.util,
  javax.measure,
  javax.measure.unit,
  org.osgi.framework,
- org.osgi.service.cm,
+ org.osgi.service.cm;version="1.5.0",
+ org.osgi.service.device;version="1.1.0",
  org.osgi.service.event,
  org.osgi.service.log,
- org.osgi.service.monitor
+ org.osgi.service.monitor,
+ org.osgi.util.tracker
 Bundle-ClassPath: lib/drools/drools-core-5.4.0.Final.jar,
  lib/drools/drools-compiler-5.4.0.Final.jar,
  lib/drools/mvel2-2.1.0.drools16.jar,
@@ -29,11 +26,9 @@ Bundle-ClassPath: lib/drools/drools-core-5.4.0.Final.jar,
  .,
  lib/drools/knowledge-api-5.4.0.Final.jar,
  lib/drools/knowledge-internal-api-5.4.0.Final.jar,
- lib/jaxb-impl-2.1.5.jar,
  lib/jdt/org.eclipse.jdt.compiler.apt_1.0.300.v20100513-0845.jar,
  lib/jdt/org.eclipse.jdt.compiler.tool_1.0.100.v_A68_R36x.jar,
  lib/jdt/org.eclipse.jdt.core_3.6.1.v_A68_R36x.jar
 Service-Component: OSGI-INF/component.xml
-Bundle-Vendor: eLite - Politecnico di Torino (http://elite.polito.it)
-Export-Package: it.polito.elite.dog.addons.rules.api,
- it.polito.elite.dog.addons.rules.schemalibrary
+Export-Package: it.polito.elite.dog.addons.rules.api;version="1.0.0",
+ it.polito.elite.dog.addons.rules.schemalibrary;version="1.0.0"

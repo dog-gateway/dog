@@ -1,14 +1,19 @@
 /*
- * Dog 2.0 - Addons
+ * Dog - Addons
  * 
- * Copyright [2011]
- * [Emiliano Castellina (emiliano.castellina@polito.it), Politecnico di Torino]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino]
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2011-2012 Dario Bonino and Emiliano Castellina
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.addons.rules.util;
 
@@ -21,11 +26,8 @@ import it.polito.elite.dog.addons.rules.schemalibrary.Param;
 import it.polito.elite.dog.addons.rules.schemalibrary.RecurringInstant;
 import it.polito.elite.dog.addons.rules.schemalibrary.Rule;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
-import it.polito.elite.domotics.dog2.doglibrary.corenotifications.TimedTriggerNotification;
-import it.polito.elite.domotics.dog2.doglibrary.message.DogMessage;
-import it.polito.elite.domotics.dog2.doglibrary.message.DogMessageFactory;
-import it.polito.elite.domotics.dog2.doglibrary.message.DogScheduleJob;
-import it.polito.elite.domotics.dog2.doglibrary.message.MessageScheduleRequest.MonitorActionTypes;
+import it.polito.elite.dog.core.library.model.notification.core.TimedTriggerNotification;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.util.HashSet;
 import java.util.List;
@@ -36,15 +38,24 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.osgi.service.log.LogService;
 
+/**
+ * 
+ * @author Castellina Emiliano (skeleton)
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
+ *
+ */
+@SuppressWarnings("unused")
 public class TimedNotificationsPreProcessor
 {
-	private LogService logger;
+	private LogHelper logger;
 	
-	public TimedNotificationsPreProcessor(LogService logger)
+	public TimedNotificationsPreProcessor(LogHelper logger)
 	{
 		this.logger = logger;
 	}
 	
+	//TODO Fix when a new scheduler will be developed...
 	/**
 	 * Pre-process the given rule list by substituting time-based events with
 	 * timedOnNotifications scheduled by means of the DogScheduler
@@ -52,7 +63,7 @@ public class TimedNotificationsPreProcessor
 	 * @param rules
 	 *            a {@link RuleList} containing the rules to be pre-processed
 	 */
-	public Set<DogMessage> preProcess(RuleList rules)
+	/*public Set<DogMessage> preProcess(RuleList rules)
 	{
 		// the set of all messages needed for scheduling the pre-processed event
 		// notifications
@@ -183,5 +194,5 @@ public class TimedNotificationsPreProcessor
 		// return the messages that must be scheduled for timed events
 		return messagesToSchedule;
 		
-	}
+	}*/
 }

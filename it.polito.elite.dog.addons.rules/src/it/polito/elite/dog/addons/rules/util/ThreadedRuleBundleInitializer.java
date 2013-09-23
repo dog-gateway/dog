@@ -1,20 +1,24 @@
 /*
- * Dog 2.0 - Addons
+ * Dog - Addons
  * 
- * Copyright [2011]
- * [Emiliano Castellina (emiliano.castellina@polito.it), Politecnico di Torino]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino]
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2011-2012 Dario Bonino and Emiliano Castellina
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.addons.rules.util;
 
 import java.io.File;
 import java.io.StringReader;
-import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -31,8 +35,15 @@ import org.osgi.service.log.LogService;
 
 import it.polito.elite.dog.addons.rules.RuleEngine;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
-import it.polito.elite.domotics.dog2.doglibrary.message.DogMessage;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
+/**
+ * 
+ * @author Castellina Emiliano (skeleton)
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
+ *
+ */
 public class ThreadedRuleBundleInitializer extends Thread
 {
 	// the pointer to the rule bundle that this thread should initialize
@@ -40,14 +51,15 @@ public class ThreadedRuleBundleInitializer extends Thread
 	private String ruleBasePath;
 	
 	// the logger service needed for logging the Thread operations
-	private LogService logger;
+	private LogHelper logger;
 	
 	// an XML2DRL
 	private Xml2DrlTranslator xml2drl;
 	
+	//TODO Uncomment when a new scheduler will be developed...
 	// the pre processor needed to transform time-based events in e-blocks into
 	// timed notifications
-	private TimedNotificationsPreProcessor tProcessor;
+	//private TimedNotificationsPreProcessor tProcessor;
 	
 	/**
 	 * The Initializer constructor, takes the rule bundle to initialize as
@@ -60,7 +72,8 @@ public class ThreadedRuleBundleInitializer extends Thread
 		this.bundleToInitialize = bundleToInitialize;
 		this.logger = bundleToInitialize.getLogger();
 		this.xml2drl = new Xml2DrlTranslator();
-		this.tProcessor = new TimedNotificationsPreProcessor(this.logger);
+		//TODO Uncomment when a new scheduler will be developed...
+		//this.tProcessor = new TimedNotificationsPreProcessor(this.logger);
 		this.ruleBasePath = ruleBasePath;
 	}
 	
@@ -87,8 +100,8 @@ public class ThreadedRuleBundleInitializer extends Thread
 		
 		// ------------ PHASE 2: extract timed events from e-blocks in order to
 		// schedule the corresponding timedOn notifications
-		// TODO: implement event scheduling
-		Set<DogMessage> timedEvents = this.tProcessor.preProcess(localRules);
+		// TODO: implement event scheduling - uncomment the following row and fix the tProcessor.preProcess() method
+		//Set<DogMessage> timedEvents = this.tProcessor.preProcess(localRules);
 		
 		// ------------ PHASE 3: extract thresholds in order to set up the
 		// threshold bundle to send threshold traversal notifications
@@ -125,8 +138,9 @@ public class ThreadedRuleBundleInitializer extends Thread
 		// set the knowledge base of the rule bundle
 		this.bundleToInitialize.setRuleBase(kBase);
 		
+		//TODO Fix when a new scheduler will be developed...
 		// schedule all the timed triggers
-		this.bundleToInitialize.scheduleTimedEvents(timedEvents);
+		//this.bundleToInitialize.scheduleTimedEvents(timedEvents);
 		
 		// debug
 		this.logger.log(LogService.LOG_DEBUG, "[DogRulesBundle]: created knowledge base and session");
@@ -154,7 +168,7 @@ public class ThreadedRuleBundleInitializer extends Thread
 			{
 				// create the JAXB context for parsing the local rule store (in
 				// xml)
-				JAXBContext ctx = JAXBContext.newInstance("it.polito.elite.dog.addons.rules.schemalibrary");
+				JAXBContext ctx = JAXBContext.newInstance(RuleList.class.getPackage().getName());
 				
 				// create the corresponding un-marshaler for getting the list of
 				// JAXB classes modeling the local rule store

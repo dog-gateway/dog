@@ -1,15 +1,19 @@
 /*
- * Dog 2.0 - Addons
+ * Dog - Addons
  * 
- * Copyright [2011]
- * [Emiliano Castellina (emiliano.castellina@polito.it), Politecnico di Torino]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino]
- * [Luigi De Russis (luigi.derussis@polito.it), Politecnico di Torino]
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2011-2013 Dario Bonino, Luigi De Russis and Emiliano Castellina
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.addons.rules;
 
@@ -21,26 +25,14 @@ import it.polito.elite.dog.addons.rules.util.ThreadedRuleBundleInitializer;
 import it.polito.elite.dog.addons.rules.util.TimeConversion;
 import it.polito.elite.dog.addons.rules.util.TimedNotificationsPreProcessor;
 import it.polito.elite.dog.addons.rules.util.Xml2DrlTranslator;
-import it.polito.elite.domotics.dog2.doglibrary.DogCommand;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
-import it.polito.elite.domotics.dog2.doglibrary.corenotifications.TimedTriggerNotification;
-import it.polito.elite.domotics.dog2.doglibrary.interfaces.DogExecutorInterface;
-import it.polito.elite.domotics.dog2.doglibrary.interfaces.DogRulesService;
-import it.polito.elite.domotics.dog2.doglibrary.interfaces.DogSchedulerInterface;
-import it.polito.elite.domotics.dog2.doglibrary.interfaces.XmlRpcMessageForwarder;
-import it.polito.elite.domotics.dog2.doglibrary.message.DogMessage;
-import it.polito.elite.domotics.dog2.doglibrary.message.DogMessage.MessageTypes;
-import it.polito.elite.domotics.dog2.doglibrary.message.DogMessageFactory;
-import it.polito.elite.domotics.dog2.doglibrary.message.DogScheduleJob;
-import it.polito.elite.domotics.dog2.doglibrary.message.MessageCommandRequest;
-import it.polito.elite.domotics.dog2.doglibrary.message.MessageCommandRequest.CommandTypes;
-import it.polito.elite.domotics.dog2.doglibrary.message.MessageScheduleRequest;
-import it.polito.elite.domotics.dog2.doglibrary.message.MessageScheduleRequest.MonitorActionTypes;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.model.notification.Notification;
-import it.polito.elite.domotics.model.notification.StateChangeNotification;
-import it.polito.elite.domotics.model.state.State;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.notification.Notification;
+import it.polito.elite.dog.core.library.model.notification.StateChangeNotification;
+import it.polito.elite.dog.core.library.model.notification.core.TimedTriggerNotification;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.util.Executor;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -55,7 +47,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.unit.Unit;
@@ -88,9 +79,12 @@ import org.osgi.service.monitor.StatusVariable;
 /**
  * At last Dog can do something smart!
  * 
- * @author (only skeleton) Castellina Emiliano
- * @author Bonino Dario
- * @autor (minor tweaks) Luigi De Russis
+ * @author Castellina Emiliano (skeleton)
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ *         (original version)
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
+ *         (successive modifications)
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
@@ -99,16 +93,10 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	private BundleContext context;
 	
 	/** Dog logger */
-	protected LogService logger;
+	protected LogHelper logger;
 	
 	/** the log id **/
 	public static final String logId = "[RuleEngine]: ";
-	
-	/** Reference to the DogScheduler **/
-	protected DogSchedulerInterface scheduler;
-	
-	/** Reference to the DogExecutor **/
-	private DogExecutorInterface executor;
 	
 	/** Reference to the MonitorAdmin */
 	private MonitorAdmin monitorAdmin;
@@ -139,11 +127,6 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	// the knowledge sessio to be used for firing rules
 	private StatefulKnowledgeSession runtimeRuleSession;
 	
-	/** queue of DogMessage */
-	DogMessageRulesQueue messageQueue;
-	/** separated thread for running the queue */
-	Thread thMessageQueue;
-	
 	/**
 	 * Class constructor
 	 * 
@@ -163,7 +146,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		this.context = context;
 		
 		// create the logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 		
 		// initially the bundle is not ready to offer his services
 		this.rulesAreReady = false;
@@ -171,11 +154,6 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 		// prepare the drools rule base object
 		this.ruleBase = KnowledgeBaseFactory.newKnowledgeBase();
-		
-		// create the queue
-		this.messageQueue = new DogMessageRulesQueue(context, this);
-		this.thMessageQueue = new Thread(this.messageQueue);
-		this.thMessageQueue.start();
 		
 		// debug
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Activated...");
@@ -299,7 +277,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	/**
 	 * @return the logger
 	 */
-	public LogService getLogger()
+	public LogHelper getLogger()
 	{
 		return logger;
 	}
@@ -346,7 +324,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// check that given properties are not null
 		if (properties != null)
 		{
-			String rulesFileName = (String) properties.get(DogDeviceCostants.RULES);
+			String rulesFileName = (String) properties.get(DeviceCostants.RULES);
 			if ((rulesFileName != null) && (!rulesFileName.isEmpty()))
 			{
 				this.logger.log(LogService.LOG_DEBUG,
@@ -412,7 +390,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 		// preprocess timed e-blocks
 		TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
-		Set<DogMessage> timedEvents = proc.preProcess(this.localRuleBaseJAXB);
+		//TODO Fix when a new scheduler will be developed...
+		//Set<DogMessage> timedEvents = proc.preProcess(this.localRuleBaseJAXB);
 		
 		// translator from xml to drl
 		Xml2DrlTranslator translator = new Xml2DrlTranslator();
@@ -443,8 +422,9 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			ruleBase.addKnowledgePackages(kBuilder.getKnowledgePackages());
 			this.setRuleBase(ruleBase);
 			
+			//TODO Fix when a new scheduler will be developed...
 			// schedule timed events if any available
-			this.scheduleTimedEvents(timedEvents);
+			//this.scheduleTimedEvents(timedEvents);
 			
 			// debug
 			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
@@ -540,7 +520,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 		// preprocess timed e-blocks
 		TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
-		Set<DogMessage> timedEvents = proc.preProcess(rules);
+		//TODO Fix when a new scheduler will be developed...
+		//Set<DogMessage> timedEvents = proc.preProcess(rules);
 		
 		// translator from xml to drl
 		Xml2DrlTranslator translator = new Xml2DrlTranslator();
@@ -576,8 +557,9 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			
 			this.setRuleBase(ruleBase);
 			
+			//TODO Fix when a new scheduler will be developed...
 			// schedule timed events if any available
-			this.scheduleTimedEvents(timedEvents);
+			//this.scheduleTimedEvents(timedEvents);
 			
 			// debug
 			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
@@ -663,7 +645,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			
 			// marshal rules on file...
 			// create the JAXB context for parsing the local rule store (in xml)
-			JAXBContext ctx = JAXBContext.newInstance("it.polito.elite.dog.addons.rules.schemalibrary");
+			JAXBContext ctx = JAXBContext.newInstance(RuleList.class.getPackage().getName());
 			Marshaller m = ctx.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
@@ -727,7 +709,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			try
 			{
 				// get the JAXB context for marshalling
-				JAXBContext ctx = JAXBContext.newInstance("it.polito.elite.dog.addons.rules.schemalibrary");
+				JAXBContext ctx = JAXBContext.newInstance(RuleList.class.getPackage().getName());
 				
 				// create the marshaller
 				Marshaller m = ctx.createMarshaller();
@@ -769,7 +751,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		{
 			// parse the xml rule to add
 			// create the JAXB context for parsing the local rule store (in xml)
-			JAXBContext ctx = JAXBContext.newInstance("it.polito.elite.dog.addons.rules.schemalibrary");
+			JAXBContext ctx = JAXBContext.newInstance(RuleList.class.getPackage().getName());
 			
 			// create the corresponding un-marshaler for getting the list of
 			// JAXB classes modeling the local rule store
@@ -941,16 +923,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 	}
 	
-	public void executeCommand(String toDevice, String commandName, Object[] params)
-	{
-		MessageCommandRequest cmdRequest = new MessageCommandRequest(CommandTypes.SIMPLE, new DogCommand(toDevice,
-				commandName, params));
-		DogMessage msg = new DogMessage();
-		msg.setType(MessageTypes.COMMAND);
-		msg.setContent(cmdRequest);
-		this.executor.executeCommand(msg);
-	}
-	
+	// TODO Review!
 	// times are given in seconds...
 	public void scheduleCommand(String toDevice, String commandName, Object[] params, Long startTimeS, Long endTimeS,
 			Long afterTimeS)
@@ -968,15 +941,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// if the command already expired, do not schedule it
 		if (nowL < endTime)
 		{
-			// first create the new DogCommand to be sent
-			DogCommand cmdToSchedule = new DogCommand(toDevice, commandName, params);
-			
-			// create the dog message requesting the command execution
-			MessageCommandRequest cmdRequest = new MessageCommandRequest(CommandTypes.SIMPLE, cmdToSchedule);
-			DogMessage cmdMsg = new DogMessage();
-			cmdMsg.setType(MessageTypes.COMMAND);
-			cmdMsg.setContent(cmdRequest);
-			
+			logger.log(LogService.LOG_INFO, "Command Execution on " + toDevice + " -> " + commandName);
+						
 			// only after is specified
 			if ((startTimeS == null) && (afterTimeS != null))
 			{
@@ -987,8 +953,11 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			if (startTimeS < nowL)
 			{
 				// execute the command immediately
-				this.executor.executeCommand(cmdMsg);
+				Executor.getInstance().execute(context, toDevice, commandName, params);
 			}
+			
+			//TODO Fix when a new scheduler will be developed...
+			/*
 			else
 			{
 				// the command shall be scheduled
@@ -1023,10 +992,12 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			if (endTimeS != null)
 			{
 				// TODO: handle the scheduling of the opposite command...
-			}
-		}
+			}*/
+		}		
 	}
-	
+		
+	//TODO Fix when a new scheduler will be developed...
+	/*
 	public synchronized void scheduleTimedEvents(Set<DogMessage> timedEvents)
 	{
 		// schedule received event messages, if not empty
@@ -1042,14 +1013,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			
 		}
 		
-	}
-	
-	@Override
-	public void handleDogRuleMessage(DogMessage newMessage)
-	{
-		this.messageQueue.addMessage(newMessage);
-		
-	}
+	}*/
 	
 	/***************************************************************************
 	 * 
@@ -1083,7 +1047,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// TODO remove/clean inner data structures
 	}
 	
-	public void addedScheduler(DogSchedulerInterface scheduler)
+	//TODO Fix when a new scheduler will be developed...
+	/*public void addedScheduler(DogSchedulerInterface scheduler)
 	{
 		// store a reference to the dog scheduler for "scheduling" timed
 		// activations and commands
@@ -1099,50 +1064,14 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		this.unregisterServices();
 		
 		// TODO remove/clean inner data structures
-	}
-	
-	public void addedExecutor(DogExecutorInterface executor)
-	{
-		// store a reference to the dog scheduler for "scheduling" timed
-		// activations and commands
-		this.executor = executor;
-		
-		// check whether the bundle could register provided services
-		this.checkAndRegisterServices();
-	}
-	
-	public void removedExecutor(DogExecutorInterface executor)
-	{
-		// unregister
-		this.unregisterServices();
-		
-		// TODO remove/clean inner data structures
-	}
-	
-	public void addedXmlRPCMessageForwarder(XmlRpcMessageForwarder forwarder)
-	{
-		// Tell to the XmlRpcMessageForward that this service will process
-		// the RULES DogMessage
-		forwarder.registerMessageHandler(DogMessageFactory.createMessageHandlerRequest(MessageTypes.RULES,
-				DogRulesService.class.getName(), "handleDogRuleMessage"));
-	}
-	
-	public void removedXmlRPCMessageForwarder(XmlRpcMessageForwarder forwarder)
-	{
-		// log and do nothing
-		if (this.logger != null)
-			this.logger
-					.log(LogService.LOG_INFO,
-							RuleEngine.logId
-									+ "Removed XML-RPC forwarder, the RuleEngine will no more be accessible through XML-RPC, but is still alive!");
-	}
+	}*/
 	
 	/**
 	 * Check if all dependencies are satisfied and services can be published...
 	 */
 	private void checkAndRegisterServices()
 	{
-		if (this.monitorAdmin != null && this.scheduler != null && this.executor != null && this.context != null)
+		if (this.monitorAdmin != null /*&& this.scheduler != null*/ && this.context != null)
 		{ // all the needed services are up and running?
 		
 			// if the needed services have been matched and the rule base has
@@ -1155,5 +1084,4 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			this.registerServices();
 		}
 	}
-	
 }
