@@ -15,7 +15,9 @@ package it.polito.elite.dog.drivers.zwave.temperatureandhumiditysensor;
 
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.CommandClasses;
+import it.polito.elite.dog.drivers.zwave.model.CommandClassesData;
 import it.polito.elite.dog.drivers.zwave.model.Controller;
+import it.polito.elite.dog.drivers.zwave.model.DataElemObject;
 import it.polito.elite.dog.drivers.zwave.model.Device;
 import it.polito.elite.dog.drivers.zwave.model.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
@@ -33,46 +35,55 @@ import it.polito.elite.domotics.model.statevalue.TemperatureStateValue;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
-import javax.measure.quantity.Dimensionless;
-import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver implements TemperatureAndHumiditySensor
+public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver implements
+		TemperatureAndHumiditySensor
 {
 	public static final String SENSORTYPE_TEMPERATURE = "Temperature";
 	public static final String SENSORTYPE_HUMIDITY = "Humidity";
-
+	
 	// the class logger
 	private LogService logger;
-
-	public ZWaveTemperatureAndHumiditySensorDriverInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
-			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
+	
+	// sensor-level update times
+	private long temperatureUpdateTime = 0;
+	private long humidityUpdateTime = 0;
+	
+	public ZWaveTemperatureAndHumiditySensorDriverInstance(ZWaveNetwork network, ControllableDevice device,
+			int deviceId, Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
 	{
 		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
-
+		
 		// create a logger
 		logger = new DogLogInstance(context);
-
+		
 		// initialize states
 		this.initializeStates();
 	}
-
+	
 	/**
 	 * Initializes the state asynchronously as required by OSGi
 	 */
 	private void initializeStates()
 	{
+		//set up unit of measures
+		Unit.ONE.alternate("%");
+		
 		// initialize the state
-		this.currentState.setState(TemperatureState.class.getSimpleName(), new TemperatureState(new TemperatureStateValue()));
-		this.currentState.setState(HumidityMeasurementState.class.getSimpleName(), new HumidityMeasurementState(new HumidityStateValue()));
-
+		this.currentState.setState(TemperatureState.class.getSimpleName(), new TemperatureState(
+				new TemperatureStateValue()));
+		this.currentState.setState(HumidityMeasurementState.class.getSimpleName(), new HumidityMeasurementState(
+				new HumidityStateValue()));
+		
 		// get the initial state of the device
 		Runnable worker = new Runnable() {
 			public void run()
@@ -80,174 +91,225 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 				network.read(nodeInfo, true);
 			}
 		};
-
+		
 		Thread workerThread = new Thread(worker);
 		workerThread.start();
 	}
-
+	
 	@Override
 	public void notifyStateChanged(State newState)
 	{
-		//probably not used...
+		// probably not used...
 	}
-
+	
 	@Override
-	public void newMessageFromHouse(Device deviceNode, Instance instanceNode, 
-			Controller controllerNode, String sValue)
+	public void newMessageFromHouse(Device deviceNode, Instance instanceNode, Controller controllerNode, String sValue)
 	{
-		//update deviceNode
+		// update deviceNode
 		this.deviceNode = deviceNode;
-
-		//instance 0 doesn't contains updated value //TODO: non e' vero: problema delle 3 istanze!!!
-		if(instanceNode.getInstanceId() != 0)
+		
+		// instance 0 doesn't contains updated value //TODO: non e' vero:
+		// problema delle 3 istanze!!!
+		// if(instanceNode.getInstanceId() != 0)
+		// {
+		// Read the value for temperature or humidity.
+		CommandClasses ccInst = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_MULTILEVEL);
+		
+		// Check if it is a real new value or if it is an old one
+		long globalUpdateTime = ccInst.getValUpdateTime();
+		
+		// check if the instance contains only one value
+		if (globalUpdateTime > 0)
 		{
-			// Read the value for temperature or humidity.
-			CommandClasses ccInst = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_MULTILEVEL);
-
-			//first time we only save update time, no more
-			if(lastUpdateTime == 0)
-				lastUpdateTime = ccInst.getValUpdateTime();
-			// Check if it is a real new value or if it is an old one
-			else if(lastUpdateTime < ccInst.getValUpdateTime())
+			// check if the values are up-to-date
+			if (this.lastUpdateTime < globalUpdateTime)
 			{
-				//update last update time
+				// update last update time
 				lastUpdateTime = ccInst.getValUpdateTime();
 				nFailedUpdate = 0;
-
-				//Reads values and sensorType 
+				
+				// Reads values and sensorType
 				double measure = ccInst.getVal();
 				String sensorType = ccInst.getSensorType();
-
-				//call the right method 
-				if(sensorType.equals(SENSORTYPE_TEMPERATURE))
+				
+				// parse unit of measure
+				String unitOfMeasure = (String) ccInst.getCommandClassesData().getDataElemValue(CommandClassesData.FIELD_SCALESTRING);
+				
+				//forward to the right method
+				this.forwardMeasure(measure, unitOfMeasure, sensorType, this.lastUpdateTime);
+				
+			}
+			
+		}
+		else if (ccInst.getValUpdateTime() < 0)
+		{
+			// handle the case in which instances are more complex than usual
+			// (e.g. in the ST814 case) and data is hidden in numeric keys.
+			// TODO: check if this is the best way (I have some doubt on it)
+			
+			// iterate over numeric keys
+			Map<String, DataElemObject> cmdClassData = ccInst.getCommandClassesData().getAllData();
+			
+			
+			for (String key : cmdClassData.keySet())
+			{
+				// check for numeric key
+				try
 				{
-
-					//TODO: controllare l'unita' di misura ???
-					notifyNewTemperatureValue(DecimalMeasure.valueOf(measure, SI.CELSIUS));
+					// check if the key is a number, otherwise an exception will
+					// be thrown and caught
+					Integer.valueOf(key);
+					
+					// get the element data associated to the key
+					DataElemObject sensorData = cmdClassData.get(key);
+					
+					//check the last update time
+					long updateTime = sensorData.getUpdateTime();
+					
+					// Read value
+					double measure = Double.valueOf(sensorData.getDataElemValue(CommandClassesData.FIELD_VAL)
+							.toString());
+					
+					// Read sensorType
+					String sensorType = (String) sensorData.getDataElemValue(CommandClassesData.FIELD_SENSORTYPE);
+					
+					// parse unit of measure
+					String unitOfMeasure = (String) sensorData.getDataElemValue(CommandClassesData.FIELD_SCALESTRING);
+					
+					//forward to the right method
+					this.forwardMeasure(measure, unitOfMeasure, sensorType, updateTime);
+					
 				}
-				else if(sensorType.equals(SENSORTYPE_HUMIDITY))
+				catch (NumberFormatException ne)
 				{
-					Unit<Dimensionless> percentage = Unit.ONE.alternate("%");
-					notifyChangedRelativeHumidity(DecimalMeasure.valueOf(measure, percentage));
+					// not a number, simply ignore it
 				}
 			}
-			/*else
-			{
-				// increment counter
-				nFailedUpdate++;
-
-				//log a message after 5 failed update
-				if(nFailedUpdate >= 5)
-				{
-					logger.log(LogService.LOG_WARNING, ZWaveTemperatureAndHumiditySensorDriver.LOG_ID + "Device " + device.getDeviceId()
-							+ " doesn't respond after 5 update requests");
-
-					nFailedUpdate = 0;
-				}
-			}*/
+			
 		}
 	}
-
+	
 	@Override
 	protected void specificConfiguration()
 	{
 		// prepare the device state map
 		currentState = new DeviceStatus(device.getDeviceId());
 	}
-
+	
 	@Override
 	protected void addToNetworkDriver(ZWaveNodeInfo nodeInfo)
 	{
 		network.addDriver(nodeInfo, updateTimeMillis, this);
 	}
-
+	
 	@Override
 	protected boolean isController()
 	{
 		return false;
 	}
-
+	
 	@Override
 	public void deleteGroup(String groupID)
 	{
 		// intentionally left empty
 	}
-
+	
 	@Override
 	public void storeGroup(String groupID)
 	{
 		// intentionally left empty
 	}
-
+	
 	@Override
 	public DeviceStatus getState()
 	{
 		return currentState;
 	}
-
+	
 	@Override
-	public Measure<?, ?> getRelativeHumidity() 
+	public Measure<?, ?> getRelativeHumidity()
 	{
 		return (Measure<?, ?>) currentState.getState(HumidityMeasurementState.class.getSimpleName())
 				.getCurrentStateValue()[0].getValue();
 	}
-
+	
 	@Override
-	public Measure<?, ?> getTemperature() 
+	public Measure<?, ?> getTemperature()
 	{
-		return (Measure<?, ?>) currentState.getState(TemperatureState.class.getSimpleName())
-				.getCurrentStateValue()[0].getValue();
+		return (Measure<?, ?>) currentState.getState(TemperatureState.class.getSimpleName()).getCurrentStateValue()[0]
+				.getValue();
 	}
-
+	
 	@Override
-	public void notifyNewTemperatureValue(Measure<?, ?> temperatureValue) 
+	public void notifyNewTemperatureValue(Measure<?, ?> temperatureValue)
 	{
 		// update the state
 		TemperatureStateValue pValue = new TemperatureStateValue();
 		pValue.setValue(temperatureValue);
-		currentState.setState(TemperatureState.class.getSimpleName(),
-				new TemperatureState(pValue));
-
+		currentState.setState(TemperatureState.class.getSimpleName(), new TemperatureState(pValue));
+		
 		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveTemperatureAndHumiditySensorDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " temperature " + temperatureValue.toString());
-
+		logger.log(LogService.LOG_DEBUG,
+				ZWaveTemperatureAndHumiditySensorDriver.LOG_ID + "Device " + device.getDeviceId() + " temperature "
+						+ temperatureValue.toString());
+		
 		// notify the new measure
 		((TemperatureAndHumiditySensor) device).notifyNewTemperatureValue(temperatureValue);
 	}
-
+	
 	@Override
-	public void notifyChangedRelativeHumidity(Measure<?, ?> relativeHumidity) 
+	public void notifyChangedRelativeHumidity(Measure<?, ?> relativeHumidity)
 	{
 		// update the state
 		HumidityStateValue pValue = new HumidityStateValue();
 		pValue.setValue(relativeHumidity);
-		currentState.setState(HumidityMeasurementState.class.getSimpleName(),
-				new HumidityMeasurementState(pValue));
-
+		currentState.setState(HumidityMeasurementState.class.getSimpleName(), new HumidityMeasurementState(pValue));
+		
 		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveTemperatureAndHumiditySensorDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " humidity " + relativeHumidity.toString());
-
+		logger.log(LogService.LOG_DEBUG,
+				ZWaveTemperatureAndHumiditySensorDriver.LOG_ID + "Device " + device.getDeviceId() + " humidity "
+						+ relativeHumidity.toString());
+		
 		// notify the new measure
 		((TemperatureAndHumiditySensor) device).notifyChangedRelativeHumidity(relativeHumidity);
 	}
-
+	
 	@Override
-	protected ZWaveNodeInfo createNodeInfo(int deviceId, Set<Integer> instancesId, boolean isController) 
+	protected ZWaveNodeInfo createNodeInfo(int deviceId, Set<Integer> instancesId, boolean isController)
 	{
-		HashMap<Integer,Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
-
-		//for this device the right Get command class is COMMAND_CLASS_SENSOR_MULTILEVEL for each instance.
+		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
+		
+		// for this device the right Get command class is
+		// COMMAND_CLASS_SENSOR_MULTILEVEL for each instance.
 		HashSet<Integer> ccSet = new HashSet<Integer>();
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_SENSOR_MULTILEVEL);
-
-		for(Integer instanceId : instancesId)
+		
+		for (Integer instanceId : instancesId)
 		{
 			instanceCommand.put(instanceId, ccSet);
 		}
 		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand, isController);
-
+		
 		return nodeInfo;
+	}
+	
+	private void forwardMeasure(double measure, String unitOfMeasure, String sensorType, long updateTime)
+	{
+		// check which value has been read
+		if (sensorType.equals(SENSORTYPE_TEMPERATURE))
+		{
+			//check if and how manage the update time
+			if(this.temperatureUpdateTime < updateTime)
+				this.temperatureUpdateTime = updateTime;
+			notifyNewTemperatureValue(DecimalMeasure.valueOf(measure + " " + unitOfMeasure));
+		}
+		else if (sensorType.equals(SENSORTYPE_HUMIDITY))
+		{			
+			//check if and how manage the update time
+			if(this.humidityUpdateTime < updateTime)
+				this.humidityUpdateTime = updateTime;
+			
+			notifyChangedRelativeHumidity(DecimalMeasure.valueOf(measure + " " + unitOfMeasure));
+		}
 	}
 }

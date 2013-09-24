@@ -30,6 +30,7 @@ public class CommandClassesData
 	public static final String FIELD_LEVEL = "level";
 	public static final String FIELD_ISINTERVIEWDONE = "interviewDone";
 	public static final String FIELD_SCALE = "scale";
+	public static final String FIELD_SCALESTRING = "scaleString";
 	
 	//static name properties
 	private long updateTime;
