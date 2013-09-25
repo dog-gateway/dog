@@ -75,7 +75,7 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 	 */
 	private void initializeStates()
 	{
-		//set up unit of measures
+		// set up unit of measures
 		Unit.ONE.alternate("%");
 		
 		// initialize the state
@@ -133,9 +133,10 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 				String sensorType = ccInst.getSensorType();
 				
 				// parse unit of measure
-				String unitOfMeasure = (String) ccInst.getCommandClassesData().getDataElemValue(CommandClassesData.FIELD_SCALESTRING);
+				String unitOfMeasure = (String) ccInst.getCommandClassesData().getDataElemValue(
+						CommandClassesData.FIELD_SCALESTRING);
 				
-				//forward to the right method
+				// forward to the right method
 				this.forwardMeasure(measure, unitOfMeasure, sensorType, this.lastUpdateTime);
 				
 			}
@@ -150,7 +151,6 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 			// iterate over numeric keys
 			Map<String, DataElemObject> cmdClassData = ccInst.getCommandClassesData().getAllData();
 			
-			
 			for (String key : cmdClassData.keySet())
 			{
 				// check for numeric key
@@ -163,7 +163,7 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 					// get the element data associated to the key
 					DataElemObject sensorData = cmdClassData.get(key);
 					
-					//check the last update time
+					// check the last update time
 					long updateTime = sensorData.getUpdateTime();
 					
 					// Read value
@@ -176,7 +176,7 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 					// parse unit of measure
 					String unitOfMeasure = (String) sensorData.getDataElemValue(CommandClassesData.FIELD_SCALESTRING);
 					
-					//forward to the right method
+					// forward to the right method
 					this.forwardMeasure(measure, unitOfMeasure, sensorType, updateTime);
 					
 				}
@@ -243,11 +243,22 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 	@Override
 	public void notifyNewTemperatureValue(Measure<?, ?> temperatureValue)
 	{
-		// update the state
-		TemperatureStateValue pValue = new TemperatureStateValue();
-		pValue.setValue(temperatureValue);
-		currentState.setState(TemperatureState.class.getSimpleName(), new TemperatureState(pValue));
-		
+		// if the given temperature is null, than the network-level value is not
+		// up-to-date
+		// and the currently stored value should be notified
+		if (temperatureValue != null)
+		{
+			// update the state
+			TemperatureStateValue pValue = new TemperatureStateValue();
+			pValue.setValue(temperatureValue);
+			currentState.setState(TemperatureState.class.getSimpleName(), new TemperatureState(pValue));
+		}
+		else
+		{
+			
+			temperatureValue = (Measure<?, ?>) this.currentState.getState(TemperatureState.class.getSimpleName())
+					.getCurrentStateValue()[0].getValue();
+		}
 		// debug
 		logger.log(LogService.LOG_DEBUG,
 				ZWaveTemperatureAndHumiditySensorDriver.LOG_ID + "Device " + device.getDeviceId() + " temperature "
@@ -260,11 +271,21 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 	@Override
 	public void notifyChangedRelativeHumidity(Measure<?, ?> relativeHumidity)
 	{
-		// update the state
-		HumidityStateValue pValue = new HumidityStateValue();
-		pValue.setValue(relativeHumidity);
-		currentState.setState(HumidityMeasurementState.class.getSimpleName(), new HumidityMeasurementState(pValue));
-		
+		// if the given temperature is null, than the network-level value is not
+		// up-to-date
+		// and the currently stored value should be notified
+		if (relativeHumidity != null)
+		{
+			// update the state
+			HumidityStateValue pValue = new HumidityStateValue();
+			pValue.setValue(relativeHumidity);
+			currentState.setState(HumidityMeasurementState.class.getSimpleName(), new HumidityMeasurementState(pValue));
+		}
+		else
+		{
+			relativeHumidity = (Measure<?, ?>) this.currentState.getState(
+					HumidityMeasurementState.class.getSimpleName()).getCurrentStateValue()[0].getValue();
+		}
 		// debug
 		logger.log(LogService.LOG_DEBUG,
 				ZWaveTemperatureAndHumiditySensorDriver.LOG_ID + "Device " + device.getDeviceId() + " humidity "
@@ -298,18 +319,29 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 		// check which value has been read
 		if (sensorType.equals(SENSORTYPE_TEMPERATURE))
 		{
-			//check if and how manage the update time
-			if(this.temperatureUpdateTime < updateTime)
+			// check if and how manage the update time
+			if (this.temperatureUpdateTime < updateTime)
+			{
 				this.temperatureUpdateTime = updateTime;
-			notifyNewTemperatureValue(DecimalMeasure.valueOf(measure + " " + unitOfMeasure));
+				this.notifyNewTemperatureValue(DecimalMeasure.valueOf(measure + " " + unitOfMeasure));
+			}
+			else
+			{
+				this.notifyNewTemperatureValue(null);
+			}
 		}
 		else if (sensorType.equals(SENSORTYPE_HUMIDITY))
-		{			
-			//check if and how manage the update time
-			if(this.humidityUpdateTime < updateTime)
+		{
+			// check if and how manage the update time
+			if (this.humidityUpdateTime < updateTime)
+			{
 				this.humidityUpdateTime = updateTime;
-			
-			notifyChangedRelativeHumidity(DecimalMeasure.valueOf(measure + " " + unitOfMeasure));
+				this.notifyChangedRelativeHumidity(DecimalMeasure.valueOf(measure + " " + unitOfMeasure));
+			}
+			else
+			{
+				this.notifyChangedRelativeHumidity(null);
+			}
 		}
 	}
 }
