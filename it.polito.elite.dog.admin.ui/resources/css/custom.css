@@ -2,3 +2,14 @@
 {
 	margin-right: .3em;
 }
+
+.barlabel
+{
+	display: block;
+    font-weight: bold;
+    left: 5px;
+    position: relative;
+    text-align: center;
+    top: 5px;
+    width: 100%;
+}
