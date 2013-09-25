@@ -34,4 +34,9 @@ public interface BundleManagerInterface
 	@Path("/bundles")
 	@Produces(MediaType.TEXT_HTML)
 	public String getBundles();
+	
+	@GET
+	@Path("/bundles/statistics")
+	@Produces(MediaType.TEXT_HTML)
+	public String getOverallStatistics();
 }

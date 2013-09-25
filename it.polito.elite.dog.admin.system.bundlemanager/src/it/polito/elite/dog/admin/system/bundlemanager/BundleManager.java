@@ -43,6 +43,12 @@ public class BundleManager implements BundleManagerInterface
 	// the service logger
 	private LogHelper logger;
 	
+	// the number of columns
+	public static final int nColumns = 2;
+	
+	// the full-row span
+	public static final int spanPerRow = 12;
+	
 	// the bundle context reference to extract information on the entire Dog
 	// status
 	private BundleContext context;
@@ -92,7 +98,8 @@ public class BundleManager implements BundleManagerInterface
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * it.polito.elite.dog.admin.system.bundlemanager.BundleManagerInterface#getBundles()
+	 * it.polito.elite.dog.admin.system.bundlemanager.BundleManagerInterface
+	 * #getBundles()
 	 */
 	@Override
 	@GET
@@ -108,12 +115,27 @@ public class BundleManager implements BundleManagerInterface
 		StringBuffer htmlOut = new StringBuffer();
 		
 		// append the unordered list header
-		htmlOut.append("<ul class=\"unstyled\">\n");
 		
 		// generate a list of bundles
 		for (int i = 0; i < allBundles.length; i++)
 		{
+			// column handling
+			if (i == 0)
+			{
+				htmlOut.append("<div class=\"span" + (BundleManager.spanPerRow / nColumns)
+						+ "\">\n<div class=\"well\">\n<ul class=\"unstyled\">\n");
+			}
+			else if (i == allBundles.length / nColumns)
+			{
+				htmlOut.append("</ul>\n</div>\n</div>");
+				htmlOut.append("<div class=\"span" + (BundleManager.spanPerRow / nColumns)
+						+ "\">\n<div class=\"well\">\n<ul class=\"unstyled\">\n");
+			}
+			
+			// handle the current bundle rendering
 			htmlOut.append("<li>" + allBundles[i].getSymbolicName() + " (" + allBundles[i].getVersion() + ") ");
+			
+			// render the bundle state
 			switch (allBundles[i].getState())
 			{
 				case Bundle.ACTIVE:
@@ -136,10 +158,69 @@ public class BundleManager implements BundleManagerInterface
 			htmlOut.append("</li>\n");
 		}
 		
-		htmlOut.append("</ul>\n");
+		htmlOut.append("</ul>\n</div>\n</div>");
 		
 		return htmlOut.toString();
 		
 	}
 	
+	@Override
+	@GET
+	@Path("/bundles/statistics")
+	@Produces(MediaType.TEXT_HTML)
+	public String getOverallStatistics()
+	{
+		// get all the installed bundles
+		Bundle allBundles[] = this.context.getBundles();
+		
+		// the output buffer
+		StringBuffer htmlOut = new StringBuffer();
+		
+		// prepare counters
+		int nActive = 0;
+		int nInstalled = 0;
+		int nResolved = 0;
+		
+		// generate a list of bundles
+		for (int i = 0; i < allBundles.length; i++)
+		{
+			// render the bundle state
+			switch (allBundles[i].getState())
+			{
+				case Bundle.ACTIVE:
+				{
+					nActive++;
+					break;
+				}
+				case Bundle.INSTALLED:
+				{
+					nInstalled++;
+					break;
+				}
+				case Bundle.RESOLVED:
+				{
+					nResolved++;
+					break;
+				}
+			}
+		}
+		
+		// render statistics
+		
+		// compute the active ratio
+		double activeRatio = (double)nActive / (double)(nActive+nResolved+nInstalled);
+		
+		// compute the label color
+		String color = "";
+		if (activeRatio < 0.5)
+			color = "label-important";
+		else if (activeRatio == 1)
+			color = "label-success";
+		else
+			color = "label-warning";
+		
+		htmlOut.append("<span class=\"label pull-right " + color + "\">" + nActive + " Active / " + nInstalled +" Installed / "+nResolved+" Resolved </span>");
+		
+		return htmlOut.toString();
+	}
 }

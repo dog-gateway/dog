@@ -31,6 +31,7 @@ import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -48,6 +49,10 @@ public class DeviceMonitor implements DeviceMonitorInterface
 {
 	// the service logger
 	private LogHelper logger;
+	
+	// devices per row
+	public static final int devicesPerRow = 4;
+	public static final int spanPerRow = 12;
 	
 	// the bundle context reference to extract information on the entire Dog
 	// status
@@ -128,7 +133,19 @@ public class DeviceMonitor implements DeviceMonitorInterface
 						ControllableDevice currentDevice = (ControllableDevice) device;
 						
 						// start the list item for the current device
-						htmlOut.append("<div class=\"row-fluid\"><div class=\"well\"");
+						if ((i % DeviceMonitor.devicesPerRow) == 0)
+						{
+							// close div the last opened div, except for the
+							// first row
+							if (i != 0)
+								htmlOut.append("</div>");
+							htmlOut.append("<div class=\"row-fluid\">");
+						}
+						
+						// format as a grid
+						htmlOut.append("<div class=\"span" + (DeviceMonitor.spanPerRow / DeviceMonitor.devicesPerRow)
+								+ "\">");
+						htmlOut.append("<div class=\"well\"");
 						
 						// get the device icon...
 						String category = currentDevice.getDeviceDescriptor().getDevCategory();
@@ -159,6 +176,10 @@ public class DeviceMonitor implements DeviceMonitorInterface
 						htmlOut.append("</div></div>");
 					}
 				}
+				
+				// close orphan divs
+				if ((allDevices.length % DeviceMonitor.devicesPerRow) > 0)
+					htmlOut.append("</div>");
 			}
 		}
 		catch (InvalidSyntaxException e)
@@ -172,12 +193,73 @@ public class DeviceMonitor implements DeviceMonitorInterface
 		return htmlOut.toString();
 	}
 	
+	@Override
+	@GET
+	@Path("/devices/statistics")
+	@Produces(MediaType.TEXT_HTML)
+	public String getOverallStatistics()
+	{
+		// the output buffer for storing incrementally built html
+		StringBuffer htmlOut = new StringBuffer();
+		
+		// device counts
+		int nDevices = 0;
+		int nActiveDevices = 0;
+		try
+		{
+			ServiceReference<?>[] allDevices = this.context.getAllServiceReferences(Device.class.getName(), null);
+			
+			if (allDevices != null)
+			{
+				for (int i = 0; i < allDevices.length; i++)
+				{
+					Object device = this.context.getService(allDevices[i]);
+					if (device instanceof ControllableDevice)
+					{
+						// get the device activation status
+						String active = (String) allDevices[i].getProperty(DogDeviceCostants.ACTIVE);
+						
+						// parse the boolean value hold by the active string
+						boolean isDeviceActive = Boolean.valueOf(active);
+						
+						// updated device counts
+						nDevices++;
+						if (isDeviceActive)
+							nActiveDevices++;
+					}
+				}
+			}
+		}
+		catch (InvalidSyntaxException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// the ratio
+		double activeRatio = (double) nActiveDevices / (double) nDevices;
+		
+		// compute the label color
+		String color = "";
+		if (activeRatio < 0.33)
+			color = "label-important";
+		else if (activeRatio > 0.66)
+			color = "label-success";
+		else
+			color = "label-warning";
+		
+		htmlOut.append("<span class=\"label pull-right " + color + "\">" + nActiveDevices + " Active / " + nDevices + " Not Active</span>");
+		
+		// return the statistics
+		return htmlOut.toString();
+	}
+	
 	private String getDeviceState(ControllableDevice currentDevice)
 	{
 		StringBuffer stateAsString = new StringBuffer();
 		DeviceStatus state = ((Controllable) currentDevice).getState();
-	
-		//check not null
+		
+		// check not null
 		if (state != null)
 		{
 			Map<String, State> allStates = state.getStates();

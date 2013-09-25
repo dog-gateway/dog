@@ -38,4 +38,9 @@ public interface DeviceMonitorInterface
 	@Produces(MediaType.TEXT_HTML)
 	public String getInstalledDevices();
 	
+	@GET
+	@Path("/devices/statistics")
+	@Produces(MediaType.TEXT_HTML)
+	public String getOverallStatistics();
+	
 }

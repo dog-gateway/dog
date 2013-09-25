@@ -120,7 +120,7 @@ public class FrameworkMonitor implements FrameworkMonitorInterface
 		}
 		else
 		{
-			response.append(" label-error\">");
+			response.append(" label-important\">");
 		}
 	
 		response.append(freeMemory+" MBytes</span>");
