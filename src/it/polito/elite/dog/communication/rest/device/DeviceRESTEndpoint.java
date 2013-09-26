@@ -1,5 +1,19 @@
-/**
+/*
+ * Dog - Device Rest Endpoint
  * 
+ * Copyright (c) 2013 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.communication.rest.device;
 
@@ -7,14 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.model.devicecategory.Controllable;
-import it.polito.elite.domotics.model.state.State;
-import it.polito.elite.domotics.model.statevalue.StateValue;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceDescriptor;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.StateValue;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.DeviceDescriptor;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -38,7 +52,7 @@ import org.osgi.service.log.LogService;
 public class DeviceRESTEndpoint implements DeviceRESTApi
 {
 	// the service logger
-	private LogService logger;
+	private LogHelper logger;
 	
 	// the log id
 	public static final String logId = "[DeviceRESTEndpoint]: ";
@@ -67,7 +81,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		this.context = context;
 		
 		// init the logger with a null logger
-		this.logger = new DogLogInstance(this.context);
+		this.logger = new LogHelper(this.context);
 		
 		// log the activation
 		this.logger.log(LogService.LOG_INFO, DeviceRESTEndpoint.logId + "Activated....");
@@ -136,13 +150,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						ControllableDevice currentDevice = (ControllableDevice) device;
 						
 						// get the device descriptor
-						DogDeviceDescriptor deviceDescriptor = currentDevice.getDeviceDescriptor();
+						DeviceDescriptor deviceDescriptor = currentDevice.getDeviceDescriptor();
 						
 						// save device data
 						deviceJSON.put("uri", deviceDescriptor.getDevURI());
 						deviceJSON.put("description", deviceDescriptor.getDevDescription());
 						deviceJSON.put("active",
-								Boolean.valueOf((String) allDevices[i].getProperty(DogDeviceCostants.ACTIVE)));
+								Boolean.valueOf((String) allDevices[i].getProperty(DeviceCostants.ACTIVE)));
 						
 						// get the device status
 						DeviceStatus state = ((Controllable) currentDevice).getState();
