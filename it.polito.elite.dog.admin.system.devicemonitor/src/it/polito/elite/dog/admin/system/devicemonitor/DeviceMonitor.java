@@ -51,7 +51,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 	private LogHelper logger;
 	
 	// devices per row
-	public static final int devicesPerRow = 4;
+	public static final int devicesPerRow = 3;
 	public static final int spanPerRow = 12;
 	
 	// the bundle context reference to extract information on the entire Dog
@@ -217,7 +217,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 					if (device instanceof ControllableDevice)
 					{
 						// get the device activation status
-						String active = (String) allDevices[i].getProperty(DogDeviceCostants.ACTIVE);
+						String active = (String) allDevices[i].getProperty(DeviceCostants.ACTIVE);
 						
 						// parse the boolean value hold by the active string
 						boolean isDeviceActive = Boolean.valueOf(active);
@@ -248,7 +248,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 		else
 			color = "label-warning";
 		
-		htmlOut.append("<span class=\"label pull-right " + color + "\">" + nActiveDevices + " Active / " + nDevices + " Not Active</span>");
+		htmlOut.append("<span class=\"label pull-right " + color + "\">" + nActiveDevices + " Active / " + (nDevices-nActiveDevices) + " Not Active</span>");
 		
 		// return the statistics
 		return htmlOut.toString();
@@ -274,10 +274,10 @@ public class DeviceMonitor implements DeviceMonitorInterface
 				StateValue currentStateValues[] = currentState.getCurrentStateValue();
 				
 				// iterate over the values
-				stateAsString.append("<p>");
+				stateAsString.append("<p>"+currentState.getStateName()+" ");
 				for (int i = 0; i < currentStateValues.length; i++)
 				{
-					stateAsString.append("<span class=\"label label-info\">" + currentStateValues[i].getValue()
+					stateAsString.append("<span class=\"label label-info pull-right\">" + currentStateValues[i].getValue()
 							+ "</span>");
 				}
 				stateAsString.append("<p/>");
