@@ -17,10 +17,16 @@
  */
 package it.polito.elite.dog.communication.rest.device.api;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * The interface defining the API for the devices, it permits to:
@@ -40,8 +46,8 @@ public interface DeviceRESTApi
 {
 	/**
 	 * Represents the status of devices registered in the Dog gateway runtime,
-	 * i.e., defined in the Dog configuration and
-	 * successfully registered within the gateway runtime.
+	 * i.e., defined in the Dog configuration and successfully registered within
+	 * the gateway runtime.
 	 * 
 	 * @return The JSON description of the current device status
 	 */
@@ -49,5 +55,58 @@ public interface DeviceRESTApi
 	@Path("/status")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getAllDeviceStatus();
-	
+
+	/**
+	 * TODO: For testing purpose only
+	 * 
+	 * Represents a command, identified by a command-name, to be sent to the
+	 * device identified by the given device-id. Commands are idempotent: the
+	 * same command always results in the same behavior of the selected device.
+	 * If the command brings the device in same state in which the device is, no
+	 * differences will be appreciable
+	 * 
+	 * @param deviceId The device unique identifier (URI)
+	 * @param commandName The command to be executed
+	 */
+	@GET
+	@Path("{device-id}/commands/{command-name}")
+	public String executeCommandGet(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName);
+
+	/**
+	 * Represents a command, identified by a command-name, to be sent to the
+	 * device identified by the given device-id. Commands are idempotent: the
+	 * same command always results in the same behavior of the selected device.
+	 * If the command brings the device in same state in which the device is, no
+	 * differences will be appreciable
+	 * 
+	 * @param deviceId The device unique identifier (URI)
+	 * @param commandName The command to be executed
+	 * @param commandParameters Any possible command parameter (one in this version)
+	 */
+	@POST
+	@Path("{device-id}/commands/{command-name}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void executeCommandPost(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName,
+			JSONObject commandParameters);
+
+	/**
+	 * Represents a command, identified by a command-name, to be sent to the
+	 * device identified by the given device-id. Commands are idempotent: the
+	 * same command always results in the same behavior of the selected device.
+	 * If the command brings the device in same state in which the device is, no
+	 * differences will be appreciable
+	 * 
+	 * @param deviceId The device unique identifier (URI)
+	 * @param commandName The command to be executed
+	 * @param commandParameters Any possible command parameter (one in this version)
+	 */
+	@PUT
+	@Path("{device-id}/commands/{command-name}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void executeCommandPut(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName,
+			JSONObject commandParameters);
+
 }
