@@ -1,24 +1,28 @@
 /*
  * Dog  - Z-Wave
  * 
- * Copyright [2013] 
- * [Davide Aimone (aimone.dav@gmail.com)]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
+ * Copyright 2013 Davide Aimone  and Dario Bonino 
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.zwave.gateway;
 
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.devicecategory.ZWaveGateway;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.core.library.model.devicecategory.ZWaveGateway;
 
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -47,7 +51,7 @@ public class ZWaveGatewayDriver implements Driver
 	protected BundleContext context;
 	
 	// System logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static final String LOG_ID = "[ZWaveGatewayDriver]: ";
@@ -91,7 +95,7 @@ public class ZWaveGatewayDriver implements Driver
 		context = bundleContext;
 		
 		// init the logger
-		logger = new DogLogInstance(context);
+		logger = new LogHelper(context);
 		
 		registerDriver();
 	}
@@ -122,10 +126,10 @@ public class ZWaveGatewayDriver implements Driver
 		int matchValue = Device.MATCH_NONE;
 		
 		// get the given device category
-		String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
+		String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
 		
 		// get the given device manufacturer
-		String manufacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+		String manufacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
 		
 		// compute the matching score between the given device and this driver
 		if (deviceCategory != null)
@@ -182,8 +186,8 @@ public class ZWaveGatewayDriver implements Driver
 					// modify the service description causing a forcing the
 					// framework to send a modified service notification
 					final Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-					propDriver.put(DogDeviceCostants.DRIVER_ID, DRIVER_ID);
-					propDriver.put(DogDeviceCostants.GATEWAY_COUNT, connectedGateways.size());
+					propDriver.put(DeviceCostants.DRIVER_ID, DRIVER_ID);
+					propDriver.put(DeviceCostants.GATEWAY_COUNT, connectedGateways.size());
 					
 					regDriver.setProperties(propDriver);
 				}
@@ -243,8 +247,8 @@ public class ZWaveGatewayDriver implements Driver
 		if ((network.get() != null) && (this.context != null) && (this.regDriver == null))
 		{
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-			propDriver.put(DogDeviceCostants.DRIVER_ID, DRIVER_ID);
-			propDriver.put(DogDeviceCostants.GATEWAY_COUNT, connectedGateways.size());
+			propDriver.put(DeviceCostants.DRIVER_ID, DRIVER_ID);
+			propDriver.put(DeviceCostants.GATEWAY_COUNT, connectedGateways.size());
 			regDriver = context.registerService(Driver.class.getName(), this, propDriver);
 			regZWaveGateway = context.registerService(ZWaveGatewayDriver.class.getName(), this, null);
 		}

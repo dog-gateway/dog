@@ -1,15 +1,19 @@
 /*
  * Dog  - Z-Wave
  * 
- * Copyright [2013] 
- * [Davide Aimone (aimone.dav@gmail.com)]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
+ * Copyright 2013 Davide Aimone  and Dario Bonino 
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.zwave.network;
 
@@ -20,7 +24,7 @@ import it.polito.elite.dog.drivers.zwave.model.ZWaveModelTree;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import it.polito.elite.dog.drivers.zwave.util.ConnessionManager;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -52,7 +56,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	private ServiceRegistration<?> regServiceZWaveDriverImpl;
 	
 	// the driver logger
-	private LogService logger;
+	private LogHelper logger;
 	
 	// connession maanger used to deal with zway server
 	private ConnessionManager conManager;
@@ -162,7 +166,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	protected void activate(BundleContext bundleContext)
 	{
 		// create a logger
-		logger = new DogLogInstance(bundleContext);
+		logger = new LogHelper(bundleContext);
 		
 		// store the bundle context
 		this.bundleContext = bundleContext;
@@ -421,7 +425,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	 * 
 	 * @return
 	 */
-	public LogService getLogger()
+	public LogHelper getLogger()
 	{
 		return logger;
 	}

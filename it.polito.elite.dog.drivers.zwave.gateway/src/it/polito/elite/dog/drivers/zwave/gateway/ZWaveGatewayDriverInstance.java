@@ -1,15 +1,19 @@
 /*
  * Dog  - Z-Wave
  * 
- * Copyright [2013] 
- * [Davide Aimone (aimone.dav@gmail.com)]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
+ * Copyright 2013 Davide Aimone  and Dario Bonino 
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.zwave.gateway;
 
@@ -20,24 +24,24 @@ import it.polito.elite.dog.drivers.zwave.model.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.model.devicecategory.ZWaveGateway;
-import it.polito.elite.domotics.model.state.State;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.ZWaveGateway;
+import it.polito.elite.dog.core.library.model.state.State;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
+
 
 
 public class ZWaveGatewayDriverInstance extends ZWaveDriver implements ZWaveGateway
 {
 	// the driver logger
-	LogService logger;
+	LogHelper logger;
 
 	// the log identifier, unique for the class
 	public static String LOG_ID = "[ZWaveGatewayDriverInstance]: ";
@@ -53,7 +57,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements ZWaveGate
 		super(network, controllableDevice, nodeId, instancesId, nodeId, 0, context);
 
 		// create a logger
-		logger = new DogLogInstance(context);
+		logger = new LogHelper(context);
 
 		// create a new device state (according to the current DogOnt model, no
 		// state is actually associated to a Modbus gateway)

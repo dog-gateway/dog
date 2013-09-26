@@ -1,18 +1,34 @@
 /*
  * Dog  - Z-Wave
  * 
- * Copyright [2013] 
- * [Davide Aimone (aimone.dav@gmail.com)]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
+ * Copyright 2013 Davide Aimone  and Dario Bonino 
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.zwave.dimmerdevice;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.DimmerLamp;
+import it.polito.elite.dog.core.library.model.devicecategory.DimmerSwitch;
+import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.state.LevelState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.state.OnOffState;
+import it.polito.elite.dog.core.library.model.statevalue.LevelStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.Controller;
@@ -21,18 +37,6 @@ import it.polito.elite.dog.drivers.zwave.model.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.model.devicecategory.DimmerLamp;
-import it.polito.elite.domotics.model.devicecategory.DimmerSwitch;
-import it.polito.elite.domotics.model.devicecategory.ElectricalSystem;
-import it.polito.elite.domotics.model.state.LevelState;
-import it.polito.elite.domotics.model.state.OnOffState;
-import it.polito.elite.domotics.model.state.State;
-import it.polito.elite.domotics.model.statevalue.LevelStateValue;
-import it.polito.elite.domotics.model.statevalue.OffStateValue;
-import it.polito.elite.domotics.model.statevalue.OnStateValue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +51,7 @@ import org.osgi.service.log.LogService;
 public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements DimmerLamp, DimmerSwitch
 {
 	// the class logger
-	private LogService logger;
+	private LogHelper logger;
 
 	public ZWaveDimmerDeviceDriverInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
 			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
@@ -55,7 +59,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements Dimm
 		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
 
 		// create a logger
-		logger = new DogLogInstance(context);
+		logger = new LogHelper(context);
 
 		// initialize states
 		this.initializeStates();

@@ -1,15 +1,19 @@
 /*
  * Dog  - Z-Wave
  * 
- * Copyright [2013] 
- * [Davide Aimone (aimone.dav@gmail.com)]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
+ * Copyright 2013 Davide Aimone  and Dario Bonino 
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.zwave.singlephaseelectricitymeter;
 
@@ -21,17 +25,17 @@ import it.polito.elite.dog.drivers.zwave.model.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.DeviceStatus;
-import it.polito.elite.domotics.model.devicecategory.SinglePhaseActivePowerMeter;
-import it.polito.elite.domotics.model.devicecategory.SinglePhaseElectricityMeter;
-import it.polito.elite.domotics.model.devicecategory.SinglePhaseEnergyMeter;
-import it.polito.elite.domotics.model.state.SinglePhaseActiveEnergyState;
-import it.polito.elite.domotics.model.state.SinglePhaseActivePowerMeasurementState;
-import it.polito.elite.domotics.model.state.State;
-import it.polito.elite.domotics.model.statevalue.ActiveEnergyStateValue;
-import it.polito.elite.domotics.model.statevalue.ActivePowerStateValue;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.SinglePhaseActivePowerMeter;
+import it.polito.elite.dog.core.library.model.devicecategory.SinglePhaseElectricityMeter;
+import it.polito.elite.dog.core.library.model.devicecategory.SinglePhaseEnergyMeter;
+import it.polito.elite.dog.core.library.model.state.SinglePhaseActiveEnergyState;
+import it.polito.elite.dog.core.library.model.state.SinglePhaseActivePowerMeasurementState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.ActiveEnergyStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,7 +55,7 @@ import org.osgi.service.log.LogService;
 public class ZWaveSinglePhaseElectricityMeterInstance extends ZWaveDriver implements SinglePhaseElectricityMeter
 {
 	// the class logger
-	private LogService logger;
+	private LogHelper logger;
 	
 	public ZWaveSinglePhaseElectricityMeterInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
 			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
@@ -59,7 +63,7 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends ZWaveDriver implem
 		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
 		
 		// create a logger
-		logger = new DogLogInstance(context);
+		logger = new LogHelper(context);
 		
 		// initialize states
 		this.initializeStates();

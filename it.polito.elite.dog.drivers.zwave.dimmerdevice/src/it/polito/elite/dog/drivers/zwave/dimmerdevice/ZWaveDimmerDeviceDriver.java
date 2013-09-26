@@ -1,25 +1,29 @@
 /*
  * Dog  - Z-Wave
  * 
- * Copyright [2013] 
- * [Davide Aimone (aimone.dav@gmail.com)]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
+ * Copyright 2013 Davide Aimone  and Dario Bonino 
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.drivers.zwave.dimmerdevice;
 
 import it.polito.elite.dog.drivers.zwave.gateway.ZWaveGatewayDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.domotics.dog2.doglibrary.DogDeviceCostants;
-import it.polito.elite.domotics.dog2.doglibrary.devicecategory.ControllableDevice;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.devicecategory.DimmableLight;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.core.library.model.devicecategory.DimmableLight;
 
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -36,7 +40,6 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
-import org.osgi.service.log.LogService;
 
 public class ZWaveDimmerDeviceDriver implements Driver, ManagedService
 {
@@ -44,7 +47,7 @@ public class ZWaveDimmerDeviceDriver implements Driver, ManagedService
 	protected BundleContext context;
 	
 	// System logger
-	LogService logger;
+	LogHelper logger;
 	
 	// the log identifier, unique for the class
 	public static String LOG_ID = "[ZWaveDimmableDeviceDriver]: ";
@@ -90,7 +93,7 @@ public class ZWaveDimmerDeviceDriver implements Driver, ManagedService
 	public void activate(BundleContext bundleContext)
 	{
 		// init the logger
-		logger = new DogLogInstance(bundleContext);
+		logger = new LogHelper(bundleContext);
 		
 		// store the context
 		context = bundleContext;
@@ -136,10 +139,10 @@ public class ZWaveDimmerDeviceDriver implements Driver, ManagedService
 		int matchValue = Device.MATCH_NONE;
 		
 		// get the given device category
-		String deviceCategory = (String) reference.getProperty(DogDeviceCostants.DEVICE_CATEGORY);
+		String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
 		
 		// get the given device manufacturer
-		String manifacturer = (String) reference.getProperty(DogDeviceCostants.MANUFACTURER);
+		String manifacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
 		
 		// get the gateway to which the device is connected
 		@SuppressWarnings("unchecked")
@@ -212,7 +215,7 @@ public class ZWaveDimmerDeviceDriver implements Driver, ManagedService
 			// create a new property object describing this driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
 			// add the id of this driver to the properties
-			propDriver.put(DogDeviceCostants.DRIVER_ID, DRIVER_ID);
+			propDriver.put(DeviceCostants.DRIVER_ID, DRIVER_ID);
 			// register this driver in the OSGi framework
 			regDriver = context.registerService(Driver.class.getName(), this, propDriver);
 		}
