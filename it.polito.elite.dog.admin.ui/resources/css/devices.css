@@ -91,6 +91,7 @@
 }
 
 .device-singletemperaturesensor,
+.device-temperatureandhumiditysensor,
 .device-temperaturesensor
 {
 	background-image: url("../img/devices/temperature.png");
@@ -301,7 +302,8 @@
 	background-image: url("../img/devices/humidity-sensor.png");
 }
 
-.device-infraredsensor
+.device-infraredsensor,
+.device-movementsensor
 {
 	background-image: url("../img/devices/infrared-sensor.png");
 }
@@ -313,7 +315,8 @@
 
 .device-lamp,
 .device-lampholder,
-.device-lighting
+.device-lighting,
+.device-simplelamp
 {
 	background-image: url("../img/devices/lamp.png");
 }
