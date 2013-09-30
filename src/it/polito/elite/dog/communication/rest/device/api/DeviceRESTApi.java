@@ -26,8 +26,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.codehaus.jettison.json.JSONObject;
-
 /**
  * The interface defining the API for the devices, it permits to:
  * <ul>
@@ -89,7 +87,7 @@ public interface DeviceRESTApi
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void executeCommandPost(@PathParam("device-id") String deviceId,
 			@PathParam("command-name") String commandName,
-			JSONObject commandParameters);
+			String commandParameters);
 
 	/**
 	 * Represents a command, identified by a command-name, to be sent to the
@@ -107,6 +105,6 @@ public interface DeviceRESTApi
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void executeCommandPut(@PathParam("device-id") String deviceId,
 			@PathParam("command-name") String commandName,
-			JSONObject commandParameters);
+			String commandParameters);
 
 }

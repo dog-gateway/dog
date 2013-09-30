@@ -294,7 +294,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Path("{device-id}/commands/{command-name}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void executeCommandPost(@PathParam("device-id") String deviceId, @PathParam("command-name") String commandName,
-			JSONObject commandParameters)
+			String commandParameters)
 	{
 		this.executeCommand(deviceId, commandName, commandParameters);
 	}
@@ -304,7 +304,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Path("{device-id}/commands/{command-name}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void executeCommandPut(@PathParam("device-id") String deviceId, @PathParam("command-name") String commandName,
-			JSONObject commandParameters)
+			String commandParameters)
 	{
 		this.executeCommand(deviceId, commandName, commandParameters);
 	}
@@ -316,7 +316,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	 * @param commandParameters
 	 */
 	private void executeCommand(String deviceId, String commandName,
-			JSONObject commandParameters)
+			String commandParameters)
 	{
 		// get the executor instance
 		Executor executor = Executor.getInstance();
@@ -329,7 +329,11 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			Object param;
 			try
 			{
-				param = commandParameters.get("value");
+				//convert the received JSON String to a JSON object
+				JSONObject commandParametersJSON = new JSONObject(commandParameters);
+				
+				//extract the parameter value./
+				param = commandParametersJSON.get("value");
 
 				// exec the command
 				executor.execute(context, deviceId, commandName,
