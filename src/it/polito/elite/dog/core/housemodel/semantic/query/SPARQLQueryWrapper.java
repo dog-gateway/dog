@@ -386,12 +386,12 @@ public class SPARQLQueryWrapper
 	 * 
 	 * @param entityURI
 	 *            The URI of the object to locate
-	 * @return A {@link Set}<{@link String}> of locations
+	 * @return A {@link String} representing the location
 	 */
-	public Set<String> getEntityLocationInRoom(String entityURI)
+	public String getEntityLocationInRoom(String entityURI)
 	{
 		// get the location if possible
-		Set<String> locations = new HashSet<String>();
+		String location = "";
 		
 		// the query
 		String qBody = "SELECT DISTINCT ?loc WHERE {<" + entityURI + "> dogOnt:isIn ?loc}";
@@ -407,11 +407,11 @@ public class SPARQLQueryWrapper
 			sol = res.next();
 			if (sol != null)
 				// if the location is not null....store it
-				locations.add(sol.getResource("loc").getLocalName());
+				location = sol.getResource("loc").getLocalName();
 		}
 		
 		// return found locations
-		return locations;
+		return location;
 	}
 	
 	/**

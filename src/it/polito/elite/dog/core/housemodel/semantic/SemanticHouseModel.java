@@ -605,7 +605,7 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 		// getting
 		// the low level information needed to answer the get config request
 		Map<String, String> basicData;
-		Set<String> locations;
+		String location;
 		Set<String> propDevices = null;
 		Set<String> propCmds = null;
 		Set<String> propNotifs = null;
@@ -622,7 +622,7 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 					basicData.get(DeviceCostants.MANUFACTURER));
 			
 			// the location
-			locations = this.qWrapper.getEntityLocationInRoom(devURI);
+			location = this.qWrapper.getEntityLocationInRoom(devURI);
 			
 			// the gateway
 			gateway = this.qWrapper.getHasGateway(devURI);
@@ -654,7 +654,7 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 			devDesc.setPluggedIn(this.qWrapper.getPluggedIn(devURI));
 			
 			// add the location
-			devDesc.setDevLocations(locations);
+			devDesc.setDevLocation(location);
 			
 			// check manufacturer null
 			if (devDesc.getDevTechnology() == null)
