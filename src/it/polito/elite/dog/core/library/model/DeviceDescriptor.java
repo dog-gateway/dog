@@ -60,7 +60,7 @@ public class DeviceDescriptor extends Properties implements Serializable
 	private String pluggedIn;
 	private String sensorOf;
 	private String actuatorOf;
-	private Set<String> devLocations;
+	private String devLocation;
 	private Map<String, Set<String>> devSimpleConfigurationParams;
 	private Set<ElementDescription> devCommandSpecificParams;
 	private Set<ElementDescription> devNotificationSpecificParams;
@@ -95,7 +95,7 @@ public class DeviceDescriptor extends Properties implements Serializable
 	 *            plants)
 	 */
 	public DeviceDescriptor(String devURI, String devCategory, String devDescription, String devTechnology,
-			Set<String> devLocations, Map<String, Set<String>> devSimpleConfigurationParams,
+			String devLocation, Map<String, Set<String>> devSimpleConfigurationParams,
 			Set<ElementDescription> devCommandSpecificParams,
 			Set<ElementDescription> devNotificationSpecificParams)
 	{
@@ -103,7 +103,7 @@ public class DeviceDescriptor extends Properties implements Serializable
 		this.devCategory = devCategory;
 		this.devDescription = devDescription;
 		this.devTechnology = devTechnology;
-		this.devLocations = devLocations;
+		this.devLocation = devLocation;
 		this.devSimpleConfigurationParams = devSimpleConfigurationParams;
 		this.devCommandSpecificParams = devCommandSpecificParams;
 		this.devNotificationSpecificParams = devNotificationSpecificParams;
@@ -132,14 +132,14 @@ public class DeviceDescriptor extends Properties implements Serializable
 	 *            rooms that are connected through it.
 	 */
 	public DeviceDescriptor(String devURI, String devCategory, String devDescription, String devTechnology,
-			Set<String> devLocations)
+			String devLocation)
 	{
 		super();
 		this.devURI = devURI;
 		this.devCategory = devCategory;
 		this.devDescription = devDescription;
 		this.devTechnology = devTechnology;
-		this.devLocations = devLocations;
+		this.devLocation = devLocation;
 		this.devSimpleConfigurationParams = new HashMap<String, Set<String>>();
 		this.devCommandSpecificParams = new HashSet<ElementDescription>();
 		this.devNotificationSpecificParams = new HashSet<ElementDescription>();
@@ -170,7 +170,7 @@ public class DeviceDescriptor extends Properties implements Serializable
 		this.devCategory = devCategory;
 		this.devDescription = devDescription;
 		this.devTechnology = devTechnology;
-		this.devLocations = new HashSet<String>();
+		this.devLocation = "";
 		this.devSimpleConfigurationParams = new HashMap<String, Set<String>>();
 		this.devCommandSpecificParams = new HashSet<ElementDescription>();
 		this.devNotificationSpecificParams = new HashSet<ElementDescription>();
@@ -382,9 +382,9 @@ public class DeviceDescriptor extends Properties implements Serializable
 	 * @return A {@link Set} of location URIs indicating the rooms in which the
 	 *         device is located
 	 */
-	public Set<String> getDevLocations()
+	public String getDevLocation()
 	{
-		return devLocations;
+		return devLocation;
 	}
 	
 	/**
@@ -394,16 +394,16 @@ public class DeviceDescriptor extends Properties implements Serializable
 	 *            A {@link Set} of location URIs indicating the rooms in which
 	 *            the device is located
 	 */
-	public void setDevLocations(Set<String> devLocations)
+	public void setDevLocation(String devLocation)
 	{
-		this.devLocations = devLocations;
+		this.devLocation = devLocation;
 	}
 	
 	public boolean addDevLocation(String location)
 	{
-		if ((this.devLocations != null) && (location != null) && (!location.isEmpty()))
+		if ((this.devLocation != null) && (location != null) && (!location.isEmpty()))
 		{
-			this.devLocations.add(location);
+			this.devLocation = location;
 			return true;
 		}
 		else
@@ -548,18 +548,17 @@ public class DeviceDescriptor extends Properties implements Serializable
 	{
 		this.devTechnology = devTechnology;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("<![CDATA[\n");
 		sb.append("Device URI " + this.devURI + "\n");
-		sb.append("DeviceCategory " + this.devCategory + "\n");
-		sb.append("Device description " + this.devDescription + "\n");
+		sb.append("Device Location " + this.devLocation + "\n");
+		sb.append("Device Description " + this.devDescription + "\n");
+		sb.append("Device Category " + this.devCategory + "\n");
 		sb.append("Device Technology " + this.devTechnology + "\n");
 		sb.append("Device Gateway " + this.gateway + "\n");
-		sb.append("]]>\n");
 		return sb.toString();
 	}
 	
