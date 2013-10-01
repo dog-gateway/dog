@@ -19,6 +19,7 @@ package it.polito.elite.dog.core.housemodel.api;
 
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -32,17 +33,67 @@ import java.util.Vector;
 public interface HouseModel
 {
 	/**
+	 * Update the list of devices configured in the real environment.
+	 * 
+	 * @param descriptors
+	 *            a {@link Vector} of {@link DeviceDescriptor} containing the
+	 *            information about the devices to update
+	 */
+	public void updateConfiguration(Vector<DeviceDescriptor> updatedDescriptors);
+	
+	/**
+	 * Update a device configured in the real environment
+	 * 
+	 * @param updatedDescriptor
+	 *            the information about the device to update
+	 */
+	public void updateConfiguration(DeviceDescriptor updatedDescriptor);
+	
+	/**
+	 * Add a list of devices to the current configuration
+	 * 
+	 * @param newDescriptors
+	 *            a {@link Vector} of {@link DeviceDescriptor} containing the
+	 *            information about the devices to add
+	 */
+	public void addToConfiguration(Vector<DeviceDescriptor> newDescriptors);
+	
+	/**
+	 * Add a device to the current configuration
+	 * 
+	 * @param newDescriptor
+	 *            the information about the device to add
+	 */
+	public void addToConfiguration(DeviceDescriptor newDescriptor);
+	
+	/**
+	 * Remove a list of devices from the current configuration
+	 * 
+	 * @param removedDescriptors
+	 *            a {@link Set} of {@link String} representing the device URIs
+	 */
+	public void removeFromConfiguration(Set<String> deviceURIs);
+	
+	/**
+	 * Remove a device from the current configuration
+	 * 
+	 * @param removedDescriptor
+	 *            the URI of the device to remove
+	 */
+	public void removeFromConfiguration(String deviceURI);
+	
+	/**
 	 * Get the list of the devices configured in the real environment.
 	 * 
-	 * @return a Vector of DeviceDescriptor containing all the devices
-	 *         information
+	 * @return a {@link Vector} of {@link DeviceDescriptor} containing the
+	 *         information about the configured devices
 	 */
 	public Vector<DeviceDescriptor> getConfiguration();
 	
 	/**
 	 * Get the SVG house plan.
 	 * 
-	 * @return the SVG representing the current environment
+	 * @return a SVG image representing the current environment
 	 */
 	public String getSVGPlan();
 }

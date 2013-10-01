@@ -5,7 +5,7 @@ Bundle-SymbolicName: it.polito.elite.dog.core.housemodel.simple
 Bundle-Version: 1.0.0.pre
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .
-Export-Package: it.polito.elite.dog.core.housemodel.api;version="1.0.0"
+Export-Package: it.polito.elite.dog.core.housemodel.api;version="1.1.0"
 Import-Package: it.polito.elite.dog.core.library.jaxb;version="1.0.0",
  it.polito.elite.dog.core.library.model;version="1.0.0",
  it.polito.elite.dog.core.library.model.notification;version="1.0.0",

@@ -18,7 +18,6 @@
 package it.polito.elite.dog.core.housemodel.simple;
 
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
-import it.polito.elite.dog.core.housemodel.api.ModelUpdate;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
 import it.polito.elite.dog.core.library.jaxb.Configparam;
@@ -29,11 +28,7 @@ import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
-import it.polito.elite.dog.core.library.model.notification.core.AddedNewDeviceNotification;
-import it.polito.elite.dog.core.library.model.notification.core.RemovedDeviceNotification;
-import it.polito.elite.dog.core.library.model.notification.core.UpdatedModelNotification;
 import it.polito.elite.dog.core.library.util.ElementDescription;
-import it.polito.elite.dog.core.library.util.EventFactory;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.BufferedReader;
@@ -44,8 +39,8 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -56,8 +51,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 
 /**
@@ -70,7 +63,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
+public class SimpleHouseModel implements HouseModel, ManagedService
 {
 	// bundle context
 	private BundleContext context;
@@ -84,20 +77,16 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 	private DogHomeConfiguration xlmConfiguration;
 	// the logger
 	private LogHelper logger;
-	// reference to the Event Admin
-	private AtomicReference<EventAdmin> eventAdmin;
 	
-	// ModelUpdate service registration
-	private ServiceRegistration<?> srModelUpdate;
 	// HouseModel service registration
 	private ServiceRegistration<?> srHouseModel;
 	
 	/**
-	 * Class constructor
+	 * Default (empty) constructor
 	 */
 	public SimpleHouseModel()
 	{
-		this.eventAdmin = new AtomicReference<EventAdmin>();
+		
 	}
 	
 	/**
@@ -134,7 +123,6 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 		this.svgPlan = null;
 		
 		this.srHouseModel = null;
-		this.srModelUpdate = null;
 	}
 	
 	/***
@@ -146,32 +134,6 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 		{
 			this.srHouseModel.unregister();
 		}
-		if (this.srModelUpdate != null)
-		{
-			this.srModelUpdate.unregister();
-		}
-	}
-	
-	/**
-	 * Bind this component to the EventAdmin
-	 * 
-	 * @param ea
-	 *            the EventAdmin service to bind
-	 */
-	public void addedEventAdmin(EventAdmin ea)
-	{
-		this.eventAdmin.set(ea);
-	}
-	
-	/**
-	 * Unbind this component
-	 * 
-	 * @param ea
-	 *            the EventAdmin instance to remove
-	 */
-	public void removedEventAdmin(EventAdmin ea)
-	{
-		this.eventAdmin.compareAndSet(ea, null);
 	}
 	
 	/**
@@ -254,6 +216,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 				DeviceDescriptor deviceDescriptor = new DeviceDescriptor(dev.getName());
 				deviceDescriptor.setDevTechnology(dev.getDomoticSystem());
 				deviceDescriptor.setDevCategory(dev.getClazz());
+				deviceDescriptor.setDevLocation(dev.getIsIn());
 				deviceDescriptor.setGateway(dev.getGateway());
 				
 				// actuator
@@ -338,11 +301,10 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 	 */
 	private void registerServices()
 	{
-		if (this.srHouseModel == null && this.srModelUpdate == null)
+		if (this.srHouseModel == null)
 		{
-			// register offered service
+			// register the offered service
 			this.srHouseModel = this.context.registerService(HouseModel.class.getName(), this, null);
-			this.srModelUpdate = this.context.registerService(ModelUpdate.class.getName(), this, null);
 		}
 	}
 	
@@ -351,6 +313,55 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 	 * HouseModel service - implemented methods
 	 * 
 	 ********************************************************************************/
+	@Override
+	public void updateConfiguration(Vector<DeviceDescriptor> updatedDescriptors)
+	{
+		for(DeviceDescriptor descriptor : updatedDescriptors)
+		{
+			this.updateConfiguration(descriptor);
+		}
+	}
+	
+	@Override
+	public void updateConfiguration(DeviceDescriptor updatedDescriptor)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void addToConfiguration(Vector<DeviceDescriptor> newDescriptors)
+	{
+		for(DeviceDescriptor descriptor : newDescriptors)
+		{
+			this.addToConfiguration(descriptor);
+		}
+	}
+	
+	@Override
+	public void addToConfiguration(DeviceDescriptor newDescriptor)
+	{
+		// TODO review
+		this.addNewDeviceImpl(newDescriptor);
+	}
+	
+	@Override
+	public void removeFromConfiguration(Set<String> deviceURIs)
+	{
+		for(String device : deviceURIs)
+		{
+			this.removeFromConfiguration(device);
+		}
+	}
+	
+	@Override
+	public void removeFromConfiguration(String deviceURI)
+	{
+		// TODO review
+		this.removeDeviceImpl(deviceURI);
+		
+	}
+	
 	@Override
 	public Vector<DeviceDescriptor> getConfiguration()
 	{
@@ -393,7 +404,8 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 		HashSet<String> conditionDeviceCategories = null;
 		
 		if (condition == null)
-		{ // get all the devices
+		{
+			// get all the devices
 			conditionDevices = new HashSet<String>(this.deviceList.keySet());
 		}
 		else
@@ -443,50 +455,6 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 		return devicesProp;
 	}
 	
-	/*********************************************************************************
-	 * 
-	 * ModelUpdate service - implemented methods
-	 * 
-	 ********************************************************************************/
-	
-	@Override
-	public void addNewDevice(DeviceDescriptor descriptor)
-	{
-		this.addNewDeviceImpl(descriptor);
-	}
-	
-	@Override
-	public void removeDevice(String deviceURI)
-	{
-		this.removeDeviceImpl(deviceURI);
-	}
-	
-	@Override
-	public void setDeviceLocation(String deviceURI, String deviceLocation)
-	{
-		this.setDeviceLocationImpl(deviceURI, deviceLocation);
-	}
-	
-	/**
-	 * Effective implementation of the setDeviceLocation method. By using this
-	 * method, it is possible to change/set the location of an existing device.
-	 * 
-	 * @param deviceURI
-	 *            the device URI
-	 * @param deviceLocation
-	 *            the new device location
-	 */
-	private void setDeviceLocationImpl(String deviceURI, String deviceLocation)
-	{
-		DeviceDescriptor deviceProp = this.deviceList.get(deviceURI);
-		if (deviceProp != null)
-		{
-			deviceProp.put(DeviceCostants.DEVICELOCATION, deviceLocation);
-		}
-		// notify the update
-		this.notifyModelUpdated();
-	}
-	
 	/**
 	 * Effective implementation of the removeDevice method. It allows to remove
 	 * an existing device from the running framework.
@@ -494,6 +462,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 	 * @param deviceURI
 	 *            the device URI to remove
 	 */
+	// TODO review
 	private void removeDeviceImpl(String deviceURI)
 	{
 		DeviceDescriptor deviceProp = this.deviceList.remove(deviceURI);
@@ -529,8 +498,6 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 				this.xlmConfiguration.getControllables().get(0).getDevice().remove(removedDevice);
 			}
 		}
-		// notify the change
-		this.notifyRemovedDevice(new DeviceDescriptor(deviceURI));
 		
 	}
 	
@@ -541,6 +508,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 	 * @param deviceDescriptor
 	 *            the information about the device to add
 	 */
+	// TODO review
 	private void addNewDeviceImpl(DeviceDescriptor deviceDescriptor)
 	{
 		this.deviceList.put(deviceDescriptor.getDevURI(), deviceDescriptor);
@@ -565,103 +533,20 @@ public class SimpleHouseModel implements HouseModel, ManagedService, ModelUpdate
 			newDevice.setName(deviceDescriptor.getDevURI());
 			newDevice.setClazz(deviceDescriptor.getDevCategory());
 			newDevice.setDomoticSystem(deviceDescriptor.getDevTechnology());
-			if (deviceDescriptor.getDevLocations().size() == 0)
+			if (!deviceDescriptor.getDevLocation().isEmpty())
 			{
 				// set a defaul location
 				newDevice.setIsIn("Flat");
 			}
 			else
 			{
-				newDevice.setIsIn(deviceDescriptor.getDevLocations().iterator().next());
+				newDevice.setIsIn(deviceDescriptor.getDevLocation());
 			}
 			newDevice.setDescription(deviceDescriptor.getDevDescription());
 			
 			this.xlmConfiguration.getControllables().get(0).getDevice().add(newDevice);
 			
 		}
-		// notify the change
-		this.notifyAddedNewDeviced(deviceDescriptor);
-	}
-	
-	/*********************************************************************************
-	 * 
-	 * Methods for supporting the EventAdmin notification
-	 * 
-	 ********************************************************************************/
-	/**
-	 * Notify that the model has been updated (e.g., a new location has been set
-	 * for a device).
-	 */
-	public synchronized void notifyModelUpdated()
-	{
-		// get a pointer to the EventAdmin service
-		EventAdmin ea = eventAdmin.get();
-		
-		// if the EventAdmin is available
-		if (ea != null)
-		{
-			// Create the notification
-			UpdatedModelNotification notification = new UpdatedModelNotification();
-			// Create the event
-			Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
-			// Send the event to the EventAdmin
-			ea.postEvent(event);
-		}
-		
-	}
-	
-	/**
-	 * Notify that a new device has been added.
-	 * 
-	 * @param desc
-	 *            the {@link DeviceDescriptor} describing the newly added device
-	 */
-	public synchronized void notifyAddedNewDeviced(DeviceDescriptor desc)
-	{
-		// get a pointer to the EventAdmin service
-		EventAdmin ea = eventAdmin.get();
-		
-		// if the EventAdmin is available
-		if (ea != null)
-		{
-			// Create the notification
-			AddedNewDeviceNotification notification = new AddedNewDeviceNotification(desc);
-			// Create the event
-			Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
-			// Send the event to the EventAdmin
-			ea.postEvent(event);
-		}
-		
-		// send also a generic update notification
-		this.notifyModelUpdated();
-		
-	}
-	
-	/**
-	 * Notify that a device has been removed from the framework.
-	 * 
-	 * @param desc
-	 *            the {@link DeviceDescriptor} describing the removed device
-	 */
-	public void notifyRemovedDevice(DeviceDescriptor desc)
-	{
-		// get a pointer to the EventAdmin service
-		EventAdmin ea = eventAdmin.get();
-		
-		// if the EventAdmin is available
-		if (ea != null)
-		{
-			// Create the notification
-			RemovedDeviceNotification notification = new RemovedDeviceNotification(desc);
-			// Create the event
-			Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
-			// Send the event to the EventAdmin
-			ea.postEvent(event);
-		}
-		
-		// send also a generic update notification
-		this.notifyModelUpdated();
-		
 	}
 	
 	/*********************************************************************************
