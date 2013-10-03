@@ -197,29 +197,30 @@ public class DeviceFactoryImpl implements DeviceFactory
 	}
 	
 	@Override
-	// TODO review
 	public void addNewDevice(DeviceDescriptor descriptor)
 	{
 		// update the model
 		houseModel.get().addToConfiguration(descriptor);
 		
+		// get the device URI
 		String deviceUri = descriptor.getDevURI();
-		// log
-		this.logger.log(LogService.LOG_INFO, "Adding " + deviceUri);
 		
-		// check if the device exists...
+		// log
+		this.logger.log(LogService.LOG_INFO, "Adding " + deviceUri + "...");
+		
+		// check if the device already exists...
 		String deviceFilter = String.format("(%s=%s)", DeviceCostants.DEVICEURI, deviceUri);
 		try
 		{
 			ServiceReference<?> references[] = this.context.getServiceReferences(Device.class.getName(), deviceFilter);
 			if (references == null)
 			{
-				// it creates the device from a property set
+				// the device does not exists, so we can create it
 				this.createDeviceFromDeviceDescriptor(descriptor);
 			}
 			else
 			{
-				// log a warning
+				// the device already exist... log a warning
 				this.logger.log(LogService.LOG_WARNING, "Device " + deviceUri
 						+ " already exist. Skipping its creation...");
 			}
@@ -234,14 +235,13 @@ public class DeviceFactoryImpl implements DeviceFactory
 	}
 	
 	@Override
-	// TODO review
 	public void removeDevice(String deviceURI)
 	{
 		// update the model
 		this.houseModel.get().removeFromConfiguration(deviceURI);
 		
 		// log
-		this.logger.log(LogService.LOG_INFO, "Removing " + deviceURI);
+		this.logger.log(LogService.LOG_INFO, "Removing " + deviceURI + "...");
 		
 		// get the device from the framework
 		String deviceFilter = String.format("(%s=%s)", DeviceCostants.DEVICEURI, deviceURI);
@@ -251,7 +251,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 			if (references != null)
 			{
 				AbstractDevice device = (AbstractDevice) this.context.getService(references[0]);
-				// remove the device!
+				// effectively remove the device
 				device.removeDevice();
 				
 				// log success
@@ -275,7 +275,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 		catch (Exception e)
 		{
 			// error in removing the device
-			this.logger.log(LogService.LOG_ERROR, "Exception while destroying " + deviceURI, e);
+			this.logger.log(LogService.LOG_ERROR, "Exception while removing " + deviceURI, e);
 		}
 		
 	}

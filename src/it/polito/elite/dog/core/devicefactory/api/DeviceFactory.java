@@ -20,16 +20,16 @@ package it.polito.elite.dog.core.devicefactory.api;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 
 /**
- * This interface describes the ability of a HouseModel bundle to accept and
- * model new devices, dynamically added at runtime. Dynamic management of
- * devices is particularly important for wireless networks such as Z-Wave and
- * ZigBee where devices may join (be associated) or leave (be dissociated) the
- * network with which Dog interacts.
+ * This interface describes the ability of a DeviceFactory to handle new
+ * devices, dynamically added at runtime. Dynamic management of devices is
+ * particularly important for wireless networks such as Z-Wave and ZigBee where
+ * devices may join (be associated) or leave (be dissociated) the network with
+ * which Dog interacts.
  * 
- * Dynamically added devices shall be stored persistently in the model until an
- * explicit dissociation command is received. Such a requirement is strongly
- * related to the device location, which, once defined, must be retained even if
- * Dog or the Wireless network is shut down.
+ * Dynamically added devices shall be also stored persistently in the model
+ * until an explicit 'remove' command is received. Such a requirement is
+ * strongly related to the device location, which, once defined, must be
+ * retained even if Dog or the wireless network is shut down.
  * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
@@ -39,7 +39,7 @@ import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 public interface DeviceFactory
 {
 	/**
-	 * Requires to add a new device to the HouseModel. The {@link DogMessage}
+	 * Requires to add a new device to the framework. The {@link DogMessage}
 	 * received as parameter contains a {@link DeviceDescriptor} describing the
 	 * main characteristics of the device to be added. Such features include at
 	 * least: the device unique name (URI), the device category and the device
@@ -47,11 +47,21 @@ public interface DeviceFactory
 	 * 
 	 * @param msg
 	 */
+	/**
+	 * Add a new device to the framework and communicate the adding to the
+	 * referred HouseModel. The {@link DeviceDescriptor} received as parameter
+	 * describes the main characteristics of the device to be added. Such
+	 * features include, at least: the device unique name (URI), the device
+	 * category and the device manufacturer.
+	 * 
+	 * @param descriptor
+	 *            the {@link DeviceDescriptor} representing the device to add
+	 */
 	public void addNewDevice(DeviceDescriptor descriptor);
 	
 	/**
-	 * Requires to remove a device (and associated instances in the case of a
-	 * Semantics-based House Model) from a HouseModel.
+	 * Remove a device from the framework and communicate the deletion to the
+	 * referred HouseModel.
 	 * 
 	 * @param deviceURI
 	 *            the URI of the device to be removed
@@ -59,17 +69,11 @@ public interface DeviceFactory
 	public void removeDevice(String deviceURI);
 	
 	/**
-	 * Requires to change the location of a given device, identified by its URI.
-	 * Whenever the addNewDevice message is called, without location, devices
-	 * are added to the top most container instance available in the model
-	 * (typically a Flat or Building instance). Afterwards, a GUI may require
-	 * the user to specify the actual device location and this new location, by
-	 * exploiting this method.
+	 * Update the characteristic of an existing device (e.g., its location
+	 * inside the environment).
 	 * 
-	 * @param deviceURI
-	 *            the URI of the device
-	 * @param deviceLocation
-	 *            the new location for the given device
+	 * @param descriptor
+	 *            the {@link DeviceDescriptor} representing the device to update
 	 */
 	public void updateDevice(DeviceDescriptor descriptor);
 }
