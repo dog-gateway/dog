@@ -91,7 +91,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements ZWaveGate
 	 * starts exclusion process that lasts for 20 seconds
 	 */
 	@Override
-	public void disassociate(String nodeID)  //TODO: remove String nodeID
+	public void disassociate()  //TODO: remove String nodeID
 	{
 		// start disassociate process and, after 20 sec reset controller status to normal
 		ZWavePairUnpairThreads pairUnpairThreads = new ZWavePairUnpairThreads(network, logger, false, 20000);
