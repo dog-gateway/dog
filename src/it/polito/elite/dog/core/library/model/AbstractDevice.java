@@ -22,14 +22,11 @@ import it.polito.elite.dog.core.library.model.notification.Notification;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.util.EventFactory;
 import it.polito.elite.dog.core.library.util.LogHelper;
-//import it.polito.elite.domotics.dog2.doglibrary.interfaces.DogMessageListenerInterface;
-//import it.polito.elite.domotics.dog2.doglibrary.message.DogMessage;
 
 import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -428,15 +425,19 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public Set<String> getDeviceLocation()
+	/**
+	 * Get the device location
+	 * 
+	 * @return the location or an empty string if no location has been set
+	 */
+	public String getDeviceLocation()
 	{
 		if (this.deviceProp.containsKey(DeviceCostants.DEVICELOCATION))
 		{
-			return (Set<String>) this.deviceProp.get(DeviceCostants.DEVICELOCATION);
+			return (String) this.deviceProp.get(DeviceCostants.DEVICELOCATION);
 		}
 		else
-			return null;
+			return new String();
 	}
 	
 	@Override

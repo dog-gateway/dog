@@ -103,8 +103,7 @@ public abstract class ControllableDevice implements Device
 		this.deviceProp.put(DeviceCostants.DEVICE_CATEGORY, defaultPackage + "." + deviceDescriptor.getDevCategory());
 		this.deviceProp.put(DeviceCostants.DEVICEURI, deviceDescriptor.getDevURI());
 		this.deviceProp.put(DeviceCostants.MANUFACTURER, deviceDescriptor.getDevTechnology());
-		if (deviceDescriptor.getDevLocation() != null)
-			this.deviceProp.put(DeviceCostants.DEVICELOCATION, deviceDescriptor.getDevLocation());
+		this.deviceProp.put(DeviceCostants.DEVICELOCATION, deviceDescriptor.getDevLocation());
 		this.deviceId = deviceDescriptor.getDevURI();
 		this.deviceDescriptor = deviceDescriptor;
 	}

@@ -399,17 +399,6 @@ public class DeviceDescriptor extends Properties implements Serializable
 		this.devLocation = devLocation;
 	}
 	
-	public boolean addDevLocation(String location)
-	{
-		if ((this.devLocation != null) && (location != null) && (!location.isEmpty()))
-		{
-			this.devLocation = location;
-			return true;
-		}
-		else
-			return false;
-	}
-	
 	/**
 	 * Provide the {@link Map} containing all device configuration parameters in
 	 * name - value couples
