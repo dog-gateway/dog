@@ -229,7 +229,6 @@ public class DeviceFactoryImpl implements DeviceFactory
 		{
 			// error in the device creation
 			this.logger.log(LogService.LOG_ERROR, "Exception while creating " + descriptor, e);
-			
 		}
 		
 	}
@@ -280,14 +279,39 @@ public class DeviceFactoryImpl implements DeviceFactory
 		
 	}
 	
-	// TODO complete
 	@Override
 	public void updateDevice(DeviceDescriptor descriptor)
 	{
 		// update the HouseModel
+		this.houseModel.get().updateConfiguration(descriptor);
 		
-		// get the device from the framework
+		// get the device URI
+		String deviceUri = descriptor.getDevURI();
 		
-		// update the device in the framework
+		// log
+		this.logger.log(LogService.LOG_INFO, "Updating " + deviceUri + "...");
+		
+		// get the device from the framework...
+		String deviceFilter = String.format("(%s=%s)", DeviceCostants.DEVICEURI, deviceUri);
+		try
+		{
+			ServiceReference<?> references[] = this.context.getServiceReferences(Device.class.getName(), deviceFilter);
+			if (references != null && references.length == 1)
+			{
+				AbstractDevice device = (AbstractDevice) this.context.getService(references[0]);
+				/*
+				 * TODO The descriptor MUST contain all the information about
+				 * the device, not only the one(s) updated. Check if this
+				 * constraint is too strong!
+				 */
+				// update the device in the framework
+				device.setDeviceProperties(descriptor);
+			}
+		}
+		catch (Exception e)
+		{
+			// error in updating the device
+			this.logger.log(LogService.LOG_ERROR, "Exception while updating " + descriptor, e);
+		}
 	}
 }
