@@ -38,7 +38,7 @@ public interface ZWaveGateway extends HomeGateway
 
 	public DeviceStatus getState();
 	public void associate();
-	public void disassociate(String nodeID);
+	public void disassociate();
 
 
 	/*Generated Notifications*/
