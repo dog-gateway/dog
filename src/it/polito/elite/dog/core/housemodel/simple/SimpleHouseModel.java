@@ -216,7 +216,11 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 				DeviceDescriptor deviceDescriptor = new DeviceDescriptor(dev.getName());
 				deviceDescriptor.setDevTechnology(dev.getDomoticSystem());
 				deviceDescriptor.setDevCategory(dev.getClazz());
-				deviceDescriptor.setDevLocation(dev.getIsIn());
+				if (dev.getIsIn() != null)
+					deviceDescriptor.setDevLocation(dev.getIsIn());
+				else
+					deviceDescriptor.setDevLocation("");
+				deviceDescriptor.setDevDescription(dev.getDescription());
 				deviceDescriptor.setGateway(dev.getGateway());
 				
 				// actuator
@@ -316,7 +320,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	@Override
 	public void updateConfiguration(Vector<DeviceDescriptor> updatedDescriptors)
 	{
-		for(DeviceDescriptor descriptor : updatedDescriptors)
+		for (DeviceDescriptor descriptor : updatedDescriptors)
 		{
 			this.updateConfiguration(descriptor);
 		}
@@ -332,7 +336,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	@Override
 	public void addToConfiguration(Vector<DeviceDescriptor> newDescriptors)
 	{
-		for(DeviceDescriptor descriptor : newDescriptors)
+		for (DeviceDescriptor descriptor : newDescriptors)
 		{
 			this.addToConfiguration(descriptor);
 		}
@@ -341,14 +345,43 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	@Override
 	public void addToConfiguration(DeviceDescriptor newDescriptor)
 	{
-		// TODO review
-		this.addNewDeviceImpl(newDescriptor);
+		// add the device into the device list
+		this.deviceList.put(newDescriptor.getDevURI(), newDescriptor);
+		
+		// add the device into the category list
+		HashSet<String> deviceUris = null;
+		if (this.deviceCategoriesUriList.containsKey(newDescriptor.getDevCategory()))
+		{
+			deviceUris = this.deviceCategoriesUriList.get(newDescriptor.getDevCategory());
+		}
+		else
+		{
+			deviceUris = new HashSet<String>();
+			this.deviceCategoriesUriList.put(newDescriptor.getDevCategory(), deviceUris);
+		}
+		deviceUris.add(newDescriptor.getDevURI());
+		
+		// add the new device into the XML configuration
+		if (this.xlmConfiguration != null)
+		{
+			ObjectFactory factory = new ObjectFactory();
+			Device newDevice = factory.createDevice();
+			
+			newDevice.setName(newDescriptor.getDevURI());
+			newDevice.setClazz(newDescriptor.getDevCategory());
+			newDevice.setDomoticSystem(newDescriptor.getDevTechnology());
+			newDevice.setIsIn(newDescriptor.getDevLocation());
+			newDevice.setDescription(newDescriptor.getDevDescription());
+			
+			this.xlmConfiguration.getControllables().get(0).getDevice().add(newDevice);
+			
+		}
 	}
 	
 	@Override
 	public void removeFromConfiguration(Set<String> deviceURIs)
 	{
-		for(String device : deviceURIs)
+		for (String device : deviceURIs)
 		{
 			this.removeFromConfiguration(device);
 		}
@@ -357,8 +390,44 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	@Override
 	public void removeFromConfiguration(String deviceURI)
 	{
-		// TODO review
-		this.removeDeviceImpl(deviceURI);
+		// remove the device from the device list
+		DeviceDescriptor deviceProp = this.deviceList.remove(deviceURI);
+		
+		// remove the device from the category list
+		if (deviceProp != null)
+		{
+			String deviceCategory = deviceProp.getDevCategory();
+			if (deviceCategory != null)
+			{
+				HashSet<String> devices = this.deviceCategoriesUriList.get(deviceCategory);
+				if (devices != null)
+				{
+					devices.remove(deviceURI);
+				}
+			}
+		}
+		
+		// remove the device from the XML configuration
+		if (this.xlmConfiguration != null)
+		{
+			Device removedDevice = null;
+			List<Device> devices = this.xlmConfiguration.getControllables().get(0).getDevice();
+			boolean found = false;
+			for (int i = 0; i < devices.size() && !found; i++)
+			{
+				Device device = devices.get(i);
+				if (device.getName().equals(deviceURI))
+				{
+					removedDevice = device;
+					found = true;
+				}
+				
+			}
+			if (removedDevice != null)
+			{
+				this.xlmConfiguration.getControllables().get(0).getDevice().remove(removedDevice);
+			}
+		}
 		
 	}
 	
@@ -453,100 +522,6 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 			
 		}
 		return devicesProp;
-	}
-	
-	/**
-	 * Effective implementation of the removeDevice method. It allows to remove
-	 * an existing device from the running framework.
-	 * 
-	 * @param deviceURI
-	 *            the device URI to remove
-	 */
-	// TODO review
-	private void removeDeviceImpl(String deviceURI)
-	{
-		DeviceDescriptor deviceProp = this.deviceList.remove(deviceURI);
-		if (deviceProp != null)
-		{
-			String deviceCategory = deviceProp.getProperty(DeviceCostants.DEVICE_CATEGORY);
-			if (deviceCategory != null)
-			{
-				HashSet<String> devices = this.deviceCategoriesUriList.get(deviceCategory);
-				if (devices != null)
-				{
-					devices.remove(deviceURI);
-				}
-			}
-		}
-		if (this.xlmConfiguration != null)
-		{
-			Device removedDevice = null;
-			List<Device> devices = this.xlmConfiguration.getControllables().get(0).getDevice();
-			boolean found = false;
-			for (int i = 0; i < devices.size() && !found; i++)
-			{
-				Device device = devices.get(i);
-				if (device.getName().equals(deviceURI))
-				{
-					removedDevice = device;
-					found = true;
-				}
-				
-			}
-			if (removedDevice != null)
-			{
-				this.xlmConfiguration.getControllables().get(0).getDevice().remove(removedDevice);
-			}
-		}
-		
-	}
-	
-	/**
-	 * Effective implementation of the addNewDevice method. It adds a new device
-	 * to the running framework.
-	 * 
-	 * @param deviceDescriptor
-	 *            the information about the device to add
-	 */
-	// TODO review
-	private void addNewDeviceImpl(DeviceDescriptor deviceDescriptor)
-	{
-		this.deviceList.put(deviceDescriptor.getDevURI(), deviceDescriptor);
-		HashSet<String> deviceUris = null;
-		
-		if (this.deviceCategoriesUriList.containsKey(deviceDescriptor.getDevCategory()))
-		{
-			deviceUris = this.deviceCategoriesUriList.get(deviceDescriptor.getDevCategory());
-		}
-		else
-		{
-			deviceUris = new HashSet<String>();
-			this.deviceCategoriesUriList.put(deviceDescriptor.getDevCategory(), deviceUris);
-		}
-		deviceUris.add(deviceDescriptor.getDevURI());
-		
-		if (this.xlmConfiguration != null)
-		{
-			ObjectFactory factory = new ObjectFactory();
-			Device newDevice = factory.createDevice();
-			
-			newDevice.setName(deviceDescriptor.getDevURI());
-			newDevice.setClazz(deviceDescriptor.getDevCategory());
-			newDevice.setDomoticSystem(deviceDescriptor.getDevTechnology());
-			if (!deviceDescriptor.getDevLocation().isEmpty())
-			{
-				// set a defaul location
-				newDevice.setIsIn("Flat");
-			}
-			else
-			{
-				newDevice.setIsIn(deviceDescriptor.getDevLocation());
-			}
-			newDevice.setDescription(deviceDescriptor.getDevDescription());
-			
-			this.xlmConfiguration.getControllables().get(0).getDevice().add(newDevice);
-			
-		}
 	}
 	
 	/*********************************************************************************

@@ -24,7 +24,7 @@ import java.util.Vector;
 
 /**
  * The API for providing the HouseModel service, i.e., the configuration of the
- * environment.
+ * environment and its update.
  * 
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
