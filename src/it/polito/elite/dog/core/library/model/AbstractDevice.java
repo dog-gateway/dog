@@ -425,21 +425,6 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		}
 	}
 	
-	/**
-	 * Get the device location
-	 * 
-	 * @return the location or an empty string if no location has been set
-	 */
-	public String getDeviceLocation()
-	{
-		if (this.deviceProp.containsKey(DeviceCostants.DEVICELOCATION))
-		{
-			return (String) this.deviceProp.get(DeviceCostants.DEVICELOCATION);
-		}
-		else
-			return new String();
-	}
-	
 	@Override
 	public void noDriverFound()
 	{
