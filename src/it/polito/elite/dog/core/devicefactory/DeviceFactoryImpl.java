@@ -302,7 +302,8 @@ public class DeviceFactoryImpl implements DeviceFactory
 				/*
 				 * TODO The descriptor MUST contain all the information about
 				 * the device, not only the one(s) updated. Check if this
-				 * constraint is too strong!
+				 * constraint is too strong! The alternative is to modify the
+				 * DeviceDescriptor implementation...
 				 */
 				// update the device in the framework
 				device.setDeviceProperties(descriptor);
