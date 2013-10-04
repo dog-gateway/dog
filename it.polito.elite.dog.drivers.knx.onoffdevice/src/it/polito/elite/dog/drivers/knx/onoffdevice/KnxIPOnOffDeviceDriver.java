@@ -214,7 +214,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
 			
 			// add the id of this driver to the properties
-			propDriver.put(DeviceCostants.DRIVER_ID, "KnxIP_ONOFF_driver");
+			propDriver.put(DeviceCostants.DRIVER_ID, KnxIPOnOffDeviceDriver.class.getName());
 			
 			// register this driver in the OSGi framework
 			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);

@@ -156,7 +156,7 @@ public class KnxIPGatewayDriver implements Driver
 		if ((this.network.get() != null) && (this.regDriver == null) && (this.context != null))
 		{
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-			propDriver.put(DeviceCostants.DRIVER_ID, "KnxIP_KnxIPGateway_driver");
+			propDriver.put(DeviceCostants.DRIVER_ID, KnxIPGatewayDriver.class.getName());
 			propDriver.put(DeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
 			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
 			this.regKnxIPGateway = this.context.registerService(KnxIPGatewayDriver.class.getName(), this, null);
