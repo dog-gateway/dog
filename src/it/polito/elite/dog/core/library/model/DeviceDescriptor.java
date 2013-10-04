@@ -532,12 +532,12 @@ public class DeviceDescriptor
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("Device URI " + this.devURI + "\n");
-		sb.append("Device Location " + this.devLocation + "\n");
-		sb.append("Device Description " + this.devDescription + "\n");
-		sb.append("Device Category " + this.devCategory + "\n");
-		sb.append("Device Technology " + this.devTechnology + "\n");
-		sb.append("Device Gateway " + this.gateway + "\n");
+		sb.append("{ ");
+		sb.append("LOCATION = " + this.devLocation + ", ");
+		sb.append("DESCRIPTION = " + this.devDescription + ", ");
+		sb.append("DEVICE_CATEGORY = " + this.devCategory + ", ");
+		sb.append("MANUFACTURER = " + this.devTechnology + ", ");
+		sb.append("GATEWAY = " + this.gateway + " }\n");
 		return sb.toString();
 	}
 	
