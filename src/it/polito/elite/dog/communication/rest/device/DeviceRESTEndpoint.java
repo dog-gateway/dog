@@ -324,7 +324,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// check if a post/put body is given and convert it into an array of
 		// parameters
 		// TODO: check if commands can have more than 1 parameter
-		if (commandParameters != null)
+		if ((commandParameters != null)&&(!commandParameters.isEmpty()))
 		{
 			Object param;
 			try
