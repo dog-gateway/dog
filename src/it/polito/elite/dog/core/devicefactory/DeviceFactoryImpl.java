@@ -193,7 +193,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 		ct.newInstance(arglist);
 		
 		// log success
-		this.logger.log(LogService.LOG_INFO, "Created class " + devDescriptor.toString());
+		this.logger.log(LogService.LOG_INFO, "Created device " + devDescriptor.getDevURI() + " with properties: " + devDescriptor.toString());
 	}
 	
 	@Override
@@ -254,7 +254,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 				device.removeDevice();
 				
 				// log success
-				this.logger.log(LogService.LOG_INFO, "DeviceFactory removed " + deviceURI);
+				this.logger.log(LogService.LOG_INFO, deviceURI + " has been successfully removed!");
 				
 				// log a warning if more than a device exists with
 				// the same URI (it should be impossible by construction, in any
@@ -299,12 +299,6 @@ public class DeviceFactoryImpl implements DeviceFactory
 			if (references != null && references.length == 1)
 			{
 				AbstractDevice device = (AbstractDevice) this.context.getService(references[0]);
-				/*
-				 * TODO The descriptor MUST contain all the information about
-				 * the device, not only the one(s) updated. Check if this
-				 * constraint is too strong! The alternative is to modify the
-				 * DeviceDescriptor implementation...
-				 */
 				// update the device in the framework
 				device.setDeviceProperties(descriptor);
 			}

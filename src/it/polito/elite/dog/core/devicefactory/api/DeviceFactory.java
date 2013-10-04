@@ -70,7 +70,8 @@ public interface DeviceFactory
 	
 	/**
 	 * Update the characteristic of an existing device (e.g., its location
-	 * inside the environment).
+	 * inside the environment). It MUST receive a full and valid
+	 * {@link DeviceDescriptor}.
 	 * 
 	 * @param descriptor
 	 *            the {@link DeviceDescriptor} representing the device to update
