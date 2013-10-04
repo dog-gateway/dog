@@ -154,7 +154,7 @@ public class ModbusGatewayDriver implements Driver
 	private void registerDriver()
 	{
 		Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-		propDriver.put(DeviceCostants.DRIVER_ID, "Modbus_ModbusGateway_driver");
+		propDriver.put(DeviceCostants.DRIVER_ID, ModbusGatewayDriver.class.getName());
 		propDriver.put(DeviceCostants.GATEWAY_COUNT, this.connectedGateways.size());
 		this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
 		this.regModbusGateway = this.context.registerService(ModbusGatewayDriver.class.getName(), this, null);

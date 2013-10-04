@@ -254,7 +254,7 @@ public class ModbusThreePhaseElectricityMeterDriver implements Driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
 			
 			// add the id of this driver to the properties
-			propDriver.put(DeviceCostants.DRIVER_ID, "Modbus_ModbusThreePhaseElectricityMeter_driver");
+			propDriver.put(DeviceCostants.DRIVER_ID, ModbusThreePhaseElectricityMeterDriver.class.getName());
 			
 			// register this driver in the OSGi framework
 			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
