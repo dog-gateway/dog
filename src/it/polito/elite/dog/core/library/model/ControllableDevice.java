@@ -41,8 +41,6 @@ public abstract class ControllableDevice implements Device
 	private DeviceDescriptor deviceDescriptor;
 	private final String defaultPackage = Controllable.class.getPackage().getName();
 	
-	public static final String[] lowlevelProperties = { DeviceCostants.MANUFACTURER, DeviceCostants.CONFIGPARAM };
-	
 	// store the devices properties, defined in the DEVICE_CATEGORY
 	volatile protected Hashtable<String, Object> deviceProp;
 	// unique device identifier (replicated in the deviceProp)
@@ -80,14 +78,9 @@ public abstract class ControllableDevice implements Device
 	{
 		this.parseDescriptor(deviceDescriptor);
 		
-		if (!this.deviceDescriptor.containsKey(DeviceCostants.ACTIVE))
+		if (!this.deviceProp.containsKey(DeviceCostants.ACTIVE))
 		{
 			this.deviceProp.put(DeviceCostants.ACTIVE, "false");
-		}
-		else
-		{
-			String active = (String) this.deviceDescriptor.get(DeviceCostants.ACTIVE);
-			this.deviceProp.put(DeviceCostants.ACTIVE, active);
 		}
 		
 	}

@@ -19,12 +19,10 @@ package it.polito.elite.dog.core.library.model;
 
 import it.polito.elite.dog.core.library.util.ElementDescription;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -41,14 +39,8 @@ import java.util.Set;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class DeviceDescriptor extends Properties implements Serializable
-{
-	
-	/**
-	 * The serial version identifier
-	 */
-	private static final long serialVersionUID = 1L;
-	
+public class DeviceDescriptor
+{	
 	private String devURI;
 	private String devCategory;
 	private String devDescription;
@@ -78,16 +70,14 @@ public class DeviceDescriptor extends Properties implements Serializable
 	 *            device inherits (descending from dogont:Controllable)
 	 * @param devDescription
 	 *            The human-readable description of the device as extracted from
-	 *            the DogOnt ontology
+	 *            the configuration
 	 * @param devTechnology
 	 *            The technology with which the device is realized either
 	 *            BTICINO, KNX or ELITE
-	 * @param devLocations
-	 *            The architectural spaces in which the device is located, it
-	 *            might be in 2 or more places... For example a door isIn all
-	 *            rooms that are connected through it.
+	 * @param devLocation
+	 *            The architectural space in which the device is located.
 	 * @param devSimpleConfigurationParams
-	 *            The configuration parameters of the give device, e.g., the
+	 *            The configuration parameters of the given device, e.g., the
 	 *            group address or the physical type, etc.
 	 * @param devCommandSpecificParams
 	 *            The command specific parameters such as the group address or
