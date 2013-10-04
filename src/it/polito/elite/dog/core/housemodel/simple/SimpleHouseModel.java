@@ -329,8 +329,11 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	@Override
 	public void updateConfiguration(DeviceDescriptor updatedDescriptor)
 	{
-		// TODO Auto-generated method stub
+		// remove the device from the current configuration
+		this.removeFromConfiguration(updatedDescriptor.getDevURI());
 		
+		// add the updated device
+		this.addToConfiguration(updatedDescriptor);
 	}
 	
 	@Override
