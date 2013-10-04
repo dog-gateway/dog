@@ -33,6 +33,8 @@ public class DataConst
 	public static final String LAST_RECEIVED = "lastReceived";
 	public static final String LAST_SEND = "lastSend";
 	public static final String NODE_INFO_FRAME = "nodeInfoFrame";
+	public static final String LAST_INCLUDED_DEVICE = "lastIncludedDevice";
+	public static final String LAST_EXCLUDED_DEVICE = "lastExcludedDevice";
 	
 	//utils
 	public static final int INVALID = -1;

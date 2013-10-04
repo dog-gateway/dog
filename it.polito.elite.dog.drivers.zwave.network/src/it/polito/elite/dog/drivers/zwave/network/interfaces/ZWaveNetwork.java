@@ -17,6 +17,9 @@
  */
 package it.polito.elite.dog.drivers.zwave.network.interfaces;
 
+import java.util.Map;
+
+import it.polito.elite.dog.drivers.zwave.model.Device;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 
@@ -95,4 +98,17 @@ public interface ZWaveNetwork
 	 * @param datapoint
 	 */
 	void removeDriver(ZWaveDriver driver);
+	
+	/**
+	 * Get all raw device data for devices currently available on the network, including those
+	 * that still have to be configured in Dog
+	 * @return
+	 */
+	public Map<Integer, Device> getRawDevices();
+	
+	/**
+	 * Get raw device data on the basis of the given nodeId 
+	 * @return
+	 */
+	public Device getRawDevice(int nodeId);
 }

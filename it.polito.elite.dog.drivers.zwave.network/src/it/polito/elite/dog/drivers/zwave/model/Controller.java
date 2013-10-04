@@ -22,4 +22,13 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class Controller 
 {
 	@JsonProperty("data") private ControllerData controllerData;
+	
+	/**
+	 * Gets the controller data describing this controller
+	 * @return
+	 */
+	public ControllerData getData()
+	{
+		return controllerData;
+	}
 }

@@ -34,6 +34,7 @@ public class ControllerData
 	private String type;
 	private Integer invalidateTime;
 	
+	
 	//dynamic name prop are managed through this map
 	//and through @JsonAnyGetter and @JsonAnySetter annotation
 	private Map<String, DataElemObject> data = new HashMap<String, DataElemObject>(); 
@@ -141,4 +142,25 @@ public class ControllerData
 	public void setInvalidateTime(Integer invalidateTime) {
 		this.invalidateTime = invalidateTime;
 	}
+	
+	public int getLastIncludedDevice()
+	{
+		//the nodeId to return
+		int nodeId = -1;
+		
+		if(this.data.containsKey(DataConst.LAST_INCLUDED_DEVICE))
+		{
+			//get the last included device
+			DataElemObject lastIncludedDevice = this.data.get(DataConst.LAST_INCLUDED_DEVICE);
+			
+			if(lastIncludedDevice.getType().equals("int"))
+			{
+				//get the nodeId
+				nodeId = (Integer)lastIncludedDevice.getValue();
+			}
+		}
+		
+		return nodeId;
+	}
+	
 }
