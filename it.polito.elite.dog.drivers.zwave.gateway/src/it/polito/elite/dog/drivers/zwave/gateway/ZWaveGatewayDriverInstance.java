@@ -37,6 +37,7 @@ import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
@@ -52,16 +53,22 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 
 	// data controller associated with the gateway
 	protected Controller controller;
-	
+
+	// the current list of devices for which dynamic creation can be done
+	private ConcurrentHashMap<String, String> supportedDevices;
+
 	// the device factory reference
 	private DeviceFactory deviceFactory;
 
 	// last included device;
 	private int lastIncludedDevice = -1;
 
-	public ZWaveGatewayDriverInstance(ZWaveNetwork network, DeviceFactory deviceFactory,
-			ControllableDevice controllableDevice, int nodeId,
-			Set<Integer> instancesId, BundleContext context)
+	// last excluded device
+	private int lastExcludedDevice = -1;
+
+	public ZWaveGatewayDriverInstance(ZWaveNetwork network,
+			DeviceFactory deviceFactory, ControllableDevice controllableDevice,
+			int nodeId, Set<Integer> instancesId, BundleContext context)
 	{
 		// gateway driver node contains always multiple instanceId, but only the
 		// one with Id = 0 contains interesting data
@@ -70,9 +77,9 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		super(network, controllableDevice, nodeId, instancesId, nodeId, 0,
 				context);
 
-		//store the device factory reference
+		// store the device factory reference
 		this.deviceFactory = deviceFactory;
-		
+
 		// create a logger
 		logger = new LogHelper(context);
 
@@ -171,18 +178,46 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		int lastIncludedDeviceAtController = controller.getData()
 				.getLastIncludedDevice();
 		if ((lastIncludedDeviceAtController != -1)
-				&& (lastIncludedDeviceAtController != this.lastIncludedDevice))
+				&& (lastIncludedDeviceAtController != this.lastIncludedDevice)
+				&& (this.supportedDevices != null)
+				&& (!this.supportedDevices.isEmpty()))
 		{
-			// update the last included device
-			this.lastIncludedDevice = lastIncludedDeviceAtController;
 
 			// get the device data
 			Device newDeviceData = this.network
-					.getRawDevice(this.lastIncludedDevice);
+					.getRawDevice(lastIncludedDeviceAtController);
+			
+			//TODO: extract data for uniquely identifying the device
 
 			// build the device descriptor
-			this.buildDeviceDescriptor(newDeviceData, this.lastIncludedDevice);
+			DeviceDescriptor descriptorToAdd = this.buildDeviceDescriptor(
+					newDeviceData, lastIncludedDeviceAtController);
 
+			// create the device
+			// cross the finger
+			this.deviceFactory.addNewDevice(descriptorToAdd);
+
+			// TODO: only when the device has been created update the last
+			// included device
+			this.lastIncludedDevice = lastIncludedDeviceAtController;
+		}
+
+		// check if any new device has been recently associated
+		int lastExcludedDeviceAtController = controller.getData()
+				.getLastExcludedDevice();
+		if ((lastExcludedDeviceAtController != -1)
+				&& (lastExcludedDeviceAtController != this.lastExcludedDevice))
+		{
+			// update the last included device
+			this.lastExcludedDevice = lastExcludedDeviceAtController;
+
+			// get the device URI
+			String deviceId = this.network
+					.getControllableDeviceURIFromNodeId(this.lastExcludedDevice);
+
+			// remove the device (if not null)
+			if ((deviceId != null) && (!deviceId.isEmpty()))
+				this.deviceFactory.removeDevice(deviceId);
 		}
 	}
 
@@ -213,29 +248,51 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		return nodeInfo;
 	}
 
-	//TODO: implement better.... just a trial
-	private void buildDeviceDescriptor(Device device, int nodeId)
+	/**
+	 * @return the supportedDevices
+	 */
+	public ConcurrentHashMap<String, String> getSupportedDevices()
 	{
+		return supportedDevices;
+	}
+
+	/**
+	 * @param supportedDevices
+	 *            the supportedDevices to set
+	 */
+	public void setSupportedDevices(
+			ConcurrentHashMap<String, String> supportedDevices)
+	{
+		// simplest updated policy : replacement
+		this.supportedDevices = supportedDevices;
+
+		// debug
+		this.logger.log(LogService.LOG_DEBUG,
+				"Updated dynamic device creation db");
+	}
+
+	// TODO: implement better.... just a trial
+	private DeviceDescriptor buildDeviceDescriptor(Device device, int nodeId)
+	{
+		DeviceDescriptor descriptor = null;
+
 		DataElemObject deviceType = device.getData().get("deviceTypeString");
 
 		if (deviceType.getValue().equals("Binary Power Switch"))
 		{
-			DeviceDescriptor descriptorToAdd = new DeviceDescriptor(
-					"MeteringPowerOutlet_" + nodeId, "MeteringPowerOutlet",
-					"New Device", ZWaveInfo.MANUFACTURER);
-			descriptorToAdd.setDevLocation("lobby");
-			descriptorToAdd.setGateway(this.device.getDeviceId());
-			descriptorToAdd.addDevSimpleConfigurationParam("NodeID", ""
-					+ nodeId);
-			descriptorToAdd.addDevSimpleConfigurationParam("InstanceID", "0");
-			
-			//cross the finger
-			deviceFactory.addNewDevice(descriptorToAdd);
+			descriptor = new DeviceDescriptor("MeteringPowerOutlet_" + nodeId,
+					"MeteringPowerOutlet", "New Device", ZWaveInfo.MANUFACTURER);
+			descriptor.setDevLocation("lobby");
+			descriptor.setGateway(this.device.getDeviceId());
+			descriptor.addDevSimpleConfigurationParam("NodeID", "" + nodeId);
+			descriptor.addDevSimpleConfigurationParam("InstanceID", "0");
 
 		}
 		// debug dump
 		this.logger.log(LogService.LOG_INFO,
 				"Detected new device: \n\tdeviceType: " + deviceType.getValue()
 						+ "\n\tdeviceid:" + this.lastIncludedDevice);
+		// return
+		return descriptor;
 	}
 }

@@ -24,6 +24,7 @@ import it.polito.elite.dog.drivers.zwave.model.ZWaveModelTree;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import it.polito.elite.dog.drivers.zwave.util.ConnessionManager;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.util.Dictionary;
@@ -461,13 +462,47 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	{
 		return this.modelTree.getDevices();
 	}
-	
+
 	/**
-	 * Get raw device data on the basis of the given nodeId 
+	 * Get raw device data on the basis of the given nodeId
+	 * 
 	 * @return
 	 */
 	public Device getRawDevice(int nodeId)
 	{
 		return this.modelTree.getDevices().get(new Integer(nodeId));
+	}
+
+	/**
+	 * checks among currently handled device whether the given node id exists,
+	 * and in the case, extracts the corresponding device URI
+	 * 
+	 * @param nodeId
+	 * @return The URI of the corresponding {@link ControllableDevice}
+	 */
+	@Override
+	public String getControllableDeviceURIFromNodeId(int nodeId)
+	{
+		String deviceId = null;
+		
+		// look for nodeinfos
+		for (ZWaveNodeInfo info : this.nodeInfo2Driver.keySet())
+		{
+			// compare the node id, if they are equal, get the driver and ask
+			// for the device uri
+			if (info.getDeviceNodeId() == nodeId)
+			{
+				//the driver currently connected to the device
+				ZWaveDriver driver = this.nodeInfo2Driver.get(info);
+				
+				//get the device uri
+				deviceId = driver.getDevice().getDeviceId();
+				
+				//break the cycle if the needed information has been found
+				break;
+			}
+		}
+		
+		return deviceId;
 	}
 }

@@ -163,4 +163,24 @@ public class ControllerData
 		return nodeId;
 	}
 	
+	public int getLastExcludedDevice()
+	{
+		//the nodeId to return
+		int nodeId = -1;
+		
+		if(this.data.containsKey(DataConst.LAST_EXCLUDED_DEVICE))
+		{
+			//get the last included device
+			DataElemObject lastExcludedDevice = this.data.get(DataConst.LAST_EXCLUDED_DEVICE);
+			
+			if(lastExcludedDevice.getType().equals("int"))
+			{
+				//get the nodeId
+				nodeId = (Integer)lastExcludedDevice.getValue();
+			}
+		}
+		
+		return nodeId;
+	}
+	
 }

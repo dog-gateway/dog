@@ -25,6 +25,8 @@ import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.devicecategory.ZWaveGateway;
 
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
@@ -36,11 +38,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
 import org.osgi.service.log.LogService;
 
-public class ZWaveGatewayDriver implements Driver
+public class ZWaveGatewayDriver implements Driver, ManagedService
 {
 	// List of available command on controller
 	public static final String CMD_INCLUDE = "controller.AddNodeToNetwork";
@@ -82,6 +86,11 @@ public class ZWaveGatewayDriver implements Driver
 	// the set of currently connected gateways... indexed by their ids
 	private Map<String, ZWaveGatewayDriverInstance> connectedGateways;
 
+	// the dictionary containing the current snapshot of the driver
+	// configuration, i.e., the list of supported devices and the corresponding
+	// DogOnt types.
+	private ConcurrentHashMap<String, String> supportedDevices;
+
 	// the LDAP query used to match the ModbusNetworkDriver
 	String filterQuery = String.format("(%s=%s)", Constants.OBJECTCLASS,
 			ZWaveNetwork.class.getName());
@@ -89,8 +98,15 @@ public class ZWaveGatewayDriver implements Driver
 	public ZWaveGatewayDriver()
 	{
 		// initialize the map of connected gateways
-		connectedGateways = new ConcurrentHashMap<String, ZWaveGatewayDriverInstance>();
-		network = new AtomicReference<ZWaveNetwork>();
+		this.connectedGateways = new ConcurrentHashMap<String, ZWaveGatewayDriverInstance>();
+		
+		// initialize the supported devices map
+		this.supportedDevices = new ConcurrentHashMap<String, String>();
+		
+		//initialize the network driver reference
+		this.network = new AtomicReference<ZWaveNetwork>();
+		
+		//initialize the device factory reference
 		this.deviceFactory = new AtomicReference<DeviceFactory>();
 	}
 
@@ -126,7 +142,7 @@ public class ZWaveGatewayDriver implements Driver
 			// unregisters this driver from the OSGi framework
 			unRegister();
 	}
-	
+
 	public void addedDeviceFactory(DeviceFactory deviceFactory)
 	{
 		this.deviceFactory.set(deviceFactory);
@@ -201,8 +217,7 @@ public class ZWaveGatewayDriver implements Driver
 					// create a new instance of the gateway driver
 					@SuppressWarnings("unchecked")
 					ZWaveGatewayDriverInstance driver = new ZWaveGatewayDriverInstance(
-							this.network.get(),
-							this.deviceFactory.get(),
+							this.network.get(), this.deviceFactory.get(),
 							(ControllableDevice) context.getService(reference),
 							Integer.parseInt(sNodeID), instancesId, context);
 
@@ -316,5 +331,43 @@ public class ZWaveGatewayDriver implements Driver
 	public ZWaveNetwork getNetwork()
 	{
 		return network.get();
+	}
+
+	@Override
+	public void updated(Dictionary<String, ?> config)
+			throws ConfigurationException
+	{
+		// check if configuration is not null, if null... dynamic device
+		// creation will be disabled
+		if (config != null)
+		{
+			//debug
+			if(this.supportedDevices.isEmpty())
+				this.logger.log(LogService.LOG_DEBUG, "Creating dynamic device creation db...");
+			else
+				this.logger.log(LogService.LOG_DEBUG, "Updating dynamic device creation db...");
+			// store the configuration (deep copy, check if needed)
+			Enumeration<String> keys = config.keys();
+			
+			//iterate over the keys
+			while(keys.hasMoreElements())
+			{
+				//get the device unique id (manufacturer-productseries-productid)
+				String deviceId = keys.nextElement();
+				String deviceType = (String)config.get(deviceId);
+				
+				//store the couple
+				this.supportedDevices.put(deviceId, deviceType);
+			}
+			
+			//update connected drivers
+			for(String key : this.connectedGateways.keySet())
+			{
+				this.connectedGateways.get(key).setSupportedDevices(this.supportedDevices);
+			}
+			
+			//debug
+			this.logger.log(LogService.LOG_DEBUG, "Completed dynamic device creation db");
+		}
 	}
 }
