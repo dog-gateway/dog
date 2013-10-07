@@ -359,7 +359,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 			descriptor = new DeviceDescriptor(deviceClass + "_" + nodeId,
 					deviceClass, "New Device of type " + deviceClass,
 					ZWaveInfo.MANUFACTURER);
-			descriptor.setDevLocation("lobby");
+			descriptor.setDevLocation("");
 			descriptor.setGateway(this.device.getDeviceId());
 			descriptor.addDevSimpleConfigurationParam("NodeID", "" + nodeId);
 
