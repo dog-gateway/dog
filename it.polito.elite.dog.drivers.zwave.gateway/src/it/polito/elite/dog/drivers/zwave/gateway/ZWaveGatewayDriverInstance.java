@@ -26,8 +26,9 @@ import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.Controller;
-import it.polito.elite.dog.drivers.zwave.model.DataElemObject;
+import it.polito.elite.dog.drivers.zwave.model.DataConst;
 import it.polito.elite.dog.drivers.zwave.model.Device;
+import it.polito.elite.dog.drivers.zwave.model.DeviceData;
 import it.polito.elite.dog.drivers.zwave.model.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
@@ -174,11 +175,18 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		this.deviceNode = deviceNode;
 		controller = controllerNode;
 
+		/*-------------- HANDLE ASSOCIATION ------------------------*/
+
 		// check if any new device has been recently associated
 		int lastIncludedDeviceAtController = controller.getData()
 				.getLastIncludedDevice();
 		if ((lastIncludedDeviceAtController != -1)
+				//checks that the device is not the last included before
 				&& (lastIncludedDeviceAtController != this.lastIncludedDevice)
+				//checks that the device is not already included and running
+				&& (this.network
+						.getControllableDeviceURIFromNodeId(lastIncludedDeviceAtController) == null) 
+				//checks that there are supported devices
 				&& (this.supportedDevices != null)
 				&& (!this.supportedDevices.isEmpty()))
 		{
@@ -186,8 +194,8 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 			// get the device data
 			Device newDeviceData = this.network
 					.getRawDevice(lastIncludedDeviceAtController);
-			
-			//TODO: extract data for uniquely identifying the device
+
+			// TODO: extract data for uniquely identifying the device
 
 			// build the device descriptor
 			DeviceDescriptor descriptorToAdd = this.buildDeviceDescriptor(
@@ -202,7 +210,9 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 			this.lastIncludedDevice = lastIncludedDeviceAtController;
 		}
 
-		// check if any new device has been recently associated
+		/*-------------- HANDLE DISASSOCIATION ------------------------*/
+
+		// check if any new device has been recently disassociated
 		int lastExcludedDeviceAtController = controller.getData()
 				.getLastExcludedDevice();
 		if ((lastExcludedDeviceAtController != -1)
@@ -276,22 +286,48 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 	{
 		DeviceDescriptor descriptor = null;
 
-		DataElemObject deviceType = device.getData().get("deviceTypeString");
+		// get the new device data
+		DeviceData deviceData = device.getData();
 
-		if (deviceType.getValue().equals("Binary Power Switch"))
+		// get the manufacturer id
+		String manufacturerId = deviceData.getAllData()
+				.get(DataConst.MANUFACTURER_ID).getValue().toString();
+		String manufacturerProductType = deviceData.getAllData()
+				.get(DataConst.MANUFACTURER_PRODUCT_TYPE).getValue().toString();
+		String manufacturerProductId = deviceData.getAllData()
+				.get(DataConst.MANUFACTURER_PRODUCT_ID).getValue().toString();
+
+		// build the device unique id
+		String deviceUniqueId = manufacturerId + "-" + manufacturerProductType
+				+ "-" + manufacturerProductId;
+
+		// get the device class
+		String deviceClass = this.supportedDevices.get(deviceUniqueId);
+
+		if ((deviceClass != null) && (!deviceClass.isEmpty()))
 		{
-			descriptor = new DeviceDescriptor("MeteringPowerOutlet_" + nodeId,
-					"MeteringPowerOutlet", "New Device", ZWaveInfo.MANUFACTURER);
+			descriptor = new DeviceDescriptor(deviceClass + "_" + nodeId,
+					deviceClass, "New Device of type " + deviceClass,
+					ZWaveInfo.MANUFACTURER);
 			descriptor.setDevLocation("lobby");
 			descriptor.setGateway(this.device.getDeviceId());
 			descriptor.addDevSimpleConfigurationParam("NodeID", "" + nodeId);
-			descriptor.addDevSimpleConfigurationParam("InstanceID", "0");
 
+			// mine instances
+			for (Integer instanceId : device.getInstances().keySet())
+			{
+				descriptor.addDevSimpleConfigurationParam("InstanceID",
+						instanceId.toString());
+			}
+
+			// debug dump
+			this.logger.log(LogService.LOG_INFO,
+					"Detected new device: \n\tdeviceUniqueId: "
+							+ deviceUniqueId + "\n\tnodeId: "
+							+ this.lastIncludedDevice + "\n\tdeviceClass: "
+							+ deviceClass);
 		}
-		// debug dump
-		this.logger.log(LogService.LOG_INFO,
-				"Detected new device: \n\tdeviceType: " + deviceType.getValue()
-						+ "\n\tdeviceid:" + this.lastIncludedDevice);
+
 		// return
 		return descriptor;
 	}
