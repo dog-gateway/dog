@@ -35,6 +35,7 @@ public class DataConst
 	public static final String NODE_INFO_FRAME = "nodeInfoFrame";
 	public static final String LAST_INCLUDED_DEVICE = "lastIncludedDevice";
 	public static final String LAST_EXCLUDED_DEVICE = "lastExcludedDevice";
+	public static final String CONTROLLER_STATE = "controllerState";
 	public static final String MANUFACTURER_ID = "manufacturerId";
 	public static final String MANUFACTURER_PRODUCT_TYPE = "manufacturerProductType";
 	public static final String MANUFACTURER_PRODUCT_ID = "manufacturerProductId";

@@ -146,6 +146,16 @@ public class ZWavePoller extends Thread
 		deviceSet.put(nodeInfo.getDeviceNodeId(),elem);
 	}
 	
+	/**
+	 * Call this method to remove a device to the queue of the thread.
+	 * @param nodeInfo {@link ZWaveNodeInfo} representing the node
+	 * @param updateTimeMillis how much the device must be triggered for a full update. 0 means no trigger for this node
+	 */
+	public void removeDeviceFromQueue(ZWaveNodeInfo nodeInfo)
+	{
+		this.deviceSet.remove(nodeInfo.getDeviceNodeId());
+	}
+	
 	public class TriggerElem
 	{
 		//how often trigger the node

@@ -25,162 +25,200 @@ import org.codehaus.jackson.annotate.JsonAnySetter;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class ControllerData 
+public class ControllerData
 {
-	//static name properties
+	// static name properties
 	private Integer updateTime;
 	private String name;
 	private Object value;
 	private String type;
 	private Integer invalidateTime;
-	
-	
-	//dynamic name prop are managed through this map
-	//and through @JsonAnyGetter and @JsonAnySetter annotation
-	private Map<String, DataElemObject> data = new HashMap<String, DataElemObject>(); 
-	
+
+	// dynamic name prop are managed through this map
+	// and through @JsonAnyGetter and @JsonAnySetter annotation
+	private Map<String, DataElemObject> data = new HashMap<String, DataElemObject>();
+
 	@JsonCreator
-    public ControllerData(@JsonProperty("updateTime") Integer updateTime,
-    		@JsonProperty("name") String name,
-    		@JsonProperty("value") Object value,
-    		@JsonProperty("type") String type,
-    		@JsonProperty("invalidateTime") Integer invalidateTime
-    		)
-    {
+	public ControllerData(@JsonProperty("updateTime") Integer updateTime,
+			@JsonProperty("name") String name,
+			@JsonProperty("value") Object value,
+			@JsonProperty("type") String type,
+			@JsonProperty("invalidateTime") Integer invalidateTime)
+	{
 		this.updateTime = updateTime;
 		this.name = name;
 		this.value = value;
 		this.type = type;
 		this.invalidateTime = invalidateTime;
-    }
-	
-	// "any getter" needed for serialization    
-    @JsonAnyGetter
-    public Map<String,DataElemObject> getAllData() {
-        return data;
-    }
+	}
 
-    @JsonAnySetter
-    public void set(String name, DataElemObject value) {
-    	data.put(name, value);
-    }
-    
-    /**
-     * returns the property defined by name or null
-     */
-    public DataElemObject get(String name)
-    {
-    	return data.get(name);
-    }
-    
+	// "any getter" needed for serialization
+	@JsonAnyGetter
+	public Map<String, DataElemObject> getAllData()
+	{
+		return data;
+	}
+
+	@JsonAnySetter
+	public void set(String name, DataElemObject value)
+	{
+		data.put(name, value);
+	}
+
+	/**
+	 * returns the property defined by name or null
+	 */
+	public DataElemObject get(String name)
+	{
+		return data.get(name);
+	}
+
 	/**
 	 * @return the updateTime
 	 */
-	public Integer getUpdateTime() {
+	public Integer getUpdateTime()
+	{
 		return updateTime;
 	}
 
 	/**
-	 * @param updateTime the updateTime to set
+	 * @param updateTime
+	 *            the updateTime to set
 	 */
-	public void setUpdateTime(Integer updateTime) {
+	public void setUpdateTime(Integer updateTime)
+	{
 		this.updateTime = updateTime;
 	}
 
 	/**
 	 * @return the name
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
 
 	/**
 	 * @return the value
 	 */
-	public Object getValue() {
+	public Object getValue()
+	{
 		return value;
 	}
 
 	/**
-	 * @param value the value to set
+	 * @param value
+	 *            the value to set
 	 */
-	public void setValue(Object value) {
+	public void setValue(Object value)
+	{
 		this.value = value;
 	}
 
 	/**
 	 * @return the type
 	 */
-	public String getType() {
+	public String getType()
+	{
 		return type;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
-	public void setType(String type) {
+	public void setType(String type)
+	{
 		this.type = type;
 	}
 
 	/**
 	 * @return the invalidateTime
 	 */
-	public Integer getInvalidateTime() {
+	public Integer getInvalidateTime()
+	{
 		return invalidateTime;
 	}
 
 	/**
-	 * @param invalidateTime the invalidateTime to set
+	 * @param invalidateTime
+	 *            the invalidateTime to set
 	 */
-	public void setInvalidateTime(Integer invalidateTime) {
+	public void setInvalidateTime(Integer invalidateTime)
+	{
 		this.invalidateTime = invalidateTime;
 	}
-	
+
 	public int getLastIncludedDevice()
 	{
-		//the nodeId to return
+		// the nodeId to return
 		int nodeId = -1;
-		
-		if(this.data.containsKey(DataConst.LAST_INCLUDED_DEVICE))
+
+		if (this.data.containsKey(DataConst.LAST_INCLUDED_DEVICE))
 		{
-			//get the last included device
-			DataElemObject lastIncludedDevice = this.data.get(DataConst.LAST_INCLUDED_DEVICE);
-			
-			if(lastIncludedDevice.getType().equals("int"))
+			// get the last included device
+			DataElemObject lastIncludedDevice = this.data
+					.get(DataConst.LAST_INCLUDED_DEVICE);
+
+			if (lastIncludedDevice.getType().equals("int"))
 			{
-				//get the nodeId
-				nodeId = (Integer)lastIncludedDevice.getValue();
+				// get the nodeId
+				nodeId = (Integer) lastIncludedDevice.getValue();
 			}
 		}
-		
+
 		return nodeId;
 	}
-	
+
 	public int getLastExcludedDevice()
 	{
-		//the nodeId to return
+		// the nodeId to return
 		int nodeId = -1;
-		
-		if(this.data.containsKey(DataConst.LAST_EXCLUDED_DEVICE))
+
+		if (this.data.containsKey(DataConst.LAST_EXCLUDED_DEVICE))
 		{
-			//get the last included device
-			DataElemObject lastExcludedDevice = this.data.get(DataConst.LAST_EXCLUDED_DEVICE);
-			
-			if(lastExcludedDevice.getType().equals("int"))
+			// get the last included device
+			DataElemObject lastExcludedDevice = this.data
+					.get(DataConst.LAST_EXCLUDED_DEVICE);
+
+			if (lastExcludedDevice.getType().equals("int"))
 			{
-				//get the nodeId
-				nodeId = (Integer)lastExcludedDevice.getValue();
+				// get the nodeId
+				nodeId = (Integer) lastExcludedDevice.getValue();
 			}
 		}
-		
+
 		return nodeId;
 	}
-	
+
+	public int getControllerState()
+	{
+		// the controller state to return
+		int controllerState = -1;
+
+		if (this.data.containsKey(DataConst.CONTROLLER_STATE))
+		{
+			// get the last included device
+			DataElemObject lastExcludedDevice = this.data
+					.get(DataConst.CONTROLLER_STATE);
+
+			if (lastExcludedDevice.getType().equals("int"))
+			{
+				// get the nodeId
+				controllerState = (Integer) lastExcludedDevice.getValue();
+			}
+		}
+
+		return controllerState;
+	}
+
 }

@@ -51,6 +51,7 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 	public static final String CMD_EXCLUDE = "controller.RemoveNodeFromNetwork";
 	public static final String CMD_LEARN = "controller.SetLearnMode";
 	public static final String CMD_RESET = "controller.SetDefault";
+	
 
 
 	// The OSGi framework context

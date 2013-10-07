@@ -111,6 +111,12 @@ public interface ZWaveNetwork
 	 *            the unique identifier.
 	 */
 	void removeDriver(ZWaveNodeInfo nodeInfo);
+	
+	/**
+	 * removes a specific device/driver association
+	 * @param nodeId
+	 */
+	public void removeDriver(int nodeId);
 
 	/**
 	 * Removes the driver-register associations for the given driver. To be

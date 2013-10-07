@@ -376,6 +376,31 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 		}
 	}
 
+	@Override
+	public void removeDriver(int nodeId)
+	{
+		ZWaveNodeInfo infoToRemove = null;
+		// look for nodeinfos
+		for (ZWaveNodeInfo info : this.nodeInfo2Driver.keySet())
+		{
+			// compare the node id, if they are equal, get the driver and ask
+			// for the device uri
+			if (info.getDeviceNodeId() == nodeId)
+			{
+				infoToRemove = info;
+				break;
+			}
+		}
+
+		if (infoToRemove != null)
+		{
+			this.poller.removeDeviceFromQueue(infoToRemove);
+			this.removeDriver(infoToRemove);
+		}
+			
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -484,7 +509,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	public String getControllableDeviceURIFromNodeId(int nodeId)
 	{
 		String deviceId = null;
-		
+
 		// look for nodeinfos
 		for (ZWaveNodeInfo info : this.nodeInfo2Driver.keySet())
 		{
@@ -492,17 +517,17 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 			// for the device uri
 			if (info.getDeviceNodeId() == nodeId)
 			{
-				//the driver currently connected to the device
+				// the driver currently connected to the device
 				ZWaveDriver driver = this.nodeInfo2Driver.get(info);
-				
-				//get the device uri
+
+				// get the device uri
 				deviceId = driver.getDevice().getDeviceId();
-				
-				//break the cycle if the needed information has been found
+
+				// break the cycle if the needed information has been found
 				break;
 			}
 		}
-		
+
 		return deviceId;
 	}
 }

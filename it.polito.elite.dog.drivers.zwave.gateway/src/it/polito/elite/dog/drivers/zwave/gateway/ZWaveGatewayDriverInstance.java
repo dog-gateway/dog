@@ -21,8 +21,13 @@ import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.HomeGateway;
 import it.polito.elite.dog.core.library.model.devicecategory.ZWaveGateway;
+import it.polito.elite.dog.core.library.model.state.DeviceAssociationState;
 import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.AssociatingStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.DisassociatingStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.IdleStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.Controller;
@@ -91,15 +96,26 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		// connect this driver instance with the device
 		device.setDriver(this);
 
-		// ask for update controller data
-		// updateDeviceData();
+		// initialize device states
+		this.initializeStates();
 	}
 
 	@Override
 	public void notifyStateChanged(State newState)
 	{
-		// TODO Auto-generated method stub
+		// update the current state
+		this.currentState.setState(
+				DeviceAssociationState.class.getSimpleName(), newState);
 
+		// debug
+		logger.log(
+				LogService.LOG_DEBUG,
+				ZWaveGatewayDriverInstance.LOG_ID + "Device "
+						+ device.getDeviceId() + " is now "
+						+ (newState).getCurrentStateValue()[0].getValue());
+
+		// call the super method
+		((HomeGateway) device).notifyStateChanged(newState);
 	}
 
 	/**
@@ -108,11 +124,8 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 	@Override
 	public void associate()
 	{
-		// start associate process and, after 20 sec reset controller status to
-		// normal
-		ZWavePairUnpairThreads pairUnpairThreads = new ZWavePairUnpairThreads(
-				network, logger, true, 20000);
-		pairUnpairThreads.start();
+		//start inclusion mode
+		network.controllerWrite(ZWaveGatewayDriver.CMD_INCLUDE, "1");
 	}
 
 	/**
@@ -121,11 +134,8 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 	@Override
 	public void disassociate() // TODO: remove String nodeID
 	{
-		// start disassociate process and, after 20 sec reset controller status
-		// to normal
-		ZWavePairUnpairThreads pairUnpairThreads = new ZWavePairUnpairThreads(
-				network, logger, false, 20000);
-		pairUnpairThreads.start();
+		//start exclusion mode
+		network.controllerWrite(ZWaveGatewayDriver.CMD_EXCLUDE, "1");
 	}
 
 	/**
@@ -181,12 +191,12 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		int lastIncludedDeviceAtController = controller.getData()
 				.getLastIncludedDevice();
 		if ((lastIncludedDeviceAtController != -1)
-				//checks that the device is not the last included before
+				// checks that the device is not the last included before
 				&& (lastIncludedDeviceAtController != this.lastIncludedDevice)
-				//checks that the device is not already included and running
+				// checks that the device is not already included and running
 				&& (this.network
-						.getControllableDeviceURIFromNodeId(lastIncludedDeviceAtController) == null) 
-				//checks that there are supported devices
+						.getControllableDeviceURIFromNodeId(lastIncludedDeviceAtController) == null)
+				// checks that there are supported devices
 				&& (this.supportedDevices != null)
 				&& (!this.supportedDevices.isEmpty()))
 		{
@@ -201,13 +211,17 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 			DeviceDescriptor descriptorToAdd = this.buildDeviceDescriptor(
 					newDeviceData, lastIncludedDeviceAtController);
 
-			// create the device
-			// cross the finger
-			this.deviceFactory.addNewDevice(descriptorToAdd);
+			// check not null
+			if (descriptorToAdd != null)
+			{
+				// create the device
+				// cross the finger
+				this.deviceFactory.addNewDevice(descriptorToAdd);
 
-			// TODO: only when the device has been created update the last
-			// included device
-			this.lastIncludedDevice = lastIncludedDeviceAtController;
+				// TODO: only when the device has been created update the last
+				// included device
+				this.lastIncludedDevice = lastIncludedDeviceAtController;
+			}
 		}
 
 		/*-------------- HANDLE DISASSOCIATION ------------------------*/
@@ -227,7 +241,43 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 
 			// remove the device (if not null)
 			if ((deviceId != null) && (!deviceId.isEmpty()))
+			{
 				this.deviceFactory.removeDevice(deviceId);
+			}
+
+			// remove the device association
+			// TODO: this should be done by the device driver, check how to
+			this.network.removeDriver(this.lastExcludedDevice);
+		}
+
+		/*-------------- HANDLE STATE ----------------------------*/
+		int controllerState = this.controller.getData().getControllerState();
+
+		// handle controller states
+		switch (controllerState)
+		{
+		case 0: // idle
+		{
+			this.notifyStateChanged(new DeviceAssociationState(
+					new IdleStateValue()));
+			break;
+		}
+		case 1: // associating
+		{
+			this.notifyStateChanged(new DeviceAssociationState(
+					new AssociatingStateValue()));
+			break;
+		}
+		case 5: // disassociating
+		{
+			this.notifyStateChanged(new DeviceAssociationState(
+					new DisassociatingStateValue()));
+			break;
+		}
+		default:
+		{
+			break;
+		}
 		}
 	}
 
@@ -330,5 +380,29 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 
 		// return
 		return descriptor;
+	}
+
+	/**
+	 * Initializes the state asynchronously as required by OSGi
+	 */
+	private void initializeStates()
+	{
+		// initialize the state
+		this.currentState.setState(
+				DeviceAssociationState.class.getSimpleName(),
+				new DeviceAssociationState(new IdleStateValue()));
+
+		// get the initial state of the device
+		Runnable worker = new Runnable()
+		{
+			public void run()
+			{
+				network.read(nodeInfo, true);
+			}
+		};
+
+		Thread workerThread = new Thread(worker);
+		workerThread.start();
+
 	}
 }
