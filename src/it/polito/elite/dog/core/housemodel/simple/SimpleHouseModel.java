@@ -432,6 +432,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		{
 			// create the marshaller
 			Marshaller marshaller = jaxbContext.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
 			// write the updated XML configuration upon the old one...
 			if ((this.configurationPath != null) && (!this.configurationPath.isEmpty()))
