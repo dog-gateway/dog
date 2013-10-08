@@ -169,11 +169,11 @@ public abstract class ZWaveDriver implements StatefulDevice
 
 		// get parameters associated to each device command (if any)
 		Set<ElementDescription> commandsSpecificParameters = device
-				.getDeviceDescriptor().getDevCommandSpecificParams();
+				.getDeviceDescriptor().getCommandSpecificParams();
 
 		// get parameters associated to each device notification (if any)
 		Set<ElementDescription> notificationsSpecificParameters = device
-				.getDeviceDescriptor().getDevNotificationSpecificParams();
+				.getDeviceDescriptor().getNotificationSpecificParams();
 
 		// --------------- Handle command specific parameters ----------------
 		for (ElementDescription parameter : commandsSpecificParameters)

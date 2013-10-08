@@ -356,6 +356,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 
 		if ((deviceClass != null) && (!deviceClass.isEmpty()))
 		{
+			/*
 			descriptor = new DeviceDescriptor(deviceClass + "_" + nodeId,
 					deviceClass, "New Device of type " + deviceClass,
 					ZWaveInfo.MANUFACTURER);
@@ -368,7 +369,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 			{
 				descriptor.addDevSimpleConfigurationParam("InstanceID",
 						instanceId.toString());
-			}
+			}*/
 
 			// debug dump
 			this.logger.log(LogService.LOG_INFO,

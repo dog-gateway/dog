@@ -173,11 +173,11 @@ public class ZWaveMovementSensorDriver implements Driver, ManagedService
 		
 		// get the corresponding end point set
 		Set<String> nodeIdSet = ((ControllableDevice) context.getService(reference)).getDeviceDescriptor()
-				.getDevSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
+				.getSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
 		
 		// get the corresponding end point set
 		Set<String> instanceIdSet = ((ControllableDevice) context.getService(reference)).getDeviceDescriptor()
-				.getDevSimpleConfigurationParams().get(ZWaveInfo.INSTANCE_ID);
+				.getSimpleConfigurationParams().get(ZWaveInfo.INSTANCE_ID);
 		
 		// get the nodeId
 		String sNodeID = nodeIdSet.iterator().next();

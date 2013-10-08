@@ -195,7 +195,7 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 		@SuppressWarnings("unchecked")
 		Set<String> gatewayNodeIdSet = ((ControllableDevice) context
 				.getService(reference)).getDeviceDescriptor()
-				.getDevSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
+				.getSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
 
 		@SuppressWarnings("unchecked")
 		String deviceId = ((ControllableDevice) context.getService(reference))
