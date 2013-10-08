@@ -482,7 +482,7 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 	public String getDescription(String id) throws IllegalArgumentException
 	{
 		if ("status".equals(id))
-			return this.getDeviceDescriptor().getDevDescription();
+			return this.getDeviceDescriptor().getDescription();
 		else
 			throw new IllegalArgumentException("Invalid Status Variable name " + id);
 	}

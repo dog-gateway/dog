@@ -93,11 +93,11 @@ public abstract class ControllableDevice implements Device
 	 */
 	private void parseDescriptor(DeviceDescriptor deviceDescriptor)
 	{
-		this.deviceProp.put(DeviceCostants.DEVICE_CATEGORY, defaultPackage + "." + deviceDescriptor.getDevCategory());
-		this.deviceProp.put(DeviceCostants.DEVICEURI, deviceDescriptor.getDevURI());
-		this.deviceProp.put(DeviceCostants.MANUFACTURER, deviceDescriptor.getDevTechnology());
-		this.deviceProp.put(DeviceCostants.DEVICELOCATION, deviceDescriptor.getDevLocation());
-		this.deviceId = deviceDescriptor.getDevURI();
+		this.deviceProp.put(DeviceCostants.DEVICE_CATEGORY, defaultPackage + "." + deviceDescriptor.getDeviceCategory());
+		this.deviceProp.put(DeviceCostants.DEVICEURI, deviceDescriptor.getDeviceURI());
+		this.deviceProp.put(DeviceCostants.MANUFACTURER, deviceDescriptor.getTechnology());
+		this.deviceProp.put(DeviceCostants.DEVICELOCATION, deviceDescriptor.getLocation());
+		this.deviceId = deviceDescriptor.getDeviceURI();
 		this.deviceDescriptor = deviceDescriptor;
 	}
 	

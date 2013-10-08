@@ -17,34 +17,36 @@
  */
 package it.polito.elite.dog.core.library.model;
 
+import it.polito.elite.dog.core.library.jaxb.Configcommand;
+import it.polito.elite.dog.core.library.jaxb.Confignotification;
+import it.polito.elite.dog.core.library.jaxb.Configparam;
+import it.polito.elite.dog.core.library.jaxb.ControlFunctionality;
+import it.polito.elite.dog.core.library.jaxb.Device;
+import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.util.ElementDescription;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * A descriptor for a Dog/DogOnt device instance, it allows representing
- * together a set of low level device features such as the network parameters,
- * the device-specific command configurations, etc.
+ * A descriptor for a Dog/DogOnt device instance. It allows representing a set
+ * of low level device features such as the network parameters, the
+ * device-specific command configurations, etc., and it contains the JAXB device
+ * representation.
  * 
- * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
- *         (original implementation)
- * @author <a href="mailto:emiliano.castellina@polito.it">Emiliano
- *         Castellina</a> (successive modifications)
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
- *         (successive modifications)
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class DeviceDescriptor
-{	
-	private String devURI;
-	private String devCategory;
-	private String devDescription;
-	private String devTechnology;
+{
+	private String deviceURI;
+	private String deviceCategory;
+	private String description;
+	private String technology;
 	private String gateway;
 	private String hasMeter;
 	private Set<String> meterOf;
@@ -52,238 +54,213 @@ public class DeviceDescriptor
 	private String pluggedIn;
 	private String sensorOf;
 	private String actuatorOf;
-	private String devLocation;
-	private Map<String, Set<String>> devSimpleConfigurationParams;
-	private Set<ElementDescription> devCommandSpecificParams;
-	private Set<ElementDescription> devNotificationSpecificParams;
+	private String location;
+	private Map<String, Set<String>> simpleConfigurationParams;
+	private Set<ElementDescription> commandSpecificParams;
+	private Set<ElementDescription> notificationSpecificParams;
+	private Device jaxbDevice;
 	
 	/**
-	 * Creates a descriptor for a Dog/DogOnt device instance, it allows
+	 * /** Creates a descriptor for a Dog/DogOnt device instance, it allows
 	 * representing together a set of low level device features such as the
 	 * network parameters, the device-specific command configurations, etc.
 	 * 
-	 * @param devURI
-	 *            The device URI, which uniquely identifies it inside a given
-	 *            home representation in DogOnt
-	 * @param devCategory
-	 *            The device category, i.e. the DogOnt class from which this
-	 *            device inherits (descending from dogont:Controllable)
-	 * @param devDescription
-	 *            The human-readable description of the device as extracted from
-	 *            the configuration
-	 * @param devTechnology
-	 *            The technology with which the device is realized either
-	 *            BTICINO, KNX or ELITE
-	 * @param devLocation
-	 *            The architectural space in which the device is located.
-	 * @param devSimpleConfigurationParams
-	 *            The configuration parameters of the given device, e.g., the
-	 *            group address or the physical type, etc.
-	 * @param devCommandSpecificParams
-	 *            The command specific parameters such as the group address or
-	 *            the command hex value (at the moment it is needed only for KNX
-	 *            plants)
+	 * @param jaxbDevice
+	 *            the JAXB representation of a device
 	 */
-	public DeviceDescriptor(String devURI, String devCategory, String devDescription, String devTechnology,
-			String devLocation, Map<String, Set<String>> devSimpleConfigurationParams,
-			Set<ElementDescription> devCommandSpecificParams,
-			Set<ElementDescription> devNotificationSpecificParams)
+	public DeviceDescriptor(Device jaxbDevice)
 	{
-		this.devURI = devURI;
-		this.devCategory = devCategory;
-		this.devDescription = devDescription;
-		this.devTechnology = devTechnology;
-		this.devLocation = devLocation;
-		this.devSimpleConfigurationParams = devSimpleConfigurationParams;
-		this.devCommandSpecificParams = devCommandSpecificParams;
-		this.devNotificationSpecificParams = devNotificationSpecificParams;
+		// the device unique URI (mandatory)
+		this.deviceURI = jaxbDevice.getName();
+		
+		// manufacturer (mandatory)
+		this.technology = jaxbDevice.getDomoticSystem();
+		
+		// device category (mandatory)
+		this.deviceCategory = jaxbDevice.getClazz();
+		
+		// location in the environment
+		if (jaxbDevice.getIsIn() != null)
+			this.location = jaxbDevice.getIsIn();
+		else
+			this.location = "";
+		
+		// description (long name)
+		this.description = jaxbDevice.getDescription();
+		
+		// gateway
+		this.gateway = jaxbDevice.getGateway();
+		
+		// actuator
+		this.actuatorOf = jaxbDevice.getActuatorOf();
+		
+		// controlled objects
+		List<String> allControls = jaxbDevice.getControls();
+		if ((allControls != null) && (!allControls.isEmpty()))
+			this.controlledObjects = new HashSet<String>(allControls);
+		
+		// has meter
+		this.hasMeter = jaxbDevice.getHasMeter();
+		
+		// meter of
+		List<String> allMeterOf = jaxbDevice.getMeterOf();
+		if ((allMeterOf != null) && (!allMeterOf.isEmpty()))
+			this.meterOf = new HashSet<String>(allMeterOf);
+		
+		// plugged in
+		this.pluggedIn = jaxbDevice.getPluggedIn();
+		
+		// sensor of
+		this.sensorOf = jaxbDevice.getSensorOf();
+		
+		// set general parameters
+		for (Configparam param : jaxbDevice.getParam())
+		{
+			this.addSimpleConfigurationParam(param.getName(), param.getValue());
+		}
+		
+		// set command-specific parameters
+		HashSet<ElementDescription> commandsParameter = new HashSet<ElementDescription>();
+		
+		for (ControlFunctionality controlF : jaxbDevice.getControlFunctionality())
+		{
+			for (Configcommand command : controlF.getCommands().getCommand())
+			{
+				ElementDescription dogElementDescription = new ElementDescription(command.getName(), command.getClazz());
+				for (Configparam param : command.getParam())
+				{
+					dogElementDescription.addElementParam(param.getName(), param.getValue());
+				}
+				commandsParameter.add(dogElementDescription);
+				
+			}
+		}
+		this.commandSpecificParams = commandsParameter;
+		
+		// set notification-specific parameters
+		HashSet<ElementDescription> notificationsParameter = new HashSet<ElementDescription>();
+		for (NotificationFunctionality notificatinF : jaxbDevice.getNotificationFunctionality())
+		{
+			for (Confignotification notification : notificatinF.getNotifications().getNotification())
+			{
+				ElementDescription dogElementDescription = new ElementDescription(notification.getName(),
+						notification.getClazz());
+				
+				for (Configparam param : notification.getParam())
+				{
+					dogElementDescription.addElementParam(param.getName(), param.getValue());
+				}
+				notificationsParameter.add(dogElementDescription);
+				
+			}
+		}
+		this.notificationSpecificParams = notificationsParameter;
+		
+		// store the JAXB representation of the device
+		this.setJaxbDevice(jaxbDevice);
 	}
 	
 	/**
-	 * Creates a descriptor for a Dog/DogOnt device instance, it allows
-	 * representing together a set of low level device features such as the
-	 * network parameters, the device-specific command configurations, etc.
-	 * 
-	 * @param devURI
-	 *            The device URI, which uniquely identifies it inside a given
-	 *            home representation in DogOnt
-	 * @param devCategory
-	 *            The device category, i.e. the DogOnt class from which this
-	 *            device inherits (descending from dogont:Controllable)
-	 * @param devDescription
-	 *            The human-readable description of the device as extracted from
-	 *            the DogOnt ontology
-	 * @param devTechnology
-	 *            The technology with which the device is realized either
-	 *            BTICINO, KNX or ELITE
-	 * @param devLocations
-	 *            The architectural spaces in which the device is located, it
-	 *            might be in 2 or more places... For example a door isIn all
-	 *            rooms that are connected through it.
-	 */
-	public DeviceDescriptor(String devURI, String devCategory, String devDescription, String devTechnology,
-			String devLocation)
-	{
-		super();
-		this.devURI = devURI;
-		this.devCategory = devCategory;
-		this.devDescription = devDescription;
-		this.devTechnology = devTechnology;
-		this.devLocation = devLocation;
-		this.devSimpleConfigurationParams = new HashMap<String, Set<String>>();
-		this.devCommandSpecificParams = new HashSet<ElementDescription>();
-		this.devNotificationSpecificParams = new HashSet<ElementDescription>();
-	}
-	
-	/**
-	 * Creates a descriptor for a Dog/DogOnt device instance, it allows
-	 * representing together a set of low level device features such as the
-	 * network parameters, the device-specific command configurations, etc.
-	 * 
-	 * @param devURI
-	 *            The device URI, which uniquely identifies it inside a given
-	 *            home representation in DogOnt
-	 * @param devCategory
-	 *            The device category, i.e. the DogOnt class from which this
-	 *            device inherits (descending from dogont:Controllable)
-	 * @param devDescription
-	 *            The human-readable description of the device as extracted from
-	 *            the DogOnt ontology
-	 * @param devTechnology
-	 *            The technology with which the device is realized either
-	 *            BTICINO, KNX or ELITE
-	 */
-	public DeviceDescriptor(String devURI, String devCategory, String devDescription, String devTechnology)
-	{
-		super();
-		this.devURI = devURI;
-		this.devCategory = devCategory;
-		this.devDescription = devDescription;
-		this.devTechnology = devTechnology;
-		this.devLocation = "";
-		this.devSimpleConfigurationParams = new HashMap<String, Set<String>>();
-		this.devCommandSpecificParams = new HashSet<ElementDescription>();
-		this.devNotificationSpecificParams = new HashSet<ElementDescription>();
-	}
-	
-	/***
-	 * Dummy class constructor, with only a parameter
-	 * 
-	 * @param devURI
-	 *            The device URI, which uniquely identifies it inside a given
-	 *            home representation in DogOnt
-	 */
-	public DeviceDescriptor(String devURI)
-	{
-		this(devURI, "", "", "");
-	}
-	
-	/**
-	 * @param devURI
-	 *            the devURI to set
-	 */
-	public void setDevURI(String devURI)
-	{
-		this.devURI = devURI;
-	}
-	
-	/**
-	 * Provides back the URI of the device represented by this description
+	 * Provide the URI of the device represented by this descriptor
 	 * 
 	 * @return The device URI as {@link String}
 	 */
-	public String getDevURI()
+	public String getDeviceURI()
 	{
-		return devURI;
+		return this.deviceURI;
 	}
 	
 	/**
-	 * @param devCategory
-	 *            the devCategory to set
-	 */
-	public void setDevCategory(String devCategory)
-	{
-		this.devCategory = devCategory;
-	}
-	
-	/**
-	 * Provides back the DogOnt class of the device represented by this
-	 * description
+	 * Provide the DogOnt class of the device represented by this descriptor
 	 * 
-	 * @return The class URI as {@link String}
+	 * @return The class name as {@link String}
 	 */
-	public String getDevCategory()
+	public String getDeviceCategory()
 	{
-		return devCategory;
+		return this.deviceCategory;
 	}
 	
 	/**
-	 * @param devDescription
-	 *            the devDescription to set
+	 * @param deviceCategory
+	 *            the deviceCategory to set
 	 */
-	public void setDevDescription(String devDescription)
+	public void setDeviceCategory(String deviceCategory)
 	{
-		this.devDescription = devDescription;
+		this.deviceCategory = deviceCategory;
+		
+		// update the JAXB device
+		this.jaxbDevice.setClazz(deviceCategory);
 	}
 	
 	/**
-	 * Provides back the description of the device represented by this
-	 * description
+	 * @param deviceDescription
+	 *            the description (long name) of the device to set
+	 */
+	public void setDescription(String deviceDescription)
+	{
+		this.description = deviceDescription;
+		
+		// update the JAXB device
+		this.jaxbDevice.setDescription(deviceDescription);
+	}
+	
+	/**
+	 * Provide the description (long name) of the device represented by this
+	 * descriptor
 	 * 
-	 * @return The device description as {@link String}
+	 * @return the device description as {@link String}
 	 */
-	public String getDevDescription()
+	public String getDescription()
 	{
-		return devDescription;
+		return this.description;
 	}
 	
 	/**
-	 * @param gateway
-	 *            the gateway to set
+	 * Get the gateway associated to this device
+	 * 
+	 * @return the gateway device URI
+	 */
+	public String getGateway()
+	{
+		return this.gateway;
+	}
+	
+	/**
+	 * @param gateway the gateway to set
 	 */
 	public void setGateway(String gateway)
 	{
 		this.gateway = gateway;
+		
+		// update the JAXB device
+		this.jaxbDevice.setGateway(gateway);
 	}
-	
-	public String getGateway()
-	{
-		return gateway;
-	}
-	
+
 	/**
-	 * @return the meterOf
+	 * @return the meterOf information
 	 */
 	public Set<String> getMeterOf()
 	{
-		return meterOf;
+		return this.meterOf;
 	}
-	
+
 	/**
-	 * @param meterOf
-	 *            the meterOf to set
-	 */
-	public void setMeterOf(Set<String> meterOf)
-	{
-		this.meterOf = meterOf;
-	}
-	
-	
-	
-	/**
-	 * @return the hasMeter
+	 * @return the hasMeter information
 	 */
 	public String getHasMeter()
 	{
-		return hasMeter;
+		return this.hasMeter;
 	}
-
+	
 	/**
 	 * @param hasMeter the hasMeter to set
 	 */
 	public void setHasMeter(String hasMeter)
 	{
 		this.hasMeter = hasMeter;
+		
+		// update the JAXB device
+		this.setHasMeter(hasMeter);
 	}
 
 	/**
@@ -291,102 +268,102 @@ public class DeviceDescriptor
 	 */
 	public Set<String> getControlledObjects()
 	{
-		return controlledObjects;
+		return this.controlledObjects;
 	}
 
 	/**
-	 * @param controlledObjects the controlledObjects to set
-	 */
-	public void setControlledObjects(Set<String> controlledObjects)
-	{
-		this.controlledObjects = controlledObjects;
-	}
-
-	/**
-	 * @return the pluggedIn
+	 * @return the pluggedIn device URI
 	 */
 	public String getPluggedIn()
 	{
-		return pluggedIn;
+		return this.pluggedIn;
 	}
-
+	
 	/**
 	 * @param pluggedIn the pluggedIn to set
 	 */
 	public void setPluggedIn(String pluggedIn)
 	{
 		this.pluggedIn = pluggedIn;
+		
+		// update the JAXB device
+		this.jaxbDevice.setPluggedIn(pluggedIn);
 	}
 
 	/**
-	 * @return the sensorOf
+	 * @return the sensorOf information
 	 */
 	public String getSensorOf()
 	{
-		return sensorOf;
+		return this.sensorOf;
 	}
-
+	
 	/**
 	 * @param sensorOf the sensorOf to set
 	 */
 	public void setSensorOf(String sensorOf)
 	{
 		this.sensorOf = sensorOf;
+		
+		// update the JAXB device
+		this.jaxbDevice.setSensorOf(sensorOf);
 	}
 
 	/**
-	 * @return the actuatorOf
+	 * @return the actuatorOf device URI
 	 */
 	public String getActuatorOf()
 	{
-		return actuatorOf;
+		return this.actuatorOf;
 	}
-
+	
 	/**
 	 * @param actuatorOf the actuatorOf to set
 	 */
 	public void setActuatorOf(String actuatorOf)
 	{
 		this.actuatorOf = actuatorOf;
+		
+		// update the JAXB device
+		this.jaxbDevice.setActuatorOf(actuatorOf);
 	}
 
 	/**
-	 * @param devNotificationSpecificParams
-	 *            the devNotificationSpecificParams to set
+	 * Get the notification-related parameter store for the current device
+	 * descriptor
+	 * 
+	 * @return the notification-related parameters as a {@link Set} of
+	 *         {@link ElementDescription}
 	 */
-	public void setDevNotificationSpecificParams(Set<ElementDescription> devNotificationSpecificParams)
-	{
-		this.devNotificationSpecificParams = devNotificationSpecificParams;
-	}
-	
-	public Set<ElementDescription> getDevNotificationSpecificParams()
+	public Set<ElementDescription> getNotificationSpecificParams()
 	{
 		// return a copy of the element
-		return new HashSet<ElementDescription>(this.devNotificationSpecificParams);
+		return new HashSet<ElementDescription>(this.notificationSpecificParams);
 	}
 	
 	/**
-	 * Provides the Locations in which the device described by this class is
-	 * placed
+	 * Provide the location in which the device described is placed
 	 * 
-	 * @return A {@link Set} of location URIs indicating the rooms in which the
-	 *         device is located
+	 * @return the location indicating the room in which the device is located
 	 */
-	public String getDevLocation()
+	public String getLocation()
 	{
-		return devLocation;
+		return this.location;
 	}
 	
 	/**
-	 * Sets the Locations in which the device described by this class is placed
+	 * Set the location in which the device described is placed
 	 * 
-	 * @param devLocations
-	 *            A {@link Set} of location URIs indicating the rooms in which
+	 * @param deviceLocation
+	 *            A location as a {@link String}, indicating the room in which
 	 *            the device is located
 	 */
-	public void setDevLocation(String devLocation)
+	public void setLocation(String deviceLocation)
 	{
-		this.devLocation = devLocation;
+		this.location = deviceLocation;
+		
+		// update the JAXB device
+		this.jaxbDevice.setIsIn(deviceLocation);
 	}
 	
 	/**
@@ -397,22 +374,9 @@ public class DeviceDescriptor
 	 *         containing all device configuration parameters in name - value
 	 *         couples
 	 */
-	public Map<String, Set<String>> getDevSimpleConfigurationParams()
+	public Map<String, Set<String>> getSimpleConfigurationParams()
 	{
-		return devSimpleConfigurationParams;
-	}
-	
-	/**
-	 * Sets the {@link Map} containing all device configuration parameters in
-	 * name - value couples
-	 * 
-	 * @param devSimpleConfigurationParams
-	 *            A {@link Map}<{@link String},{@link String}> containing all
-	 *            device configuration parameters in name - value couples
-	 */
-	public void setDevSimpleConfigurationParams(Map<String, Set<String>> devSimpleConfigurationParams)
-	{
-		this.devSimpleConfigurationParams = devSimpleConfigurationParams;
+		return this.simpleConfigurationParams;
 	}
 	
 	/**
@@ -424,16 +388,16 @@ public class DeviceDescriptor
 	 *            The device configuration parameter value
 	 * @return true if the addition is successful, false otherwise
 	 */
-	public boolean addDevSimpleConfigurationParam(String name, String value)
+	private boolean addSimpleConfigurationParam(String name, String value)
 	{
-		if ((this.devSimpleConfigurationParams != null) && (name != null) && (!name.isEmpty()) && (value != null)
+		if ((this.simpleConfigurationParams != null) && (name != null) && (!name.isEmpty()) && (value != null)
 				&& (!value.isEmpty()))
 		{
-			Set<String> values = this.devSimpleConfigurationParams.get(name);
+			Set<String> values = this.simpleConfigurationParams.get(name);
 			if (values != null)
 				values.add(value);
 			else
-				this.devSimpleConfigurationParams.put(name, new HashSet<String>(Collections.singleton(value)));
+				this.simpleConfigurationParams.put(name, new HashSet<String>(Collections.singleton(value)));
 			return true;
 		}
 		else
@@ -444,99 +408,68 @@ public class DeviceDescriptor
 	 * Provides a {@link Set} of command specific configurations associated the
 	 * device represented by this description
 	 * 
-	 * @return A {@link Set}<{@link ElementDescription}> of command
-	 *         descriptions detailing command specific configurations associated
-	 *         to this device
+	 * @return A {@link Set}<{@link ElementDescription}> of command descriptions
+	 *         detailing command specific configurations associated to this
+	 *         device
 	 */
-	public Set<ElementDescription> getDevCommandSpecificParams()
+	public Set<ElementDescription> getCommandSpecificParams()
 	{
-		return devCommandSpecificParams;
+		return this.commandSpecificParams;
 	}
 	
 	/**
-	 * Sets the {@link Set} of command specific configurations associated to the
-	 * device represented by this description
-	 * 
-	 * @param devCommandSpecificParams
-	 *            A {@link Set}<{@link ElementDescription}> of command
-	 *            descriptions detailing command specific configurations
-	 *            associated to this device
-	 */
-	public void setDevCommandSpecificParams(Set<ElementDescription> devCommandSpecificParams)
-	{
-		this.devCommandSpecificParams = devCommandSpecificParams;
-	}
-	
-	/**
-	 * Adds one command specific configuration parameter, represented by a
-	 * {@link ElementDescription} instance
-	 * 
-	 * @param param
-	 *            The command specific configuration parameter to add.
-	 * @return true if the addition is successful, false otherwise
-	 */
-	public boolean addDevCommandSpecificParam(ElementDescription param)
-	{
-		if ((this.devCommandSpecificParams != null) && (param != null))
-		{
-			this.devCommandSpecificParams.add(param);
-			return true;
-		}
-		else
-			return false;
-	}
-	
-	/**
-	 * Adds one notification specific configuration parameter, represented by a
-	 * {@link ElementDescription} instance
-	 * 
-	 * @param param
-	 *            The notification specific configuration parameter to add.
-	 * @return true if the addition is successful, false otherwise
-	 */
-	public boolean addDevNotificationSpecificParam(ElementDescription param)
-	{
-		if ((this.devNotificationSpecificParams != null) && (param != null))
-		{
-			this.devNotificationSpecificParams.add(param);
-			return true;
-		}
-		else
-			return false;
-	}
-	
-	/**
-	 * Provides back the technology with which the device represented by this
-	 * description is built
+	 * Provide the technology with which the device represented by this
+	 * descriptor is built
 	 * 
 	 * @return The device-building technology as {@link String}
 	 */
-	public String getDevTechnology()
+	public String getTechnology()
 	{
-		return devTechnology;
+		return this.technology;
 	}
 	
 	/**
-	 * Sets the technology with which which the device represented by this
-	 * description is built
-	 * 
-	 * @param devTechnology
-	 *            The technology as a String (in upper case)
+	 * @param technology the technology to set
 	 */
-	public void setDevTechnology(String devTechnology)
+	public void setTechnology(String technology)
 	{
-		this.devTechnology = devTechnology;
+		this.technology = technology;
+		
+		// update the JAXB device
+		this.jaxbDevice.setDomoticSystem(technology);
 	}
 
+	/**
+	 * @return jaxbDevice the JAXB representation of the described device
+	 */
+	public Device getJaxbDevice()
+	{
+		return this.jaxbDevice;
+	}
+	
+	/**
+	 * @param jaxbDevice
+	 *            the jaxbDevice to set
+	 */
+	public void setJaxbDevice(Device jaxbDevice)
+	{
+		this.jaxbDevice = jaxbDevice;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("{ ");
-		sb.append("LOCATION = " + this.devLocation + ", ");
-		sb.append("DESCRIPTION = " + this.devDescription + ", ");
-		sb.append("DEVICE_CATEGORY = " + this.devCategory + ", ");
-		sb.append("MANUFACTURER = " + this.devTechnology + ", ");
+		sb.append("LOCATION = " + this.location + ", ");
+		sb.append("DESCRIPTION = " + this.description + ", ");
+		sb.append("DEVICE_CATEGORY = " + this.deviceCategory + ", ");
+		sb.append("MANUFACTURER = " + this.technology + ", ");
 		sb.append("GATEWAY = " + this.gateway + " }\n");
 		return sb.toString();
 	}
