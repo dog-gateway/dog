@@ -166,11 +166,11 @@ public abstract class ModbusDriver implements StatefulDevice
 		
 		// get parameters associated to each device command (if any)
 		Set<ElementDescription> commandsSpecificParameters = this.device.getDeviceDescriptor()
-				.getDevCommandSpecificParams();
+				.getCommandSpecificParams();
 		
 		// get parameters associated to each device notification (if any)
 		Set<ElementDescription> notificationsSpecificParameters = this.device.getDeviceDescriptor()
-				.getDevNotificationSpecificParams();
+				.getNotificationSpecificParams();
 		
 		// --------------- Handle command specific parameters ----------------
 		for (ElementDescription parameter : commandsSpecificParameters)

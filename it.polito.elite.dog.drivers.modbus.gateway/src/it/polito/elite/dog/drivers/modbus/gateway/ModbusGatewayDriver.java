@@ -206,13 +206,13 @@ public class ModbusGatewayDriver implements Driver
 		{
 			// get the corresponding end point set
 			Set<String> gatewayAddressSet = ((ControllableDevice) this.context.getService(reference))
-					.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_ADDRESS);
+					.getDeviceDescriptor().getSimpleConfigurationParams().get(ModbusInfo.GATEWAY_ADDRESS);
 			
 			Set<String> gatewayPortSet = ((ControllableDevice) this.context.getService(reference))
-					.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.GATEWAY_PORT);
+					.getDeviceDescriptor().getSimpleConfigurationParams().get(ModbusInfo.GATEWAY_PORT);
 			
 			Set<String> gatewayProtocolSet = ((ControllableDevice) this.context.getService(reference))
-					.getDeviceDescriptor().getDevSimpleConfigurationParams().get(ModbusInfo.PROTO_ID);
+					.getDeviceDescriptor().getSimpleConfigurationParams().get(ModbusInfo.PROTO_ID);
 			
 			String deviceId = ((ControllableDevice) this.context.getService(reference)).getDeviceId();
 			
