@@ -38,7 +38,9 @@ import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.osgi.framework.BundleContext;
@@ -70,6 +72,10 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	private DogHomeConfiguration xlmConfiguration;
 	// the logger
 	private LogHelper logger;
+	// the JAXB context
+	private JAXBContext jaxbContext;
+	// the XML configuration full path
+	private String configurationPath;
 	
 	// HouseModel service registration
 	private ServiceRegistration<?> srHouseModel;
@@ -157,7 +163,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	/**
 	 * Load and parse the XML configuration of the current environment.
 	 * 
-	 * @param xmlData
+	 * @param xmlFilename
 	 *            the XML file storing the configuration
 	 * @param type
 	 *            the configuration type (it supports {@link DeviceCostants}
@@ -165,18 +171,21 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 * @return true if the parsing has been successful or the configuration is
 	 *         not empty; false, otherwise.
 	 */
-	private boolean loadXmlConfiguration(String xmlData, String type)
+	private boolean loadXmlConfiguration(String xmlFilename, String type)
 	{
 		try
 		{
-			JAXBContext jaxbContext = JAXBContext.newInstance(DogHomeConfiguration.class.getPackage().getName());
-			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			this.jaxbContext = JAXBContext.newInstance(DogHomeConfiguration.class.getPackage().getName());
+			Unmarshaller unmarshaller = this.jaxbContext.createUnmarshaller();
 			
 			if (type.equals(DeviceCostants.DEVICES))
 			{
+				// store the configuration path
+				this.configurationPath = System.getProperty("configFolder") + "/" + xmlFilename;
+				
+				// unmarshall
 				this.xlmConfiguration = (DogHomeConfiguration) ((JAXBElement<DogHomeConfiguration>) unmarshaller
-						.unmarshal(new StreamSource(System.getProperty("configFolder") + "/" + xmlData),
-								DogHomeConfiguration.class)).getValue();
+						.unmarshal(new StreamSource(this.configurationPath), DogHomeConfiguration.class)).getValue();
 			}
 			
 		}
@@ -255,18 +264,21 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		for (DeviceDescriptor descriptor : updatedDescriptors)
 		{
-			this.updateConfiguration(descriptor);
+			this.updateDevice(descriptor);
 		}
+		
+		// write a new XML configuration file on disk
+		this.saveConfiguration();
 	}
 	
 	@Override
 	public void updateConfiguration(DeviceDescriptor updatedDescriptor)
 	{
-		// remove the device from the current configuration
-		this.removeFromConfiguration(updatedDescriptor.getDeviceURI());
+		// update the device present in the configuration
+		this.updateDevice(updatedDescriptor);
 		
-		// add the updated device
-		this.addToConfiguration(updatedDescriptor);
+		// write a new XML configuration file on disk
+		this.saveConfiguration();
 	}
 	
 	@Override
@@ -274,34 +286,22 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		for (DeviceDescriptor descriptor : newDescriptors)
 		{
-			this.addToConfiguration(descriptor);
+			// insert the device in the configuration
+			this.addDevice(descriptor);
 		}
+		
+		// write a new XML configuration file on disk
+		this.saveConfiguration();
 	}
 	
 	@Override
 	public void addToConfiguration(DeviceDescriptor newDescriptor)
 	{
-		// add the device into the device list
-		this.deviceList.put(newDescriptor.getDeviceURI(), newDescriptor);
+		// insert the device in the configuration
+		this.addDevice(newDescriptor);
 		
-		// add the device into the category list
-		HashSet<String> deviceUris = null;
-		if (this.deviceCategoriesUriList.containsKey(newDescriptor.getDeviceCategory()))
-		{
-			deviceUris = this.deviceCategoriesUriList.get(newDescriptor.getDeviceCategory());
-		}
-		else
-		{
-			deviceUris = new HashSet<String>();
-			this.deviceCategoriesUriList.put(newDescriptor.getDeviceCategory(), deviceUris);
-		}
-		deviceUris.add(newDescriptor.getDeviceURI());
-		
-		// add the new device into the XML configuration
-		if (this.xlmConfiguration != null)
-		{
-			this.xlmConfiguration.getControllables().get(0).getDevice().add(newDescriptor.getJaxbDevice());
-		}
+		// write a new XML configuration file on disk
+		this.saveConfiguration();
 	}
 	
 	@Override
@@ -309,12 +309,79 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		for (String device : deviceURIs)
 		{
-			this.removeFromConfiguration(device);
+			this.removeDevice(device);
 		}
+		
+		// write a new XML configuration file on disk
+		this.saveConfiguration();
 	}
 	
 	@Override
 	public void removeFromConfiguration(String deviceURI)
+	{
+		// remove the given device from the configuration
+		this.removeDevice(deviceURI);
+		
+		// write a new XML configuration file on disk
+		this.saveConfiguration();
+	}
+	
+	/**
+	 * Implementation of the updateConfiguration methods, for updating the
+	 * devices present in the HouseModel at runtime
+	 * 
+	 * @param updatedDescriptor
+	 *            the {@link DeviceDescriptor} representing the device to update
+	 */
+	private void updateDevice(DeviceDescriptor updatedDescriptor)
+	{
+		// remove the device from the current configuration
+		this.removeDevice(updatedDescriptor.getDeviceURI());
+		
+		// add the updated device
+		this.addDevice(updatedDescriptor);
+	}
+	
+	/**
+	 * Implementation of the addToConfiguration methods, for adding devices to
+	 * the HouseModel at runtime
+	 * 
+	 * @param descriptor
+	 *            the {@link DeviceDescriptor} representing the device to add
+	 */
+	private void addDevice(DeviceDescriptor descriptor)
+	{
+		// add the device into the device list
+		this.deviceList.put(descriptor.getDeviceURI(), descriptor);
+		
+		// add the device into the category list
+		HashSet<String> deviceUris = null;
+		if (this.deviceCategoriesUriList.containsKey(descriptor.getDeviceCategory()))
+		{
+			deviceUris = this.deviceCategoriesUriList.get(descriptor.getDeviceCategory());
+		}
+		else
+		{
+			deviceUris = new HashSet<String>();
+			this.deviceCategoriesUriList.put(descriptor.getDeviceCategory(), deviceUris);
+		}
+		deviceUris.add(descriptor.getDeviceURI());
+		
+		// add the new device into the XML configuration
+		if (this.xlmConfiguration != null)
+		{
+			this.xlmConfiguration.getControllables().get(0).getDevice().add(descriptor.getJaxbDevice());
+		}
+	}
+	
+	/**
+	 * Implementation of the removeFromConfiguration methods, for removing
+	 * devices from the HouseModel at runtime
+	 * 
+	 * @param deviceURI
+	 *            the URI of the device to remove
+	 */
+	private void removeDevice(String deviceURI)
 	{
 		// remove the device from the device list
 		DeviceDescriptor deviceProp = this.deviceList.remove(deviceURI);
@@ -354,7 +421,26 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 				this.xlmConfiguration.getControllables().get(0).getDevice().remove(removedDevice);
 			}
 		}
-		
+	}
+	
+	/**
+	 * Save the updated XML configuration onto the disk
+	 */
+	private void saveConfiguration()
+	{
+		try
+		{
+			// create the marshaller
+			Marshaller marshaller = jaxbContext.createMarshaller();
+			
+			// write the updated XML configuration upon the old one...
+			if ((this.configurationPath != null) && (!this.configurationPath.isEmpty()))
+				marshaller.marshal(this.xlmConfiguration, new StreamResult(this.configurationPath));
+		}
+		catch (JAXBException e)
+		{
+			this.logger.log(LogService.LOG_ERROR, "Exception in saving the XML configuration onto the disk", e);
+		}
 	}
 	
 	@Override
