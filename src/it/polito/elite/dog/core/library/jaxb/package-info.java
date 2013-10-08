@@ -22,5 +22,5 @@
 // Generated on: 2013.09.13 at 02:38:48 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://elite.polito.it/dogHomeConfiguration", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://elite.polito.it/dogHomeConfiguration", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED, xmlns={@javax.xml.bind.annotation.XmlNs(prefix="dhc", namespaceURI="http://elite.polito.it/dogHomeConfiguration")})
 package it.polito.elite.dog.core.library.jaxb;
