@@ -203,7 +203,7 @@ public class KnxIPGatewayDriver implements Driver
 			// get the corresponding end point set
 			
 			Set<String> gatewayAddressSet = ((ControllableDevice) this.context.getService(reference))
-					.getDeviceDescriptor().getDevSimpleConfigurationParams().get(KnxIPInfo.GATEWAY_ADDRESS);
+					.getDeviceDescriptor().getSimpleConfigurationParams().get(KnxIPInfo.GATEWAY_ADDRESS);
 			
 			String deviceId = ((ControllableDevice) this.context.getService(reference)).getDeviceId();
 			
