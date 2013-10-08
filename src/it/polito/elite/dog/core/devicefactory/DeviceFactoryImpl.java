@@ -155,7 +155,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 			catch (Exception e)
 			{
 				// log the error
-				this.logger.log(LogService.LOG_ERROR, devProp.getDevURI() + " gives the exception: ", e);
+				this.logger.log(LogService.LOG_ERROR, devProp.getDeviceURI() + " gives the exception: ", e);
 			}
 			
 		}
@@ -180,7 +180,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 	{
 		// get the class corresponding to the desired DogDevice category
 		Class<?> cls = DeviceFactoryImpl.class.getClassLoader().loadClass(
-				this.classPrefix + ".Dog" + devDescriptor.getDevCategory());
+				this.classPrefix + ".Dog" + devDescriptor.getDeviceCategory());
 		
 		// create the desired DogDevice instance
 		Class<?> partypes[] = new Class[2];
@@ -193,7 +193,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 		ct.newInstance(arglist);
 		
 		// log success
-		this.logger.log(LogService.LOG_INFO, "Created device " + devDescriptor.getDevURI() + " with properties: " + devDescriptor.toString());
+		this.logger.log(LogService.LOG_INFO, "Created device " + devDescriptor.getDeviceURI() + " with properties: " + devDescriptor.toString());
 	}
 	
 	@Override
@@ -203,7 +203,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 		houseModel.get().addToConfiguration(descriptor);
 		
 		// get the device URI
-		String deviceUri = descriptor.getDevURI();
+		String deviceUri = descriptor.getDeviceURI();
 		
 		// log
 		this.logger.log(LogService.LOG_INFO, "Adding " + deviceUri + "...");
@@ -286,7 +286,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 		this.houseModel.get().updateConfiguration(descriptor);
 		
 		// get the device URI
-		String deviceUri = descriptor.getDevURI();
+		String deviceUri = descriptor.getDeviceURI();
 		
 		// log
 		this.logger.log(LogService.LOG_INFO, "Updating " + deviceUri + "...");
