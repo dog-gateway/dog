@@ -26,6 +26,7 @@ import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.util.ElementDescription;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,10 @@ public class DeviceDescriptor
 	 */
 	public DeviceDescriptor(Device jaxbDevice)
 	{
+		// init
+		this.simpleConfigurationParams = new HashMap<String, Set<String>>();
+		this.location = "";
+		
 		// the device unique URI (mandatory)
 		this.deviceURI = jaxbDevice.getName();
 		
@@ -82,8 +87,6 @@ public class DeviceDescriptor
 		// location in the environment
 		if (jaxbDevice.getIsIn() != null)
 			this.location = jaxbDevice.getIsIn();
-		else
-			this.location = "";
 		
 		// description (long name)
 		this.description = jaxbDevice.getDescription();
@@ -226,7 +229,8 @@ public class DeviceDescriptor
 	}
 	
 	/**
-	 * @param gateway the gateway to set
+	 * @param gateway
+	 *            the gateway to set
 	 */
 	public void setGateway(String gateway)
 	{
@@ -235,13 +239,24 @@ public class DeviceDescriptor
 		// update the JAXB device
 		this.jaxbDevice.setGateway(gateway);
 	}
-
+	
 	/**
 	 * @return the meterOf information
 	 */
 	public Set<String> getMeterOf()
 	{
 		return this.meterOf;
+	}
+	
+	/**
+	 * @param meterOf the meterOf to set
+	 */
+	public void setMeterOf(Set<String> meterOf)
+	{
+		this.meterOf = meterOf;
+		
+		// update the JAXB device
+		this.jaxbDevice.getMeterOf().addAll(meterOf);
 	}
 
 	/**
@@ -253,7 +268,8 @@ public class DeviceDescriptor
 	}
 	
 	/**
-	 * @param hasMeter the hasMeter to set
+	 * @param hasMeter
+	 *            the hasMeter to set
 	 */
 	public void setHasMeter(String hasMeter)
 	{
@@ -262,13 +278,24 @@ public class DeviceDescriptor
 		// update the JAXB device
 		this.setHasMeter(hasMeter);
 	}
-
+	
 	/**
 	 * @return the controlledObjects
 	 */
 	public Set<String> getControlledObjects()
 	{
 		return this.controlledObjects;
+	}
+	
+	/**
+	 * @param controlledObjects the controlledObjects to set
+	 */
+	public void setControlledObjects(Set<String> controlledObjects)
+	{
+		this.controlledObjects = controlledObjects;
+		
+		// update the JAXB device
+		this.jaxbDevice.getControls().addAll(controlledObjects);
 	}
 
 	/**
@@ -280,7 +307,8 @@ public class DeviceDescriptor
 	}
 	
 	/**
-	 * @param pluggedIn the pluggedIn to set
+	 * @param pluggedIn
+	 *            the pluggedIn to set
 	 */
 	public void setPluggedIn(String pluggedIn)
 	{
@@ -289,7 +317,7 @@ public class DeviceDescriptor
 		// update the JAXB device
 		this.jaxbDevice.setPluggedIn(pluggedIn);
 	}
-
+	
 	/**
 	 * @return the sensorOf information
 	 */
@@ -299,7 +327,8 @@ public class DeviceDescriptor
 	}
 	
 	/**
-	 * @param sensorOf the sensorOf to set
+	 * @param sensorOf
+	 *            the sensorOf to set
 	 */
 	public void setSensorOf(String sensorOf)
 	{
@@ -308,7 +337,7 @@ public class DeviceDescriptor
 		// update the JAXB device
 		this.jaxbDevice.setSensorOf(sensorOf);
 	}
-
+	
 	/**
 	 * @return the actuatorOf device URI
 	 */
@@ -318,7 +347,8 @@ public class DeviceDescriptor
 	}
 	
 	/**
-	 * @param actuatorOf the actuatorOf to set
+	 * @param actuatorOf
+	 *            the actuatorOf to set
 	 */
 	public void setActuatorOf(String actuatorOf)
 	{
@@ -327,7 +357,7 @@ public class DeviceDescriptor
 		// update the JAXB device
 		this.jaxbDevice.setActuatorOf(actuatorOf);
 	}
-
+	
 	/**
 	 * Get the notification-related parameter store for the current device
 	 * descriptor
@@ -429,7 +459,8 @@ public class DeviceDescriptor
 	}
 	
 	/**
-	 * @param technology the technology to set
+	 * @param technology
+	 *            the technology to set
 	 */
 	public void setTechnology(String technology)
 	{
@@ -438,7 +469,7 @@ public class DeviceDescriptor
 		// update the JAXB device
 		this.jaxbDevice.setDomoticSystem(technology);
 	}
-
+	
 	/**
 	 * @return jaxbDevice the JAXB representation of the described device
 	 */
