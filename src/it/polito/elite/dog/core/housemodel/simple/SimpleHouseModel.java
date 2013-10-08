@@ -18,17 +18,10 @@
 package it.polito.elite.dog.core.housemodel.simple;
 
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
-import it.polito.elite.dog.core.library.jaxb.Configcommand;
-import it.polito.elite.dog.core.library.jaxb.Confignotification;
-import it.polito.elite.dog.core.library.jaxb.Configparam;
-import it.polito.elite.dog.core.library.jaxb.ControlFunctionality;
 import it.polito.elite.dog.core.library.jaxb.Device;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
-import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
-import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
-import it.polito.elite.dog.core.library.util.ElementDescription;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.BufferedReader;
@@ -194,7 +187,9 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		
 		long t1 = System.currentTimeMillis();
 		
-		this.getDeviceDescriptionFromXml();
+		// create a DeviceDescriptor-based representation of current XML
+		// configuration
+		this.createDeviceDescriptors();
 		
 		long t2 = System.currentTimeMillis();
 		this.logger.log(LogService.LOG_INFO, String.format("Parsing time: JAXB %.2f s\n", (float) (t2 - t1) / 1000f));
@@ -203,94 +198,32 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		
 	}
 	
-	/***
-	 * Retrieve information about DeviceDescriptor from XML data
+	/**
+	 * Create a DeviceDescriptor for each JAXB device obtained from the XML
+	 * configuration
 	 */
-	private void getDeviceDescriptionFromXml()
+	private void createDeviceDescriptors()
 	{
 		if (this.xlmConfiguration != null)
 		{
-			// for each device
 			for (Device dev : this.xlmConfiguration.getControllables().get(0).getDevice())
 			{
-				DeviceDescriptor deviceDescriptor = new DeviceDescriptor(dev.getName());
-				deviceDescriptor.setDevTechnology(dev.getDomoticSystem());
-				deviceDescriptor.setDevCategory(dev.getClazz());
-				if (dev.getIsIn() != null)
-					deviceDescriptor.setDevLocation(dev.getIsIn());
-				else
-					deviceDescriptor.setDevLocation("");
-				deviceDescriptor.setDevDescription(dev.getDescription());
-				deviceDescriptor.setGateway(dev.getGateway());
-				
-				// actuator
-				deviceDescriptor.setActuatorOf(dev.getActuatorOf());
-				
-				// controlled objects
-				List<String> allControls = dev.getControls();
-				if ((allControls != null) && (!allControls.isEmpty()))
-					deviceDescriptor.setControlledObjects(new HashSet<String>(allControls));
-				
-				// has meter
-				deviceDescriptor.setHasMeter(dev.getHasMeter());
-				
-				// set parameters
-				for (Configparam param : dev.getParam())
-				{
-					deviceDescriptor.addDevSimpleConfigurationParam(param.getName(), param.getValue());
-				}
-				HashSet<ElementDescription> dogCommandsParameter = new HashSet<ElementDescription>();
-				// parameter of the commands
-				for (ControlFunctionality controlF : dev.getControlFunctionality())
-				{
-					for (Configcommand command : controlF.getCommands().getCommand())
-					{
-						
-						ElementDescription dogElementDescription = new ElementDescription(command.getName(),
-								command.getClazz());
-						for (Configparam param : command.getParam())
-						{
-							dogElementDescription.addElementParam(param.getName(), param.getValue());
-						}
-						dogCommandsParameter.add(dogElementDescription);
-						
-					}
-				} // end for controlfunctionality
-				
-				// notification parameters
-				HashSet<ElementDescription> dogNotificationsParameter = new HashSet<ElementDescription>();
-				for (NotificationFunctionality notificatinF : dev.getNotificationFunctionality())
-				{
-					for (Confignotification notification : notificatinF.getNotifications().getNotification())
-					{
-						ElementDescription dogElementDescription = new ElementDescription(notification.getName(),
-								notification.getClazz());
-						
-						for (Configparam param : notification.getParam())
-						{
-							dogElementDescription.addElementParam(param.getName(), param.getValue());
-						}
-						dogNotificationsParameter.add(dogElementDescription);
-						
-					}
-					
-				}
-				
-				deviceDescriptor.setDevNotificationSpecificParams(dogNotificationsParameter);
-				deviceDescriptor.setDevCommandSpecificParams(dogCommandsParameter);
+				DeviceDescriptor currentDescriptor = new DeviceDescriptor(dev);
 				
 				// add the Device Descriptor to the device list
-				this.deviceList.put(deviceDescriptor.getDevURI(), deviceDescriptor);
+				this.deviceList.put(currentDescriptor.getDeviceURI(), currentDescriptor);
+				
 				// add the element to the map that stores information grouped by
 				// Device Category
-				HashSet<String> devicesForDevCategory = this.deviceCategoriesUriList.get(deviceDescriptor
-						.getDevCategory());
+				HashSet<String> devicesForDevCategory = this.deviceCategoriesUriList.get(currentDescriptor
+						.getDeviceCategory());
+				// category does not exist yet...
 				if (devicesForDevCategory == null)
 				{
 					devicesForDevCategory = new HashSet<String>();
-					this.deviceCategoriesUriList.put(deviceDescriptor.getDevCategory(), devicesForDevCategory);
+					this.deviceCategoriesUriList.put(currentDescriptor.getDeviceCategory(), devicesForDevCategory);
 				}
-				devicesForDevCategory.add(deviceDescriptor.getDevURI());
+				devicesForDevCategory.add(currentDescriptor.getDeviceURI());
 			}
 			
 		}
@@ -330,7 +263,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	public void updateConfiguration(DeviceDescriptor updatedDescriptor)
 	{
 		// remove the device from the current configuration
-		this.removeFromConfiguration(updatedDescriptor.getDevURI());
+		this.removeFromConfiguration(updatedDescriptor.getDeviceURI());
 		
 		// add the updated device
 		this.addToConfiguration(updatedDescriptor);
@@ -349,35 +282,25 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	public void addToConfiguration(DeviceDescriptor newDescriptor)
 	{
 		// add the device into the device list
-		this.deviceList.put(newDescriptor.getDevURI(), newDescriptor);
+		this.deviceList.put(newDescriptor.getDeviceURI(), newDescriptor);
 		
 		// add the device into the category list
 		HashSet<String> deviceUris = null;
-		if (this.deviceCategoriesUriList.containsKey(newDescriptor.getDevCategory()))
+		if (this.deviceCategoriesUriList.containsKey(newDescriptor.getDeviceCategory()))
 		{
-			deviceUris = this.deviceCategoriesUriList.get(newDescriptor.getDevCategory());
+			deviceUris = this.deviceCategoriesUriList.get(newDescriptor.getDeviceCategory());
 		}
 		else
 		{
 			deviceUris = new HashSet<String>();
-			this.deviceCategoriesUriList.put(newDescriptor.getDevCategory(), deviceUris);
+			this.deviceCategoriesUriList.put(newDescriptor.getDeviceCategory(), deviceUris);
 		}
-		deviceUris.add(newDescriptor.getDevURI());
+		deviceUris.add(newDescriptor.getDeviceURI());
 		
 		// add the new device into the XML configuration
 		if (this.xlmConfiguration != null)
 		{
-			ObjectFactory factory = new ObjectFactory();
-			Device newDevice = factory.createDevice();
-			
-			newDevice.setName(newDescriptor.getDevURI());
-			newDevice.setClazz(newDescriptor.getDevCategory());
-			newDevice.setDomoticSystem(newDescriptor.getDevTechnology());
-			newDevice.setIsIn(newDescriptor.getDevLocation());
-			newDevice.setDescription(newDescriptor.getDevDescription());
-			
-			this.xlmConfiguration.getControllables().get(0).getDevice().add(newDevice);
-			
+			this.xlmConfiguration.getControllables().get(0).getDevice().add(newDescriptor.getJaxbDevice());
 		}
 	}
 	
@@ -399,7 +322,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		// remove the device from the category list
 		if (deviceProp != null)
 		{
-			String deviceCategory = deviceProp.getDevCategory();
+			String deviceCategory = deviceProp.getDeviceCategory();
 			if (deviceCategory != null)
 			{
 				HashSet<String> devices = this.deviceCategoriesUriList.get(deviceCategory);
