@@ -51,8 +51,6 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 	public static final String CMD_EXCLUDE = "controller.RemoveNodeFromNetwork";
 	public static final String CMD_LEARN = "controller.SetLearnMode";
 	public static final String CMD_RESET = "controller.SetDefault";
-	
-
 
 	// The OSGi framework context
 	protected BundleContext context;
@@ -101,14 +99,14 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 	{
 		// initialize the map of connected gateways
 		this.connectedGateways = new ConcurrentHashMap<String, ZWaveGatewayDriverInstance>();
-		
+
 		// initialize the supported devices map
 		this.supportedDevices = new ConcurrentHashMap<String, String>();
-		
-		//initialize the network driver reference
+
+		// initialize the network driver reference
 		this.network = new AtomicReference<ZWaveNetwork>();
-		
-		//initialize the device factory reference
+
+		// initialize the device factory reference
 		this.deviceFactory = new AtomicReference<DeviceFactory>();
 	}
 
@@ -223,6 +221,11 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 							(ControllableDevice) context.getService(reference),
 							Integer.parseInt(sNodeID), instancesId, context);
 
+					// set the supported devices
+					if ((this.supportedDevices != null)
+							&& (!this.supportedDevices.isEmpty()))
+						driver.setSupportedDevices(this.supportedDevices);
+					
 					synchronized (connectedGateways)
 					{
 						// store a reference to the gateway driver
@@ -343,33 +346,38 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 		// creation will be disabled
 		if (config != null)
 		{
-			//debug
-			if(this.supportedDevices.isEmpty())
-				this.logger.log(LogService.LOG_DEBUG, "Creating dynamic device creation db...");
+			// debug
+			if (this.supportedDevices.isEmpty())
+				this.logger.log(LogService.LOG_DEBUG,
+						"Creating dynamic device creation db...");
 			else
-				this.logger.log(LogService.LOG_DEBUG, "Updating dynamic device creation db...");
+				this.logger.log(LogService.LOG_DEBUG,
+						"Updating dynamic device creation db...");
 			// store the configuration (deep copy, check if needed)
 			Enumeration<String> keys = config.keys();
-			
-			//iterate over the keys
-			while(keys.hasMoreElements())
+
+			// iterate over the keys
+			while (keys.hasMoreElements())
 			{
-				//get the device unique id (manufacturer-productseries-productid)
+				// get the device unique id
+				// (manufacturer-productseries-productid)
 				String deviceId = keys.nextElement();
-				String deviceType = (String)config.get(deviceId);
-				
-				//store the couple
+				String deviceType = (String) config.get(deviceId);
+
+				// store the couple
 				this.supportedDevices.put(deviceId, deviceType);
 			}
-			
-			//update connected drivers
-			for(String key : this.connectedGateways.keySet())
+
+			// update connected drivers
+			for (String key : this.connectedGateways.keySet())
 			{
-				this.connectedGateways.get(key).setSupportedDevices(this.supportedDevices);
+				this.connectedGateways.get(key).setSupportedDevices(
+						this.supportedDevices);
 			}
-			
-			//debug
-			this.logger.log(LogService.LOG_DEBUG, "Completed dynamic device creation db");
+
+			// debug
+			this.logger.log(LogService.LOG_DEBUG,
+					"Completed dynamic device creation db");
 		}
 	}
 }

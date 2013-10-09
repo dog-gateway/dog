@@ -1,12 +1,12 @@
-<!-- $name definition -->
-
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+<dhc:controllables>
 <dhc:device domoticSystem="ZWave" name="$name" class="MeteringPowerOutlet"
 	gateway="$gateway">
 	<dhc:description>$description</dhc:description>
 	<dhc:isIn>$location</dhc:isIn>
-	<dhc:param value="$nodeId" name="NodeID" />
+	<dhc:param value="$nodeId" name="NodeID" type="network"/>
 	#foreach( $instanceId in $instanceIds )
-	<dhc:param value="$instanceId" name="InstanceID" />
+	<dhc:param value="$instanceId" name="InstanceID" type="network"/>
 	#end
 	<dhc:controlFunctionality class="OnOffFunctionality">
 		<dhc:commands>
@@ -16,7 +16,7 @@
 			</dhc:command>
 			<dhc:command id="OnCommand_$name" name="OnCommand_$name"
 				class="OnCommand">
-				<dhc:param value="on" name="realCommandName" />
+				<param value="on" name="realCommandName" />
 			</dhc:command>
 		</dhc:commands>
 	</dhc:controlFunctionality>
@@ -33,8 +33,8 @@
 		<dhc:commands>
 			<dhc:command id="GetActiveEnergyValueCommand_$name" name="GetActiveEnergyValueCommand_$name"
 				class="GetActiveEnergyCommand">
-				<dhc:param value="getActiveEnergyValue" name="realCommandName" />
-				<dhc:param value="Measure" name="returnType" />
+				<param value="getActiveEnergyValue" name="realCommandName" />
+				<param value="Measure" name="returnType" />
 			</dhc:command>
 		</dhc:commands>
 	</dhc:controlFunctionality>
@@ -90,3 +90,5 @@
 		</dhc:statevalues>
 	</dhc:state>
 </dhc:device>
+</dhc:controllables>
+</dhc:dogHomeConfiguration>

@@ -20,6 +20,7 @@ package it.polito.elite.dog.drivers.zwave.gateway;
 import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
+import it.polito.elite.dog.core.library.model.DeviceDescriptorFactory;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.HomeGateway;
 import it.polito.elite.dog.core.library.model.devicecategory.ZWaveGateway;
@@ -36,7 +37,6 @@ import it.polito.elite.dog.drivers.zwave.model.Device;
 import it.polito.elite.dog.drivers.zwave.model.DeviceData;
 import it.polito.elite.dog.drivers.zwave.model.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
-import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 
@@ -66,11 +66,17 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 	// the device factory reference
 	private DeviceFactory deviceFactory;
 
+	// the device descriptor factory reference
+	private DeviceDescriptorFactory descriptorFactory;
+
 	// last included device;
 	private int lastIncludedDevice = -1;
 
 	// last excluded device
 	private int lastExcludedDevice = -1;
+
+	// enable dynamic device detection
+	private boolean detectionEnabled = false;
 
 	public ZWaveGatewayDriverInstance(ZWaveNetwork network,
 			DeviceFactory deviceFactory, ControllableDevice controllableDevice,
@@ -88,6 +94,18 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 
 		// create a logger
 		logger = new LogHelper(context);
+
+		// create the device descriptor factory
+		try
+		{
+			this.descriptorFactory = new DeviceDescriptorFactory(context
+					.getBundle().getEntry("/deviceTemplates"));
+		} catch (Exception e)
+		{
+
+			this.logger.log(LogService.LOG_ERROR,
+					"Error while creating DeviceDescriptorFactory ", e);
+		}
 
 		// create a new device state (according to the current DogOnt model, no
 		// state is actually associated to a Modbus gateway)
@@ -124,7 +142,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 	@Override
 	public void associate()
 	{
-		//start inclusion mode
+		// start inclusion mode
 		network.controllerWrite(ZWaveGatewayDriver.CMD_INCLUDE, "1");
 	}
 
@@ -134,7 +152,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 	@Override
 	public void disassociate() // TODO: remove String nodeID
 	{
-		//start exclusion mode
+		// start exclusion mode
 		network.controllerWrite(ZWaveGatewayDriver.CMD_EXCLUDE, "1");
 	}
 
@@ -186,41 +204,50 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		controller = controllerNode;
 
 		/*-------------- HANDLE ASSOCIATION ------------------------*/
-
-		// check if any new device has been recently associated
-		int lastIncludedDeviceAtController = controller.getData()
-				.getLastIncludedDevice();
-		if ((lastIncludedDeviceAtController != -1)
-				// checks that the device is not the last included before
-				&& (lastIncludedDeviceAtController != this.lastIncludedDevice)
-				// checks that the device is not already included and running
-				&& (this.network
-						.getControllableDeviceURIFromNodeId(lastIncludedDeviceAtController) == null)
-				// checks that there are supported devices
-				&& (this.supportedDevices != null)
-				&& (!this.supportedDevices.isEmpty()))
+		// check if dynamic device detection is enabled
+		if (detectionEnabled)
 		{
-
-			// get the device data
-			Device newDeviceData = this.network
-					.getRawDevice(lastIncludedDeviceAtController);
-
-			// TODO: extract data for uniquely identifying the device
-
-			// build the device descriptor
-			DeviceDescriptor descriptorToAdd = this.buildDeviceDescriptor(
-					newDeviceData, lastIncludedDeviceAtController);
-
-			// check not null
-			if (descriptorToAdd != null)
+			// check if any new device has been recently associated
+			int lastIncludedDeviceAtController = controller.getData()
+					.getLastIncludedDevice();
+			if ((lastIncludedDeviceAtController != -1)
+					// checks that the device is not the last included before
+					&& (lastIncludedDeviceAtController != this.lastIncludedDevice)
+					// checks that the device is not already included and
+					// running
+					&& (this.network
+							.getControllableDeviceURIFromNodeId(lastIncludedDeviceAtController) == null)
+					// checks that there are supported devices
+					&& (this.supportedDevices != null)
+					&& (!this.supportedDevices.isEmpty()))
 			{
-				// create the device
-				// cross the finger
-				this.deviceFactory.addNewDevice(descriptorToAdd);
 
-				// TODO: only when the device has been created update the last
-				// included device
-				this.lastIncludedDevice = lastIncludedDeviceAtController;
+				// get the device data
+				Device newDeviceData = this.network
+						.getRawDevice(lastIncludedDeviceAtController);
+
+				// TODO: extract data for uniquely identifying the device
+
+				// build the device descriptor
+				DeviceDescriptor descriptorToAdd = this.buildDeviceDescriptor(
+						newDeviceData, lastIncludedDeviceAtController);
+
+				// check not null
+				if (descriptorToAdd != null)
+				{
+					// create the device
+					// cross the finger
+					this.deviceFactory.addNewDevice(descriptorToAdd);
+
+					// only when the device has been created update the
+					// last included device
+					this.lastIncludedDevice = lastIncludedDeviceAtController;
+
+					// disable dynamic detection until a new association is
+					// detected
+					this.detectionEnabled = false;
+
+				}
 			}
 		}
 
@@ -258,6 +285,15 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		{
 		case 0: // idle
 		{
+			if (this.currentState.getState(
+					DeviceAssociationState.class.getSimpleName())
+					.getCurrentStateValue()[0].getClass().getName()
+					.equals(AssociatingStateValue.class.getName()))
+			{
+				// enable dynamic device detection
+				this.detectionEnabled = true;
+			}
+
 			this.notifyStateChanged(new DeviceAssociationState(
 					new IdleStateValue()));
 			break;
@@ -266,6 +302,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		{
 			this.notifyStateChanged(new DeviceAssociationState(
 					new AssociatingStateValue()));
+
 			break;
 		}
 		case 5: // disassociating
@@ -334,49 +371,90 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 	// TODO: implement better.... just a trial
 	private DeviceDescriptor buildDeviceDescriptor(Device device, int nodeId)
 	{
+		// the device descriptor to return
 		DeviceDescriptor descriptor = null;
 
-		// get the new device data
-		DeviceData deviceData = device.getData();
-
-		// get the manufacturer id
-		String manufacturerId = deviceData.getAllData()
-				.get(DataConst.MANUFACTURER_ID).getValue().toString();
-		String manufacturerProductType = deviceData.getAllData()
-				.get(DataConst.MANUFACTURER_PRODUCT_TYPE).getValue().toString();
-		String manufacturerProductId = deviceData.getAllData()
-				.get(DataConst.MANUFACTURER_PRODUCT_ID).getValue().toString();
-
-		// build the device unique id
-		String deviceUniqueId = manufacturerId + "-" + manufacturerProductType
-				+ "-" + manufacturerProductId;
-
-		// get the device class
-		String deviceClass = this.supportedDevices.get(deviceUniqueId);
-
-		if ((deviceClass != null) && (!deviceClass.isEmpty()))
+		if (this.descriptorFactory != null)
 		{
-			/*
-			descriptor = new DeviceDescriptor(deviceClass + "_" + nodeId,
-					deviceClass, "New Device of type " + deviceClass,
-					ZWaveInfo.MANUFACTURER);
-			descriptor.setDevLocation("");
-			descriptor.setGateway(this.device.getDeviceId());
-			descriptor.addDevSimpleConfigurationParam("NodeID", "" + nodeId);
 
-			// mine instances
-			for (Integer instanceId : device.getInstances().keySet())
+			// get the new device data
+			DeviceData deviceData = device.getData();
+
+			// get the manufacturer id
+			String manufacturerId = deviceData.getAllData()
+					.get(DataConst.MANUFACTURER_ID).getValue().toString();
+			String manufacturerProductType = deviceData.getAllData()
+					.get(DataConst.MANUFACTURER_PRODUCT_TYPE).getValue()
+					.toString();
+			String manufacturerProductId = deviceData.getAllData()
+					.get(DataConst.MANUFACTURER_PRODUCT_ID).getValue()
+					.toString();
+
+			// build the device unique id
+			String deviceUniqueId = manufacturerId + "-"
+					+ manufacturerProductType + "-" + manufacturerProductId;
+
+			// get the device class
+			String deviceClass = this.supportedDevices.get(deviceUniqueId);
+
+			if ((deviceClass != null) && (!deviceClass.isEmpty()))
 			{
-				descriptor.addDevSimpleConfigurationParam("InstanceID",
-						instanceId.toString());
-			}*/
+				// create a descriptor definition map
+				HashMap<String, Object> descriptorDefinitionData = new HashMap<String, Object>();
 
-			// debug dump
-			this.logger.log(LogService.LOG_INFO,
-					"Detected new device: \n\tdeviceUniqueId: "
-							+ deviceUniqueId + "\n\tnodeId: "
-							+ this.lastIncludedDevice + "\n\tdeviceClass: "
-							+ deviceClass);
+				// store the device name
+				descriptorDefinitionData.put(DeviceDescriptorFactory.NAME,
+						deviceClass + "_" + nodeId);
+
+				// store the device description
+				descriptorDefinitionData.put(
+						DeviceDescriptorFactory.DESCRIPTION,
+						"New Device of type " + deviceClass);
+
+				// store the device gateway
+				descriptorDefinitionData.put(DeviceDescriptorFactory.GATEWAY,
+						this.device.getDeviceId());
+
+				// store the device location
+				descriptorDefinitionData.put(DeviceDescriptorFactory.LOCATION,
+						"");
+
+				// store the node id
+				descriptorDefinitionData.put("nodeId", "" + nodeId);
+
+				// handle multiple instances
+				String instanceIds[] = new String[device.getInstances().size()];
+
+				// mine instances
+				int i = 0;
+				for (Integer instanceId : device.getInstances().keySet())
+				{
+					instanceIds[i] = instanceId.toString();
+					i++;
+				}
+
+				// store mined instances
+				descriptorDefinitionData.put("instanceIds", instanceIds);
+
+				// get the device descriptor
+				try
+				{
+					descriptor = this.descriptorFactory.getDescriptor(
+							descriptorDefinitionData, deviceClass);
+				} catch (Exception e)
+				{
+					this.logger
+							.log(LogService.LOG_ERROR,
+									"Error while creating DeviceDescriptor for the just added device ",
+									e);
+				}
+
+				// debug dump
+				this.logger.log(LogService.LOG_INFO,
+						"Detected new device: \n\tdeviceUniqueId: "
+								+ deviceUniqueId + "\n\tnodeId: " + nodeId
+								+ "\n\tdeviceClass: " + deviceClass);
+			}
 		}
 
 		// return
