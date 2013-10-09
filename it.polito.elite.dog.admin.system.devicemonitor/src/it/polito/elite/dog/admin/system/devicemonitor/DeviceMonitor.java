@@ -152,7 +152,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 
 						// get the device icon...
 						String category = currentDevice.getDeviceDescriptor()
-								.getDevCategory();
+								.getDeviceCategory();
 						htmlOut.append("<p><i class=\"device-"
 								+ category.toLowerCase() + "\"></i>");
 
