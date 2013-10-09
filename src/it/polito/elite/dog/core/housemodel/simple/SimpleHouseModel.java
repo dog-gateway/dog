@@ -18,6 +18,8 @@
 package it.polito.elite.dog.core.housemodel.simple;
 
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
+import it.polito.elite.dog.core.library.jaxb.BuildingEnvironment;
+import it.polito.elite.dog.core.library.jaxb.Controllables;
 import it.polito.elite.dog.core.library.jaxb.Device;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
@@ -28,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -69,7 +72,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	// the SVG house plan
 	private String svgPlan;
 	// the XML configuration
-	private DogHomeConfiguration xlmConfiguration;
+	private DogHomeConfiguration xmlConfiguration;
 	// the logger
 	private LogHelper logger;
 	// the JAXB context
@@ -184,7 +187,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 				this.configurationPath = System.getProperty("configFolder") + "/" + xmlFilename;
 				
 				// unmarshall
-				this.xlmConfiguration = (DogHomeConfiguration) ((JAXBElement<DogHomeConfiguration>) unmarshaller
+				this.xmlConfiguration = (DogHomeConfiguration) ((JAXBElement<DogHomeConfiguration>) unmarshaller
 						.unmarshal(new StreamSource(this.configurationPath), DogHomeConfiguration.class)).getValue();
 			}
 			
@@ -213,9 +216,9 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 */
 	private void createDeviceDescriptors()
 	{
-		if (this.xlmConfiguration != null)
+		if (this.xmlConfiguration != null)
 		{
-			for (Device dev : this.xlmConfiguration.getControllables().get(0).getDevice())
+			for (Device dev : this.xmlConfiguration.getControllables().get(0).getDevice())
 			{
 				DeviceDescriptor currentDescriptor = new DeviceDescriptor(dev);
 				
@@ -368,9 +371,9 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		deviceUris.add(descriptor.getDeviceURI());
 		
 		// add the new device into the XML configuration
-		if (this.xlmConfiguration != null)
+		if (this.xmlConfiguration != null)
 		{
-			this.xlmConfiguration.getControllables().get(0).getDevice().add(descriptor.getJaxbDevice());
+			this.xmlConfiguration.getControllables().get(0).getDevice().add(descriptor.getJaxbDevice());
 		}
 	}
 	
@@ -401,10 +404,10 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		}
 		
 		// remove the device from the XML configuration
-		if (this.xlmConfiguration != null)
+		if (this.xmlConfiguration != null)
 		{
 			Device removedDevice = null;
-			List<Device> devices = this.xlmConfiguration.getControllables().get(0).getDevice();
+			List<Device> devices = this.xmlConfiguration.getControllables().get(0).getDevice();
 			boolean found = false;
 			for (int i = 0; i < devices.size() && !found; i++)
 			{
@@ -418,7 +421,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 			}
 			if (removedDevice != null)
 			{
-				this.xlmConfiguration.getControllables().get(0).getDevice().remove(removedDevice);
+				this.xmlConfiguration.getControllables().get(0).getDevice().remove(removedDevice);
 			}
 		}
 	}
@@ -436,7 +439,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 			
 			// write the updated XML configuration upon the old one...
 			if ((this.configurationPath != null) && (!this.configurationPath.isEmpty()))
-				marshaller.marshal(this.xlmConfiguration, new StreamResult(this.configurationPath));
+				marshaller.marshal(this.xmlConfiguration, new StreamResult(this.configurationPath));
 		}
 		catch (JAXBException e)
 		{
@@ -448,12 +451,6 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	public Vector<DeviceDescriptor> getConfiguration()
 	{
 		return this.getConfigDevice();
-	}
-	
-	@Override
-	public String getSVGPlan()
-	{
-		return this.svgPlan;
 	}
 	
 	/**
@@ -535,6 +532,51 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 			
 		}
 		return devicesProp;
+	}
+	
+	@Override
+	public String getSVGPlan()
+	{
+		return this.svgPlan;
+	}
+	
+	@Override
+	public DogHomeConfiguration getJAXBConfiguration()
+	{
+		// return the complete JAXB configuration (i.e., rooms, devices,
+		// low-level properties, etc.)
+		return this.xmlConfiguration;
+	}
+	
+	@Override
+	public List<Controllables> getJAXBDevices()
+	{
+		List<Controllables> devices = new ArrayList<Controllables>();
+		
+		if (this.xmlConfiguration.getControllables() != null)
+		{
+			devices.addAll(this.xmlConfiguration.getControllables());
+		}
+		
+		// return all the devices with their properties, in their JAXB
+		// representation
+		return devices;
+		
+	}
+	
+	@Override
+	public List<BuildingEnvironment> getJAXBBuildingEnvironment()
+	{
+		List<BuildingEnvironment> building = new ArrayList<BuildingEnvironment>();
+		
+		if (this.xmlConfiguration.getBuildingEnvironment() != null)
+		{
+			building.addAll(this.xmlConfiguration.getBuildingEnvironment());
+		}
+		
+		// return the building structures (flats, rooms, etc.) in their JAXB
+		// representation
+		return building;
 	}
 	
 	/*********************************************************************************

@@ -17,8 +17,12 @@
  */
 package it.polito.elite.dog.core.housemodel.api;
 
+import it.polito.elite.dog.core.library.jaxb.BuildingEnvironment;
+import it.polito.elite.dog.core.library.jaxb.Controllables;
+import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -33,7 +37,8 @@ import java.util.Vector;
 public interface HouseModel
 {
 	/**
-	 * Update the list of devices configured in the real environment.
+	 * Update the list of devices configured in the real environment (only in
+	 * the HouseModel, not in the framework)
 	 * 
 	 * @param descriptors
 	 *            a {@link Vector} of {@link DeviceDescriptor} containing the
@@ -42,7 +47,8 @@ public interface HouseModel
 	public void updateConfiguration(Vector<DeviceDescriptor> updatedDescriptors);
 	
 	/**
-	 * Update a device configured in the real environment
+	 * Update a device configured in the real environment (only in the
+	 * HouseModel, not in the framework)
 	 * 
 	 * @param updatedDescriptor
 	 *            the information about the device to update
@@ -50,7 +56,8 @@ public interface HouseModel
 	public void updateConfiguration(DeviceDescriptor updatedDescriptor);
 	
 	/**
-	 * Add a list of devices to the current configuration
+	 * Add a list of devices to the current configuration (only in the
+	 * HouseModel, not in the framework)
 	 * 
 	 * @param newDescriptors
 	 *            a {@link Vector} of {@link DeviceDescriptor} containing the
@@ -59,7 +66,8 @@ public interface HouseModel
 	public void addToConfiguration(Vector<DeviceDescriptor> newDescriptors);
 	
 	/**
-	 * Add a device to the current configuration
+	 * Add a device to the current configuration (only in the HouseModel, not in
+	 * the framework)
 	 * 
 	 * @param newDescriptor
 	 *            the information about the device to add
@@ -67,7 +75,8 @@ public interface HouseModel
 	public void addToConfiguration(DeviceDescriptor newDescriptor);
 	
 	/**
-	 * Remove a list of devices from the current configuration
+	 * Remove a list of devices from the current configuration (only in the
+	 * HouseModel, not in the framework)
 	 * 
 	 * @param removedDescriptors
 	 *            a {@link Set} of {@link String} representing the device URIs
@@ -75,7 +84,8 @@ public interface HouseModel
 	public void removeFromConfiguration(Set<String> deviceURIs);
 	
 	/**
-	 * Remove a device from the current configuration
+	 * Remove a device from the current configuration (only in the HouseModel,
+	 * not in the framework)
 	 * 
 	 * @param removedDescriptor
 	 *            the URI of the device to remove
@@ -91,9 +101,86 @@ public interface HouseModel
 	public Vector<DeviceDescriptor> getConfiguration();
 	
 	/**
+	 * Get the JAXB representation of the environment: a list of devices, with
+	 * their properties, and a list of rooms/places.
+	 * 
+	 * @return {@link DogHomeConfiguration}
+	 */
+	public DogHomeConfiguration getJAXBConfiguration();
+	
+	/**
+	 * Get the JAXB representation of the devices configured in the environment,
+	 * with their properties
+	 * 
+	 * @return a {@link List} of {@link Controllables}, i.e., all the configured
+	 *         devices
+	 */
+	public List<Controllables> getJAXBDevices();
+	
+	/**
+	 * Get the JAXB representation of the building environment (flats, rooms,
+	 * etc.)
+	 * 
+	 * @return a {@link List} of {@link BuildingEnvironment}, i.e., all the
+	 *         building-related environments (flats, rooms, etc.)
+	 */
+	public List<BuildingEnvironment> getJAXBBuildingEnvironment();
+	
+	/**
 	 * Get the SVG house plan.
 	 * 
 	 * @return a SVG image representing the current environment
 	 */
 	public String getSVGPlan();
+	
+	/**
+	 * Update the description (i.e., long name) of a building environment
+	 * present in the current configuration
+	 * 
+	 * @param URI
+	 *            the unique name of the building environment to update
+	 * @param description
+	 *            the new description of the building environment to update
+	 */
+	//public void updateBuildingConfiguration(String URI, String description);
+	
+	/**
+	 * Add a room to an existing flat or storey present in the configuration
+	 * 
+	 * @param URI
+	 *            the unique name of the room to add
+	 * @param description
+	 *            the (optional) description of the room to add
+	 * @param type
+	 *            the room type
+	 * @param isIn
+	 *            the unique name representing where the room is located
+	 */
+	//public void addRoomToBuilding(String URI, String description, String type, String isIn);
+	
+	/**
+	 * Add a flat to the building environment
+	 * 
+	 * @param name
+	 *            the unique name of the flat to add
+	 */
+	//public void addFlatToBuilding(String URI);
+	
+	/**
+	 * Add a storey to the building environment
+	 * 
+	 * @param name
+	 *            the unique name of the storey to add
+	 */
+	//public void addStoreyToBuilding(String URI);
+	
+	/**
+	 * Remove an existing building environment in the configuration with all its
+	 * children (e.g., if a storey has been removed, all the rooms present in
+	 * the storey are removed)
+	 * 
+	 * @param name
+	 *            the unique name of the building environment to remove
+	 */
+	//public void removeFromBuildingConfiguration(String URI);
 }
