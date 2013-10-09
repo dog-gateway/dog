@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+	<dhc:controllables>
+		<dhc:device class="DoorSensor" name="ZW_DoorWindowSensor_$name"
+			domoticSystem="ZWave" gateway="$gateway">
+			<dhc:description>$description</dhc:description>
+			<dhc:isIn>$location</dhc:isIn>
+			<dhc:param value="$nodeId" name="NodeID" type="network" />
+			#foreach( $instanceId in $instanceIds )
+			<dhc:param value="$instanceId" name="InstanceID" type="network" />
+			#end
+			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="StateChangeNotification"
+						name="StateChangeNotification_$name">
+						<dhc:param name="nParams" value="1" />
+						<dhc:param name="notificationName" value="stateChanged" />
+						<dhc:param name="notificationParamName" value="newState"
+							type="State" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality class="OpenCloseNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="CloseNotification"
+						name="CloseNotification_$name">
+						<dhc:param name="nParams" value="0" />
+						<dhc:param name="notificationName" value="close" />
+					</dhc:notification>
+					<dhc:notification class="OpenNotification"
+						name="OpenNotification_$name">
+						<dhc:param name="nParams" value="0" />
+						<dhc:param name="notificationName" value="open" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:state class="OpenCloseState">
+				<dhc:statevalues>
+					<dhc:statevalue class="OpenStateValue" name="open" />
+					<dhc:statevalue class="CloseStateValue" name="close" />
+				</dhc:statevalues>
+			</dhc:state>
+		</dhc:device>
+	</dhc:controllables>
+</dhc:dogHomeConfiguration>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
 <dhc:controllables>
 <dhc:device domoticSystem="ZWave" name="$name" class="MeteringPowerOutlet"
