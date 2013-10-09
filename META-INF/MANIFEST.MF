@@ -26,4 +26,10 @@ Export-Package: it.polito.elite.dog.core.library.model;version="1.0.0",
    it.polito.elite.domotics.dog2.doglibrary.message,
    org.w3c.dom"
 Bundle-ClassPath: .,
- lib/commons-codec-1.7.jar
+ lib/commons-codec-1.7.jar,
+ lib/avalon-logkit-2.1.jar,
+ lib/commons-collections-3.2.1.jar,
+ lib/commons-lang-2.4.jar,
+ lib/oro-2.0.8.jar,
+ lib/velocity-1.7.jar,
+ lib/velocity-tools-generic-2.0.jar
