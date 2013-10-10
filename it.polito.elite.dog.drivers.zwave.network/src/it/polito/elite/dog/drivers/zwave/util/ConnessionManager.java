@@ -17,9 +17,10 @@
  */
 package it.polito.elite.dog.drivers.zwave.util;
 
-import it.polito.elite.dog.drivers.zwave.model.ZWaveModelTree;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.ZWaveModelTree;
 
 import java.io.IOException;
+
 
 //import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;

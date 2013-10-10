@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import it.polito.elite.dog.drivers.zwave.model.ZWaveModelTree;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.ZWaveModelTree;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;

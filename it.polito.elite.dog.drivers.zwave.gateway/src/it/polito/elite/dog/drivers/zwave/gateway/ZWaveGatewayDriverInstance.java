@@ -31,11 +31,11 @@ import it.polito.elite.dog.core.library.model.statevalue.DisassociatingStateValu
 import it.polito.elite.dog.core.library.model.statevalue.IdleStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
-import it.polito.elite.dog.drivers.zwave.model.Controller;
-import it.polito.elite.dog.drivers.zwave.model.DataConst;
-import it.polito.elite.dog.drivers.zwave.model.Device;
-import it.polito.elite.dog.drivers.zwave.model.DeviceData;
-import it.polito.elite.dog.drivers.zwave.model.Instance;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.DataConst;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.DeviceData;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;

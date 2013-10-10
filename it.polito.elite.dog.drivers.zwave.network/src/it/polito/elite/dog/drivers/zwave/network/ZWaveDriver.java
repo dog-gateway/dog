@@ -17,9 +17,9 @@
  */
 package it.polito.elite.dog.drivers.zwave.network;
 
-import it.polito.elite.dog.drivers.zwave.model.Controller;
-import it.polito.elite.dog.drivers.zwave.model.Device;
-import it.polito.elite.dog.drivers.zwave.model.Instance;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;

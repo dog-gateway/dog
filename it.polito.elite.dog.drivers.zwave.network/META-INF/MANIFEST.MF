@@ -7,14 +7,17 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
 Export-Package: it.polito.elite.dog.drivers.zwave,
  it.polito.elite.dog.drivers.zwave.model,
+ it.polito.elite.dog.drivers.zwave.model.commandclasses,
+ it.polito.elite.dog.drivers.zwave.model.zway.json,
  it.polito.elite.dog.drivers.zwave.network,
  it.polito.elite.dog.drivers.zwave.network.info,
  it.polito.elite.dog.drivers.zwave.network.interfaces,
  it.polito.elite.dog.drivers.zwave.util
 Bundle-ClassPath: .
-Import-Package:  it.polito.elite.dog.core.library.model.devicecategory,
+Import-Package: it.polito.elite.dog.core.library.model,
+ it.polito.elite.dog.core.library.model.devicecategory,
  it.polito.elite.dog.core.library.util,
- it.polito.elite.dog.core.library.model,
+ javax.measure;version="4.3.1",
  javax.ws.rs.client;version="2.0.0",
  javax.ws.rs.core,
  org.codehaus.jackson;version="1.9.2",

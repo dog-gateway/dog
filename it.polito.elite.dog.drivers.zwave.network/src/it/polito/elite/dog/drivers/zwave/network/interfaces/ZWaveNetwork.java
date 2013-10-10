@@ -19,7 +19,7 @@ package it.polito.elite.dog.drivers.zwave.network.interfaces;
 
 import java.util.Map;
 
-import it.polito.elite.dog.drivers.zwave.model.Device;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 
