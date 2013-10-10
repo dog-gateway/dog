@@ -18,10 +18,14 @@
 package it.polito.elite.dog.core.housemodel.simple;
 
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
+import it.polito.elite.dog.core.library.jaxb.Building;
 import it.polito.elite.dog.core.library.jaxb.BuildingEnvironment;
 import it.polito.elite.dog.core.library.jaxb.Controllables;
 import it.polito.elite.dog.core.library.jaxb.Device;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
+import it.polito.elite.dog.core.library.jaxb.Flat;
+import it.polito.elite.dog.core.library.jaxb.Room;
+import it.polito.elite.dog.core.library.jaxb.Storey;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import it.polito.elite.dog.core.library.util.LogHelper;
@@ -579,6 +583,406 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		return building;
 	}
 	
+	@Override
+	public void updateBuildingConfiguration(Room roomToUpdate, String containerURI)
+	{
+		boolean removed = this.removeRoom(roomToUpdate.getName(), containerURI);
+		
+		boolean added = this.addRoom(roomToUpdate, containerURI);
+		
+		if ((added) && (removed))
+			this.saveConfiguration();
+	}
+	
+	@Override
+	public void updateBuildingConfiguration(Flat flatToUpdate)
+	{
+		boolean removed = this.removeFlat(flatToUpdate.getName());
+		
+		boolean added = this.addFlat(flatToUpdate);
+		
+		if ((added) && (removed))
+			this.saveConfiguration();
+	}
+	
+	@Override
+	public void updateBuildingConfiguration(Flat flatToUpdate, String storeyURI)
+	{
+		boolean removed = this.removeFlat(flatToUpdate.getName());
+		
+		boolean added = this.addFlat(flatToUpdate, storeyURI);
+		
+		if ((added) && (removed))
+			this.saveConfiguration();
+	}
+	
+	@Override
+	public void updateBuildingConfiguration(Storey storeyToUpdate)
+	{
+		boolean removed = this.removeStorey(storeyToUpdate.getName());
+		
+		boolean added = this.addStorey(storeyToUpdate);
+		
+		if ((added) && (removed))
+			this.saveConfiguration();
+	}
+	
+	@Override
+	public void addRoomToBuilding(Room roomToAdd, String containerURI)
+	{
+		if (this.xmlConfiguration != null && !this.xmlConfiguration.getBuildingEnvironment().isEmpty())
+		{
+			if (!this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().isEmpty())
+			{
+				boolean added = this.addRoom(roomToAdd, containerURI);
+				
+				if (added)
+					this.saveConfiguration();
+			}
+		}
+	}
+	
+	/**
+	 * Implementation of the addRoomToBuilding() method.
+	 * 
+	 * @param roomToAdd
+	 *            the JAXB room object to add
+	 * @param containerURI
+	 *            the unique name representing where the room is located
+	 * @return true if the operation was successful, false otherwise
+	 */
+	private boolean addRoom(Room roomToAdd, String containerURI)
+	{
+		boolean found = false;
+		
+		Building building = this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0);
+		
+		for (Flat flat : building.getFlat())
+		{
+			if (flat.getName().equals(containerURI) && (!found))
+			{
+				flat.getRoom().add(roomToAdd);
+				found = true;
+			}
+		}
+		for (Storey storey : building.getStorey())
+		{
+			if (storey.getName().equals(containerURI) && (!found))
+			{
+				storey.getRoom().add(roomToAdd);
+				found = true;
+			}
+			for (Flat flat : storey.getFlat())
+			{
+				if (flat.getName().equals(containerURI) && (!found))
+				{
+					flat.getRoom().add(roomToAdd);
+					found = true;
+				}
+			}
+		}
+		
+		return found;
+	}
+	
+	@Override
+	public void addFlatToBuilding(Flat flatToAdd)
+	{
+		if (this.xmlConfiguration != null && !this.xmlConfiguration.getBuildingEnvironment().isEmpty())
+		{
+			if (!this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().isEmpty())
+			{
+				boolean added = this.addFlat(flatToAdd);
+				
+				if (added)
+					this.saveConfiguration();
+			}
+		}
+	}
+	
+	/**
+	 * Implementation of the addFlatToBuilding() method.
+	 * 
+	 * @param flatToAdd
+	 *            the JAXB flat object to add
+	 * @return true if the operation was successful, false otherwise
+	 */
+	private boolean addFlat(Flat flatToAdd)
+	{
+		boolean added = this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getFlat()
+				.add(flatToAdd);
+		
+		return added;
+	}
+	
+	@Override
+	public void addStoreyToBuilding(Storey storeyToAdd)
+	{
+		if (this.xmlConfiguration != null && !this.xmlConfiguration.getBuildingEnvironment().isEmpty())
+		{
+			if (!this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().isEmpty())
+			{
+				boolean added = this.addStorey(storeyToAdd);
+				
+				if (added)
+					this.saveConfiguration();
+			}
+		}
+	}
+	
+	/**
+	 * Implementation of the addStoreyToBuilding() method.
+	 * 
+	 * @param storeyToAdd
+	 *            the JAXB storey object to add
+	 * @return true if the operation was successful, false otherwise
+	 */
+	private boolean addStorey(Storey storeyToAdd)
+	{
+		boolean added = this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getStorey()
+				.add(storeyToAdd);
+		
+		return added;
+	}
+	
+	@Override
+	public void addFlatToStorey(Flat flatToAdd, String storeyURI)
+	{
+		if (this.xmlConfiguration != null && !this.xmlConfiguration.getBuildingEnvironment().isEmpty())
+		{
+			if (!this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().isEmpty())
+			{
+				boolean added = this.addFlat(flatToAdd, storeyURI);
+				
+				if (added)
+					this.saveConfiguration();
+			}
+		}
+	}
+	
+	/**
+	 * Implementation of the addFlatToStorey() method.
+	 * 
+	 * @param flatToAdd
+	 *            the JAXB flat object to add
+	 * @param storeyURI
+	 *            the unique name representing in which storey the flat is
+	 *            located
+	 * @return true if the operation was successful, false otherwise
+	 */
+	private boolean addFlat(Flat flatToAdd, String storeyURI)
+	{
+		boolean added = false;
+		
+		for (Storey storey : this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getStorey())
+		{
+			if (storey.getName().equals(storeyURI))
+			{
+				added = storey.getFlat().add(flatToAdd);
+			}
+		}
+		return added;
+	}
+	
+	@Override
+	public void removeRoomFromBuilding(String roomURI, String containerURI)
+	{
+		if (this.xmlConfiguration != null && !this.xmlConfiguration.getBuildingEnvironment().isEmpty())
+		{
+			if (!this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().isEmpty())
+			{
+				boolean removed = this.removeRoom(roomURI, containerURI);
+				
+				if (removed)
+					this.saveConfiguration();
+			}
+		}
+	}
+	
+	/**
+	 * Implementation of the removeRoomFromBuilding() method.
+	 * 
+	 * @param roomURI
+	 *            the unique name representing the room to remove
+	 * @param containerURI
+	 *            the unique name representing where the room is located
+	 * @return true if the operation was successful, false otherwise
+	 */
+	private boolean removeRoom(String roomURI, String containerURI)
+	{
+		Room removedRoom = null;
+		
+		boolean found = false;
+		
+		Building building = this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0);
+		Flat containerFlat = null;
+		
+		for (Flat flat : building.getFlat())
+		{
+			if (flat.getName().equals(containerURI) && (!found))
+			{
+				for (Room room : flat.getRoom())
+				{
+					if (room.getName().equals(roomURI) && (!found))
+					{
+						removedRoom = room;
+						containerFlat = flat;
+						found = true;
+					}
+				}
+			}
+		}
+		if ((removedRoom != null) && (containerFlat != null))
+		{
+			containerFlat.getRoom().remove(removedRoom);
+		}
+		else
+		{
+			Storey containerStorey = null;
+			for (Storey storey : building.getStorey())
+			{
+				if (storey.getName().equals(containerURI) && (!found))
+				{
+					for (Room room : storey.getRoom())
+					{
+						if (room.getName().equals(roomURI) && (!found))
+						{
+							containerStorey = storey;
+							removedRoom = room;
+							found = true;
+						}
+					}
+				}
+				for (Flat flat : storey.getFlat())
+				{
+					if (flat.getName().equals(containerURI) && (!found))
+					{
+						for (Room room : flat.getRoom())
+						{
+							if (room.getName().equals(roomURI) && (!found))
+							{
+								containerFlat = flat;
+								removedRoom = room;
+								found = true;
+							}
+						}
+					}
+				}
+			}
+			if (removedRoom != null)
+			{
+				if (containerStorey != null)
+				{
+					containerStorey.getRoom().remove(removedRoom);
+				}
+				else if (containerFlat != null)
+				{
+					containerFlat.getRoom().remove(removedRoom);
+				}
+			}
+		}
+		return found;
+	}
+	
+	@Override
+	public void removeFlatFromBuilding(String flatURI)
+	{
+		if (this.xmlConfiguration != null && !this.xmlConfiguration.getBuildingEnvironment().isEmpty())
+		{
+			if (!this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().isEmpty())
+			{
+				boolean removed = this.removeFlat(flatURI);
+				
+				if (removed)
+					this.saveConfiguration();
+			}
+		}
+	}
+	
+	/**
+	 * Implementation of the removeFlatFromBuilding() method.
+	 * 
+	 * @param flatURI
+	 *            the unique name representing the flat to remove
+	 * @return true if the operation was successful, false otherwise
+	 */
+	private boolean removeFlat(String flatURI)
+	{
+		Flat flatToRemove = null;
+		boolean found = false;
+		
+		for (Flat flat : this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getFlat())
+		{
+			if (flat.equals(flatURI) && (!found))
+			{
+				flatToRemove = flat;
+				found = true;
+			}
+		}
+		if (flatToRemove != null)
+			this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getFlat().remove(flatToRemove);
+		else
+		{
+			for (Storey storey : this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getStorey())
+			{
+				for (Flat flat : storey.getFlat())
+				{
+					if (flat.equals(flatURI) && (!found))
+					{
+						flatToRemove = flat;
+						found = true;
+					}
+				}
+				if (flatToRemove != null)
+					storey.getFlat().remove(flatToRemove);
+			}
+		}
+		return found;
+	}
+	
+	@Override
+	public void removeStoreyFromBuilding(String storeyURI)
+	{
+		if (this.xmlConfiguration != null && !this.xmlConfiguration.getBuildingEnvironment().isEmpty())
+		{
+			if (!this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().isEmpty())
+			{
+				boolean removed = this.removeStorey(storeyURI);
+				
+				if (removed)
+					this.saveConfiguration();
+			}
+		}
+		
+	}
+	
+	/**
+	 * Implementation of the removeStoreyFromBuilding() method.
+	 * 
+	 * @param storeyURI
+	 *            the unique name representing the storey to remove
+	 * @return true if the operation was successful, false otherwise
+	 */
+	private boolean removeStorey(String storeyURI)
+	{
+		Storey storeyToRemove = null;
+		boolean found = false;
+		
+		for (Storey storey : this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getStorey())
+		{
+			if (storey.equals(storeyURI) && (!found))
+			{
+				storeyToRemove = storey;
+				found = true;
+			}
+		}
+		if (storeyToRemove != null)
+		{
+			this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getFlat().remove(storeyToRemove);
+		}
+		return found;
+	}
+	
 	/*********************************************************************************
 	 * 
 	 * Bundle utilities
@@ -621,5 +1025,4 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		
 		return buffer.toString();
 	}
-	
 }
