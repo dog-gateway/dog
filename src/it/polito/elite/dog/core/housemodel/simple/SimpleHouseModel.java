@@ -356,7 +356,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 * @param descriptor
 	 *            the {@link DeviceDescriptor} representing the device to add
 	 */
-	private void addDevice(DeviceDescriptor descriptor)
+	private synchronized void addDevice(DeviceDescriptor descriptor)
 	{
 		// add the device into the device list
 		this.deviceList.put(descriptor.getDeviceURI(), descriptor);
@@ -388,7 +388,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 * @param deviceURI
 	 *            the URI of the device to remove
 	 */
-	private void removeDevice(String deviceURI)
+	private synchronized void removeDevice(String deviceURI)
 	{
 		// remove the device from the device list
 		DeviceDescriptor deviceProp = this.deviceList.remove(deviceURI);
@@ -433,7 +433,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	/**
 	 * Save the updated XML configuration onto the disk
 	 */
-	private void saveConfiguration()
+	private synchronized void saveConfiguration()
 	{
 		try
 		{
@@ -442,7 +442,8 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
 			// write the updated XML configuration upon the old one...
-			if ((this.configurationPath != null) && (!this.configurationPath.isEmpty()))
+			if ((this.configurationPath != null) && (!this.configurationPath.isEmpty())
+					&& (this.xmlConfiguration != null))
 				marshaller.marshal(this.xmlConfiguration, new StreamResult(this.configurationPath));
 		}
 		catch (JAXBException e)
@@ -557,7 +558,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		List<Controllables> devices = new ArrayList<Controllables>();
 		
-		if (this.xmlConfiguration.getControllables() != null)
+		if ((this.xmlConfiguration != null) && (!this.xmlConfiguration.getControllables().isEmpty()))
 		{
 			devices.addAll(this.xmlConfiguration.getControllables());
 		}
@@ -573,7 +574,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		List<BuildingEnvironment> building = new ArrayList<BuildingEnvironment>();
 		
-		if (this.xmlConfiguration.getBuildingEnvironment() != null)
+		if ((this.xmlConfiguration != null) && (!this.xmlConfiguration.getBuildingEnvironment().isEmpty()))
 		{
 			building.addAll(this.xmlConfiguration.getBuildingEnvironment());
 		}
@@ -586,45 +587,57 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	@Override
 	public void updateBuildingConfiguration(Room roomToUpdate, String containerURI)
 	{
-		boolean removed = this.removeRoom(roomToUpdate.getName(), containerURI);
-		
-		boolean added = this.addRoom(roomToUpdate, containerURI);
-		
-		if ((added) && (removed))
-			this.saveConfiguration();
+		if (this.xmlConfiguration != null)
+		{
+			boolean removed = this.removeRoom(roomToUpdate.getName(), containerURI);
+			
+			boolean added = this.addRoom(roomToUpdate, containerURI);
+			
+			if ((added) && (removed))
+				this.saveConfiguration();
+		}
 	}
 	
 	@Override
 	public void updateBuildingConfiguration(Flat flatToUpdate)
 	{
-		boolean removed = this.removeFlat(flatToUpdate.getName());
-		
-		boolean added = this.addFlat(flatToUpdate);
-		
-		if ((added) && (removed))
-			this.saveConfiguration();
+		if (this.xmlConfiguration != null)
+		{
+			boolean removed = this.removeFlat(flatToUpdate.getName());
+			
+			boolean added = this.addFlat(flatToUpdate);
+			
+			if ((added) && (removed))
+				this.saveConfiguration();
+		}
 	}
 	
 	@Override
 	public void updateBuildingConfiguration(Flat flatToUpdate, String storeyURI)
 	{
-		boolean removed = this.removeFlat(flatToUpdate.getName());
-		
-		boolean added = this.addFlat(flatToUpdate, storeyURI);
-		
-		if ((added) && (removed))
-			this.saveConfiguration();
+		if (this.xmlConfiguration != null)
+		{
+			boolean removed = this.removeFlat(flatToUpdate.getName());
+			
+			boolean added = this.addFlat(flatToUpdate, storeyURI);
+			
+			if ((added) && (removed))
+				this.saveConfiguration();
+		}
 	}
 	
 	@Override
 	public void updateBuildingConfiguration(Storey storeyToUpdate)
 	{
-		boolean removed = this.removeStorey(storeyToUpdate.getName());
-		
-		boolean added = this.addStorey(storeyToUpdate);
-		
-		if ((added) && (removed))
-			this.saveConfiguration();
+		if (this.xmlConfiguration != null)
+		{
+			boolean removed = this.removeStorey(storeyToUpdate.getName());
+			
+			boolean added = this.addStorey(storeyToUpdate);
+			
+			if ((added) && (removed))
+				this.saveConfiguration();
+		}
 	}
 	
 	@Override
@@ -651,7 +664,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 *            the unique name representing where the room is located
 	 * @return true if the operation was successful, false otherwise
 	 */
-	private boolean addRoom(Room roomToAdd, String containerURI)
+	private synchronized boolean addRoom(Room roomToAdd, String containerURI)
 	{
 		boolean found = false;
 		
@@ -707,7 +720,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 *            the JAXB flat object to add
 	 * @return true if the operation was successful, false otherwise
 	 */
-	private boolean addFlat(Flat flatToAdd)
+	private synchronized boolean addFlat(Flat flatToAdd)
 	{
 		boolean added = this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getFlat()
 				.add(flatToAdd);
@@ -737,7 +750,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 *            the JAXB storey object to add
 	 * @return true if the operation was successful, false otherwise
 	 */
-	private boolean addStorey(Storey storeyToAdd)
+	private synchronized boolean addStorey(Storey storeyToAdd)
 	{
 		boolean added = this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getStorey()
 				.add(storeyToAdd);
@@ -770,7 +783,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 *            located
 	 * @return true if the operation was successful, false otherwise
 	 */
-	private boolean addFlat(Flat flatToAdd, String storeyURI)
+	private synchronized boolean addFlat(Flat flatToAdd, String storeyURI)
 	{
 		boolean added = false;
 		
@@ -808,7 +821,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 *            the unique name representing where the room is located
 	 * @return true if the operation was successful, false otherwise
 	 */
-	private boolean removeRoom(String roomURI, String containerURI)
+	private synchronized boolean removeRoom(String roomURI, String containerURI)
 	{
 		Room removedRoom = null;
 		
@@ -906,7 +919,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 *            the unique name representing the flat to remove
 	 * @return true if the operation was successful, false otherwise
 	 */
-	private boolean removeFlat(String flatURI)
+	private synchronized boolean removeFlat(String flatURI)
 	{
 		Flat flatToRemove = null;
 		boolean found = false;
@@ -963,7 +976,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 *            the unique name representing the storey to remove
 	 * @return true if the operation was successful, false otherwise
 	 */
-	private boolean removeStorey(String storeyURI)
+	private synchronized boolean removeStorey(String storeyURI)
 	{
 		Storey storeyToRemove = null;
 		boolean found = false;
@@ -997,7 +1010,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	 *            the XML-like file to read
 	 * @return the file content into a String object
 	 */
-	protected static String fileToString(String fileName)
+	private static String fileToString(String fileName)
 	{
 		
 		FileInputStream inputStream;
