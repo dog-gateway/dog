@@ -35,6 +35,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.log.NullLogChute;
 import org.apache.velocity.runtime.resource.loader.URLResourceLoader;
 
 /**
@@ -74,6 +75,7 @@ public class DeviceDescriptorFactory
 		p.put(RuntimeConstants.RESOURCE_LOADER, "url");
 		p.put("url.resource.loader.class", URLResourceLoader.class.getName());
 		p.put("url.resource.loader.root", url.toString());
+		p.put(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, NullLogChute.class.getName());
 
 		// create the engine
 		this.vtEngine = new VelocityEngine(p);
