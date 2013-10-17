@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: it.polito.elite.dog.core.clock
+Bundle-SymbolicName: it.polito.elite.dog.core.clock
+Bundle-Version: 1.0.0
+Bundle-Vendor: elite.polito.it
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Service-Component: OSGI-INF/component.xml
+Import-Package: it.polito.elite.dog.core.library.model.notification.core;version="1.0.0",
+ it.polito.elite.dog.core.library.util;version="1.0.0",
+ org.osgi.service.event
