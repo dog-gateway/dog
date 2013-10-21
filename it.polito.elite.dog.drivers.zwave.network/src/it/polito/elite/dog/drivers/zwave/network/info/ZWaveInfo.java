@@ -37,6 +37,9 @@ public class ZWaveInfo
 	// constant for configuration
 	public static final String PROPERTY_UPDATETIME = "updateTimeMillis";
 	
+	// the persistent store configuration property
+	public static final String PROPERTY_PERSISTENT_STORE = "persistentStore";
+	
 	/*
 	// the gateway address
 	public static String GATEWAY_ADDRESS = "IPAddress";

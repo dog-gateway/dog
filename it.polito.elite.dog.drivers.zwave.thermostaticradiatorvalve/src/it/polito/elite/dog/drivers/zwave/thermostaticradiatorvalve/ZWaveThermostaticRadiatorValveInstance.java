@@ -34,7 +34,9 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
+import it.polito.elite.dog.drivers.zwave.persistence.JSONPersistenceManager;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +45,7 @@ import java.util.Set;
 import javax.measure.Measure;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.log.LogService;
 
 /**
  * @author bonino
@@ -55,15 +58,53 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 	// the class logger
 	private LogHelper logger;
 
+	// the schedule persistent store
+	private JSONPersistenceManager persistentStore;
+
+	// a flag for signalling that this instance is ready to be updated on
+	// schedules
+	private boolean isReady;
+
 	public ZWaveThermostaticRadiatorValveInstance(ZWaveNetwork network,
 			ControllableDevice device, int deviceId, Set<Integer> instancesId,
-			int gatewayNodeId, int updateTimeMillis, BundleContext context)
+			int gatewayNodeId, int updateTimeMillis,
+			String persistenceStoreDir, BundleContext context)
 	{
 		super(network, device, deviceId, instancesId, gatewayNodeId,
 				updateTimeMillis, context);
 
 		// create a logger
-		logger = new LogHelper(context);
+		this.logger = new LogHelper(context);
+
+		// not ready
+		this.isReady = false;
+
+		// create the persistent store given the schedule directory
+		File scheduleDirFile = new File(persistenceStoreDir);
+
+		if (scheduleDirFile.exists())
+		{
+			// persistence can be managed
+
+			// check if a file associated to the current thermostatic valve
+			// exists
+			String persistentStoreName = persistenceStoreDir + File.separator
+					+ deviceId + "-schedule.json";
+
+			// build a file object pointing at the persistence store
+			this.persistentStore = new JSONPersistenceManager(
+					persistentStoreName);
+		}
+		else
+		{
+			// explicitly set the persistent store at null
+			this.persistentStore = null;
+
+			// warning
+			this.logger
+					.log(LogService.LOG_WARNING,
+							"Unable to find the persistent store for climate schedules, running in-memory only: all changes will be lost upon restart.");
+		}
 
 		// initialize states
 		this.initializeStates();
@@ -165,7 +206,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 		{
 			instanceCommand.put(instanceId, ccSet);
 		}
-		
+
 		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand,
 				isController);
 
@@ -174,66 +215,64 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 
 	private void initializeStates()
 	{
-		// initialize the inner state
-
-		// ----------- initialize the climate state values
-
-		// Monday
-		ClimateScheduleStateValue mondayScheduleStateValue = new ClimateScheduleStateValue();
-		mondayScheduleStateValue.setFeature("weekDay", Calendar.MONDAY);
-		mondayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.MONDAY));
-
-		// Tuesday
-		ClimateScheduleStateValue tuesdayScheduleStateValue = new ClimateScheduleStateValue();
-		tuesdayScheduleStateValue
-				.setFeature("weekDay", Calendar.TUESDAY);
-		tuesdayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.TUESDAY));
-
-		// Wednesday
-		ClimateScheduleStateValue wednesdayScheduleStateValue = new ClimateScheduleStateValue();
-		wednesdayScheduleStateValue.setFeature("weekDay",
-				Calendar.WEDNESDAY);
-		wednesdayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.WEDNESDAY));
-
-		// Thursday
-		ClimateScheduleStateValue thursdayScheduleStateValue = new ClimateScheduleStateValue();
-		thursdayScheduleStateValue.setFeature("weekDay",
-				Calendar.THURSDAY);
-		thursdayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.THURSDAY));
-
-		// Friday
-		ClimateScheduleStateValue fridayScheduleStateValue = new ClimateScheduleStateValue();
-		fridayScheduleStateValue.setFeature("weekDay", Calendar.FRIDAY);
-		fridayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.FRIDAY));
-
-		// Saturday
-		ClimateScheduleStateValue saturdayScheduleStateValue = new ClimateScheduleStateValue();
-		saturdayScheduleStateValue
-				.setFeature("weekDay", Calendar.SATURDAY);
-		saturdayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.SATURDAY));
-
-		// Sunday
-		ClimateScheduleStateValue sundayScheduleStateValue = new ClimateScheduleStateValue();
-		sundayScheduleStateValue.setFeature("weekDay", Calendar.SUNDAY);
-		sundayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.SUNDAY));
-
-		// set the climate schedule state (covers all the week)
-		this.currentState.setState(ClimateScheduleState.class.getSimpleName(),
-				new ClimateScheduleState(mondayScheduleStateValue,
-						tuesdayScheduleStateValue, wednesdayScheduleStateValue,
-						thursdayScheduleStateValue, fridayScheduleStateValue,
-						saturdayScheduleStateValue, sundayScheduleStateValue));
-
-		// initialize the state
-		this.currentState.setState(TemperatureState.class.getSimpleName(),
-				new TemperatureState(new TemperatureStateValue()));
-
-		// get the initial state of the device
+		// get the initial state of the device in a separate thread to avoid
+		// blocking the attachment algorithm
 		Runnable worker = new Runnable()
 		{
 			public void run()
 			{
+				DailyClimateSchedule[] schedules;
+
+				// check if the persistent store is available or not, and if it
+				// can be
+				// used/created or not
+				if ((persistentStore != null) && (persistentStore.exists()))
+				{
+
+					// if exists, load the stored schedules
+					schedules = persistentStore
+							.load(DailyClimateSchedule[].class);
+
+				}
+				else
+				{
+					// create the schedules
+					schedules = new DailyClimateSchedule[7];
+
+					// create empty schedules
+					for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++)
+						schedules[i - 1] = new DailyClimateSchedule(i);
+
+					// store the schedules, if empty? no at the moment
+				}
+
+				// ----------- initialize the climate state values ----
+
+				// create the climate state values placeholder
+				ClimateScheduleStateValue values[] = new ClimateScheduleStateValue[schedules.length];
+
+				// store the various state values
+				for (int i = 0; i < schedules.length; i++)
+				{
+					values[i] = new ClimateScheduleStateValue();
+					values[i].setFeature("weekDay", schedules[i].getWeekDay());
+					values[i].setValue(schedules[i]);
+				}
+
+				// set the climate schedule state (covers all the week)
+				currentState.setState(
+						ClimateScheduleState.class.getSimpleName(),
+						new ClimateScheduleState(values));
+
+				// initialize the temperature state
+				currentState.setState(TemperatureState.class.getSimpleName(),
+						new TemperatureState(new TemperatureStateValue()));
+
+				// read the current state
 				network.read(nodeInfo, true);
+
+				// set the is ready flag at true
+				isReady = true;
 			}
 		};
 

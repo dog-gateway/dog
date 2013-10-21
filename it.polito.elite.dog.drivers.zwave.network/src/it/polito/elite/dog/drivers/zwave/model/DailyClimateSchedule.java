@@ -6,6 +6,8 @@ package it.polito.elite.dog.drivers.zwave.model;
 import java.util.Calendar;
 import java.util.Hashtable;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 /**
  * @author bonino
  * 
@@ -13,9 +15,11 @@ import java.util.Hashtable;
 public class DailyClimateSchedule
 {
 	// the set of switch points associated to a given week day
+	@JsonProperty
 	private Hashtable<String, ClimateScheduleSwitchPoint> switchPoints;
 
 	// the week day
+	@JsonProperty
 	private int weekDay;
 
 	public DailyClimateSchedule(int weekDay)
@@ -46,7 +50,7 @@ public class DailyClimateSchedule
 	 * Add a set/array of switch point to this daily schedule
 	 * @param points
 	 */
-	public void addAllSwitchPoints(ClimateScheduleSwitchPoint... points)
+	public void addAllSwitchPoints(Iterable<ClimateScheduleSwitchPoint> points)
 	{
 		  for(ClimateScheduleSwitchPoint point : points)
 			  this.addSwitchPoint(point);
@@ -55,6 +59,16 @@ public class DailyClimateSchedule
 	public ClimateScheduleSwitchPoint removeSwitchPoint(Calendar timeAt)
 	{
 		return this.switchPoints.remove(ClimateScheduleSwitchPoint.getTimeAtKey(timeAt));
+	}
+	
+	/**
+	 * Remove a set/array of switch point to this daily schedule
+	 * @param points
+	 */
+	public void removeAllSwitchPoints(Iterable<ClimateScheduleSwitchPoint> points)
+	{
+		  for(ClimateScheduleSwitchPoint point : points)
+			  this.switchPoints.remove(ClimateScheduleSwitchPoint.getTimeAtKey(point));
 	}
 
 	/**

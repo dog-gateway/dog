@@ -7,6 +7,8 @@ import java.util.Calendar;
 
 import javax.measure.Measure;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 /**
  * @author bonino
  * 
@@ -14,9 +16,11 @@ import javax.measure.Measure;
 public class ClimateScheduleSwitchPoint
 {
 	// the time at which the temperature should change
+	@JsonProperty
 	private Calendar timeAt;
 
 	// the new temperature value
+	@JsonProperty
 	private Measure<?, ?> desiredTemperature;
 
 	/**
