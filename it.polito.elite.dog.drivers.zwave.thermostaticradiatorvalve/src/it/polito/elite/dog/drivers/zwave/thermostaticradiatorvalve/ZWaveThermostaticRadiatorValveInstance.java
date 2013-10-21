@@ -28,7 +28,6 @@ import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.DailyClimateSchedule;
-import it.polito.elite.dog.drivers.zwave.model.commandclasses.ClimateSchedule;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
@@ -36,6 +35,7 @@ import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -180,42 +180,42 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 
 		// Monday
 		ClimateScheduleStateValue mondayScheduleStateValue = new ClimateScheduleStateValue();
-		mondayScheduleStateValue.setFeature("weekDay", ClimateSchedule.MONDAY);
-		mondayScheduleStateValue.setValue(new DailyClimateSchedule());
+		mondayScheduleStateValue.setFeature("weekDay", Calendar.MONDAY);
+		mondayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.MONDAY));
 
 		// Tuesday
 		ClimateScheduleStateValue tuesdayScheduleStateValue = new ClimateScheduleStateValue();
 		tuesdayScheduleStateValue
-				.setFeature("weekDay", ClimateSchedule.TUESDAY);
-		tuesdayScheduleStateValue.setValue(new DailyClimateSchedule());
+				.setFeature("weekDay", Calendar.TUESDAY);
+		tuesdayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.TUESDAY));
 
 		// Wednesday
 		ClimateScheduleStateValue wednesdayScheduleStateValue = new ClimateScheduleStateValue();
 		wednesdayScheduleStateValue.setFeature("weekDay",
-				ClimateSchedule.WEDNESDAY);
-		wednesdayScheduleStateValue.setValue(new DailyClimateSchedule());
+				Calendar.WEDNESDAY);
+		wednesdayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.WEDNESDAY));
 
 		// Thursday
 		ClimateScheduleStateValue thursdayScheduleStateValue = new ClimateScheduleStateValue();
 		thursdayScheduleStateValue.setFeature("weekDay",
-				ClimateSchedule.THURSDAY);
-		thursdayScheduleStateValue.setValue(new DailyClimateSchedule());
+				Calendar.THURSDAY);
+		thursdayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.THURSDAY));
 
 		// Friday
 		ClimateScheduleStateValue fridayScheduleStateValue = new ClimateScheduleStateValue();
-		fridayScheduleStateValue.setFeature("weekDay", ClimateSchedule.MONDAY);
-		fridayScheduleStateValue.setValue(new DailyClimateSchedule());
+		fridayScheduleStateValue.setFeature("weekDay", Calendar.FRIDAY);
+		fridayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.FRIDAY));
 
 		// Saturday
 		ClimateScheduleStateValue saturdayScheduleStateValue = new ClimateScheduleStateValue();
 		saturdayScheduleStateValue
-				.setFeature("weekDay", ClimateSchedule.MONDAY);
-		saturdayScheduleStateValue.setValue(new DailyClimateSchedule());
+				.setFeature("weekDay", Calendar.SATURDAY);
+		saturdayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.SATURDAY));
 
 		// Sunday
 		ClimateScheduleStateValue sundayScheduleStateValue = new ClimateScheduleStateValue();
-		sundayScheduleStateValue.setFeature("weekDay", ClimateSchedule.MONDAY);
-		sundayScheduleStateValue.setValue(new DailyClimateSchedule());
+		sundayScheduleStateValue.setFeature("weekDay", Calendar.SUNDAY);
+		sundayScheduleStateValue.setValue(new DailyClimateSchedule(Calendar.SUNDAY));
 
 		// set the climate schedule state (covers all the week)
 		this.currentState.setState(ClimateScheduleState.class.getSimpleName(),
