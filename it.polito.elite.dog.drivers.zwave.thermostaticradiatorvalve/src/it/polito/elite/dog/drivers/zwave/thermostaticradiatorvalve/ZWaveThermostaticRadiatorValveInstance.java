@@ -19,6 +19,7 @@ package it.polito.elite.dog.drivers.zwave.thermostaticradiatorvalve;
 
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.ThermostaticRadiatorValve;
 import it.polito.elite.dog.core.library.model.state.ClimateScheduleState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -28,6 +29,8 @@ import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.DailyClimateSchedule;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClassesData;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
@@ -42,6 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
 
 import org.osgi.framework.BundleContext;
@@ -91,9 +95,23 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 			String persistentStoreName = persistenceStoreDir + File.separator
 					+ deviceId + "-schedule.json";
 
-			// build a file object pointing at the persistence store
-			this.persistentStore = new JSONPersistenceManager(
-					persistentStoreName);
+			try
+			{
+				// build a file object pointing at the persistence store
+				this.persistentStore = new JSONPersistenceManager(
+						persistentStoreName);
+			}
+			catch (Exception e)
+			{
+				// explicitly set the persistent store at null
+				this.persistentStore = null;
+
+				// warning
+				this.logger
+						.log(LogService.LOG_WARNING,
+								"Unable to create/acquire the persistent store for climate schedules, running in-memory only: all changes will be lost upon restart.",
+								e);
+			}
 		}
 		else
 		{
@@ -161,15 +179,64 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 	@Override
 	public void notifyStateChanged(State newState)
 	{
-		// TODO Auto-generated method stub
-
+		// check the state type
+		if (newState instanceof TemperatureState)
+		{
+			//update the inner set point state
+			this.currentState.setState(TemperatureState.class.getSimpleName(), newState);
+		}
+		
+		//notify the state change
+		((ElectricalSystem) this.device).notifyStateChanged(newState);
 	}
 
 	@Override
 	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
-		// TODO Auto-generated method stub
+		//check ready
+		if(this.isReady)
+		{
+			// update deviceNode
+			this.deviceNode = deviceNode;
+
+			// get the thermostat set point command class data
+			CommandClasses thermostatCC = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT);
+			
+			// get the last update time if any
+			long globalUpdateTime = thermostatCC.getUpdateTime();
+			
+			// check if the instance contains only one value
+			if (globalUpdateTime > 0)
+			{
+				// check if the values are up-to-date
+				if (this.lastUpdateTime < globalUpdateTime)
+				{
+					//update the last update time
+					this.lastUpdateTime = globalUpdateTime;
+					
+					//read the current set point
+					double setPoint = thermostatCC.getVal();
+					
+					//read the current unit of measure
+					String unitOfMeasure = (String) thermostatCC.getCommandClassesData().getDataElemValue(
+							CommandClassesData.FIELD_SCALESTRING);
+					
+					//trim the scale string
+					unitOfMeasure = unitOfMeasure.replace("grd", "");
+					unitOfMeasure = unitOfMeasure.trim();
+					
+					//convert to a decimal measure
+					TemperatureStateValue setPointStateValue = new TemperatureStateValue();
+					setPointStateValue.setValue(DecimalMeasure.valueOf(setPoint + " " + unitOfMeasure));
+					TemperatureState setPointState = new TemperatureState(setPointStateValue);
+			
+					//notify the new state
+					this.notifyStateChanged(setPointState);
+				}
+			}
+			
+		}
 
 	}
 

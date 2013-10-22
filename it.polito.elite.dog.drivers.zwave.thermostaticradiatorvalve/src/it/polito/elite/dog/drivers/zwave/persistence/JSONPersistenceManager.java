@@ -18,37 +18,54 @@
 package it.polito.elite.dog.drivers.zwave.persistence;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-
 /**
  * @author bonino
- *
+ * 
  */
 public class JSONPersistenceManager
 {
 	private static ObjectMapper theMapper;
-	
+
 	private static ObjectMapper getMapperInstance()
 	{
-		if(JSONPersistenceManager.theMapper == null)
+		if (JSONPersistenceManager.theMapper == null)
 			JSONPersistenceManager.theMapper = new ObjectMapper();
-		
+
 		return JSONPersistenceManager.theMapper;
 	}
 
-	
 	private File persistentStore;
-	
-	public JSONPersistenceManager(String persistentStoreName)
+
+	public JSONPersistenceManager(String persistentStoreName) throws Exception
 	{
-		// TODO Auto-generated constructor stub
+		// build a File object pointing at the given location
+		this.persistentStore = new File(persistentStoreName);
+
+		// check writable
+		if ((this.persistentStore.exists())
+				&& (!this.persistentStore.canWrite()))
+		{
+			// unable to write, fail....
+			throw new Exception("Unable to write the given persistence file ("
+					+ persistentStoreName + "), please check permissions...");
+		}
 	}
 
+	/**
+	 * Loads a JSON persisted array of objects of type {@link T}
+	 * 
+	 * @param arrayClass
+	 *            The class of objects to load
+	 * @return The loaded array of T instances
+	 */
 	public <T> T[] load(Class<T[]> arrayClass)
 	{
 		ObjectMapper mapper = JSONPersistenceManager.getMapperInstance();
@@ -71,13 +88,78 @@ public class JSONPersistenceManager
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;		
+		return null;
 	}
 
+	/**
+	 * Checks if the persistence file associated to this persistence manager
+	 * exists
+	 * 
+	 * @return true if the persistence file exists or false if the file does not
+	 *         exist.
+	 */
 	public boolean exists()
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return this.persistentStore.exists();
+	}
+
+	/**
+	 * Replaces the content of the managed persistence file with the content of
+	 * a given array of T values
+	 * 
+	 * @param values
+	 *            The new values to sync with the persistence store
+	 */
+	public synchronized <T> void persist(T[] values) throws Exception
+	{
+		// serialize the values as JSON
+		ObjectMapper mapper = JSONPersistenceManager.getMapperInstance();
+		try
+		{
+			// render as JSON
+			String updatedJSONPersistenceContent = mapper
+					.writeValueAsString(values);
+
+			// replace the file
+			File tempFile = File.createTempFile(this.persistentStore.getName(),
+					".bak");
+
+			// copy the current file
+			this.persistentStore.renameTo(tempFile);
+
+			// write the new file
+			try
+			{
+				FileWriter fw = new FileWriter(this.persistentStore, false);
+				fw.write(updatedJSONPersistenceContent);
+				fw.flush();
+				fw.close();
+			}
+			catch (IOException e)
+			{
+				// unable to write the file...reset back the original file
+				tempFile.renameTo(persistentStore);
+
+				// re-throw the exception
+				throw e;
+			}
+			finally
+			{
+				// delete on exit
+				tempFile.delete();
+			}
+
+		}
+		catch (JsonGenerationException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (JsonMappingException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

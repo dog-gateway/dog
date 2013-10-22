@@ -26,6 +26,7 @@ import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import it.polito.elite.dog.drivers.zwave.thermostaticradiatorvalve.ZWaveThermostaticRadiatorValveInstance;
 
+import java.io.File;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -311,6 +312,11 @@ public class ZWaveThermostaticRadiatorValveDriver implements Driver,
 			{
 				// parse the string
 				this.persistenceStoreDirectory = persistenceDir;
+				
+				//check absolute vs relative
+				File persistenceStoreDir = new File (this.persistenceStoreDirectory);
+				if(!persistenceStoreDir.isAbsolute())
+					this.persistenceStoreDirectory = System.getProperty("configFolder") + "/" +this.persistenceStoreDirectory;
 			}
 
 			this.registerDriver();
