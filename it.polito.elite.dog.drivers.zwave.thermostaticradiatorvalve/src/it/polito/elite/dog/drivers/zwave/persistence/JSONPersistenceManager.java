@@ -69,9 +69,10 @@ public class JSONPersistenceManager
 	public <T> T[] load(Class<T[]> arrayClass)
 	{
 		ObjectMapper mapper = JSONPersistenceManager.getMapperInstance();
+		T[] array = null;
 		try
 		{
-			mapper.readValue(this.persistentStore, arrayClass);
+			array = mapper.readValue(this.persistentStore, arrayClass);
 		}
 		catch (JsonParseException e)
 		{
@@ -88,7 +89,7 @@ public class JSONPersistenceManager
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return array;
 	}
 
 	/**

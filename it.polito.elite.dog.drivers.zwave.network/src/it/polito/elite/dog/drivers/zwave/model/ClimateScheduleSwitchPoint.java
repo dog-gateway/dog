@@ -5,8 +5,10 @@ package it.polito.elite.dog.drivers.zwave.model;
 
 import java.util.Calendar;
 
+import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
@@ -43,6 +45,11 @@ public class ClimateScheduleSwitchPoint
 		this.desiredTemperature = desiredTemperature;
 	}
 
+	public ClimateScheduleSwitchPoint()
+	{
+		// empty constructor for Jackson instantiation
+	}
+
 	/**
 	 * @return the timeAt
 	 */
@@ -72,9 +79,22 @@ public class ClimateScheduleSwitchPoint
 	 * @param desiredTemperature
 	 *            the desiredTemperature to set
 	 */
+	@JsonIgnore
 	public void setDesiredTemperature(Measure<?, ?> desiredTemperature)
 	{
 		this.desiredTemperature = desiredTemperature;
+	}
+
+	/**
+	 * Sets the desired temperature given the String representation of it. Used
+	 * by jackson mapping.
+	 * 
+	 * @param desiredTemperatureAsString
+	 */
+	public void setDesiredTemperature(String desiredTemperatureAsString)
+	{
+		this.desiredTemperature = DecimalMeasure
+				.valueOf(desiredTemperatureAsString);
 	}
 
 	/**
@@ -94,9 +114,9 @@ public class ClimateScheduleSwitchPoint
 		StringBuffer keyBuffer = new StringBuffer();
 
 		keyBuffer.append(timeAt.get(Calendar.DAY_OF_WEEK));
-		keyBuffer.append(timeAt.get(Calendar.HOUR));
-		keyBuffer.append(timeAt.get(Calendar.MINUTE));
-		keyBuffer.append(timeAt.get(Calendar.SECOND));
+		keyBuffer.append(String.format("%02d", timeAt.get(Calendar.HOUR)));
+		keyBuffer.append(String.format("%02d", timeAt.get(Calendar.MINUTE)));
+		keyBuffer.append(String.format("%02d", timeAt.get(Calendar.SECOND)));
 
 		return keyBuffer.toString();
 	}

@@ -31,6 +31,12 @@ public class DailyClimateSchedule
 		this.switchPoints = new Hashtable<String, ClimateScheduleSwitchPoint>();
 	}
 
+	public DailyClimateSchedule()
+	{
+		// initialize the switch points table
+		this.switchPoints = new Hashtable<String, ClimateScheduleSwitchPoint>();
+	}
+
 	/**
 	 * Add a new switch point, if a point already existed at the same time,
 	 * overwrites the old value
@@ -45,30 +51,49 @@ public class DailyClimateSchedule
 		this.switchPoints.put(ClimateScheduleSwitchPoint.getTimeAtKey(point),
 				point);
 	}
-	
+
 	/**
 	 * Add a set/array of switch point to this daily schedule
+	 * 
 	 * @param points
 	 */
 	public void addAllSwitchPoints(Iterable<ClimateScheduleSwitchPoint> points)
 	{
-		  for(ClimateScheduleSwitchPoint point : points)
-			  this.addSwitchPoint(point);
+		for (ClimateScheduleSwitchPoint point : points)
+			this.addSwitchPoint(point);
 	}
-	
-	public ClimateScheduleSwitchPoint removeSwitchPoint(Calendar timeAt)
-	{
-		return this.switchPoints.remove(ClimateScheduleSwitchPoint.getTimeAtKey(timeAt));
-	}
-	
+
 	/**
-	 * Remove a set/array of switch point to this daily schedule
+	 * Sets the switch points for this climate schedule object. Used by jackson
+	 * mapping.
+	 * 
 	 * @param points
 	 */
-	public void removeAllSwitchPoints(Iterable<ClimateScheduleSwitchPoint> points)
+	public void setSwitchPoints(ClimateScheduleSwitchPoint[] points)
 	{
-		  for(ClimateScheduleSwitchPoint point : points)
-			  this.switchPoints.remove(ClimateScheduleSwitchPoint.getTimeAtKey(point));
+		for (int i = 0; i < points.length; i++)
+		{
+			this.addSwitchPoint(points[i]);
+		}
+	}
+
+	public ClimateScheduleSwitchPoint removeSwitchPoint(Calendar timeAt)
+	{
+		return this.switchPoints.remove(ClimateScheduleSwitchPoint
+				.getTimeAtKey(timeAt));
+	}
+
+	/**
+	 * Remove a set/array of switch point to this daily schedule
+	 * 
+	 * @param points
+	 */
+	public void removeAllSwitchPoints(
+			Iterable<ClimateScheduleSwitchPoint> points)
+	{
+		for (ClimateScheduleSwitchPoint point : points)
+			this.switchPoints.remove(ClimateScheduleSwitchPoint
+					.getTimeAtKey(point));
 	}
 
 	/**
