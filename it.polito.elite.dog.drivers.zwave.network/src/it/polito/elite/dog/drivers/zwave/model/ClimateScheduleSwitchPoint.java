@@ -3,6 +3,7 @@
  */
 package it.polito.elite.dog.drivers.zwave.model;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 import javax.measure.DecimalMeasure;
@@ -15,8 +16,13 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * @author bonino
  * 
  */
-public class ClimateScheduleSwitchPoint
+public class ClimateScheduleSwitchPoint implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// the time at which the temperature should change
 	@JsonProperty
 	private Calendar timeAt;
@@ -130,6 +136,15 @@ public class ClimateScheduleSwitchPoint
 	public static String getTimeAtKey(ClimateScheduleSwitchPoint point)
 	{
 		return ClimateScheduleSwitchPoint.getTimeAtKey(point.timeAt);
+	}
+
+	@Override
+	public String toString()
+	{
+		return "[" + desiredTemperature + "@"
+				+ timeAt.get(Calendar.HOUR_OF_DAY) + ":"
+				+ timeAt.get(Calendar.MINUTE) + ":"
+				+ timeAt.get(Calendar.SECOND) + "]";
 	}
 
 }

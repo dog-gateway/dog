@@ -3,6 +3,7 @@
  */
 package it.polito.elite.dog.drivers.zwave.model;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Hashtable;
 
@@ -12,8 +13,13 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * @author bonino
  * 
  */
-public class DailyClimateSchedule
+public class DailyClimateSchedule implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// the set of switch points associated to a given week day
 	@JsonProperty
 	private Hashtable<String, ClimateScheduleSwitchPoint> switchPoints;
@@ -123,4 +129,11 @@ public class DailyClimateSchedule
 		return weekDay;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "[weekDay=" + weekDay + ","+switchPoints+"]";
+	}
+
+	
 }

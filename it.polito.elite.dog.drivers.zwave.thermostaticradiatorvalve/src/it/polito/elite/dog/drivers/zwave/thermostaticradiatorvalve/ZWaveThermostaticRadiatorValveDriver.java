@@ -20,6 +20,7 @@ package it.polito.elite.dog.drivers.zwave.thermostaticradiatorvalve;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.devicecategory.ThermostaticRadiatorValve;
+import it.polito.elite.dog.core.library.model.notification.core.ClockTimeNotification;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.gateway.ZWaveGatewayDriver;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
@@ -42,13 +43,16 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 
 /**
  * @author bonino
  * 
  */
 public class ZWaveThermostaticRadiatorValveDriver implements Driver,
-		ManagedService
+		ManagedService, EventHandler
 {
 	// The OSGi framework context
 	protected BundleContext context;
@@ -321,6 +325,40 @@ public class ZWaveThermostaticRadiatorValveDriver implements Driver,
 
 			this.registerDriver();
 		}
+	}
+
+	@Override
+	public void handleEvent(Event event)
+	{
+		//check that the received event is a clock notification
+		final Object eventContent = event.getProperty(EventConstants.EVENT);
+		
+		if(eventContent instanceof ClockTimeNotification)
+		{
+			//handle the clock notification asynchronously?
+			Runnable clockNotificationTask = new Runnable()
+			{
+				
+				@Override
+				public void run()
+				{
+					// dispatch the event content
+					for(ZWaveThermostaticRadiatorValveInstance driverInstance: connectedDrivers)
+					{
+						driverInstance.checkTime(((ClockTimeNotification)eventContent).getClockTick());
+					}
+					
+				}
+			};
+			
+			//create an execution thread for event handling
+			Thread taskRunner = new Thread(clockNotificationTask);
+			
+			//start the task
+			taskRunner.start();
+			
+		}
+		
 	}
 
 }

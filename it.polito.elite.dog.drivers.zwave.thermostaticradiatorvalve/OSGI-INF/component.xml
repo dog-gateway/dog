@@ -4,6 +4,8 @@
    <reference bind="addingService" cardinality="1..1" interface="it.polito.elite.dog.drivers.zwave.gateway.ZWaveGatewayDriver" name="ZWaveGatewayDriver" policy="dynamic" unbind="removedService"/>
    <service>
       <provide interface="org.osgi.service.cm.ManagedService"/>
+      <provide interface="org.osgi.service.event.EventHandler"/>
    </service>
    <property name="service.pid" type="String" value="it.polito.elite.dog.drivers.zwave.temperatureandhumiditysensor"/>
+   <property name="event.topics" type="String" value="it/polito/elite/dog/core/library/model/notification/core/ClockTimeNotification"/>
 </scr:component>

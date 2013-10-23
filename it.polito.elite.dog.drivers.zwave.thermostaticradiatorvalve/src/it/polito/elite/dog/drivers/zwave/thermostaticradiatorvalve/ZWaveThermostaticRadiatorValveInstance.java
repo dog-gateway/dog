@@ -28,6 +28,7 @@ import it.polito.elite.dog.core.library.model.statevalue.ClimateScheduleStateVal
 import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
+import it.polito.elite.dog.drivers.zwave.model.ClimateScheduleSwitchPoint;
 import it.polito.elite.dog.drivers.zwave.model.DailyClimateSchedule;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClassesData;
@@ -182,11 +183,12 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 		// check the state type
 		if (newState instanceof TemperatureState)
 		{
-			//update the inner set point state
-			this.currentState.setState(TemperatureState.class.getSimpleName(), newState);
+			// update the inner set point state
+			this.currentState.setState(TemperatureState.class.getSimpleName(),
+					newState);
 		}
-		
-		//notify the state change
+
+		// notify the state change
 		((ElectricalSystem) this.device).notifyStateChanged(newState);
 	}
 
@@ -194,48 +196,54 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
-		//check ready
-		if(this.isReady)
+		// check ready
+		if (this.isReady)
 		{
 			// update deviceNode
 			this.deviceNode = deviceNode;
 
 			// get the thermostat set point command class data
-			CommandClasses thermostatCC = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT);
-			
+			CommandClasses thermostatCC = instanceNode
+					.getCommandClass(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT);
+
 			// get the last update time if any
 			long globalUpdateTime = thermostatCC.getUpdateTime();
-			
+
 			// check if the instance contains only one value
 			if (globalUpdateTime > 0)
 			{
 				// check if the values are up-to-date
 				if (this.lastUpdateTime < globalUpdateTime)
 				{
-					//update the last update time
+					// update the last update time
 					this.lastUpdateTime = globalUpdateTime;
-					
-					//read the current set point
-					double setPoint = thermostatCC.getVal();
-					
-					//read the current unit of measure
-					String unitOfMeasure = (String) thermostatCC.getCommandClassesData().getDataElemValue(
-							CommandClassesData.FIELD_SCALESTRING);
-					
-					//trim the scale string
-					unitOfMeasure = unitOfMeasure.replace("grd", "");
-					unitOfMeasure = unitOfMeasure.trim();
-					
-					//convert to a decimal measure
-					TemperatureStateValue setPointStateValue = new TemperatureStateValue();
-					setPointStateValue.setValue(DecimalMeasure.valueOf(setPoint + " " + unitOfMeasure));
-					TemperatureState setPointState = new TemperatureState(setPointStateValue);
-			
-					//notify the new state
-					this.notifyStateChanged(setPointState);
 				}
+				// read the current set point
+				double setPoint = ((Number) thermostatCC.getCommandClassesData()
+						.getAllData().get("1")
+						.getDataElemValue(CommandClassesData.FIELD_VAL)).doubleValue();
+
+				// read the current unit of measure
+				String unitOfMeasure = (String) thermostatCC
+						.getCommandClassesData().getAllData().get("1")
+						.getDataElemValue(CommandClassesData.FIELD_SCALESTRING);
+
+				// trim the scale string
+				unitOfMeasure = unitOfMeasure.replace("grd", "");
+				unitOfMeasure = unitOfMeasure.trim();
+
+				// convert to a decimal measure
+				TemperatureStateValue setPointStateValue = new TemperatureStateValue();
+				setPointStateValue.setValue(DecimalMeasure.valueOf(setPoint
+						+ " " + unitOfMeasure));
+				TemperatureState setPointState = new TemperatureState(
+						setPointStateValue);
+
+				// notify the new state
+				this.notifyStateChanged(setPointState);
+
 			}
-			
+
 		}
 
 	}
@@ -266,7 +274,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
 
 		HashSet<Integer> ccSet = new HashSet<Integer>();
-		ccSet.add(ZWaveAPI.COMMAND_CLASS_CLIMATE_CONTROL_SCHEDULE);
+		// ccSet.add(ZWaveAPI.COMMAND_CLASS_CLIMATE_CONTROL_SCHEDULE);
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT);
 
 		for (Integer instanceId : instancesId)
@@ -345,6 +353,47 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 
 		Thread workerThread = new Thread(worker);
 		workerThread.start();
+	}
+
+	public void checkTime(Calendar clockTick)
+	{
+		if (this.isReady)
+		{
+			// given a time instant expressed as a calendar object, check if
+			// there
+			// is any switch point that needs activation
+
+			// get the stored switch points
+			ClimateScheduleStateValue[] allScheduledSwitchPoints = (ClimateScheduleStateValue[]) this.currentState
+					.getState(ClimateScheduleState.class.getSimpleName())
+					.getCurrentStateValue();
+
+			// iterate over the switch points
+			for (int i = 0; i < allScheduledSwitchPoints.length; i++)
+			{
+				if (allScheduledSwitchPoints[i].getFeatures().get("weekDay")
+						.equals(clockTick.get(Calendar.DAY_OF_WEEK)))
+				{
+					// get the day schedule
+					DailyClimateSchedule schedule = (DailyClimateSchedule) allScheduledSwitchPoints[i]
+							.getValue();
+
+					// get the switch point
+					ClimateScheduleSwitchPoint switchPoint = schedule
+							.getSwitchPoint(clockTick);
+
+					// set the new set point if available
+					if (switchPoint != null)
+						this.setTemperatureAt(switchPoint
+								.getDesiredTemperature());
+
+					// break as no more switch points can be activated for this
+					// instant of time
+					break;
+				}
+			}
+
+		}
 	}
 
 }
