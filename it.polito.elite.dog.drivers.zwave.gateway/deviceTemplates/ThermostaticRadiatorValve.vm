@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
 	<dhc:controllables>
-		<dhc:device class="ThermostaticRadiatorValve" name="$name"
+		<dhc:device class="ThermostaticRadiatorValve" id="$name"
 			domoticSystem="ZWave" gateway="$gateway">
 			<dhc:description>$description</dhc:description>
 			<dhc:isIn>$location</dhc:isIn>
@@ -68,7 +68,7 @@
 			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="StateChangeNotification"
-						name="StateChangeNotification_$name">
+						id="StateChangeNotification_$name">
 						<dhc:param name="nParams" value="1" />
 						<dhc:param name="notificationName" value="stateChanged" />
 						<dhc:param name="notificationParamName" value="newState"
