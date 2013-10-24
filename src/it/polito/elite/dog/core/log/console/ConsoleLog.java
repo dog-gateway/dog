@@ -237,10 +237,7 @@ public class ConsoleLog implements LogListener, ManagedService
 	{
 		// maybe the received configuration is not for me...
 		if (properties != null)
-		{
-			// clear the table for setting the desired log levels
-			this.loggerWriterTable.clear();
-			
+		{	
 			// set each log level to console or none, according to configuration
 			// data
 			String errorWriters = (String) properties.get("ERROR");
