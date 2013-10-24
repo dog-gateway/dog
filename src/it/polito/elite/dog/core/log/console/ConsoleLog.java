@@ -45,8 +45,8 @@ import org.osgi.service.log.LogService;
  */
 public class ConsoleLog implements LogListener, ManagedService
 {
-	// the registered log readers
-	private AtomicReference<LogReaderService> registeredLogReaders;
+	// the registered LogReaderService
+	private AtomicReference<LogReaderService> registeredLogReader;
 	
 	// the service registration handle
 	private ServiceRegistration<?> serviceRegManagedService;
@@ -69,7 +69,7 @@ public class ConsoleLog implements LogListener, ManagedService
 	public ConsoleLog()
 	{
 		// initialize atomic references
-		this.registeredLogReaders = new AtomicReference<LogReaderService>();
+		this.registeredLogReader = new AtomicReference<LogReaderService>();
 	}
 	
 	/**
@@ -137,7 +137,7 @@ public class ConsoleLog implements LogListener, ManagedService
 	public void addedLogReaderService(LogReaderService reader)
 	{
 		// store the registered log reader service
-		this.registeredLogReaders.set(reader);
+		this.registeredLogReader.set(reader);
 		
 		// add the current class as log listener
 		reader.addLogListener(this);
@@ -155,7 +155,7 @@ public class ConsoleLog implements LogListener, ManagedService
 		reader.removeLogListener(this);
 		
 		// remove the previous registered log reader service
-		this.registeredLogReaders.compareAndSet(reader, null);
+		this.registeredLogReader.compareAndSet(reader, null);
 	}
 	
 	/**
