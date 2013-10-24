@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
 	<dhc:controllables>
-		<dhc:device class="MovementSensor" name="$name"
+		<dhc:device class="MovementSensor" id="$name"
 			domoticSystem="ZWave" gateway="$gateway">
 			<dhc:description>$description</dhc:description>
 			<dhc:isIn>$location</dhc:isIn>
@@ -12,7 +12,7 @@
 			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="StateChangeNotification"
-						name="StateChangeNotification_$name">
+						id="StateChangeNotification_$name">
 						<dhc:param name="nParams" value="1" />
 						<dhc:param name="notificationName" value="stateChanged" />
 						<dhc:param name="notificationParamName" value="newState"
@@ -23,12 +23,12 @@
 			<dhc:notificationFunctionality class="MovementNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="MovementCeasedNotification"
-						name="MovementCeasedNotification_$name">
+						id="MovementCeasedNotification_$name">
 						<dhc:param name="nParams" value="0" />
 						<dhc:param name="notificationName" value="ceasedMovement" />
 					</dhc:notification>
 					<dhc:notification class="MovementDetectedNotification"
-						name="MovementDetectedNotification_$name">
+						id="MovementDetectedNotification_$name">
 						<dhc:param name="nParams" value="0" />
 						<dhc:param name="notificationName" value="detectedMovement" />
 					</dhc:notification>
