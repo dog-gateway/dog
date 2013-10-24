@@ -416,7 +416,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 			for (int i = 0; i < devices.size() && !found; i++)
 			{
 				Device device = devices.get(i);
-				if (device.getName().equals(deviceURI))
+				if (device.getId().equals(deviceURI))
 				{
 					removedDevice = device;
 					found = true;
@@ -589,7 +589,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		if (this.xmlConfiguration != null)
 		{
-			boolean removed = this.removeRoom(roomToUpdate.getName(), containerURI);
+			boolean removed = this.removeRoom(roomToUpdate.getId(), containerURI);
 			
 			boolean added = this.addRoom(roomToUpdate, containerURI);
 			
@@ -603,7 +603,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		if (this.xmlConfiguration != null)
 		{
-			boolean removed = this.removeFlat(flatToUpdate.getName());
+			boolean removed = this.removeFlat(flatToUpdate.getId());
 			
 			boolean added = this.addFlat(flatToUpdate);
 			
@@ -617,7 +617,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		if (this.xmlConfiguration != null)
 		{
-			boolean removed = this.removeFlat(flatToUpdate.getName());
+			boolean removed = this.removeFlat(flatToUpdate.getId());
 			
 			boolean added = this.addFlat(flatToUpdate, storeyURI);
 			
@@ -631,7 +631,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	{
 		if (this.xmlConfiguration != null)
 		{
-			boolean removed = this.removeStorey(storeyToUpdate.getName());
+			boolean removed = this.removeStorey(storeyToUpdate.getId());
 			
 			boolean added = this.addStorey(storeyToUpdate);
 			
@@ -672,7 +672,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		
 		for (Flat flat : building.getFlat())
 		{
-			if (flat.getName().equals(containerURI) && (!found))
+			if (flat.getId().equals(containerURI) && (!found))
 			{
 				flat.getRoom().add(roomToAdd);
 				found = true;
@@ -680,14 +680,14 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		}
 		for (Storey storey : building.getStorey())
 		{
-			if (storey.getName().equals(containerURI) && (!found))
+			if (storey.getId().equals(containerURI) && (!found))
 			{
 				storey.getRoom().add(roomToAdd);
 				found = true;
 			}
 			for (Flat flat : storey.getFlat())
 			{
-				if (flat.getName().equals(containerURI) && (!found))
+				if (flat.getId().equals(containerURI) && (!found))
 				{
 					flat.getRoom().add(roomToAdd);
 					found = true;
@@ -789,7 +789,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		
 		for (Storey storey : this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getStorey())
 		{
-			if (storey.getName().equals(storeyURI))
+			if (storey.getId().equals(storeyURI))
 			{
 				added = storey.getFlat().add(flatToAdd);
 			}
@@ -832,11 +832,11 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		
 		for (Flat flat : building.getFlat())
 		{
-			if (flat.getName().equals(containerURI) && (!found))
+			if (flat.getId().equals(containerURI) && (!found))
 			{
 				for (Room room : flat.getRoom())
 				{
-					if (room.getName().equals(roomURI) && (!found))
+					if (room.getId().equals(roomURI) && (!found))
 					{
 						removedRoom = room;
 						containerFlat = flat;
@@ -854,11 +854,11 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 			Storey containerStorey = null;
 			for (Storey storey : building.getStorey())
 			{
-				if (storey.getName().equals(containerURI) && (!found))
+				if (storey.getId().equals(containerURI) && (!found))
 				{
 					for (Room room : storey.getRoom())
 					{
-						if (room.getName().equals(roomURI) && (!found))
+						if (room.getId().equals(roomURI) && (!found))
 						{
 							containerStorey = storey;
 							removedRoom = room;
@@ -868,11 +868,11 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 				}
 				for (Flat flat : storey.getFlat())
 				{
-					if (flat.getName().equals(containerURI) && (!found))
+					if (flat.getId().equals(containerURI) && (!found))
 					{
 						for (Room room : flat.getRoom())
 						{
-							if (room.getName().equals(roomURI) && (!found))
+							if (room.getId().equals(roomURI) && (!found))
 							{
 								containerFlat = flat;
 								removedRoom = room;
