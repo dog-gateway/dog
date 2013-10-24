@@ -76,7 +76,7 @@ public class DeviceDescriptor
 		this.location = "";
 		
 		// the device unique URI (mandatory)
-		this.deviceURI = jaxbDevice.getName();
+		this.deviceURI = jaxbDevice.getId();
 		
 		// manufacturer (mandatory)
 		this.technology = jaxbDevice.getDomoticSystem();
@@ -146,7 +146,7 @@ public class DeviceDescriptor
 		{
 			for (Confignotification notification : notificatinF.getNotifications().getNotification())
 			{
-				ElementDescription dogElementDescription = new ElementDescription(notification.getName(),
+				ElementDescription dogElementDescription = new ElementDescription(notification.getId(),
 						notification.getClazz());
 				
 				for (Configparam param : notification.getParam())
