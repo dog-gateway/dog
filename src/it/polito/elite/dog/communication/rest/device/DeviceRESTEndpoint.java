@@ -162,7 +162,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 								.getDeviceDescriptor();
 
 						// save device data
-						deviceJSON.put("uri", deviceDescriptor.getDeviceURI());
+						deviceJSON.put("name", deviceDescriptor.getDeviceURI());
 						deviceJSON.put("description",
 								deviceDescriptor.getDescription());
 						deviceJSON.put("active", Boolean
