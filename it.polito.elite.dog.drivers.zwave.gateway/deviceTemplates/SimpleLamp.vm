@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
 <dhc:controllables>
-<dhc:device domoticSystem="ZWave" name="$name" class="SimpleLamp"
+<dhc:device domoticSystem="ZWave" id="$name" class="SimpleLamp"
 	gateway="$gateway">
 	<dhc:description>$description</dhc:description>
 	<dhc:isIn>$location</dhc:isIn>
@@ -24,7 +24,7 @@
 	</dhc:controlFunctionality>
 	<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
 		<dhc:notifications>
-			<dhc:notification name="StateChangeNotification_$name"
+			<dhc:notification id="StateChangeNotification_$name"
 				class="StateChangeNotification">
 				<dhc:param value="1" name="nParams" />
 				<dhc:param value="stateChanged" name="notificationName" />
