@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
 	<dhc:controllables>
-		<dhc:device class="SinglePhaseElectricityMeter" name="$name"
+		<dhc:device class="SinglePhaseElectricityMeter" id="$name"
 			domoticSystem="ZWave" gateway="$gateway">
 			<dhc:description>$description</dhc:description>
 			<dhc:isIn>$location</dhc:isIn>
@@ -32,7 +32,7 @@
 			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="StateChangeNotification"
-						name="StateChangeNotification_$name">
+						id="StateChangeNotification_$name">
 						<dhc:param name="notificationName" value="stateChanged" />
 						<dhc:param name="notificationParamName" value="newState"
 							type="State" />
@@ -43,7 +43,7 @@
 				class="SinglePhaseActivePowerMeasurementNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="SinglePhaseActivePowerMeasurementNotification"
-						name="SinglePhaseActivePowerMeasurementNotification_$name">
+						id="SinglePhaseActivePowerMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newActivePowerValue" />
 						<dhc:param name="unitOfMeasure" value="W" />
@@ -56,7 +56,7 @@
 				class="SinglePhaseActiveEnergyMeasurementNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="SinglePhaseActiveEnergyMeasurementNotification"
-						name="SinglePhaseActiveEnergyMeasurementNotification_$name">
+						id="SinglePhaseActiveEnergyMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newActiveEnergyValue" />
 						<dhc:param name="unitOfMeasure" value="kWh" />
