@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
 	<dhc:controllables>
-		<dhc:device class="ZWaveGateway" name="$name"
+		<dhc:device class="ZWaveGateway" id="$name"
 			domoticSystem="ZWave">
 			<dhc:description>$description</dhc:description>
 			<dhc:isIn>$location</dhc:isIn>
