@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
 	<dhc:controllables>
-		<dhc:device class="TemperatureAndHumiditySensor" name="$name"
+		<dhc:device class="TemperatureAndHumiditySensor" id="$name"
 			domoticSystem="ZWave" gateway="$gateway">
 			<dhc:description>$description</dhc:description>
 			<dhc:isIn>$location</dhc:isIn>
@@ -31,7 +31,7 @@
 			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="StateChangeNotification"
-						name="StateChangeNotification_$name">
+						id="StateChangeNotification_$name">
 						<dhc:param name="notificationName" value="stateChanged" />
 						<dhc:param name="notificationParamName" value="newState"
 							type="State" />
@@ -42,7 +42,7 @@
 				class="TemperatureMeasurementNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="TemperatureMeasurementNotification"
-						name="TemperatureMeasurementNotification_$name">
+						id="TemperatureMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newTemperatureValue" />
 						<dhc:param name="unitOfMeasure" value="C" />
@@ -55,7 +55,7 @@
 				class="HumidityMeasurementNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification class="HumidityMeasurementNotification"
-						name="HumidityMeasurementNotification_$name">
+						id="HumidityMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="changedRelativeHumidity" />
 						<dhc:param name="unitOfMeasure" value="%" />
