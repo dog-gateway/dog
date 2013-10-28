@@ -317,7 +317,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 				{
 					// render the command
 					commandsAsHTMLString
-							.append("<input type=\"button\" class=\"btn\" command=\"true\" command-dst=\"/services/devices/"
+							.append("<input type=\"button\" class=\"btn\" command=\"true\" command-dst=\"/api/devices/"
 									+ device.getDeviceId()
 									+ "/commands/"
 									+ commandName +"\" value=\""+commandName+"\"/>");
