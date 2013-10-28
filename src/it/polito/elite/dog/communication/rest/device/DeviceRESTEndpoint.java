@@ -53,7 +53,7 @@ import org.osgi.service.log.LogService;
  * @author bonino
  * 
  */
-@Path("/devices/")
+@Path("/api/devices/")
 public class DeviceRESTEndpoint implements DeviceRESTApi
 {
 	// the service logger

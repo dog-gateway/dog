@@ -39,7 +39,7 @@ import javax.ws.rs.core.MediaType;
  * @author bonino
  * 
  */
-@Path("/devices/")
+@Path("/api/devices/")
 public interface DeviceRESTApi
 {
 	/**
