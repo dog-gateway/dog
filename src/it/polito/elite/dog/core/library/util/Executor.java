@@ -41,7 +41,7 @@ public class Executor
 	private static Executor theInstance;
 	// the logger
 	private LogHelper theLogger;
-	
+
 	/**
 	 * Default (empty) constructor
 	 */
@@ -49,7 +49,7 @@ public class Executor
 	{
 		// intentionally left empty
 	}
-	
+
 	/**
 	 * Get the instance for the singleton class
 	 * 
@@ -59,10 +59,10 @@ public class Executor
 	{
 		if (theInstance == null)
 			theInstance = new Executor();
-		
+
 		return theInstance;
 	}
-	
+
 	/**
 	 * Execute a given command to a specified device
 	 * 
@@ -75,41 +75,59 @@ public class Executor
 	 * @param params
 	 *            optional parameters for the command (e.g., 50.0)
 	 */
-	public void execute(BundleContext context, String toDevice, String commandName, Object[] params)
+	public void execute(BundleContext context, String toDevice,
+			String commandName, Object[] params)
 	{
 		// create filter
-		String deviceFilter = String.format("(&(%s=*)(%s=%s))", Constants.DEVICE_CATEGORY, DeviceCostants.DEVICEURI,
-				toDevice);
+		String deviceFilter = String.format("(&(%s=*)(%s=%s))",
+				Constants.DEVICE_CATEGORY, DeviceCostants.DEVICEURI, toDevice);
 		// get the device
 		ServiceTracker<?, ?> tracker;
 		try
 		{
-			tracker = new ServiceTracker<Object, Object>(context, context.createFilter(deviceFilter), null);
+			tracker = new ServiceTracker<Object, Object>(context,
+					context.createFilter(deviceFilter), null);
 			tracker.open();
 			ServiceReference<?> srDevice = tracker.getServiceReference();
-			
+
 			if (srDevice != null)
 			{
-				String active = (String) srDevice.getProperty(DeviceCostants.ACTIVE);
-				String deviceClass = (String) srDevice.getProperty(Constants.DEVICE_CATEGORY);
+				String active = (String) srDevice
+						.getProperty(DeviceCostants.ACTIVE);
+				String deviceClass = (String) srDevice
+						.getProperty(Constants.DEVICE_CATEGORY);
 				// check if the device is active
-				if (active != null && !active.isEmpty() && active.equals("true"))
+				if (active != null && !active.isEmpty()
+						&& active.equals("true"))
 				{
 					// get the device object
 					Object deviceObj = tracker.getService();
-					
+
 					// get the class
 					Class<?> cls = Class.forName(deviceClass);
-					
+
 					// get the method corresponding to the desired command...
 					Method meth = null;
-					meth = cls.getDeclaredMethod(commandName, this.objectToClassArray(params));
-					
-					if (meth == null)
+					try
 					{
-						meth = cls.getMethod(commandName, this.objectToClassArray(params.length));
+						meth = cls.getDeclaredMethod(commandName,
+								this.objectToClassArray(params));
 					}
-					
+					catch (NoSuchMethodException e)
+					{
+						try
+						{
+							meth = cls.getDeclaredMethod(commandName,
+									this.objectToSuperClassArray(params));
+						}
+						catch (NoSuchMethodException e1)
+						{
+
+							meth = cls.getMethod(commandName,
+									this.objectToClassArray(params.length));
+						}
+					}
+
 					// execute the command
 					if (meth != null)
 						meth.invoke(deviceObj, params);
@@ -121,12 +139,13 @@ public class Executor
 			// get the logger (only here, before is useless)
 			theLogger = new LogHelper(context);
 			// log the exception
-			theLogger.log(LogService.LOG_ERROR, "Exception during the exection of the command " + commandName + " on "
-					+ toDevice + ": ", e);
+			theLogger.log(LogService.LOG_ERROR,
+					"Exception during the exection of the command "
+							+ commandName + " on " + toDevice + ": ", e);
 		}
-		
+
 	}
-	
+
 	/**
 	 * This static function converts an array of object instances in an array of
 	 * the class of the instances <br/>
@@ -142,7 +161,7 @@ public class Executor
 		if (parameters != null)
 		{
 			partypes = new Class[parameters.length];
-			
+
 			for (int i = 0; i < parameters.length; i++)
 			{
 				partypes[i] = parameters[i].getClass();
@@ -150,7 +169,31 @@ public class Executor
 		}
 		return partypes;
 	}
-	
+
+	/**
+	 * This static function converts an array of object instances in an array of
+	 * the superclasses of the instances <br/>
+	 * e.g. from "Hello World", 100.0, -100 to Object, Object, Object
+	 * 
+	 * @param parameters
+	 *            array of instances
+	 * @return array with the superclasses of instances
+	 */
+	private Class<?>[] objectToSuperClassArray(Object[] parameters)
+	{
+		Class<?> partypes[] = null;
+		if (parameters != null)
+		{
+			partypes = new Class[parameters.length];
+
+			for (int i = 0; i < parameters.length; i++)
+			{
+				partypes[i] = parameters[i].getClass().getSuperclass();
+			}
+		}
+		return partypes;
+	}
+
 	/**
 	 * This static function converts an array of object instances in an array of
 	 * the class of the instances <br/>
@@ -166,7 +209,7 @@ public class Executor
 		if (parametersNumber > 0)
 		{
 			partypes = new Class[parametersNumber];
-			
+
 			for (int i = 0; i < parametersNumber; i++)
 			{
 				partypes[i] = Object.class;
@@ -174,5 +217,5 @@ public class Executor
 		}
 		return partypes;
 	}
-	
+
 }
