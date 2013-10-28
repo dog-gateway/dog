@@ -25,11 +25,13 @@ import it.polito.elite.dog.core.library.model.state.ClimateScheduleState;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.state.TemperatureState;
 import it.polito.elite.dog.core.library.model.statevalue.ClimateScheduleStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.ClimateScheduleSwitchPoint;
 import it.polito.elite.dog.drivers.zwave.model.DailyClimateSchedule;
+import it.polito.elite.dog.drivers.zwave.model.commandclasses.ThermostatMode;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClassesData;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
@@ -66,7 +68,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 	// the schedule persistent store
 	private JSONPersistenceManager persistentStore;
 
-	// a flag for signalling that this instance is ready to be updated on
+	// a flag for signaling that this instance is ready to be updated on
 	// schedules
 	private boolean isReady;
 
@@ -132,42 +134,114 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 	@Override
 	public void setDaySchedule(Object[] switchPoints, Integer weekDay)
 	{
-		// TODO Auto-generated method stub
+
+		// get the current state value registered as values of the climate
+		// schedule state
+		StateValue[] states = this.currentState.getState(
+				ClimateScheduleState.class.getSimpleName())
+				.getCurrentStateValue();
+
+		// look for the state value associated to the given weekday
+		for (int i = 0; i < states.length; i++)
+		{
+			// get the current daily schedule
+			DailyClimateSchedule schedule = (DailyClimateSchedule) ((ClimateScheduleStateValue) states[i])
+					.getValue();
+
+			// if the schedule is the one searched for
+			if (schedule.getWeekDay() == weekDay)
+			{
+				// get the switch points
+				schedule.addAllSwitchPoints((ClimateScheduleSwitchPoint[]) switchPoints);
+
+				// stop the cycle
+				break;
+			}
+		}
 
 	}
 
 	@Override
 	public Object[] getDaySchedule(Integer weekDay)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		// prepare the array to return
+		Object switchPoints[] = null;
+
+		// get the current state value registered as values of the climate
+		// schedule state
+		StateValue[] states = this.currentState.getState(
+				ClimateScheduleState.class.getSimpleName())
+				.getCurrentStateValue();
+
+		// look for the state value associated to the given weekday
+		for (int i = 0; i < states.length; i++)
+		{
+			// get the current daily schedule
+			DailyClimateSchedule schedule = (DailyClimateSchedule) ((ClimateScheduleStateValue) states[i])
+					.getValue();
+
+			// if the schedule is the one searched for
+			if (schedule.getWeekDay() == weekDay)
+			{
+				// get the switch points
+				switchPoints = schedule.getAllSwitchPoints();
+
+				// stop the cycle
+				break;
+			}
+		}
+		return switchPoints;
 	}
 
 	@Override
+	/**
+	 * Cool down the current set point by 0.5 degrees
+	 */
 	public void cool()
 	{
-		// TODO Auto-generated method stub
+		// update the mode
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
+							+ ThermostatMode.MODE_COOL);
 
 	}
 
 	@Override
 	public void stopHeatingOrCooling()
 	{
-		// TODO Auto-generated method stub
+		// updated the mode
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
+							+ ThermostatMode.MODE_OFF);
 
 	}
 
 	@Override
 	public void setTemperatureAt(Measure<?, ?> temperature)
 	{
-		// TODO Auto-generated method stub
-
+		// get the value in celsius
+		String celsius = String.format("%02.02f",
+				temperature.getValue());
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT,
+					ThermostatMode.MODE_HEAT+ "," + celsius);
 	}
 
 	@Override
+	/*
+	 * 
+	 */
 	public void heat()
 	{
-		// TODO Auto-generated method stub
+
+		// updated the setPoint
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
+							+ ThermostatMode.MODE_HEAT);
 
 	}
 
@@ -219,9 +293,10 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 					this.lastUpdateTime = globalUpdateTime;
 				}
 				// read the current set point
-				double setPoint = ((Number) thermostatCC.getCommandClassesData()
-						.getAllData().get("1")
-						.getDataElemValue(CommandClassesData.FIELD_VAL)).doubleValue();
+				double setPoint = ((Number) thermostatCC
+						.getCommandClassesData().getAllData().get("1")
+						.getDataElemValue(CommandClassesData.FIELD_VAL))
+						.doubleValue();
 
 				// read the current unit of measure
 				String unitOfMeasure = (String) thermostatCC
@@ -274,8 +349,9 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
 
 		HashSet<Integer> ccSet = new HashSet<Integer>();
-		// ccSet.add(ZWaveAPI.COMMAND_CLASS_CLIMATE_CONTROL_SCHEDULE);
+		//ccSet.add(ZWaveAPI.COMMAND_CLASS_CLIMATE_CONTROL_SCHEDULE);
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT);
+		//ccSet.add(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE);
 
 		for (Integer instanceId : instancesId)
 		{
