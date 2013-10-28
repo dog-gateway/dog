@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+<dhc:controllables>
+<dhc:device domoticSystem="ZWave" id="$name" class="Buzzer"
+	gateway="$gateway">
+	<dhc:description>$description</dhc:description>
+	<dhc:isIn>$location</dhc:isIn>
+	<dhc:param value="$nodeId" name="NodeID" type="network"/>
+	#foreach( $instanceId in $instanceIds )
+	<dhc:param value="$instanceId" name="InstanceID" type="network"/>
+	#end
+	<!-- <dhc:hasMeter>$meter</dhc:hasMeter> -->
+	<dhc:controlFunctionality class="OnOffFunctionality">
+		<dhc:commands>
+			<dhc:command id="OffCommand_$name" name="OffCommand_$name"
+				class="OffCommand">
+				<dhc:param value="off" name="realCommandName" />
+			</dhc:command>
+			<dhc:command id="OnCommand_$name" name="OnCommand_$name"
+				class="OnCommand">
+				<dhc:param value="on" name="realCommandName" />
+			</dhc:command>
+		</dhc:commands>
+	</dhc:controlFunctionality>
+	<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+		<dhc:notifications>
+			<dhc:notification id="StateChangeNotification_$name"
+				class="StateChangeNotification">
+				<dhc:param value="1" name="nParams" />
+				<dhc:param value="stateChanged" name="notificationName" />
+				<dhc:param type="State" value="newState" name="notificationParamName" />
+			</dhc:notification>
+		</dhc:notifications>
+	</dhc:notificationFunctionality>
+	<dhc:state class="OnOffState">
+		<dhc:statevalues>
+			<dhc:statevalue name="off" class="OffStateValue" />
+			<dhc:statevalue name="on" class="OnStateValue" />
+		</dhc:statevalues>
+	</dhc:state>
+</dhc:device>
+</dhc:controllables>
+</dhc:dogHomeConfiguration>

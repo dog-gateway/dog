@@ -30,8 +30,10 @@ import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
+import it.polito.elite.dog.core.library.model.devicecategory.LampHolder;
 import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
 import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
 import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -45,7 +47,7 @@ import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriver implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet
+public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriver implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet, LampHolder, OnOffOutput
 {
 	// the class logger
 	private LogHelper logger;
