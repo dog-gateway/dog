@@ -27,7 +27,7 @@ import javax.ws.rs.core.MediaType;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  *
  */
-@Path("/system/")
+@Path("/admin/system/")
 public interface FrameworkMonitorInterface
 {	
 	@GET

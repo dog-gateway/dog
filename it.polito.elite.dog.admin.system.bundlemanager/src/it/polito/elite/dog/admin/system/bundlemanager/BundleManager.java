@@ -37,7 +37,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-@Path("/system/bundlemanager/")
+@Path("/admin/system/bundlemanager/")
 public class BundleManager implements BundleManagerInterface
 {
 	// the service logger

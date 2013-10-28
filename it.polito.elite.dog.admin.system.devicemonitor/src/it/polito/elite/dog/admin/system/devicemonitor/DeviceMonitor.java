@@ -45,7 +45,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-@Path("/system/devicemonitor/")
+@Path("/admin/system/devicemonitor/")
 public class DeviceMonitor implements DeviceMonitorInterface
 {
 	// the service logger

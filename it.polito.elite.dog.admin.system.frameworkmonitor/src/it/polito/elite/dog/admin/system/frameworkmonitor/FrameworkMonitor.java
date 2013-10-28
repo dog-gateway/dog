@@ -32,7 +32,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-@Path("/framework/")
+@Path("/admin/framework/")
 public class FrameworkMonitor implements FrameworkMonitorInterface
 {
 	// the service logger
