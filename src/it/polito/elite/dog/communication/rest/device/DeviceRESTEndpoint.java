@@ -31,6 +31,8 @@ import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.util.Executor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
+import javax.measure.DecimalMeasure;
+import javax.measure.Measure;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -242,7 +244,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 											currentState.getStateName(),
 											valuesAsJSON);
 
-								} else
+								}
+								else
 								{
 									// store the current state
 									deviceStateAsJSON.put(
@@ -267,11 +270,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			}
 
 			responseAsString = responseBody.toString(4);
-		} catch (InvalidSyntaxException e)
+		}
+		catch (InvalidSyntaxException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (JSONException e)
+		}
+		catch (JSONException e)
 		{
 			this.logger.log(LogService.LOG_ERROR, DeviceRESTEndpoint.logId
 					+ "Error while composing the response");
@@ -283,32 +288,35 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Override
 	@GET
 	@Path("{device-id}/commands/{command-name}")
-	public String executeCommandGet(@PathParam("device-id") String deviceId, @PathParam("command-name") String commandName)
+	public String executeCommandGet(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName)
 	{
 		this.executeCommand(deviceId, commandName, null);
 		return "Ok";
 	}
-	
+
 	@Override
 	@POST
 	@Path("{device-id}/commands/{command-name}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void executeCommandPost(@PathParam("device-id") String deviceId, @PathParam("command-name") String commandName,
+	public void executeCommandPost(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName,
 			String commandParameters)
 	{
 		this.executeCommand(deviceId, commandName, commandParameters);
 	}
-	
+
 	@Override
 	@PUT
 	@Path("{device-id}/commands/{command-name}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void executeCommandPut(@PathParam("device-id") String deviceId, @PathParam("command-name") String commandName,
+	public void executeCommandPut(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName,
 			String commandParameters)
 	{
 		this.executeCommand(deviceId, commandName, commandParameters);
 	}
-	
+
 	/**
 	 * 
 	 * @param deviceId
@@ -324,27 +332,44 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// check if a post/put body is given and convert it into an array of
 		// parameters
 		// TODO: check if commands can have more than 1 parameter
-		if ((commandParameters != null)&&(!commandParameters.isEmpty()))
+		if ((commandParameters != null) && (!commandParameters.isEmpty()))
 		{
 			Object param;
+
 			try
 			{
-				//convert the received JSON String to a JSON object
-				JSONObject commandParametersJSON = new JSONObject(commandParameters);
-				
-				//extract the parameter value./
+				// convert the received JSON String to a JSON object
+				JSONObject commandParametersJSON = new JSONObject(
+						commandParameters);
+
+				// extract the parameter value./
 				param = commandParametersJSON.get("value");
 
-				// exec the command
-				executor.execute(context, deviceId, commandName,
-						new Object[] { param });
+				// if value can be a measure, convert to measure
+				try
+				{
+					Measure<?, ?> measure = DecimalMeasure.valueOf(param
+							.toString());
+					
+					// exec the command
+					executor.execute(context, deviceId, commandName,
+							new Object[] { measure });
+				}
+				catch (NumberFormatException e)
+				{
+					// exec the command
+					executor.execute(context, deviceId, commandName,
+							new Object[] { param });
+				}
 
-			} catch (JSONException e)
-			{
-				//log the error 
-				this.logger.log(LogService.LOG_WARNING, "Error while parsing the command parameters", e);
 			}
-		} 
+			catch (JSONException e)
+			{
+				// log the error
+				this.logger.log(LogService.LOG_WARNING,
+						"Error while parsing the command parameters", e);
+			}
+		}
 		else
 		{
 			// exec the command
