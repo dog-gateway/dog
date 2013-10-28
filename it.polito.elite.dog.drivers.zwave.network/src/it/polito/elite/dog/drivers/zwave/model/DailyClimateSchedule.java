@@ -68,6 +68,17 @@ public class DailyClimateSchedule implements Serializable
 		for (ClimateScheduleSwitchPoint point : points)
 			this.addSwitchPoint(point);
 	}
+	
+	/**
+	 * Add a set/array of switch point to this daily schedule
+	 * 
+	 * @param points
+	 */
+	public void addAllSwitchPoints(ClimateScheduleSwitchPoint[] points)
+	{
+		for (ClimateScheduleSwitchPoint point : points)
+			this.addSwitchPoint(point);
+	}
 
 	/**
 	 * Sets the switch points for this climate schedule object. Used by jackson
@@ -116,6 +127,22 @@ public class DailyClimateSchedule implements Serializable
 	{
 		return this.switchPoints.get(ClimateScheduleSwitchPoint
 				.getTimeAtKey(timeAt));
+	}
+	
+	/**
+	 * Gets all switch points associated to this schedule as an Array of {@link ClimateScheduleSwitchPoint} instances
+	 * @return an Array of {@link ClimateScheduleSwitchPoint} instances
+	 */
+	public ClimateScheduleSwitchPoint[] getAllSwitchPoints()
+	{
+		//prepare the array
+		ClimateScheduleSwitchPoint[] allSwitchPoints = new ClimateScheduleSwitchPoint[this.switchPoints.size()];
+		
+		//convert the currently stored values to an array
+		allSwitchPoints = this.switchPoints.values().toArray(allSwitchPoints);
+		
+		//return the array
+		return allSwitchPoints;
 	}
 
 	/**
