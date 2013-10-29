@@ -37,11 +37,35 @@ import javax.ws.rs.core.MediaType;
  * 
  * 
  * @author bonino
+ * @author derussis
  * 
  */
 @Path("/api/devices/")
 public interface DeviceRESTApi
 {
+	/**
+	 * Represents domotic devices handled by Dog and “controllable” by
+	 * applications using this API.
+	 * 
+	 * @return the XML representation of the configured devices
+	 */
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	public String getAllDevices();
+	
+	/**
+	 * Represents a single domotic device handled by Dog, identified by a unique
+	 * device-id, and “controllable” by applications using this API.
+	 * 
+	 * @param deviceId
+	 *            the device unique identifier
+	 * @return the XML representation of the required device
+	 */
+	@GET
+	@Path("/{device-id}")
+	@Produces(MediaType.APPLICATION_XML)
+	public String getDevice(@PathParam("device-id") String deviceId);
+	
 	/**
 	 * Represents the status of devices registered in the Dog gateway runtime,
 	 * i.e., defined in the Dog configuration and successfully registered within
@@ -53,7 +77,7 @@ public interface DeviceRESTApi
 	@Path("/status")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getAllDeviceStatus();
-
+	
 	/**
 	 * TODO: For testing purpose only
 	 * 
@@ -63,14 +87,16 @@ public interface DeviceRESTApi
 	 * If the command brings the device in same state in which the device is, no
 	 * differences will be appreciable
 	 * 
-	 * @param deviceId The device unique identifier (URI)
-	 * @param commandName The command to be executed
+	 * @param deviceId
+	 *            The device unique identifier (URI)
+	 * @param commandName
+	 *            The command to be executed
 	 */
 	@GET
 	@Path("{device-id}/commands/{command-name}")
 	public String executeCommandGet(@PathParam("device-id") String deviceId,
 			@PathParam("command-name") String commandName);
-
+	
 	/**
 	 * Represents a command, identified by a command-name, to be sent to the
 	 * device identified by the given device-id. Commands are idempotent: the
@@ -78,17 +104,19 @@ public interface DeviceRESTApi
 	 * If the command brings the device in same state in which the device is, no
 	 * differences will be appreciable
 	 * 
-	 * @param deviceId The device unique identifier (URI)
-	 * @param commandName The command to be executed
-	 * @param commandParameters Any possible command parameter (one in this version)
+	 * @param deviceId
+	 *            The device unique identifier (URI)
+	 * @param commandName
+	 *            The command to be executed
+	 * @param commandParameters
+	 *            Any possible command parameter (one in this version)
 	 */
 	@POST
 	@Path("{device-id}/commands/{command-name}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void executeCommandPost(@PathParam("device-id") String deviceId,
-			@PathParam("command-name") String commandName,
-			String commandParameters);
-
+			@PathParam("command-name") String commandName, String commandParameters);
+	
 	/**
 	 * Represents a command, identified by a command-name, to be sent to the
 	 * device identified by the given device-id. Commands are idempotent: the
@@ -96,15 +124,17 @@ public interface DeviceRESTApi
 	 * If the command brings the device in same state in which the device is, no
 	 * differences will be appreciable
 	 * 
-	 * @param deviceId The device unique identifier (URI)
-	 * @param commandName The command to be executed
-	 * @param commandParameters Any possible command parameter (one in this version)
+	 * @param deviceId
+	 *            The device unique identifier (URI)
+	 * @param commandName
+	 *            The command to be executed
+	 * @param commandParameters
+	 *            Any possible command parameter (one in this version)
 	 */
 	@PUT
 	@Path("{device-id}/commands/{command-name}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void executeCommandPut(@PathParam("device-id") String deviceId,
-			@PathParam("command-name") String commandName,
-			String commandParameters);
-
+			@PathParam("command-name") String commandName, String commandParameters);
+	
 }

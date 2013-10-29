@@ -4,4 +4,5 @@
    <service>
       <provide interface="it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi"/>
    </service>
+   <reference bind="addedHouseModel" cardinality="1..1" interface="it.polito.elite.dog.core.housemodel.api.HouseModel" name="HouseModel" policy="static"/>
 </scr:component>
