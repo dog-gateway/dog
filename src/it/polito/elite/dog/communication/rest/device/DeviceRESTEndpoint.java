@@ -18,6 +18,10 @@
 package it.polito.elite.dog.communication.rest.device;
 
 import it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi;
+import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedulePayload;
+import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
+import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
+import it.polito.elite.dog.communication.rest.device.command.Payload;
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
@@ -38,15 +42,16 @@ import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.util.Executor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.measure.DecimalMeasure;
-import javax.measure.Measure;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -58,6 +63,9 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DataBindingException;
 import javax.xml.bind.JAXB;
 
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -86,6 +94,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	// reference for the HouseModel
 	private AtomicReference<HouseModel> houseModel;
 	
+	//registered payloads
+	private Set<Class<? extends Payload<?>>> payloads;
+	
 	/**
 	 * Empty constructor
 	 */
@@ -93,6 +104,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// init the house model atomic ref
 		this.houseModel = new AtomicReference<HouseModel>();
+		
+		// init the set of allowed payloads
+		this.payloads = new HashSet<Class<? extends Payload<?>>>();
+		this.payloads.add(DailyClimateSchedulePayload.class);
+		this.payloads.add(MeasurePayload.class);
+		this.payloads.add(DoublePayload.class);
+		
 	}
 	
 	/**
@@ -419,41 +437,45 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// get the executor instance
 		Executor executor = Executor.getInstance();
 		
+		
+		//------------- Use Jackson to interpret the type of data passed as value ---------
+		
 		// check if a post/put body is given and convert it into an array of
 		// parameters
 		// TODO: check if commands can have more than 1 parameter
 		if ((commandParameters != null) && (!commandParameters.isEmpty()))
 		{
-			Object param;
+			ObjectMapper mapper = new ObjectMapper();
 			
-			try
+			//try to read the payload
+			for(Class<? extends Payload<?>> currentPayload : this.payloads)
 			{
-				// convert the received JSON String to a JSON object
-				JSONObject commandParametersJSON = new JSONObject(commandParameters);
-				
-				// extract the parameter value./
-				param = commandParametersJSON.get("value");
-				
-				// if value can be a measure, convert to measure
 				try
 				{
-					Measure<?, ?> measure = DecimalMeasure.valueOf(param.toString());
+					//try to read the value
+					Payload<?> payload = mapper.readValue(commandParameters, currentPayload);
 					
-					// exec the command
-					executor.execute(context, deviceId, commandName, new Object[] { measure });
+					//if payload !=null
+					executor.execute(context, deviceId, commandName, new Object[] {payload.getValue()});
 				}
-				catch (NumberFormatException e)
+				catch (JsonParseException e)
 				{
-					// exec the command
-					executor.execute(context, deviceId, commandName, new Object[] { param });
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				
+				catch (JsonMappingException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			catch (JSONException e)
-			{
-				// log the error
-				this.logger.log(LogService.LOG_WARNING, "Error while parsing the command parameters", e);
-			}
+			
+			
 		}
 		else
 		{
