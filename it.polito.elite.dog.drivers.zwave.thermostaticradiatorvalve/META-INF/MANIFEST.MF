@@ -7,6 +7,7 @@ Bundle-Vendor: it.polito.elite
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
 Import-Package: it.polito.elite.dog.core.library.model,
+ it.polito.elite.dog.core.library.model.climate,
  it.polito.elite.dog.core.library.model.devicecategory,
  it.polito.elite.dog.core.library.model.notification.core;version="1.0.0",
  it.polito.elite.dog.core.library.model.state,
@@ -14,7 +15,6 @@ Import-Package: it.polito.elite.dog.core.library.model,
  it.polito.elite.dog.core.library.util,
  it.polito.elite.dog.drivers.zwave,
  it.polito.elite.dog.drivers.zwave.gateway,
- it.polito.elite.dog.drivers.zwave.model,
  it.polito.elite.dog.drivers.zwave.model.commandclasses,
  it.polito.elite.dog.drivers.zwave.model.zway.json,
  it.polito.elite.dog.drivers.zwave.network,

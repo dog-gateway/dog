@@ -19,6 +19,8 @@ package it.polito.elite.dog.drivers.zwave.thermostaticradiatorvalve;
 
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.climate.ClimateScheduleSwitchPoint;
+import it.polito.elite.dog.core.library.model.climate.DailyClimateSchedule;
 import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.ThermostaticRadiatorValve;
 import it.polito.elite.dog.core.library.model.state.ClimateScheduleState;
@@ -29,8 +31,6 @@ import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
-import it.polito.elite.dog.drivers.zwave.model.ClimateScheduleSwitchPoint;
-import it.polito.elite.dog.drivers.zwave.model.DailyClimateSchedule;
 import it.polito.elite.dog.drivers.zwave.model.commandclasses.ThermostatMode;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClassesData;
@@ -142,21 +142,30 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 				.getCurrentStateValue();
 
 		// look for the state value associated to the given weekday
+		// update the schedule and perisist it
+		DailyClimateSchedule schedules[]= new DailyClimateSchedule[states.length];
 		for (int i = 0; i < states.length; i++)
 		{
 			// get the current daily schedule
-			DailyClimateSchedule schedule = (DailyClimateSchedule) ((ClimateScheduleStateValue) states[i])
+			schedules[i] = (DailyClimateSchedule) ((ClimateScheduleStateValue) states[i])
 					.getValue();
 
 			// if the schedule is the one searched for
-			if (schedule.getWeekDay() == weekDay)
+			if (schedules[i].getWeekDay() == weekDay)
 			{
 				// get the switch points
-				schedule.addAllSwitchPoints((ClimateScheduleSwitchPoint[]) switchPoints);
-
-				// stop the cycle
-				break;
+				schedules[i].replaceAllSwitchPoints((ClimateScheduleSwitchPoint[]) switchPoints);
 			}
+		}
+		
+		//persist the schedules
+		try
+		{
+			this.persistentStore.persist(schedules);
+		}
+		catch (Exception e)
+		{
+			this.logger.log(LogService.LOG_ERROR,"Unable to save schedule data.",e);
 		}
 
 	}
