@@ -133,7 +133,7 @@ public class DailyClimateSchedule implements Serializable
 	 * Gets all switch points associated to this schedule as an Array of {@link ClimateScheduleSwitchPoint} instances
 	 * @return an Array of {@link ClimateScheduleSwitchPoint} instances
 	 */
-	public ClimateScheduleSwitchPoint[] getAllSwitchPoints()
+	public ClimateScheduleSwitchPoint[] getSwitchPoints()
 	{
 		//prepare the array
 		ClimateScheduleSwitchPoint[] allSwitchPoints = new ClimateScheduleSwitchPoint[this.switchPoints.size()];

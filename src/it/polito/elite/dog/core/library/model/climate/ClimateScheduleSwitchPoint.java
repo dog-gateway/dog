@@ -71,7 +71,7 @@ public class ClimateScheduleSwitchPoint implements Serializable
 	/**
 	 * @return the desiredTemperature
 	 */
-	public Measure<?, ?> getDesiredTemperature()
+	public Measure<?, ?> desiredTemperatureAsMeasure()
 	{
 		return desiredTemperature;
 	}
@@ -95,6 +95,14 @@ public class ClimateScheduleSwitchPoint implements Serializable
 	{
 		this.desiredTemperature = DecimalMeasure
 				.valueOf(desiredTemperatureAsString);
+	}
+	
+	/**
+	 * @return the desiredTemperature
+	 */
+	public String getDesiredTemperature()
+	{
+		return desiredTemperature.toString();
 	}
 
 	/**
