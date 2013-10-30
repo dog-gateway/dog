@@ -132,40 +132,75 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 	}
 
 	@Override
-	public void setDaySchedule(Object[] switchPoints, Integer weekDay)
+	public void setDailyClimateSchedule(DailyClimateSchedule daySchedule)
 	{
-
-		// get the current state value registered as values of the climate
-		// schedule state
-		StateValue[] states = this.currentState.getState(
-				ClimateScheduleState.class.getSimpleName())
+		// get the state values
+		ClimateScheduleStateValue stateValues[] = (ClimateScheduleStateValue[]) this.currentState
+				.getState(ClimateScheduleState.class.getSimpleName())
 				.getCurrentStateValue();
 
-		// look for the state value associated to the given weekday
-		// update the schedule and perisist it
-		DailyClimateSchedule schedules[]= new DailyClimateSchedule[states.length];
-		for (int i = 0; i < states.length; i++)
-		{
-			// get the current daily schedule
-			schedules[i] = (DailyClimateSchedule) ((ClimateScheduleStateValue) states[i])
-					.getValue();
+		// prepare the array of schedules to sync on file
+		DailyClimateSchedule schedules[] = new DailyClimateSchedule[stateValues.length];
 
-			// if the schedule is the one searched for
-			if (schedules[i].getWeekDay() == weekDay)
+		// iterate over state values to find which value should be replaced
+		for (int i = 0; i < stateValues.length; i++)
+		{
+			// get the value
+			schedules[i] = (DailyClimateSchedule) stateValues[i].getValue();
+
+			// check if the current one must be replaced
+			if (schedules[i].getWeekDay() == daySchedule.getWeekDay())
 			{
-				// get the switch points
-				schedules[i].replaceAllSwitchPoints((ClimateScheduleSwitchPoint[]) switchPoints);
+				// replace
+				stateValues[i].setValue(daySchedule);
+				schedules[i] = daySchedule;
+
+				// stop the cycle
+				break;
+
 			}
 		}
-		
-		//persist the schedules
+
+		// persist the schedules
 		try
 		{
 			this.persistentStore.persist(schedules);
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR,"Unable to save schedule data.",e);
+			this.logger.log(LogService.LOG_ERROR,
+					"Unable to save schedule data.", e);
+		}
+
+	}
+
+	@Override
+	public void setClimateSchedule(DailyClimateSchedule[] dailySchedules)
+	{
+		// create the climate state values placeholder
+		ClimateScheduleStateValue values[] = new ClimateScheduleStateValue[dailySchedules.length];
+
+		// store the various state values
+		for (int i = 0; i < dailySchedules.length; i++)
+		{
+			values[i] = new ClimateScheduleStateValue();
+			values[i].setFeature("weekDay", dailySchedules[i].getWeekDay());
+			values[i].setValue(dailySchedules[i]);
+		}
+
+		// set the climate schedule state (covers all the week)
+		currentState.setState(ClimateScheduleState.class.getSimpleName(),
+				new ClimateScheduleState(values));
+
+		// persist the schedules
+		try
+		{
+			this.persistentStore.persist(dailySchedules);
+		}
+		catch (Exception e)
+		{
+			this.logger.log(LogService.LOG_ERROR,
+					"Unable to save schedule data.", e);
 		}
 
 	}
@@ -193,7 +228,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 			if (schedule.getWeekDay() == weekDay)
 			{
 				// get the switch points
-				switchPoints = schedule.getAllSwitchPoints();
+				switchPoints = schedule.getSwitchPoints();
 
 				// stop the cycle
 				break;
@@ -231,12 +266,11 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 	public void setTemperatureAt(Measure<?, ?> temperature)
 	{
 		// get the value in celsius
-		String celsius = String.format("%02.02f",
-				temperature.getValue());
+		String celsius = String.format("%02.02f", temperature.getValue());
 		for (Integer instanceId : nodeInfo.getInstanceSet())
 			network.write(nodeInfo.getDeviceNodeId(), instanceId,
 					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT,
-					ThermostatMode.MODE_HEAT+ "," + celsius);
+					ThermostatMode.MODE_HEAT + "," + celsius);
 	}
 
 	@Override
@@ -358,9 +392,9 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
 
 		HashSet<Integer> ccSet = new HashSet<Integer>();
-		//ccSet.add(ZWaveAPI.COMMAND_CLASS_CLIMATE_CONTROL_SCHEDULE);
+		// ccSet.add(ZWaveAPI.COMMAND_CLASS_CLIMATE_CONTROL_SCHEDULE);
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT);
-		//ccSet.add(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE);
+		// ccSet.add(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE);
 
 		for (Integer instanceId : instancesId)
 		{
@@ -470,7 +504,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 					// set the new set point if available
 					if (switchPoint != null)
 						this.setTemperatureAt(switchPoint
-								.getDesiredTemperature());
+								.desiredTemperatureAsMeasure());
 
 					// break as no more switch points can be activated for this
 					// instant of time
