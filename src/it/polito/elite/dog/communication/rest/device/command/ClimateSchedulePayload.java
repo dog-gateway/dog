@@ -23,21 +23,22 @@ import it.polito.elite.dog.core.library.model.climate.DailyClimateSchedule;
  * @author bonino
  *
  */
-public class DailyClimateSchedulePayload extends Payload<DailyClimateSchedule>
+public class ClimateSchedulePayload extends Payload<DailyClimateSchedule[]>
 {
+	//private DailyClimateSchedule value[];
 	
-	public DailyClimateSchedulePayload()
+	public ClimateSchedulePayload()
 	{
 		//empty constructor implementing the bean instantiation pattern
 	}
 	
 	//setters for "registered types"
-	public void setValue(DailyClimateSchedule schedule)
+	public void setValue(DailyClimateSchedule[] schedules)
 	{
-		this.value = schedule;
+		this.value = schedules;
 	}
 
-	public DailyClimateSchedule getValue()
+	public DailyClimateSchedule[] getValue()
 	{
 		return value;
 	}

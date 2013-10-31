@@ -18,6 +18,7 @@
 package it.polito.elite.dog.communication.rest.device;
 
 import it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi;
+import it.polito.elite.dog.communication.rest.device.command.ClimateSchedulePayload;
 import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedulePayload;
 import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
 import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
@@ -45,10 +46,8 @@ import it.polito.elite.dog.core.library.util.LogHelper;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -63,8 +62,6 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DataBindingException;
 import javax.xml.bind.JAXB;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -83,20 +80,20 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 {
 	// the service logger
 	private LogHelper logger;
-	
+
 	// the log id
 	public static final String logId = "[DeviceRESTEndpoint]: ";
-	
+
 	// the bundle context reference to extract information on the entire Dog
 	// status
 	private BundleContext context;
-	
+
 	// reference for the HouseModel
 	private AtomicReference<HouseModel> houseModel;
-	
-	//registered payloads
-	private Set<Class<? extends Payload<?>>> payloads;
-	
+
+	// registered payloads
+	private Vector<Class<? extends Payload<?>>> payloads;
+
 	/**
 	 * Empty constructor
 	 */
@@ -104,15 +101,18 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// init the house model atomic ref
 		this.houseModel = new AtomicReference<HouseModel>();
-		
+
 		// init the set of allowed payloads
-		this.payloads = new HashSet<Class<? extends Payload<?>>>();
+		this.payloads = new Vector<Class<? extends Payload<?>>>();
+		this.payloads.add(ClimateSchedulePayload.class);
 		this.payloads.add(DailyClimateSchedulePayload.class);
-		this.payloads.add(MeasurePayload.class);
+		// it is really mandatory that double payload precedes measure payload
+		// to avoid matching pure doubles to measures with no unit.
 		this.payloads.add(DoublePayload.class);
-		
+		this.payloads.add(MeasurePayload.class);
+
 	}
-	
+
 	/**
 	 * Bundle activation, stores a reference to the context object passed by the
 	 * framework to get access to system data, e.g., installed bundles, etc.
@@ -123,14 +123,15 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// store the bundle context
 		this.context = context;
-		
+
 		// init the logger with a null logger
 		this.logger = new LogHelper(this.context);
-		
+
 		// log the activation
-		this.logger.log(LogService.LOG_INFO, DeviceRESTEndpoint.logId + "Activated....");
+		this.logger.log(LogService.LOG_INFO, DeviceRESTEndpoint.logId
+				+ "Activated....");
 	}
-	
+
 	/**
 	 * Prepare the bundle to be deactivated...
 	 */
@@ -138,14 +139,15 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// null the context
 		this.context = null;
-		
+
 		// log deactivation
-		this.logger.log(LogService.LOG_INFO, DeviceRESTEndpoint.logId + "Deactivated...");
-		
+		this.logger.log(LogService.LOG_INFO, DeviceRESTEndpoint.logId
+				+ "Deactivated...");
+
 		// null the logger
 		this.logger = null;
 	}
-	
+
 	/**
 	 * Bind the HouseModel service (before the bundle activation)
 	 * 
@@ -157,7 +159,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// store a reference to the HouseModel service
 		this.houseModel.set(houseModel);
 	}
-	
+
 	/**
 	 * Unbind the HouseModel service
 	 * 
@@ -168,22 +170,23 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		this.houseModel.compareAndSet(houseModel, null);
 	}
-	
+
 	@Override
 	public String getAllDevices()
 	{
 		String devicesXML = "";
-		
+
 		// check if the HouseModel service is available
 		if (this.houseModel.get() != null)
 		{
 			// create a JAXB Object Factory for adding the proper header...
 			ObjectFactory factory = new ObjectFactory();
 			DogHomeConfiguration dhc = factory.createDogHomeConfiguration();
-			
+
 			// get all the devices from the HouseModel
-			Controllables controllables = this.houseModel.get().getJAXBDevices().get(0);
-			
+			Controllables controllables = this.houseModel.get()
+					.getJAXBDevices().get(0);
+
 			for (Device device : controllables.getDevice())
 			{
 				// create the JAXB representation to be sent to external
@@ -191,21 +194,21 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				// parameters
 				this.cleanJaxbDevice(device);
 			}
-			
+
 			dhc.getControllables().add(controllables);
-			
+
 			// create the XML for replying the request
 			devicesXML = this.generateXML(dhc);
 		}
-		
+
 		return devicesXML;
 	}
-	
+
 	@Override
 	public String getDevice(String deviceId)
 	{
 		String deviceXML = "";
-		
+
 		// check if the HouseModel service is available
 		if (this.houseModel.get() != null)
 		{
@@ -213,9 +216,10 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			ObjectFactory factory = new ObjectFactory();
 			DogHomeConfiguration dhc = factory.createDogHomeConfiguration();
 			Controllables controllables = factory.createControllables();
-			
+
 			// get the desired device from the HouseModel service
-			for (Device device : this.houseModel.get().getJAXBDevices().get(0).getDevice())
+			for (Device device : this.houseModel.get().getJAXBDevices().get(0)
+					.getDevice())
 			{
 				if (device.getId().equalsIgnoreCase(deviceId))
 				{
@@ -223,21 +227,21 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					// applications: it removes all the network-specific
 					// parameters
 					this.cleanJaxbDevice(device);
-					
+
 					// add the device to its container
 					controllables.getDevice().add(device);
 				}
 			}
-			
+
 			dhc.getControllables().add(controllables);
-			
+
 			// create the XML for replying the request
 			deviceXML = this.generateXML(dhc);
 		}
-		
+
 		return deviceXML;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -252,20 +256,22 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// the response
 		String responseAsString = "";
-		
+
 		// The JSON Object to return
 		JSONObject responseBody = new JSONObject();
-		
+
 		// The JSONArray containing the single device renderings as JSON
 		JSONArray devices = new JSONArray();
-		
+
 		// get all the installed device services
 		try
 		{
 			// get the device service references
-			ServiceReference<?>[] allDevices = this.context.getAllServiceReferences(
-					org.osgi.service.device.Device.class.getName(), null);
-			
+			ServiceReference<?>[] allDevices = this.context
+					.getAllServiceReferences(
+							org.osgi.service.device.Device.class.getName(),
+							null);
+
 			// check not null
 			if (allDevices != null)
 			{
@@ -275,112 +281,126 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					// get the OSGi service pointed by the current device
 					// reference
 					Object device = this.context.getService(allDevices[i]);
-					
+
 					// check if the service belongs to the set of dog devices
 					if (device instanceof ControllableDevice)
 					{
 						// prepare the device JSON entry
 						JSONObject deviceJSON = new JSONObject();
-						
+
 						// get the device instance
 						ControllableDevice currentDevice = (ControllableDevice) device;
-						
+
 						// get the device descriptor
-						DeviceDescriptor deviceDescriptor = currentDevice.getDeviceDescriptor();
-						
+						DeviceDescriptor deviceDescriptor = currentDevice
+								.getDeviceDescriptor();
+
 						// save device data
 						deviceJSON.put("id", deviceDescriptor.getDeviceURI());
-						deviceJSON.put("description", deviceDescriptor.getDescription());
-						deviceJSON.put("active",
-								Boolean.valueOf((String) allDevices[i].getProperty(DeviceCostants.ACTIVE)));
-						
+						deviceJSON.put("description",
+								deviceDescriptor.getDescription());
+						deviceJSON.put("active", Boolean
+								.valueOf((String) allDevices[i]
+										.getProperty(DeviceCostants.ACTIVE)));
+
 						// get the device status
-						DeviceStatus state = ((Controllable) currentDevice).getState();
-						
+						DeviceStatus state = ((Controllable) currentDevice)
+								.getState();
+
 						// check if the device state is available, i.e., not
 						// null
 						if (state != null)
 						{
 							// prepare the device status array
 							JSONArray deviceStatusAsJSON = new JSONArray();
-							
+
 							// get the states composing the overall device
 							// status
 							Map<String, State> allStates = state.getStates();
-							
+
 							// iterate over all states
 							for (String stateKey : allStates.keySet())
 							{
 								// get the current state
 								State currentState = allStates.get(stateKey);
-								
+
 								// get the values associate to the current state
-								StateValue currentStateValues[] = currentState.getCurrentStateValue();
-								
+								StateValue currentStateValues[] = currentState
+										.getCurrentStateValue();
+
 								// prepare the state holding JSON object
 								JSONObject deviceStateAsJSON = new JSONObject();
-								
+
 								// change behavior depending on single vs
 								// multiple states
 								if (currentStateValues.length > 1)
 								{
 									// populate the state values
 									JSONArray valuesAsJSON = new JSONArray();
-									
+
 									for (int j = 0; j < currentStateValues.length; j++)
 									{
 										// create the JSONObject to store the
 										// current state value
 										JSONObject valueAsJSON = new JSONObject();
-										
+
 										// get state value features
-										HashMap<String, Object> features = currentStateValues[j].getFeatures();
-										
+										HashMap<String, Object> features = currentStateValues[j]
+												.getFeatures();
+
 										// iterate over the features
-										for (String featureKey : features.keySet())
+										for (String featureKey : features
+												.keySet())
 										{
 											// filter out anything containing
 											// "value" inside
 											// dirt, should be improved
 											if (!featureKey.contains("Value"))
-												valueAsJSON.put(featureKey, features.get(featureKey));
+												valueAsJSON
+														.put(featureKey,
+																features.get(featureKey));
 										}
-										
+
 										// store the value
-										valueAsJSON.put("value", currentStateValues[j].getValue());
-										
+										valueAsJSON.put("value",
+												currentStateValues[j]
+														.getValue());
+
 										// add the current state value to the
 										// corresponding state
 										valuesAsJSON.put(valueAsJSON);
 									}
-									
+
 									// store the current state
-									deviceStateAsJSON.put(currentState.getStateName(), valuesAsJSON);
-									
+									deviceStateAsJSON.put(
+											currentState.getStateName(),
+											valuesAsJSON);
+
 								}
 								else
 								{
 									// store the current state
-									deviceStateAsJSON
-											.put(currentState.getStateName(), currentStateValues[0].getValue());
-									
+									deviceStateAsJSON.put(
+											currentState.getStateName(),
+											currentStateValues[0].getValue());
+
 								}
 								// add it to the overall device status
 								deviceStatusAsJSON.put(deviceStateAsJSON);
 							}
-							
+
 							deviceJSON.put("status", deviceStatusAsJSON);
 						}
-						
+
 						// add the current device to the list of devices
 						devices.put(deviceJSON);
 					}
-					
+
 				}
-				
+
 				responseBody.put("devices", devices);
 			}
-			
+
 			responseAsString = responseBody.toString(4);
 		}
 		catch (InvalidSyntaxException e)
@@ -390,12 +410,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		}
 		catch (JSONException e)
 		{
-			this.logger.log(LogService.LOG_ERROR, DeviceRESTEndpoint.logId + "Error while composing the response");
+			this.logger.log(LogService.LOG_ERROR, DeviceRESTEndpoint.logId
+					+ "Error while composing the response");
 		}
-		
+
 		return responseAsString;
 	}
-	
+
 	@Override
 	@GET
 	@Path("{device-id}/commands/{command-name}")
@@ -405,86 +426,83 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		this.executeCommand(deviceId, commandName, null);
 		return "Ok";
 	}
-	
+
 	@Override
 	@POST
 	@Path("{device-id}/commands/{command-name}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void executeCommandPost(@PathParam("device-id") String deviceId,
-			@PathParam("command-name") String commandName, String commandParameters)
+			@PathParam("command-name") String commandName,
+			String commandParameters)
 	{
 		this.executeCommand(deviceId, commandName, commandParameters);
 	}
-	
+
 	@Override
 	@PUT
 	@Path("{device-id}/commands/{command-name}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void executeCommandPut(@PathParam("device-id") String deviceId,
-			@PathParam("command-name") String commandName, String commandParameters)
+			@PathParam("command-name") String commandName,
+			String commandParameters)
 	{
 		this.executeCommand(deviceId, commandName, commandParameters);
 	}
-	
+
 	/**
 	 * 
 	 * @param deviceId
 	 * @param commandName
 	 * @param commandParameters
 	 */
-	private void executeCommand(String deviceId, String commandName, String commandParameters)
+	private void executeCommand(String deviceId, String commandName,
+			String commandParameters)
 	{
 		// get the executor instance
 		Executor executor = Executor.getInstance();
-		
-		
-		//------------- Use Jackson to interpret the type of data passed as value ---------
-		
+
+		// ------------- Use Jackson to interpret the type of data passed as
+		// value ---------
+
 		// check if a post/put body is given and convert it into an array of
 		// parameters
 		// TODO: check if commands can have more than 1 parameter
 		if ((commandParameters != null) && (!commandParameters.isEmpty()))
 		{
 			ObjectMapper mapper = new ObjectMapper();
-			
-			//try to read the payload
-			for(Class<? extends Payload<?>> currentPayload : this.payloads)
+
+			// try to read the payload
+			for (int i=0; i<this.payloads.size(); i++)
 			{
 				try
 				{
-					//try to read the value
-					Payload<?> payload = mapper.readValue(commandParameters, currentPayload);
+					// try to read the value
+					Payload<?> payload = mapper.readValue(commandParameters,
+							this.payloads.get(i));
+
+					// if payload !=null
+					executor.execute(context, deviceId, commandName,
+							new Object[] { payload.getValue() });
 					
-					//if payload !=null
-					executor.execute(context, deviceId, commandName, new Object[] {payload.getValue()});
-				}
-				catch (JsonParseException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				catch (JsonMappingException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					break;
 				}
 				catch (IOException e)
 				{
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					//do nothing and proceed to the next trial
+					//e.printStackTrace();
 				}
 			}
-			
-			
+
 		}
 		else
 		{
 			// exec the command
 			executor.execute(context, deviceId, commandName, new Object[] {});
 		}
-		
+
 	}
-	
+
 	/**
 	 * Prepare the JAXB Device to contain the proper information for external
 	 * applications. It removes all the network-related properties...
@@ -496,16 +514,18 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// store the parameters to be removed from the current device
 		Vector<Configparam> paramsToRemove = new Vector<Configparam>();
-		
+
 		// remove all the "first-level" params, since they are network-related
 		device.getParam().clear();
-		
+
 		// get all the control functionalites...
-		List<ControlFunctionality> controlFunctionalities = device.getControlFunctionality();
+		List<ControlFunctionality> controlFunctionalities = device
+				.getControlFunctionality();
 		for (ControlFunctionality controlFunctionality : controlFunctionalities)
 		{
 			// get all the commands
-			for (Configcommand command : controlFunctionality.getCommands().getCommand())
+			for (Configcommand command : controlFunctionality.getCommands()
+					.getCommand())
 			{
 				for (Configparam param : command.getParam())
 				{
@@ -525,13 +545,15 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				paramsToRemove.clear();
 			}
 		}
-		
+
 		// get all the notification functionalities...
-		List<NotificationFunctionality> notificationsFunctionalities = device.getNotificationFunctionality();
+		List<NotificationFunctionality> notificationsFunctionalities = device
+				.getNotificationFunctionality();
 		for (NotificationFunctionality notificationFunctionality : notificationsFunctionalities)
 		{
 			// get all the notifications...
-			for (Confignotification notification : notificationFunctionality.getNotifications().getNotification())
+			for (Confignotification notification : notificationFunctionality
+					.getNotifications().getNotification())
 			{
 				for (Configparam param : notification.getParam())
 				{
@@ -539,7 +561,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					// (network-related), i.e., preserve only the
 					// "notificationName" and "notificationParamName" props
 					if ((!param.getName().equalsIgnoreCase("notificationName"))
-							&& (!param.getName().equalsIgnoreCase("notificationParamName")))
+							&& (!param.getName().equalsIgnoreCase(
+									"notificationParamName")))
 					{
 						paramsToRemove.add(param);
 					}
@@ -552,9 +575,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				paramsToRemove.clear();
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Generate the XML to be sent
 	 * 
@@ -565,23 +588,24 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	private String generateXML(DogHomeConfiguration dhc)
 	{
 		String devicesXML = "";
-		
+
 		try
 		{
 			StringWriter output = new StringWriter();
-			
+
 			// marshall the DogHomeConfiguration...
 			JAXB.marshal(dhc, output);
-			
+
 			devicesXML = output.getBuffer().toString();
 		}
 		catch (DataBindingException e)
 		{
 			// the exception can be throw by the JAXB.marshal method...
-			this.logger.log(LogService.LOG_ERROR, "Exception in JAXB Marshalling...", e);
+			this.logger.log(LogService.LOG_ERROR,
+					"Exception in JAXB Marshalling...", e);
 		}
-		
+
 		return devicesXML;
 	}
-	
+
 }
