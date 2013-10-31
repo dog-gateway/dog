@@ -154,10 +154,6 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 				// replace
 				stateValues[i].setValue(daySchedule);
 				schedules[i] = daySchedule;
-
-				// stop the cycle
-				break;
-
 			}
 		}
 

@@ -75,7 +75,7 @@ public class ZWaveThermostaticRadiatorValveDriver implements Driver,
 	// milliseconds between two update of the device status, from configuration
 	// file
 	protected int updateTimeMillis;
-	
+
 	// the persistence store associated to this driver
 	private String persistenceStoreDirectory;
 
@@ -216,7 +216,8 @@ public class ZWaveThermostaticRadiatorValveDriver implements Driver,
 				(ControllableDevice) context.getService(reference),
 				Integer.parseInt(sNodeID), instancesId, this.gateway.get()
 						.getSpecificGateway(gateway).getNodeInfo()
-						.getDeviceNodeId(), this.updateTimeMillis, this.persistenceStoreDirectory, this.context);
+						.getDeviceNodeId(), this.updateTimeMillis,
+				this.persistenceStoreDirectory, this.context);
 
 		((ControllableDevice) context.getService(reference))
 				.setDriver(driverInstance);
@@ -316,11 +317,15 @@ public class ZWaveThermostaticRadiatorValveDriver implements Driver,
 			{
 				// parse the string
 				this.persistenceStoreDirectory = persistenceDir;
-				
-				//check absolute vs relative
-				File persistenceStoreDir = new File (this.persistenceStoreDirectory);
-				if(!persistenceStoreDir.isAbsolute())
-					this.persistenceStoreDirectory = System.getProperty("configFolder") + "/" +this.persistenceStoreDirectory;
+
+				// check absolute vs relative
+				File persistenceStoreDir = new File(
+						this.persistenceStoreDirectory);
+				if (!persistenceStoreDir.isAbsolute())
+					this.persistenceStoreDirectory = System
+							.getProperty("configFolder")
+							+ "/"
+							+ this.persistenceStoreDirectory;
 			}
 
 			this.registerDriver();
@@ -330,35 +335,40 @@ public class ZWaveThermostaticRadiatorValveDriver implements Driver,
 	@Override
 	public void handleEvent(Event event)
 	{
-		//check that the received event is a clock notification
+		// check that the received event is a clock notification
 		final Object eventContent = event.getProperty(EventConstants.EVENT);
-		
-		if(eventContent instanceof ClockTimeNotification)
+
+		if (eventContent instanceof ClockTimeNotification)
 		{
-			//handle the clock notification asynchronously?
+			// handle the clock notification asynchronously?
 			Runnable clockNotificationTask = new Runnable()
 			{
-				
+
 				@Override
 				public void run()
 				{
-					// dispatch the event content
-					for(ZWaveThermostaticRadiatorValveInstance driverInstance: connectedDrivers)
+					synchronized (connectedDrivers)
 					{
-						driverInstance.checkTime(((ClockTimeNotification)eventContent).getClockTick());
+						// dispatch the event content
+						for (ZWaveThermostaticRadiatorValveInstance driverInstance : connectedDrivers)
+						{
+							driverInstance
+									.checkTime(((ClockTimeNotification) eventContent)
+											.getClockTick());
+						}
 					}
-					
+
 				}
 			};
-			
-			//create an execution thread for event handling
+
+			// create an execution thread for event handling
 			Thread taskRunner = new Thread(clockNotificationTask);
-			
-			//start the task
+
+			// start the task
 			taskRunner.start();
-			
+
 		}
-		
+
 	}
 
 }
