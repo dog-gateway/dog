@@ -67,6 +67,18 @@ public interface DeviceRESTApi
 	public String getDevice(@PathParam("device-id") String deviceId);
 	
 	/**
+	 * Represents the status of the device identified by the given device-id and
+	 * registered in the Dog gateway runtime, i.e., defined in the Dog
+	 * configuration and successfully registered within the gateway runtime.
+	 * 
+	 * @return The JSON description of the current device status
+	 */
+	@GET
+	@Path("/{device-id}/status")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getDeviceStatus(@PathParam("device-id") String deviceId);
+	
+	/**
 	 * Represents the status of devices registered in the Dog gateway runtime,
 	 * i.e., defined in the Dog configuration and successfully registered within
 	 * the gateway runtime.
