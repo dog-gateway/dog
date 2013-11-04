@@ -365,7 +365,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 
 									// prepare the map to store in the response
 									// body
-									HashMap<String, Object> responseBodyFeatures = new HashMap<>();
+									HashMap<String, Object> responseBodyFeatures = new HashMap<String, Object>();
 
 									// iterate over the features
 									for (String featureKey : features.keySet())
