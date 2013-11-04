@@ -20,11 +20,11 @@ package it.polito.elite.dog.drivers.zwave.dimmerdevice;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.DimmerLamp;
-import it.polito.elite.dog.core.library.model.devicecategory.DimmerSwitch;
 import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.devicecategory.LevelControllableOutput;
 import it.polito.elite.dog.core.library.model.state.LevelState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
+import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.LevelStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
@@ -42,21 +42,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.measure.Measure;
-import javax.measure.unit.NonSI;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements DimmerLamp, DimmerSwitch
+public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements
+		DimmerLamp, LevelControllableOutput
 {
 	// the class logger
 	private LogHelper logger;
 
-	public ZWaveDimmerDeviceDriverInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
-			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
+	public ZWaveDimmerDeviceDriverInstance(ZWaveNetwork network,
+			ControllableDevice device, int deviceId, Set<Integer> instancesId,
+			int gatewayNodeId, int updateTimeMillis, BundleContext context)
 	{
-		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
+		super(network, device, deviceId, instancesId, gatewayNodeId,
+				updateTimeMillis, context);
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -71,7 +71,8 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements Dimm
 	private void initializeStates()
 	{
 		// get the initial state of the device
-		Runnable worker = new Runnable() {
+		Runnable worker = new Runnable()
+		{
 			public void run()
 			{
 				network.read(nodeInfo, true);
@@ -87,89 +88,120 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements Dimm
 	public void notifyStateChanged(State newState)
 	{
 		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveDimmerDeviceDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " is now " + ((OnOffState) newState).getCurrentStateValue()[0].getValue());
+		logger.log(LogService.LOG_DEBUG, ZWaveDimmerDeviceDriver.LOG_ID
+				+ "Device " + device.getDeviceId() + " is now "
+				+ ((OnOffState) newState).getCurrentStateValue()[0].getValue());
 		((ElectricalSystem) device).notifyStateChanged(newState);
 
 	}
 
 	@Override
-	public void newMessageFromHouse(Device deviceNode, Instance instanceNode, 
+	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
 		this.deviceNode = deviceNode;
 
 		// Read the value associated with the right CommandClass.
 		int nLevel = 0;
-		CommandClasses ccEntry = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL);
+		CommandClasses ccEntry = instanceNode
+				.getCommandClass(ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL);
 
 		// Check if it is a real new value or if it is an old one
-		if(ccEntry!=null)
+		if (ccEntry != null)
 		{
-			//update last update time
+			// update last update time
 			lastUpdateTime = ccEntry.getLevelUpdateTime();
 			nFailedUpdate = 0;
 
 			if (ccEntry != null)
 			{
 				nLevel = ccEntry.getLevelAsInt();
-				
+
 				if (nLevel > 0)
 					changeCurrentState(OnOffState.ON, nLevel);
 				else
 					changeCurrentState(OnOffState.OFF, nLevel);
 			}
 		}
-		/*else
-		{
-			// increment counter
-			nFailedUpdate++;
-
-			//log a message after 5 failed update
-			if(nFailedUpdate >= 5)
-			{
-				logger.log(LogService.LOG_WARNING, ZWaveDimmerDeviceDriver.LOG_ID + "Device " + device.getDeviceId()
-						+ " doesn't respond after 5 update requests");
-
-				nFailedUpdate = 0;
-			}
-		}*/
+		/*
+		 * else { // increment counter nFailedUpdate++;
+		 * 
+		 * //log a message after 5 failed update if(nFailedUpdate >= 5) {
+		 * logger.log(LogService.LOG_WARNING, ZWaveDimmerDeviceDriver.LOG_ID +
+		 * "Device " + device.getDeviceId() +
+		 * " doesn't respond after 5 update requests");
+		 * 
+		 * nFailedUpdate = 0; } }
+		 */
 	}
 
-		/**
-		 * Check if the current state has been changed. In that case, fire a state
-		 * change message, otherwise it does nothing
-		 * 
-		 * @param OnOffValue
-		 *            OnOffState.ON or OnOffState.OFF
-		 */
-		private void changeCurrentState(String OnOffValue, int nLevel)
+	/**
+	 * Check if the current state has been changed. In that case, fire a state
+	 * change message, otherwise it does nothing
+	 * 
+	 * @param OnOffValue
+	 *            OnOffState.ON or OnOffState.OFF
+	 */
+	private void changeCurrentState(String OnOffValue, int nLevel)
+	{
+		String currentStateValue = "";
+		State state = currentState.getState(OnOffState.class.getSimpleName());
+
+		if (state != null)
+			currentStateValue = (String) state.getCurrentStateValue()[0]
+					.getValue();
+
+		// if the current states it is different from the new state
+		if (!currentStateValue.equalsIgnoreCase(OnOffValue))
 		{
-			String currentStateValue = "";
-			State state = currentState.getState(OnOffState.class.getSimpleName());
-	
-			if (state != null)
-				currentStateValue = (String) state.getCurrentStateValue()[0].getValue();
-	
-			// if the current states it is different from the new state
-			if (!currentStateValue.equalsIgnoreCase(OnOffValue))
+			// set the new state to on or off...
+			if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
 			{
-				// set the new state to on or off...
-				if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
-					notifyOn();
-				else
-					notifyOff();
+				// update the state
+				OnOffState onState = new OnOffState(new OnStateValue());
+				currentState
+						.setState(OnOffState.class.getSimpleName(), onState);
+
+				logger.log(
+						LogService.LOG_DEBUG,
+						ZWaveDimmerDeviceDriver.LOG_ID
+								+ "Device "
+								+ device.getDeviceId()
+								+ " is now "
+								+ ((OnOffState) onState).getCurrentStateValue()[0]
+										.getValue());
 			}
-			
-			int currentLevel = 0;
-			State levelState = currentState.getState(LevelState.class.getSimpleName());
-	
-			if (levelState != null)
-				currentLevel = (Integer) ((Measure<?,?>)levelState.getCurrentStateValue()[0].getValue()).getValue();
-			
-			if(nLevel != currentLevel)
-				notifyChangedLevel(Measure.valueOf(nLevel, NonSI.PERCENT));
+			else
+			{
+				// update the state
+				OnOffState offState = new OnOffState(new OffStateValue());
+				currentState.setState(OnOffState.class.getSimpleName(),
+						offState);
+
+				logger.log(
+						LogService.LOG_DEBUG,
+						ZWaveDimmerDeviceDriver.LOG_ID
+								+ "Device "
+								+ device.getDeviceId()
+								+ " is now "
+								+ ((OnOffState) offState)
+										.getCurrentStateValue()[0].getValue());
+
+			}
 		}
+
+		// update the state
+		LevelStateValue pValue = new LevelStateValue();
+		pValue.setValue(nLevel);
+
+		currentState.setState(LevelState.class.getSimpleName(), new LevelState(
+				pValue));
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, ZWaveDimmerDeviceDriver.LOG_ID
+				+ "Device " + device.getDeviceId() + " dimmer at " + nLevel);
+
+	}
 
 	@Override
 	protected void specificConfiguration()
@@ -199,110 +231,87 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements Dimm
 	@Override
 	public void on()
 	{
-		//Sends on command to all instances, probably only one in this case
-		for(Integer instanceId : nodeInfo.getInstanceSet())
-			network.write(nodeInfo.getDeviceNodeId(), instanceId, ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL, "255");
+		// Sends on command to all instances, probably only one in this case
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL, "255");
 	}
 
 	@Override
 	public void off()
 	{
-		//Sends off command to all instances, probably only one in this case
-		for(Integer instanceId : nodeInfo.getInstanceSet())
-			network.write(nodeInfo.getDeviceNodeId(), instanceId, ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL, "0");
+		// Sends off command to all instances, probably only one in this case
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL, "0");
 	}
 
 	@Override
-	protected ZWaveNodeInfo createNodeInfo(int deviceId, Set<Integer> instancesId, boolean isController) 
+	protected ZWaveNodeInfo createNodeInfo(int deviceId,
+			Set<Integer> instancesId, boolean isController)
 	{
-		HashMap<Integer,Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
+		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
 
 		HashSet<Integer> ccSet = new HashSet<Integer>();
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL);
 
-		//binary switch has its own command class 
-		for(Integer instanceId : instancesId)
+		// binary switch has its own command class
+		for (Integer instanceId : instancesId)
 		{
 			instanceCommand.put(instanceId, ccSet);
 		}
-		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand, isController);
+		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand,
+				isController);
 		return nodeInfo;
 	}
 
-
-
 	@Override
-	public void notifyChangedLevel(Measure<?, ?> newLevel) 
+	public void set(Object value)
 	{
-		// update the state
-		LevelStateValue pValue = new LevelStateValue();
-		pValue.setValue(newLevel);
-
-		currentState.setState(LevelState.class.getSimpleName(),
-				new LevelState(pValue));
-
-		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveDimmerDeviceDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " dimmer at " + newLevel.toString());
-
-		// notify the new measure
-		((DimmerSwitch) device).notifyChangedLevel(newLevel);
+		// Sends on command to all instances, probably only one in this case
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL, value.toString());
 	}
 
 	@Override
-	public void notifyOn() 
+	public void stepDown()
 	{
-		// update the state
-		OnOffState onState = new OnOffState(new OnStateValue());
-		currentState.setState(OnOffState.class.getSimpleName(), onState);
-
-		logger.log(LogService.LOG_DEBUG, ZWaveDimmerDeviceDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " is now " + ((OnOffState) onState).getCurrentStateValue()[0].getValue());
-
-		((DimmerSwitch) device).notifyOn();
-	}
-
-	@Override
-	public void notifyOff() 
-	{
-		// update the state
-		OnOffState offState = new OnOffState(new OffStateValue());
-		currentState.setState(OnOffState.class.getSimpleName(), offState);
-
-		logger.log(LogService.LOG_DEBUG, ZWaveDimmerDeviceDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " is now " + ((OnOffState) offState).getCurrentStateValue()[0].getValue());
-
-		((DimmerSwitch) device).notifyOff();
-	}
-
-	@Override
-	public void set(Object value) 
-	{
-		//Sends on command to all instances, probably only one in this case
-		for(Integer instanceId : nodeInfo.getInstanceSet())
-			network.write(nodeInfo.getDeviceNodeId(), instanceId, ZWaveAPI.COMMAND_CLASS_SWITCH_MULTILEVEL, value.toString());
-	}
-
-	@Override
-	public void stepDown() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void stepUp() {
+	public void stepUp()
+	{
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void notifyStepUp() {
+	public void storeScene(Integer sceneNumber)
+	{
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void notifyStepDown() {
+	public void deleteScene(Integer sceneNumber)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deleteGroup(String groupID)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void storeGroup(String groupID)
+	{
 		// TODO Auto-generated method stub
 
 	}
