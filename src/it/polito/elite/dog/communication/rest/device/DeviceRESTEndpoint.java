@@ -81,9 +81,6 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	// the service logger
 	private LogHelper logger;
 
-	// the log id
-	public static final String logId = "[DeviceRESTEndpoint]: ";
-
 	// the bundle context reference to extract information on the entire Dog
 	// status
 	private BundleContext context;
@@ -137,8 +134,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		this.logger = new LogHelper(this.context);
 
 		// log the activation
-		this.logger.log(LogService.LOG_INFO, DeviceRESTEndpoint.logId
-				+ "Activated....");
+		this.logger.log(LogService.LOG_INFO, "Activated....");
 	}
 
 	/**
@@ -150,8 +146,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		this.context = null;
 
 		// log deactivation
-		this.logger.log(LogService.LOG_INFO, DeviceRESTEndpoint.logId
-				+ "Deactivated...");
+		this.logger.log(LogService.LOG_INFO, "Deactivated...");
 
 		// null the logger
 		this.logger = null;
@@ -426,8 +421,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 
 		} catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, DeviceRESTEndpoint.logId
-					+ "Error while composing the response", e);
+			this.logger.log(LogService.LOG_ERROR, "Error while composing the response", e);
 		}
 
 		return responseAsString;
