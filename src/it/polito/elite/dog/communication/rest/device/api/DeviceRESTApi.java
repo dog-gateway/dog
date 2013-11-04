@@ -1,7 +1,7 @@
 /*
  * Dog - Device Rest Endpoint
  * 
- * Copyright (c) 2013 Dario Bonino
+ * Copyright (c) 2013 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ import javax.ws.rs.core.MediaType;
  * <li>monitor device statuses and measures in real-time;</li>
  * <li>add, modify or update the set of devices controlled through the gateway;</li>
  * 
- * 
- * @author bonino
- * @author derussis
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 @Path("/api/devices/")
@@ -50,7 +50,7 @@ public interface DeviceRESTApi
 	 * @return the XML representation of the configured devices
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getAllDevices();
 	
 	/**

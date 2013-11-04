@@ -21,8 +21,10 @@ import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
 
 /**
- * @author bonino
- *
+ * 
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
+ * 
  */
 public class MeasurePayload extends CommandPayload<Measure<?,?>>
 {

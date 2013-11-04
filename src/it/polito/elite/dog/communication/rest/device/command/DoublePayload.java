@@ -19,8 +19,10 @@ package it.polito.elite.dog.communication.rest.device.command;
 
 
 /**
- * @author bonino
- *
+ * 
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
+ * 
  */
 public class DoublePayload extends CommandPayload <Double>
 {
