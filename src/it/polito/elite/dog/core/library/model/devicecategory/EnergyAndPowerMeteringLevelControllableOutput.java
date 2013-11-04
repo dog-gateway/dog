@@ -33,7 +33,7 @@ import it.polito.elite.dog.core.library.model.state.*;
 
 import javax.measure.Measure;
 
-public interface MeteringDimmablePowerOutlet extends SinglePhaseEnergyMeter, LevelControllableOutput, SinglePhaseActivePowerMeter
+public interface EnergyAndPowerMeteringLevelControllableOutput extends SinglePhaseActiveEnergyMeter, LevelControllableOutput, SinglePhaseActivePowerMeter
 {
 	public static int MATCH_TYPE=100;
 	public static int MATCH_SUB_TYPE=50;
@@ -46,7 +46,6 @@ public interface MeteringDimmablePowerOutlet extends SinglePhaseEnergyMeter, Lev
 	public Measure<?,?>  getActivePower();
 	public void storeGroup(String groupID);
 	public void off();
-	public Measure<?,?>  getReactiveEnergyValue();
 	public void stepUp();
 	public void storeScene(Integer sceneNumber);
 	public void deleteScene(Integer sceneNumber);
@@ -60,8 +59,6 @@ public interface MeteringDimmablePowerOutlet extends SinglePhaseEnergyMeter, Lev
 	public void notifyNewActivePowerValue(Measure<?,?>  powerValue);
 	/*Notification: StateChangeNotification*/
 	public void notifyStateChanged(State newState);
-	/*Notification: SinglePhaseReactiveEnergyMeasurementNotification*/
-	public void notifyNewReactiveEnergyValue(Measure<?,?>  value);
 	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(Measure<?,?>  value);
 }
