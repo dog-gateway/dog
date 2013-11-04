@@ -50,7 +50,7 @@ public interface DeviceRESTApi
 	 * @return the XML representation of the configured devices
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_XML)
 	public String getAllDevices();
 	
 	/**
