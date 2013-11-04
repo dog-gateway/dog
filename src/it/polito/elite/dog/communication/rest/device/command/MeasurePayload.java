@@ -24,7 +24,7 @@ import javax.measure.Measure;
  * @author bonino
  *
  */
-public class MeasurePayload extends Payload<Measure<?,?>>
+public class MeasurePayload extends CommandPayload<Measure<?,?>>
 {
 
 	public MeasurePayload()

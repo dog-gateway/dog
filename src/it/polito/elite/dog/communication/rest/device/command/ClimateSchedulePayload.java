@@ -23,7 +23,7 @@ import it.polito.elite.dog.core.library.model.climate.DailyClimateSchedule;
  * @author bonino
  *
  */
-public class ClimateSchedulePayload extends Payload<DailyClimateSchedule[]>
+public class ClimateSchedulePayload extends CommandPayload<DailyClimateSchedule[]>
 {
 	//private DailyClimateSchedule value[];
 	

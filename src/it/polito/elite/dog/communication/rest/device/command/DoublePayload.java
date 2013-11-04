@@ -22,7 +22,7 @@ package it.polito.elite.dog.communication.rest.device.command;
  * @author bonino
  *
  */
-public class DoublePayload extends Payload <Double>
+public class DoublePayload extends CommandPayload <Double>
 {
 
 	public DoublePayload()

@@ -55,7 +55,7 @@ public interface DeviceRESTApi
 	
 	/**
 	 * Represents a single domotic device handled by Dog, identified by a unique
-	 * device-id, and “controllable” by applications using this API.
+	 * device-id, and "controllable" by applications using this API.
 	 * 
 	 * @param deviceId
 	 *            the device unique identifier
@@ -65,6 +65,19 @@ public interface DeviceRESTApi
 	@Path("/{device-id}")
 	@Produces(MediaType.APPLICATION_XML)
 	public String getDevice(@PathParam("device-id") String deviceId);
+	
+	/**
+	 * Represents a single domotic device handled by Dog, identified by a unique
+	 * device-id, and "controllable" by applications using this API.
+	 * 
+	 * @param deviceId
+	 *            the device unique identifier
+	 * @return the XML representation of the required device
+	 */
+	@PUT
+	@Path("/{device-id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void updateDevice(@PathParam("device-id") String deviceId, String propertiesToUpdate);
 	
 	/**
 	 * Represents the status of the device identified by the given device-id and

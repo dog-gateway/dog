@@ -22,9 +22,10 @@ import it.polito.elite.dog.communication.rest.device.command.ClimateSchedulePayl
 import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedulePayload;
 import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
 import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
-import it.polito.elite.dog.communication.rest.device.command.Payload;
+import it.polito.elite.dog.communication.rest.device.command.CommandPayload;
 import it.polito.elite.dog.communication.rest.device.status.AllDeviceStatesResponsePayload;
 import it.polito.elite.dog.communication.rest.device.status.DeviceStateResponsePayload;
+import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
@@ -74,6 +75,7 @@ import org.osgi.service.log.LogService;
 
 /**
  * @author bonino
+ * @author de russis
  * 
  */
 @Path("/api/devices/")
@@ -89,8 +91,11 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	// reference for the HouseModel
 	private AtomicReference<HouseModel> houseModel;
 	
+	// reference for the DeviceFactory
+	private AtomicReference<DeviceFactory> deviceFactory;
+	
 	// registered payloads
-	private Vector<Class<? extends Payload<?>>> payloads;
+	private Vector<Class<? extends CommandPayload<?>>> payloads;
 	
 	// the instance-level mapper
 	private ObjectMapper mapper;
@@ -100,11 +105,14 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	 */
 	public DeviceRESTEndpoint()
 	{
-		// init the house model atomic ref
+		// init the house model atomic reference
 		this.houseModel = new AtomicReference<HouseModel>();
 		
+		// init the device factory atomic reference
+		this.deviceFactory = new AtomicReference<DeviceFactory>();
+		
 		// init the set of allowed payloads
-		this.payloads = new Vector<Class<? extends Payload<?>>>();
+		this.payloads = new Vector<Class<? extends CommandPayload<?>>>();
 		this.payloads.add(ClimateSchedulePayload.class);
 		this.payloads.add(DailyClimateSchedulePayload.class);
 		// it is really mandatory that double payload precedes measure payload
@@ -176,6 +184,36 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		this.houseModel.compareAndSet(houseModel, null);
 	}
 	
+	/**
+	 * Bind the DeviceFactory service (before the bundle activation)
+	 * 
+	 * @param deviceFactory
+	 *            the DeviceFactory service to add
+	 */
+	public void addedDeviceFactory(DeviceFactory deviceFactory)
+	{
+		// store a reference to the HouseModel service
+		this.deviceFactory.set(deviceFactory);
+	}
+	
+	/**
+	 * Unbind the DeviceFactory service
+	 * 
+	 * @param deviceFactory
+	 *            the DeviceFactory service to remove
+	 */
+	public void removedDeviceFactory(DeviceFactory deviceFactory)
+	{
+		this.deviceFactory.compareAndSet(deviceFactory, null);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#getAllDevices
+	 * ()
+	 */
 	@Override
 	public String getAllDevices()
 	{
@@ -208,6 +246,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		return devicesXML;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#getDevice
+	 * (java.lang.String)
+	 */
 	@Override
 	public String getDevice(String deviceId)
 	{
@@ -243,6 +288,80 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		}
 		
 		return deviceXML;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#updateDevice
+	 * (java.lang.String)
+	 */
+	@Override
+	public void updateDevice(String deviceId, String propertiesToUpdate)
+	{
+		if (propertiesToUpdate != null && !propertiesToUpdate.isEmpty())
+		{
+			// create filter for getting the desired device
+			String deviceFilter = String.format("(&(%s=*)(%s=%s))", Constants.DEVICE_CATEGORY,
+					DeviceCostants.DEVICEURI, deviceId);
+			
+			try
+			{
+				// try to read the value from the JSON
+				DeviceUpdatePayload deviceUpdatedPayload = this.mapper.readValue(propertiesToUpdate,
+						DeviceUpdatePayload.class);
+				
+				// get the device service references
+				ServiceReference<?>[] deviceService = this.context.getAllServiceReferences(
+						org.osgi.service.device.Device.class.getName(), deviceFilter);
+				
+				// only one device with the given deviceId can exists in the
+				// framework...
+				if (deviceService != null && deviceService.length == 1)
+				{
+					// get the OSGi service pointed by the current device
+					// reference
+					Object device = this.context.getService(deviceService[0]);
+					
+					if ((device != null) && (device instanceof ControllableDevice))
+					{
+						// get the device instance
+						ControllableDevice currentDevice = (ControllableDevice) device;
+						// get the associated device descriptor
+						DeviceDescriptor currentDeviceDescr = currentDevice.getDeviceDescriptor();
+						
+						// update the device properties, if available
+						if ((deviceUpdatedPayload.getIsIn() != null) && (!deviceUpdatedPayload.getIsIn().isEmpty()))
+						{
+							currentDeviceDescr.setLocation(deviceUpdatedPayload.getIsIn());
+						}
+						if ((deviceUpdatedPayload.getDescription() != null)
+								&& (!deviceUpdatedPayload.getDescription().isEmpty()))
+						{
+							currentDeviceDescr.setDescription(deviceUpdatedPayload.getDescription());
+						}
+						
+						// check if the DeviceFactory service is available
+						if (this.deviceFactory.get() != null)
+						{
+							// update the device configuration
+							this.deviceFactory.get().updateDevice(currentDeviceDescr);
+						}
+						else
+						{
+							this.logger
+									.log(LogService.LOG_WARNING,
+											"Impossible to update the device information: the Device Factory is not available!");
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				this.logger.log(LogService.LOG_ERROR, "Error in updating the information of device " + deviceId, e);
+			}
+		}
 	}
 	
 	/*
@@ -312,6 +431,12 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		return responseAsString;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#
+	 * getDeviceStatus(java.lang.String)
+	 */
 	@Override
 	public String getDeviceStatus(String deviceId)
 	{
@@ -357,7 +482,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, "Error while composing the response", e);
+			this.logger
+					.log(LogService.LOG_ERROR, "Error while composing the response for the status of " + deviceId, e);
 		}
 		
 		return responseAsString;
@@ -404,8 +530,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// get the executor instance
 		Executor executor = Executor.getInstance();
 		
-		// ------------- Use Jackson to interpret the type of data passed as
-		// value ---------
+		// --- Use Jackson to interpret the type of data passed as value ---
 		
 		// check if a post/put body is given and convert it into an array of
 		// parameters
@@ -418,7 +543,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				try
 				{
 					// try to read the value
-					Payload<?> payload = this.mapper.readValue(commandParameters, this.payloads.get(i));
+					CommandPayload<?> payload = this.mapper.readValue(commandParameters, this.payloads.get(i));
 					
 					// if payload !=null
 					executor.execute(context, deviceId, commandName, new Object[] { payload.getValue() });

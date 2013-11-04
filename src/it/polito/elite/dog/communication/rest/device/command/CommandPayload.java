@@ -21,11 +21,11 @@ package it.polito.elite.dog.communication.rest.device.command;
  * @author bonino
  *
  */
-public class Payload <T>
+public class CommandPayload <T>
 {
 	protected T value;
 
-	public Payload()
+	public CommandPayload()
 	{
 		// TODO Auto-generated constructor stub
 	}
