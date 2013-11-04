@@ -23,6 +23,8 @@ import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedul
 import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
 import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
 import it.polito.elite.dog.communication.rest.device.command.Payload;
+import it.polito.elite.dog.communication.rest.device.status.AllDeviceStatesResponsePayload;
+import it.polito.elite.dog.communication.rest.device.status.DeviceStateResponsePayload;
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
@@ -51,6 +53,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.measure.Measure;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -63,11 +66,8 @@ import javax.xml.bind.DataBindingException;
 import javax.xml.bind.JAXB;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
@@ -94,6 +94,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	// registered payloads
 	private Vector<Class<? extends Payload<?>>> payloads;
 
+	// the instance-level mapper
+	private ObjectMapper mapper;
+
 	/**
 	 * Empty constructor
 	 */
@@ -110,6 +113,12 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// to avoid matching pure doubles to measures with no unit.
 		this.payloads.add(DoublePayload.class);
 		this.payloads.add(MeasurePayload.class);
+
+		// initialize the instance-wide object mapper
+		this.mapper = new ObjectMapper();
+		// set the mapper pretty printing
+		this.mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+		this.mapper.enable(SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY);
 
 	}
 
@@ -257,12 +266,6 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// the response
 		String responseAsString = "";
 
-		// The JSON Object to return
-		JSONObject responseBody = new JSONObject();
-
-		// The JSONArray containing the single device renderings as JSON
-		JSONArray devices = new JSONArray();
-
 		// get all the installed device services
 		try
 		{
@@ -275,6 +278,15 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			// check not null
 			if (allDevices != null)
 			{
+				// create an AllDeviceStatesResponsePayload
+				AllDeviceStatesResponsePayload responsePayload = new AllDeviceStatesResponsePayload();
+
+				// create an array of DeviceStateResponsePayloads
+				DeviceStateResponsePayload[] deviceStateResponsePayload = new DeviceStateResponsePayload[allDevices.length];
+
+				// set the array as part of the response payload
+				responsePayload.setDevices(deviceStateResponsePayload);
+
 				// iterate over all devices
 				for (int i = 0; i < allDevices.length; i++)
 				{
@@ -285,9 +297,6 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					// check if the service belongs to the set of dog devices
 					if (device instanceof ControllableDevice)
 					{
-						// prepare the device JSON entry
-						JSONObject deviceJSON = new JSONObject();
-
 						// get the device instance
 						ControllableDevice currentDevice = (ControllableDevice) device;
 
@@ -295,11 +304,30 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						DeviceDescriptor deviceDescriptor = currentDevice
 								.getDeviceDescriptor();
 
-						// save device data
-						deviceJSON.put("id", deviceDescriptor.getDeviceURI());
-						deviceJSON.put("description",
-								deviceDescriptor.getDescription());
-						deviceJSON.put("active", Boolean
+						// create the response payload
+						deviceStateResponsePayload[i] = new DeviceStateResponsePayload();
+
+						// set the device id
+						deviceStateResponsePayload[i].setId(deviceDescriptor
+								.getDeviceURI());
+
+						// get the device description
+						String deviceDescription = deviceDescriptor
+								.getDescription();
+
+						// clean the description
+						deviceDescription = deviceDescription.trim();
+						deviceDescription = deviceDescription.replaceAll("\t",
+								"");
+						deviceDescription = deviceDescription.replaceAll("\n",
+								" ");
+
+						// set the description
+						deviceStateResponsePayload[i]
+								.setDescription(deviceDescription);
+
+						// set the activation status of the device
+						deviceStateResponsePayload[i].setActive(Boolean
 								.valueOf((String) allDevices[i]
 										.getProperty(DeviceCostants.ACTIVE)));
 
@@ -311,9 +339,6 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						// null
 						if (state != null)
 						{
-							// prepare the device status array
-							JSONArray deviceStatusAsJSON = new JSONArray();
-
 							// get the states composing the overall device
 							// status
 							Map<String, State> allStates = state.getStates();
@@ -328,90 +353,81 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 								StateValue currentStateValues[] = currentState
 										.getCurrentStateValue();
 
-								// prepare the state holding JSON object
-								JSONObject deviceStateAsJSON = new JSONObject();
+								// create the response-level state values
+								Object responseBodyStateValues[] = new Object[currentStateValues.length];
 
-								// change behavior depending on single vs
-								// multiple states
-								if (currentStateValues.length > 1)
+								// iterate over the state values
+								for (int j = 0; j < currentStateValues.length; j++)
 								{
-									// populate the state values
-									JSONArray valuesAsJSON = new JSONArray();
+									// get state value features
+									HashMap<String, Object> features = currentStateValues[j]
+											.getFeatures();
 
-									for (int j = 0; j < currentStateValues.length; j++)
+									// prepare the map to store in the response
+									// body
+									HashMap<String, Object> responseBodyFeatures = new HashMap<>();
+
+									// iterate over the features
+									for (String featureKey : features.keySet())
 									{
-										// create the JSONObject to store the
-										// current state value
-										JSONObject valueAsJSON = new JSONObject();
-
-										// get state value features
-										HashMap<String, Object> features = currentStateValues[j]
-												.getFeatures();
-
-										// iterate over the features
-										for (String featureKey : features
-												.keySet())
+										// check the "value" feature and, if it
+										// is an instance of measure, serialize
+										// it as a String
+										if (featureKey.contains("Value"))
 										{
-											// filter out anything containing
-											// "value" inside
-											// dirt, should be improved
-											if (!featureKey.contains("Value"))
-												valueAsJSON
+											if (features.get(featureKey) instanceof Measure<?, ?>)
+												responseBodyFeatures
+														.put("value",
+																features.get(
+																		featureKey)
+																		.toString());
+											else
+												responseBodyFeatures
+														.put("value",
+																features.get(featureKey));
+
+										} else
+										{
+											Object value = features
+													.get(featureKey);
+
+											if ((!(value instanceof String))
+													|| ((value instanceof String) && (!((String) value)
+															.isEmpty())))
+												responseBodyFeatures
 														.put(featureKey,
 																features.get(featureKey));
 										}
 
-										// store the value
-										valueAsJSON.put("value",
-												currentStateValues[j]
-														.getValue());
-
-										// add the current state value to the
-										// corresponding state
-										valuesAsJSON.put(valueAsJSON);
 									}
 
-									// store the current state
-									deviceStateAsJSON.put(
-											currentState.getStateName(),
-											valuesAsJSON);
-
+									// store the current state value
+									responseBodyStateValues[j] = responseBodyFeatures;
 								}
-								else
-								{
-									// store the current state
-									deviceStateAsJSON.put(
-											currentState.getStateName(),
-											currentStateValues[0].getValue());
 
-								}
-								// add it to the overall device status
-								deviceStatusAsJSON.put(deviceStateAsJSON);
+								// store the state
+								deviceStateResponsePayload[i].getStatus()
+										.put(currentState.getClass()
+												.getSimpleName(),
+												responseBodyStateValues);
+
 							}
 
-							deviceJSON.put("status", deviceStatusAsJSON);
 						}
-
-						// add the current device to the list of devices
-						devices.put(deviceJSON);
 					}
-
 				}
+				// store the device
+				responsePayload.setDevices(deviceStateResponsePayload);
 
-				responseBody.put("devices", devices);
+				// convert the response body to json
+				responseAsString = this.mapper
+						.writeValueAsString(responsePayload);
 			}
 
-			responseAsString = responseBody.toString(4);
-		}
-		catch (InvalidSyntaxException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (JSONException e)
+		} catch (Exception e)
 		{
 			this.logger.log(LogService.LOG_ERROR, DeviceRESTEndpoint.logId
-					+ "Error while composing the response");
+					+ "Error while composing the response", e);
 		}
 
 		return responseAsString;
@@ -469,33 +485,29 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// TODO: check if commands can have more than 1 parameter
 		if ((commandParameters != null) && (!commandParameters.isEmpty()))
 		{
-			ObjectMapper mapper = new ObjectMapper();
-
 			// try to read the payload
-			for (int i=0; i<this.payloads.size(); i++)
+			for (int i = 0; i < this.payloads.size(); i++)
 			{
 				try
 				{
 					// try to read the value
-					Payload<?> payload = mapper.readValue(commandParameters,
-							this.payloads.get(i));
+					Payload<?> payload = this.mapper.readValue(
+							commandParameters, this.payloads.get(i));
 
 					// if payload !=null
 					executor.execute(context, deviceId, commandName,
 							new Object[] { payload.getValue() });
-					
+
 					break;
-				}
-				catch (IOException e)
+				} catch (IOException e)
 				{
 					// TODO Auto-generated catch block
-					//do nothing and proceed to the next trial
-					//e.printStackTrace();
+					// do nothing and proceed to the next trial
+					// e.printStackTrace();
 				}
 			}
 
-		}
-		else
+		} else
 		{
 			// exec the command
 			executor.execute(context, deviceId, commandName, new Object[] {});
@@ -597,8 +609,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			JAXB.marshal(dhc, output);
 
 			devicesXML = output.getBuffer().toString();
-		}
-		catch (DataBindingException e)
+		} catch (DataBindingException e)
 		{
 			// the exception can be throw by the JAXB.marshal method...
 			this.logger.log(LogService.LOG_ERROR,
