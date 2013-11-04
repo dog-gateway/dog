@@ -103,8 +103,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 				// build a file object pointing at the persistence store
 				this.persistentStore = new JSONPersistenceManager(
 						persistentStoreName);
-			}
-			catch (Exception e)
+			} catch (Exception e)
 			{
 				// explicitly set the persistent store at null
 				this.persistentStore = null;
@@ -115,8 +114,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 								"Unable to create/acquire the persistent store for climate schedules, running in-memory only: all changes will be lost upon restart.",
 								e);
 			}
-		}
-		else
+		} else
 		{
 			// explicitly set the persistent store at null
 			this.persistentStore = null;
@@ -161,8 +159,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 		try
 		{
 			this.persistentStore.persist(schedules);
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			this.logger.log(LogService.LOG_ERROR,
 					"Unable to save schedule data.", e);
@@ -180,7 +177,6 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 		for (int i = 0; i < dailySchedules.length; i++)
 		{
 			values[i] = new ClimateScheduleStateValue();
-			values[i].setFeature("weekDay", dailySchedules[i].getWeekDay());
 			values[i].setValue(dailySchedules[i]);
 		}
 
@@ -192,8 +188,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 		try
 		{
 			this.persistentStore.persist(dailySchedules);
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			this.logger.log(LogService.LOG_ERROR,
 					"Unable to save schedule data.", e);
@@ -423,8 +418,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 					schedules = persistentStore
 							.load(DailyClimateSchedule[].class);
 
-				}
-				else
+				} else
 				{
 					// create the schedules
 					schedules = new DailyClimateSchedule[7];
@@ -445,7 +439,6 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 				for (int i = 0; i < schedules.length; i++)
 				{
 					values[i] = new ClimateScheduleStateValue();
-					values[i].setFeature("weekDay", schedules[i].getWeekDay());
 					values[i].setValue(schedules[i]);
 				}
 
@@ -486,12 +479,13 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriver
 			// iterate over the switch points
 			for (int i = 0; i < allScheduledSwitchPoints.length; i++)
 			{
-				if (allScheduledSwitchPoints[i].getFeatures().get("weekDay")
-						.equals(clockTick.get(Calendar.DAY_OF_WEEK)))
+				// get the day schedule
+				DailyClimateSchedule schedule = (DailyClimateSchedule) allScheduledSwitchPoints[i]
+						.getValue();
+
+				if (schedule.getWeekDay() == clockTick
+						.get(Calendar.DAY_OF_WEEK))
 				{
-					// get the day schedule
-					DailyClimateSchedule schedule = (DailyClimateSchedule) allScheduledSwitchPoints[i]
-							.getValue();
 
 					// get the switch point
 					ClimateScheduleSwitchPoint switchPoint = schedule

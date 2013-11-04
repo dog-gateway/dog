@@ -44,7 +44,10 @@ import java.util.Set;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
+import javax.measure.unit.NonSI;
+import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
+import javax.measure.unit.UnitFormat;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
@@ -81,6 +84,9 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 	{
 		// set up unit of measures
 		Unit.ONE.alternate("%");
+		UnitFormat uf = UnitFormat.getInstance();
+		uf.label(SI.CELSIUS, "C");
+		uf.alias(SI.CELSIUS, "C");
 		
 		// initialize the state
 		this.currentState.setState(TemperatureState.class.getSimpleName(), new TemperatureState(
@@ -323,7 +329,7 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver
 			if (this.temperatureUpdateTime < updateTime)
 			{
 				this.temperatureUpdateTime = updateTime;
-				this.notifyNewTemperatureValue(DecimalMeasure.valueOf(measure + " " + unitOfMeasure));
+				this.notifyNewTemperatureValue(DecimalMeasure.valueOf(measure + " " + (unitOfMeasure.contains("C")?SI.CELSIUS.toString():NonSI.FAHRENHEIT.toString())));
 			}
 			else
 			{
