@@ -50,7 +50,7 @@ public interface DeviceRESTApi
 	 * @return the JSON representation of the configured devices
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON + ";qs=2")
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getAllDevicesInJson();
 	
 	/**
@@ -60,7 +60,7 @@ public interface DeviceRESTApi
 	 * @return the XML representation of the configured devices
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_XML + "; qs=0.9")
 	public String getAllDevicesInXml();
 	
 	/**
@@ -73,7 +73,7 @@ public interface DeviceRESTApi
 	 */
 	@GET
 	@Path("/{device-id}")
-	@Produces(MediaType.APPLICATION_JSON + ";qs=2")
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getDeviceInJson(@PathParam("device-id") String deviceId);
 	
 	/**
@@ -86,7 +86,7 @@ public interface DeviceRESTApi
 	 */
 	@GET
 	@Path("/{device-id}")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_XML + "; qs=0.9")
 	public String getDeviceInXml(@PathParam("device-id") String deviceId);
 	
 	/**
