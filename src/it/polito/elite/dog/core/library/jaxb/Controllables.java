@@ -26,9 +26,12 @@ package it.polito.elite.dog.core.library.jaxb;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+
+import org.codehaus.jackson.annotate.JsonProperty;
 
 
 /**
@@ -56,7 +59,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Controllables {
 
-    protected List<Device> device;
+    @JsonProperty("devices") protected List<Device> device;
 
     /**
      * Gets the value of the device property.

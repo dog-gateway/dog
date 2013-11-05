@@ -33,6 +33,8 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * <p>Java class for floor complex type.
@@ -62,6 +64,7 @@ public class Floor {
     @XmlSchemaType(name = "ID")
     protected String id;
     @XmlAttribute(name = "class")
+    @JsonProperty("class")
     protected String clazz;
 
     /**

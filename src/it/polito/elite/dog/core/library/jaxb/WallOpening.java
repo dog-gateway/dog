@@ -34,6 +34,8 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * <p>Java class for wallOpening complex type.
@@ -64,6 +66,7 @@ public class WallOpening {
     @XmlSchemaType(name = "ID")
     protected String id;
     @XmlAttribute(name = "class")
+    @JsonProperty("class")
     protected String clazz;
     @XmlAttribute(name = "ref")
     @XmlIDREF

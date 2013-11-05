@@ -30,6 +30,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * <p>Java class for controlFunctionality complex type.
@@ -60,6 +62,7 @@ public class ControlFunctionality {
     @XmlElement(required = true)
     protected Commands commands;
     @XmlAttribute(name = "class", required = true)
+    @JsonProperty("class")
     protected String clazz;
 
     /**

@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * <p>Java class for statevalue complex type.
@@ -53,6 +55,7 @@ import javax.xml.bind.annotation.XmlType;
 public class Statevalue {
 
     @XmlAttribute(name = "class", required = true)
+    @JsonProperty("class")
     protected String clazz;
     @XmlAttribute(name = "name")
     protected String name;

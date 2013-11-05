@@ -30,6 +30,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * <p>Java class for configstate complex type.
@@ -60,6 +62,7 @@ public class Configstate {
     @XmlElement(required = true)
     protected Statevalues statevalues;
     @XmlAttribute(name = "class", required = true)
+    @JsonProperty("class")
     protected String clazz;
 
     /**

@@ -30,6 +30,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * <p>Java class for notificationFunctionality complex type.
@@ -60,6 +62,7 @@ public class NotificationFunctionality {
     @XmlElement(required = true)
     protected Notifications notifications;
     @XmlAttribute(name = "class", required = true)
+    @JsonProperty("class")
     protected String clazz;
 
     /**

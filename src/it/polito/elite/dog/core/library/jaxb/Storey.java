@@ -26,6 +26,7 @@ package it.polito.elite.dog.core.library.jaxb;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -34,6 +35,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.codehaus.jackson.annotate.JsonProperty;
 
 
 /**
@@ -79,6 +82,7 @@ public class Storey {
     @XmlAttribute(name = "levelFromGround")
     protected Integer levelFromGround;
     @XmlAttribute(name = "class")
+    @JsonProperty("class")
     protected String clazz;
 
     /**
