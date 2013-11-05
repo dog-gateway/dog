@@ -66,8 +66,12 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DataBindingException;
 import javax.xml.bind.JAXB;
 
+import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
+import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.device.Constants;
@@ -126,7 +130,18 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		this.mapper = new ObjectMapper();
 		// set the mapper pretty printing
 		this.mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
-		this.mapper.enable(SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY);
+		// avoid empty arrays and null values
+		this.mapper.configure(SerializationConfig.Feature.WRITE_EMPTY_JSON_ARRAYS, false);
+		this.mapper.setSerializationInclusion(Inclusion.NON_NULL);
+		
+		// create an introspector for parsing both Jackson and JAXB annotations
+		AnnotationIntrospector jackson = new JacksonAnnotationIntrospector();
+		AnnotationIntrospector jaxb = new JaxbAnnotationIntrospector();
+		AnnotationIntrospector fullIntrospector = new AnnotationIntrospector.Pair(jackson, jaxb);
+		// make deserializer use bot Jackson and JAXB annotations
+		this.mapper.getDeserializationConfig().withAnnotationIntrospector(fullIntrospector);
+		// make serializer use bot Jackson and JAXB annotations
+		this.mapper.getSerializationConfig().withAnnotationIntrospector(fullIntrospector);
 		
 	}
 	
@@ -212,22 +227,67 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#getAllDevices
-	 * ()
+	 * @see it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#
+	 * getAllDevicesInJson()
 	 */
 	@Override
-	public String getAllDevices()
+	public String getAllDevicesInJson()
+	{
+		String devicesJSON = "";
+		
+		// get the JAXB object containing all the configured devices
+		DogHomeConfiguration dhc = this.getAllDevices();
+		
+		try
+		{
+			devicesJSON = this.mapper.writeValueAsString(dhc.getControllables().get(0));
+		}
+		catch (Exception e)
+		{
+			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON representing all the configured devices",
+					e);
+		}
+		
+		return devicesJSON;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#
+	 * getAllDevicesInXml ()
+	 */
+	@Override
+	public String getAllDevicesInXml()
 	{
 		String devicesXML = "";
+		
+		// get the JAXB object containing all the configured devices
+		DogHomeConfiguration dhc = this.getAllDevices();
+		
+		// create the XML for replying the request
+		devicesXML = this.generateXML(dhc);
+		
+		return devicesXML;
+	}
+	
+	/**
+	 * Get all the devices configured in Dog from the {@link HouseModel} and
+	 * perform some "cleaning" operations, such as removing all the
+	 * network-related information and removing unneeded tabs or newlines
+	 * 
+	 * @return a {@link DogHomeConfiguration} object with all the devices
+	 *         information
+	 */
+	private DogHomeConfiguration getAllDevices()
+	{
+		// create a JAXB Object Factory for adding the proper header...
+		ObjectFactory factory = new ObjectFactory();
+		DogHomeConfiguration dhc = factory.createDogHomeConfiguration();
 		
 		// check if the HouseModel service is available
 		if (this.houseModel.get() != null)
 		{
-			// create a JAXB Object Factory for adding the proper header...
-			ObjectFactory factory = new ObjectFactory();
-			DogHomeConfiguration dhc = factory.createDogHomeConfiguration();
-			
 			// get all the devices from the HouseModel
 			Controllables controllables = this.houseModel.get().getJAXBDevices().get(0);
 			
@@ -240,32 +300,83 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			}
 			
 			dhc.getControllables().add(controllables);
-			
-			// create the XML for replying the request
-			devicesXML = this.generateXML(dhc);
 		}
 		
-		return devicesXML;
+		return dhc;
 	}
 	
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#getDevice
-	 * (java.lang.String)
+	 * @see it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#
+	 * getDeviceInJson(java.lang.String)
 	 */
 	@Override
-	public String getDevice(String deviceId)
+	public String getDeviceInJson(String deviceId)
+	{
+		String deviceJSON = "";
+		
+		// get the requested device configuration, in JAXB
+		DogHomeConfiguration dhc = this.getDevice(deviceId);
+		
+		// get the JAXB representation of the desired device
+		Device requestedDevice = dhc.getControllables().get(0).getDevice().get(0);
+		
+		try
+		{
+			deviceJSON = this.mapper.writeValueAsString(requestedDevice);
+		}
+		catch (Exception e)
+		{
+			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON representing all the configured devices",
+					e);
+		}
+		
+		return deviceJSON;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#
+	 * getDeviceInXml (java.lang.String)
+	 */
+	@Override
+	public String getDeviceInXml(String deviceId)
 	{
 		String deviceXML = "";
+		
+		// get the requested device configuration
+		DogHomeConfiguration dhc = this.getDevice(deviceId);
+		
+		// create the XML for replying the request
+		deviceXML = this.generateXML(dhc);
+		
+		return deviceXML;
+	}
+	
+	/**
+	 * 
+	 * Get the configuration of the device identified by the parameter deviceId
+	 * from the {@link HouseModel} and perform some "cleaning" operations, such
+	 * as removing all the network-related information and removing unneeded
+	 * tabs or newlines
+	 * 
+	 * @param deviceId
+	 *            the device unique identifier
+	 * @return a {@link DogHomeConfiguration} object with the required device
+	 *         information
+	 */
+	private DogHomeConfiguration getDevice(String deviceId)
+	{
+		ObjectFactory factory = new ObjectFactory();
+		DogHomeConfiguration dhc = factory.createDogHomeConfiguration();
 		
 		// check if the HouseModel service is available
 		if (this.houseModel.get() != null)
 		{
 			// create a JAXB Object Factory for adding the proper header...
-			ObjectFactory factory = new ObjectFactory();
-			DogHomeConfiguration dhc = factory.createDogHomeConfiguration();
+			
 			Controllables controllables = factory.createControllables();
 			
 			// get the desired device from the HouseModel service
@@ -284,12 +395,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			}
 			
 			dhc.getControllables().add(controllables);
-			
-			// create the XML for replying the request
-			deviceXML = this.generateXML(dhc);
 		}
-		
-		return deviceXML;
+		return dhc;
 	}
 	
 	/*
@@ -491,84 +598,6 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		return responseAsString;
 	}
 	
-	@Override
-	@GET
-	@Path("{device-id}/commands/{command-name}")
-	public String executeCommandGet(@PathParam("device-id") String deviceId,
-			@PathParam("command-name") String commandName)
-	{
-		this.executeCommand(deviceId, commandName, null);
-		return "Ok";
-	}
-	
-	@Override
-	@POST
-	@Path("{device-id}/commands/{command-name}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public void executeCommandPost(@PathParam("device-id") String deviceId,
-			@PathParam("command-name") String commandName, String commandParameters)
-	{
-		this.executeCommand(deviceId, commandName, commandParameters);
-	}
-	
-	@Override
-	@PUT
-	@Path("{device-id}/commands/{command-name}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public void executeCommandPut(@PathParam("device-id") String deviceId,
-			@PathParam("command-name") String commandName, String commandParameters)
-	{
-		this.executeCommand(deviceId, commandName, commandParameters);
-	}
-	
-	/**
-	 * 
-	 * @param deviceId
-	 * @param commandName
-	 * @param commandParameters
-	 */
-	private void executeCommand(String deviceId, String commandName, String commandParameters)
-	{
-		// get the executor instance
-		Executor executor = Executor.getInstance();
-		
-		// --- Use Jackson to interpret the type of data passed as value ---
-		
-		// check if a post/put body is given and convert it into an array of
-		// parameters
-		// TODO: check if commands can have more than 1 parameter
-		if ((commandParameters != null) && (!commandParameters.isEmpty()))
-		{
-			// try to read the payload
-			for (int i = 0; i < this.payloads.size(); i++)
-			{
-				try
-				{
-					// try to read the value
-					CommandPayload<?> payload = this.mapper.readValue(commandParameters, this.payloads.get(i));
-					
-					// if payload !=null
-					executor.execute(context, deviceId, commandName, new Object[] { payload.getValue() });
-					
-					break;
-				}
-				catch (IOException e)
-				{
-					// TODO Auto-generated catch block
-					// do nothing and proceed to the next trial
-					// e.printStackTrace();
-				}
-			}
-			
-		}
-		else
-		{
-			// exec the command
-			executor.execute(context, deviceId, commandName, new Object[] {});
-		}
-		
-	}
-	
 	/**
 	 * Build the Jackson representation for the status of a given
 	 * {@link ControllableDevice} object.
@@ -676,12 +705,88 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				// store the state
 				deviceStateResponsePayload.getStatus().put(currentState.getClass().getSimpleName(),
 						responseBodyStateValues);
-				
 			}
-			
 		}
 		
 		return deviceStateResponsePayload;
+	}
+	
+	@Override
+	@GET
+	@Path("{device-id}/commands/{command-name}")
+	public String executeCommandGet(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName)
+	{
+		this.executeCommand(deviceId, commandName, null);
+		return "Ok";
+	}
+	
+	@Override
+	@POST
+	@Path("{device-id}/commands/{command-name}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void executeCommandPost(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName, String commandParameters)
+	{
+		this.executeCommand(deviceId, commandName, commandParameters);
+	}
+	
+	@Override
+	@PUT
+	@Path("{device-id}/commands/{command-name}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void executeCommandPut(@PathParam("device-id") String deviceId,
+			@PathParam("command-name") String commandName, String commandParameters)
+	{
+		this.executeCommand(deviceId, commandName, commandParameters);
+	}
+	
+	/**
+	 * 
+	 * @param deviceId
+	 * @param commandName
+	 * @param commandParameters
+	 */
+	private void executeCommand(String deviceId, String commandName, String commandParameters)
+	{
+		// get the executor instance
+		Executor executor = Executor.getInstance();
+		
+		// --- Use Jackson to interpret the type of data passed as value ---
+		
+		// check if a post/put body is given and convert it into an array of
+		// parameters
+		// TODO: check if commands can have more than 1 parameter
+		if ((commandParameters != null) && (!commandParameters.isEmpty()))
+		{
+			// try to read the payload
+			for (int i = 0; i < this.payloads.size(); i++)
+			{
+				try
+				{
+					// try to read the value
+					CommandPayload<?> payload = this.mapper.readValue(commandParameters, this.payloads.get(i));
+					
+					// if payload !=null
+					executor.execute(context, deviceId, commandName, new Object[] { payload.getValue() });
+					
+					break;
+				}
+				catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					// do nothing and proceed to the next trial
+					// e.printStackTrace();
+				}
+			}
+			
+		}
+		else
+		{
+			// exec the command
+			executor.execute(context, deviceId, commandName, new Object[] {});
+		}
+		
 	}
 	
 	/**
@@ -698,6 +803,12 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		
 		// remove all the "first-level" params, since they are network-related
 		device.getParam().clear();
+		
+		// clean the description field
+		String description = device.getDescription().trim();
+		description = description.replaceAll("\t", "");
+		description = description.replaceAll("\n", " ");
+		device.setDescription(description);
 		
 		// get all the control functionalites...
 		List<ControlFunctionality> controlFunctionalities = device.getControlFunctionality();

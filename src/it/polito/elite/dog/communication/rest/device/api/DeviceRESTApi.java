@@ -47,11 +47,34 @@ public interface DeviceRESTApi
 	 * Represents domotic devices handled by Dog and “controllable” by
 	 * applications using this API.
 	 * 
+	 * @return the JSON representation of the configured devices
+	 */
+	@GET
+	@Produces(MediaType.APPLICATION_JSON + ";qs=2")
+	public String getAllDevicesInJson();
+	
+	/**
+	 * Represents domotic devices handled by Dog and “controllable” by
+	 * applications using this API.
+	 * 
 	 * @return the XML representation of the configured devices
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
-	public String getAllDevices();
+	public String getAllDevicesInXml();
+	
+	/**
+	 * Represents a single domotic device handled by Dog, identified by a unique
+	 * device-id, and "controllable" by applications using this API.
+	 * 
+	 * @param deviceId
+	 *            the device unique identifier
+	 * @return the JSON representation of the required device
+	 */
+	@GET
+	@Path("/{device-id}")
+	@Produces(MediaType.APPLICATION_JSON + ";qs=2")
+	public String getDeviceInJson(@PathParam("device-id") String deviceId);
 	
 	/**
 	 * Represents a single domotic device handled by Dog, identified by a unique
@@ -64,7 +87,7 @@ public interface DeviceRESTApi
 	@GET
 	@Path("/{device-id}")
 	@Produces(MediaType.APPLICATION_XML)
-	public String getDevice(@PathParam("device-id") String deviceId);
+	public String getDeviceInXml(@PathParam("device-id") String deviceId);
 	
 	/**
 	 * Represents a single domotic device handled by Dog, identified by a unique
