@@ -2,7 +2,7 @@
 <dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
 	<dhc:controllables>
 		<dhc:device domoticSystem="ZWave" id="$name"
-			class="EnergyAndPowerMeteringLevelControllableOutput" gateway="$gateway">
+			class="PowerMeteringLevelControllableOutput" gateway="$gateway">
 			<dhc:description>$description</dhc:description>
 	<dhc:isIn>$location</dhc:isIn>
 	<dhc:param value="$nodeId" name="NodeID" type="network"/>
@@ -49,12 +49,6 @@
 					</dhc:command>
 				</dhc:commands>
 			</dhc:controlFunctionality>
-			<dhc:controlFunctionality class="ActiveEnergyMeasurementFunctionality">
-				<dhc:commands>
-					<dhc:command class="GetActiveEnergyCommand"
-						name="GetActiveEnergyValueCommand_$name" id="GetActiveEnergyValueCommand_$name" />
-				</dhc:commands>
-			</dhc:controlFunctionality>
 			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification
@@ -78,19 +72,6 @@
 					</dhc:notification>
 				</dhc:notifications>
 			</dhc:notificationFunctionality>
-			<dhc:notificationFunctionality
-				class="ActiveEnergyMeasurementNotificationFunctionality">
-				<dhc:notifications>
-					<dhc:notification class="ActiveEnergyMeasurementNotification"
-						name="ActiveEnergyMeasurementNotification_$name">
-						<dhc:param name="nParams" value="2" />
-						<dhc:param name="notificationName" value="newActiveEnergyValue" />
-						<dhc:param name="unitOfMeasure" value="Wh" />
-						<dhc:param name="notificationParamName" value="value"
-							type="Measure" />
-					</dhc:notification>
-				</dhc:notifications>
-			</dhc:notificationFunctionality>
 			<dhc:state class="OnOffState">
 				<dhc:statevalues>
 					<dhc:statevalue name="off" class="OffStateValue" />
@@ -99,12 +80,6 @@
 			</dhc:state>
 			<dhc:state class="LevelState">
 				<dhc:statevalue name="level" class="LevelStateValue" />
-			</dhc:state>
-			<dhc:state class="SinglePhaseEnergyMeasurementState">
-				<dhc:statevalues>
-					<dhc:statevalue class="SinglePhaseActiveEnergyStateValue"
-						name="" />
-				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="SinglePhaseActivePowerMeasurementState">
 				<dhc:statevalues>

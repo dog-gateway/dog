@@ -30,7 +30,7 @@
 			</dhc:command>
 		</dhc:commands>
 	</dhc:controlFunctionality>
-	<dhc:controlFunctionality class="ActivePowerMeasurementFunctionality">
+	<dhc:controlFunctionality class="ActiveEnergyMeasurementFunctionality">
 		<dhc:commands>
 			<dhc:command id="GetActiveEnergyValueCommand_$name" name="GetActiveEnergyValueCommand_$name"
 				class="GetActiveEnergyCommand">
