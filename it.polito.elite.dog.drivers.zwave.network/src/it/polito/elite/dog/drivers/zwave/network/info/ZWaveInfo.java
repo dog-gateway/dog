@@ -40,27 +40,8 @@ public class ZWaveInfo
 	// the persistent store configuration property
 	public static final String PROPERTY_PERSISTENT_STORE = "persistentStore";
 	
-	/*
-	// the gateway address
-	public static String GATEWAY_ADDRESS = "IPAddress";
-	
-	// the gateway port
-	public static String GATEWAY_PORT = "port";
-	
-	// the register address
-	public static String REGISTER_ADDRESS = "registerAddress";
-	
-	// the register type
-	public static String REGISTER_TYPE = "registerType";
-	
-	// the  slave identifier for the register
-	public static String SLAVE_ID = "slaveId";
-	
-	//the unit of measure associated to the register value
-	public static String REGISTER_UOM = "unitOfMeasure";
+	// the persistent store configuration property
+	public static final String PROPERTY_STEP_PERCENT = "stepAsPercentage";
 
-	//the scale factor
-	public static String SCALE_FACTOR = "scaleFactor";
-	*/
 	
 }

@@ -100,7 +100,8 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		{
 			this.descriptorFactory = new DeviceDescriptorFactory(context
 					.getBundle().getEntry("/deviceTemplates"));
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 
 			this.logger.log(LogService.LOG_ERROR,
@@ -285,10 +286,12 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		{
 		case 0: // idle
 		{
-			if (this.currentState.getState(
-					DeviceAssociationState.class.getSimpleName())
-					.getCurrentStateValue()[0].getClass().getName()
-					.equals(AssociatingStateValue.class.getName()))
+			State currentAssociationState = this.currentState
+					.getState(DeviceAssociationState.class.getSimpleName());
+			if ((currentAssociationState != null)
+					&& (currentAssociationState.getCurrentStateValue()[0]
+							.getClass().getName()
+							.equals(AssociatingStateValue.class.getName())))
 			{
 				// enable dynamic device detection
 				this.detectionEnabled = true;
@@ -441,7 +444,8 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 				{
 					descriptor = this.descriptorFactory.getDescriptor(
 							descriptorDefinitionData, deviceClass);
-				} catch (Exception e)
+				}
+				catch (Exception e)
 				{
 					this.logger
 							.log(LogService.LOG_ERROR,

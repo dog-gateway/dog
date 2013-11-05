@@ -51,12 +51,17 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements
 	// the class logger
 	private LogHelper logger;
 
+	// the step increase / decrease
+	private int stepPercentage = 5; // default
+
 	public ZWaveDimmerDeviceDriverInstance(ZWaveNetwork network,
 			ControllableDevice device, int deviceId, Set<Integer> instancesId,
-			int gatewayNodeId, int updateTimeMillis, BundleContext context)
+			int gatewayNodeId, int updateTimeMillis, int stepPercentage, BundleContext context)
 	{
 		super(network, device, deviceId, instancesId, gatewayNodeId,
 				updateTimeMillis, context);
+		
+		this.stepPercentage = stepPercentage;
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -277,14 +282,36 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriver implements
 	@Override
 	public void stepDown()
 	{
-		// TODO Auto-generated method stub
+		// get the current level value
+		int currentValue = (Integer) currentState.getState(
+				LevelState.class.getSimpleName()).getCurrentStateValue()[0]
+				.getValue();
+
+		// set to 100%
+		if (currentValue == 255)
+			currentValue = 100;
+
+		// decrease by step percentage
+		currentValue = Math.max(0, currentValue - this.stepPercentage);
+
+		// set the value
+		this.set(currentValue);
 
 	}
 
 	@Override
 	public void stepUp()
 	{
-		// TODO Auto-generated method stub
+		// get the current level value
+		int currentValue = (Integer) currentState.getState(
+				LevelState.class.getSimpleName()).getCurrentStateValue()[0]
+				.getValue();
+
+		// increase by step percentage
+		currentValue = Math.min(100, currentValue + this.stepPercentage);
+
+		// set the value
+		this.set(currentValue);
 
 	}
 
