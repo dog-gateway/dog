@@ -204,7 +204,8 @@ public class ZWaveDimmerDeviceDriver implements Driver, ManagedService
 				(ControllableDevice) context.getService(reference),
 				Integer.parseInt(sNodeID), instancesId, this.gateway.get()
 						.getSpecificGateway(gateway).getNodeInfo()
-						.getDeviceNodeId(), this.updateTimeMillis, this.stepPercentage, context);
+						.getDeviceNodeId(), this.updateTimeMillis,
+				this.stepPercentage, context);
 
 		((ControllableDevice) this.context.getService(reference))
 				.setDriver(driverInstance);
@@ -294,23 +295,20 @@ public class ZWaveDimmerDeviceDriver implements Driver, ManagedService
 			String stepEntityAsString = (String) properties
 					.get(ZWaveInfo.PROPERTY_STEP_PERCENT);
 
-			// trim leading and trailing spaces
-			stepEntityAsString = stepEntityAsString.trim();
-
 			// check not null
 			if (stepEntityAsString != null)
 			{
+				// trim leading and trailing spaces
+				stepEntityAsString = stepEntityAsString.trim();
 				// parse the string
 				this.stepPercentage = Integer.valueOf(stepEntityAsString);
 			}
 			else
 			{
-				this.logger
-						.log(LogService.LOG_WARNING,
-								ZWaveInfo.PROPERTY_STEP_PERCENT
-										+ " not defined in configuraton file for "
-										+ ZWaveDimmerDeviceDriver.class
-												.getName());
+				this.logger.log(LogService.LOG_WARNING,
+						ZWaveInfo.PROPERTY_STEP_PERCENT
+								+ " not defined in configuraton file for "
+								+ ZWaveDimmerDeviceDriver.class.getName());
 			}
 
 			// register driver

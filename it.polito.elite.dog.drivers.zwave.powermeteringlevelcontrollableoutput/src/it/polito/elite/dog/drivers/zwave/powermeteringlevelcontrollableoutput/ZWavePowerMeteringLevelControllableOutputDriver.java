@@ -66,8 +66,8 @@ public class ZWavePowerMeteringLevelControllableOutputDriver implements Driver,
 	// milliseconds between two update of the device status, from configuration
 	// file
 	protected int updateTimeMillis;
-	
-	//the step entity in percentage
+
+	// the step entity in percentage
 	protected int stepPercentage;
 
 	// the list of driver instances currently connected to a device
@@ -207,7 +207,8 @@ public class ZWavePowerMeteringLevelControllableOutputDriver implements Driver,
 				(ControllableDevice) this.context.getService(reference),
 				Integer.parseInt(sNodeID), instancesId, this.gateway.get()
 						.getSpecificGateway(gateway).getNodeInfo()
-						.getDeviceNodeId(), this.updateTimeMillis, this.stepPercentage, this.context);
+						.getDeviceNodeId(), this.updateTimeMillis,
+				this.stepPercentage, this.context);
 
 		((ControllableDevice) context.getService(reference))
 				.setDriver(driverInstance);
@@ -262,8 +263,8 @@ public class ZWavePowerMeteringLevelControllableOutputDriver implements Driver,
 		for (Class<?> devCat : ZWavePowerMeteringLevelControllableOutputDriverInstance.class
 				.getInterfaces())
 		{
-			this.powerMeteringLevelControllableDeviceCategories
-					.add(devCat.getName());
+			this.powerMeteringLevelControllableDeviceCategories.add(devCat
+					.getName());
 		}
 	}
 
@@ -300,22 +301,22 @@ public class ZWavePowerMeteringLevelControllableOutputDriver implements Driver,
 			String stepEntityAsString = (String) properties
 					.get(ZWaveInfo.PROPERTY_STEP_PERCENT);
 
-			// trim leading and trailing spaces
-			stepEntityAsString = stepEntityAsString.trim();
-
 			// check not null
 			if (stepEntityAsString != null)
 			{
+				// trim leading and trailing spaces
+				stepEntityAsString = stepEntityAsString.trim();
 				// parse the string
 				this.stepPercentage = Integer.valueOf(stepEntityAsString);
 			}
 			else
 			{
-				this.logger.log(LogService.LOG_WARNING, 
-						ZWaveInfo.PROPERTY_STEP_PERCENT
-								+ " not defined in configuraton file for "
-								+ ZWavePowerMeteringLevelControllableOutputDriver.class
-										.getName());
+				this.logger
+						.log(LogService.LOG_WARNING,
+								ZWaveInfo.PROPERTY_STEP_PERCENT
+										+ " not defined in configuraton file for "
+										+ ZWavePowerMeteringLevelControllableOutputDriver.class
+												.getName());
 			}
 
 			// register driver
