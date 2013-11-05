@@ -17,12 +17,8 @@
  */
 package it.polito.elite.dog.core.housemodel.api;
 
-import it.polito.elite.dog.core.library.jaxb.BuildingEnvironment;
 import it.polito.elite.dog.core.library.jaxb.Controllables;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
-import it.polito.elite.dog.core.library.jaxb.Flat;
-import it.polito.elite.dog.core.library.jaxb.Room;
-import it.polito.elite.dog.core.library.jaxb.Storey;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 
 import java.util.List;
@@ -119,122 +115,4 @@ public interface HouseModel
 	 *         devices
 	 */
 	public List<Controllables> getJAXBDevices();
-	
-	/**
-	 * Get the JAXB representation of the building environment (flats, rooms,
-	 * etc.)
-	 * 
-	 * @return a {@link List} of {@link BuildingEnvironment}, i.e., all the
-	 *         building-related environments (flats, rooms, etc.)
-	 */
-	public List<BuildingEnvironment> getJAXBBuildingEnvironment();
-	
-	/**
-	 * Get the SVG house plan.
-	 * 
-	 * @return a SVG image representing the current environment
-	 */
-	public String getSVGPlan();
-	
-	/**
-	 * Update the properties of an existing room
-	 * 
-	 * @param roomToUpdate
-	 *            the JAXB room to update
-	 * @param containerURI
-	 *            the unique name representing where the room is located
-	 */
-	public void updateBuildingConfiguration(Room roomToUpdate, String containerURI);
-	
-	/**
-	 * Update the properties of an existing flat placed in the main building
-	 * 
-	 * @param flatToUpdate
-	 *            the JAXB flat to update
-	 */
-	public void updateBuildingConfiguration(Flat flatToUpdate);
-	
-	/**
-	 * Update the properties of an existing flat placed in a storey
-	 * 
-	 * @param flatToUpdate
-	 *            the JAXB flat to update
-	 * @param storeyURI
-	 *            the unique name representing the storey where the flat is
-	 *            placed
-	 */
-	public void updateBuildingConfiguration(Flat flatToUpdate, String storeyURI);
-	
-	/**
-	 * Update the properties of an existing storey
-	 * 
-	 * @param storeyToUpdate
-	 *            the JAXB storey to update
-	 */
-	public void updateBuildingConfiguration(Storey storeyToUpdate);
-	
-	/**
-	 * Add a room to an existing flat or storey present in the configuration
-	 * 
-	 * @param roomToAdd
-	 *            the JAXB room object to add
-	 * @param containerURI
-	 *            the unique name representing where the room is located
-	 */
-	public void addRoomToBuilding(Room roomToAdd, String containerURI);
-	
-	/**
-	 * Add a flat to the building environment
-	 * 
-	 * @param flatToAdd
-	 *            the JAXB flat object to add
-	 */
-	public void addFlatToBuilding(Flat flatToAdd);
-	
-	/**
-	 * Add a storey to the building environment
-	 * 
-	 * @param storeyToAdd
-	 *            the JAXB storey object to add
-	 */
-	public void addStoreyToBuilding(Storey storeyToAdd);
-	
-	/**
-	 * Add a flat to an existing storey
-	 * 
-	 * @param flatToAdd
-	 *            the JAXB flat object to add
-	 * @param storeyURI
-	 *            the unique name representing the storey where the flat is
-	 *            placed
-	 */
-	public void addFlatToStorey(Flat flatToAdd, String storeyURI);
-	
-	/**
-	 * Remove an existing room from the configuration
-	 * 
-	 * @param roomURI
-	 *            the unique name of the room to remove
-	 * @param containerURI
-	 *            the unique name representing where the room is located
-	 */
-	public void removeRoomFromBuilding(String roomURI, String containerURI);
-	
-	/**
-	 * Remove an existing flat from the configuration with all its children
-	 * (i.e., all the rooms present in the flat are removed)
-	 * 
-	 * @param flatURI
-	 *            the unique name of the flat to remove
-	 */
-	public void removeFlatFromBuilding(String flatURI);
-	
-	/**
-	 * Remove an existing storey from the configuration with all its children
-	 * (i.e., all the rooms present in the storey are removed)
-	 * 
-	 * @param storeyURI
-	 *            the unique name of the storey to remove
-	 */
-	public void removeStoreyFromBuilding(String storeyURI);
 }

@@ -17,6 +17,7 @@
  */
 package it.polito.elite.dog.core.housemodel.simple;
 
+import it.polito.elite.dog.core.housemodel.api.EnvironmentModel;
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.library.jaxb.Building;
 import it.polito.elite.dog.core.library.jaxb.BuildingEnvironment;
@@ -65,7 +66,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class SimpleHouseModel implements HouseModel, ManagedService
+public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedService
 {
 	// bundle context
 	private BundleContext context;
@@ -86,6 +87,9 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 	
 	// HouseModel service registration
 	private ServiceRegistration<?> srHouseModel;
+	
+	// EnvironmentModel service registration
+	private ServiceRegistration<?> srEnvironmentModel;
 	
 	/**
 	 * Default (empty) constructor
@@ -129,6 +133,7 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		this.svgPlan = null;
 		
 		this.srHouseModel = null;
+		this.srEnvironmentModel = null;
 	}
 	
 	/***
@@ -139,6 +144,10 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		if (this.srHouseModel != null)
 		{
 			this.srHouseModel.unregister();
+		}
+		if (this.srEnvironmentModel != null)
+		{
+			this.srEnvironmentModel.unregister();
 		}
 	}
 	
@@ -258,6 +267,11 @@ public class SimpleHouseModel implements HouseModel, ManagedService
 		{
 			// register the offered service
 			this.srHouseModel = this.context.registerService(HouseModel.class.getName(), this, null);
+		}
+		if (this.srEnvironmentModel == null)
+		{
+			// register the environment model service
+			this.srEnvironmentModel = this.context.registerService(EnvironmentModel.class.getName(), this, null);
 		}
 	}
 	
