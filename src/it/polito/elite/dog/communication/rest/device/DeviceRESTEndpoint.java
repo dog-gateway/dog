@@ -138,9 +138,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		AnnotationIntrospector jackson = new JacksonAnnotationIntrospector();
 		AnnotationIntrospector jaxb = new JaxbAnnotationIntrospector();
 		AnnotationIntrospector fullIntrospector = new AnnotationIntrospector.Pair(jackson, jaxb);
-		// make deserializer use bot Jackson and JAXB annotations
+		// make deserializer use both Jackson and JAXB annotations
 		this.mapper.getDeserializationConfig().withAnnotationIntrospector(fullIntrospector);
-		// make serializer use bot Jackson and JAXB annotations
+		// make serializer use both Jackson and JAXB annotations
 		this.mapper.getSerializationConfig().withAnnotationIntrospector(fullIntrospector);
 		
 	}

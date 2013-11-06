@@ -44,7 +44,7 @@ import javax.ws.rs.core.MediaType;
 public interface DeviceRESTApi
 {
 	/**
-	 * Represents domotic devices handled by Dog and “controllable” by
+	 * Represents domotic devices handled by Dog and "controllable"
 	 * applications using this API.
 	 * 
 	 * @return the JSON representation of the configured devices
@@ -54,13 +54,13 @@ public interface DeviceRESTApi
 	public String getAllDevicesInJson();
 	
 	/**
-	 * Represents domotic devices handled by Dog and “controllable” by
+	 * Represents domotic devices handled by Dog and "controllable"
 	 * applications using this API.
 	 * 
 	 * @return the XML representation of the configured devices
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_XML + "; qs=0.9")
+	@Produces(MediaType.APPLICATION_XML + "; qs=.5")
 	public String getAllDevicesInXml();
 	
 	/**
