@@ -140,7 +140,7 @@ public class Executor
 			theLogger = new LogHelper(context);
 			// log the exception
 			theLogger.log(LogService.LOG_ERROR,
-					"Exception during the exection of the command "
+					"Exception during the execution of the command "
 							+ commandName + " on " + toDevice + ": ", e);
 		}
 
