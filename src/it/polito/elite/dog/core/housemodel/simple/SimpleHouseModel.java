@@ -48,8 +48,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.namespace.QName;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -574,7 +576,22 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		
 		if ((this.xmlConfiguration != null) && (!this.xmlConfiguration.getControllables().isEmpty()))
 		{
-			devices.addAll(this.xmlConfiguration.getControllables());
+			try
+			{
+				// deep copy
+				// TODO Implement as clone() for better performance (look for a
+				// plugin on the Internet... it exists!)
+				JAXBElement<DogHomeConfiguration> contentObj = new JAXBElement<DogHomeConfiguration>(new QName(
+						DogHomeConfiguration.class.getSimpleName()), DogHomeConfiguration.class, this.xmlConfiguration);
+				JAXBSource source = new JAXBSource(this.jaxbContext, contentObj);
+				// marshall the JAXBSource to obtain a deep copy
+				devices.addAll((jaxbContext.createUnmarshaller().unmarshal(source, DogHomeConfiguration.class)
+						.getValue()).getControllables());
+			}
+			catch (JAXBException e)
+			{
+				this.logger.log(LogService.LOG_ERROR, "Exception in cloning the XML configuration", e);
+			}
 		}
 		
 		// return all the devices with their properties, in their JAXB
