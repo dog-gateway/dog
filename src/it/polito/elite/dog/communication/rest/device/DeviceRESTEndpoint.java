@@ -107,7 +107,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	private ObjectMapper mapper;
 	
 	/**
-	 * Empty constructor
+	 * Constructor
 	 */
 	public DeviceRESTEndpoint()
 	{
