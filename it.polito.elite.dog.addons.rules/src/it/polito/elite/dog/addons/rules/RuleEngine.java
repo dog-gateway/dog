@@ -77,8 +77,8 @@ import org.osgi.service.monitor.StatusVariable;
  * At last Dog can do something smart!
  * 
  * @author Castellina Emiliano (skeleton)
- * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
- *         (original version)
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a> (original
+ *         version)
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  *         (successive modifications)
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
@@ -375,8 +375,9 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 		// preprocess timed e-blocks
 		TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
-		//TODO Fix when a new scheduler will be developed...
-		//Set<DogMessage> timedEvents = proc.preProcess(this.localRuleBaseJAXB);
+		// TODO Fix when a new scheduler will be developed...
+		// Set<DogMessage> timedEvents =
+		// proc.preProcess(this.localRuleBaseJAXB);
 		
 		// translator from xml to drl
 		Xml2DrlTranslator translator = new Xml2DrlTranslator();
@@ -407,9 +408,9 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			ruleBase.addKnowledgePackages(kBuilder.getKnowledgePackages());
 			this.setRuleBase(ruleBase);
 			
-			//TODO Fix when a new scheduler will be developed...
+			// TODO Fix when a new scheduler will be developed...
 			// schedule timed events if any available
-			//this.scheduleTimedEvents(timedEvents);
+			// this.scheduleTimedEvents(timedEvents);
 			
 			// debug
 			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
@@ -456,8 +457,9 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	}
 	
 	@Override
-	public void removeRule(String ruleName)
+	public boolean removeRule(String ruleName)
 	{
+		boolean ruleExist = false;
 		
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to remove a rule:\n" + ruleName);
 		
@@ -465,30 +467,50 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// packages
 		Collection<KnowledgePackage> packages = this.ruleBase.getKnowledgePackages();
 		for (KnowledgePackage cPackage : packages)
-			this.ruleBase.removeRule(cPackage.getName(), ruleName);
-		
-		// remove the rule from the current rule base and save it
-		List<Rule> localRules = this.localRuleBaseJAXB.getRule();
-		boolean found = false;
-		for (int i = 0; (i < localRules.size() && (!found)); i++)
 		{
-			if (localRules.get(i).getName().equalsIgnoreCase(ruleName))
+			if (this.ruleBase.getRule(cPackage.getName(), ruleName) != null)
 			{
-				localRules.remove(i);
-				found = true;
+				this.ruleBase.removeRule(cPackage.getName(), ruleName);
+				ruleExist = true;
 			}
 		}
 		
-		// save the new rule base
-		this.saveRules(this.localRuleBasePath);
+		if (ruleExist)
+		{
+			// remove the rule from the current rule base and save it
+			List<Rule> localRules = this.localRuleBaseJAXB.getRule();
+			boolean found = false;
+			for (int i = 0; (i < localRules.size() && (!found)); i++)
+			{
+				if (localRules.get(i).getName().equalsIgnoreCase(ruleName))
+				{
+					localRules.remove(i);
+					found = true;
+				}
+			}
+			
+			// save the new rule base
+			this.saveRules(this.localRuleBasePath);
+		}
+		else
+		{
+			this.logger.log(LogService.LOG_WARNING, "Impossible to remove the rule \"" + ruleName
+					+ "\" since it does not exists!");
+		}
+		
+		return ruleExist;
 		
 	}
 	
 	@Override
 	public void updateRule(String ruleId, RuleList xmlRule)
 	{
-		this.removeRule(ruleId);
-		this.addRule(xmlRule);
+		boolean removed = this.removeRule(ruleId);
+		if (removed)
+			this.addRule(xmlRule);
+		else
+			this.logger.log(LogService.LOG_WARNING, "Impossible to update the rule \"" + ruleId
+					+ "\" since it does not exists!");
 		
 	}
 	
@@ -610,8 +632,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	/**
 	 * Get the local rule base encoded as a JAXB object
 	 * 
-	 * @return an the {@link JAXB} encoding the local rule base according to
-	 *         the Dog rule schema.
+	 * @return an the {@link JAXB} encoding the local rule base according to the
+	 *         Dog rule schema.
 	 */
 	@Override
 	public RuleList getRules()
@@ -790,7 +812,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		if (nowL < endTime)
 		{
 			logger.log(LogService.LOG_INFO, "Command Execution on " + toDevice + " -> " + commandName);
-						
+			
 			// only after is specified
 			if ((startTimeS == null) && (afterTimeS != null))
 			{
@@ -804,64 +826,53 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 				Executor.getInstance().execute(context, toDevice, commandName, params);
 			}
 			
-			//TODO Fix when a new scheduler will be developed...
+			// TODO Fix when a new scheduler will be developed...
 			/*
-			else
-			{
-				// the command shall be scheduled
-				// create the job to schedule
-				DogScheduleJob timedCmd = new DogScheduleJob();
-				timedCmd.setTimes(1);
-				timedCmd.setContent(cmdMsg);
-				
-				// convert to h:m:s
-				Calendar startTime = converter.dayTimeToCalendar(startTimeS);
-				timedCmd.setStartTime(startTime);
-				
-				// debug
-				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " scheduled command " + commandName + " at "
-						+ startTime.getTime());
-				
-				// create the schedule request
-				MessageScheduleRequest requestToSchedule = new MessageScheduleRequest(MonitorActionTypes.SCHEDULE);
-				requestToSchedule.setContent(timedCmd);
-				
-				// create the wrapping message
-				DogMessage schMsg = new DogMessage();
-				schMsg.setType(MessageTypes.SCHEDULE_COMMAND);
-				schMsg.setContent(requestToSchedule);
-				
-				// send the scheduling request
-				this.scheduler.scheduleMessage(schMsg);
-			}
-			
-			// here we need to check the endTime and to possibly schedule the
-			// opposite command
-			if (endTimeS != null)
-			{
-				// TODO: handle the scheduling of the opposite command...
-			}*/
-		}		
-	}
-		
-	//TODO Fix when a new scheduler will be developed...
-	/*
-	public synchronized void scheduleTimedEvents(Set<DogMessage> timedEvents)
-	{
-		// schedule received event messages, if not empty
-		if ((timedEvents != null) && (!timedEvents.isEmpty()))
-		{
-			for (DogMessage eventToSchedule : timedEvents)
-			{
-				this.scheduler.scheduleMessage(eventToSchedule);
-				
-				// debug
-				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " Scheduled timed event: " + eventToSchedule);
-			}
-			
+			 * else { // the command shall be scheduled // create the job to
+			 * schedule DogScheduleJob timedCmd = new DogScheduleJob();
+			 * timedCmd.setTimes(1); timedCmd.setContent(cmdMsg);
+			 * 
+			 * // convert to h:m:s Calendar startTime =
+			 * converter.dayTimeToCalendar(startTimeS);
+			 * timedCmd.setStartTime(startTime);
+			 * 
+			 * // debug this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId +
+			 * " scheduled command " + commandName + " at " +
+			 * startTime.getTime());
+			 * 
+			 * // create the schedule request MessageScheduleRequest
+			 * requestToSchedule = new
+			 * MessageScheduleRequest(MonitorActionTypes.SCHEDULE);
+			 * requestToSchedule.setContent(timedCmd);
+			 * 
+			 * // create the wrapping message DogMessage schMsg = new
+			 * DogMessage(); schMsg.setType(MessageTypes.SCHEDULE_COMMAND);
+			 * schMsg.setContent(requestToSchedule);
+			 * 
+			 * // send the scheduling request
+			 * this.scheduler.scheduleMessage(schMsg); }
+			 * 
+			 * // here we need to check the endTime and to possibly schedule the
+			 * // opposite command if (endTimeS != null) { // TODO: handle the
+			 * scheduling of the opposite command... }
+			 */
 		}
-		
-	}*/
+	}
+	
+	// TODO Fix when a new scheduler will be developed...
+	/*
+	 * public synchronized void scheduleTimedEvents(Set<DogMessage> timedEvents)
+	 * { // schedule received event messages, if not empty if ((timedEvents !=
+	 * null) && (!timedEvents.isEmpty())) { for (DogMessage eventToSchedule :
+	 * timedEvents) { this.scheduler.scheduleMessage(eventToSchedule);
+	 * 
+	 * // debug this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId +
+	 * " Scheduled timed event: " + eventToSchedule); }
+	 * 
+	 * }
+	 * 
+	 * }
+	 */
 	
 	/***************************************************************************
 	 * 
@@ -895,31 +906,27 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// TODO remove/clean inner data structures
 	}
 	
-	//TODO Fix when a new scheduler will be developed...
-	/*public void addedScheduler(DogSchedulerInterface scheduler)
-	{
-		// store a reference to the dog scheduler for "scheduling" timed
-		// activations and commands
-		this.scheduler = scheduler;
-		
-		// check whether the bundle could register provided services
-		this.checkAndRegisterServices();
-	}
-	
-	public void removedScheduler(DogSchedulerInterface scheduler)
-	{
-		// unregister
-		this.unregisterServices();
-		
-		// TODO remove/clean inner data structures
-	}*/
+	// TODO Fix when a new scheduler will be developed...
+	/*
+	 * public void addedScheduler(DogSchedulerInterface scheduler) { // store a
+	 * reference to the dog scheduler for "scheduling" timed // activations and
+	 * commands this.scheduler = scheduler;
+	 * 
+	 * // check whether the bundle could register provided services
+	 * this.checkAndRegisterServices(); }
+	 * 
+	 * public void removedScheduler(DogSchedulerInterface scheduler) { //
+	 * unregister this.unregisterServices();
+	 * 
+	 * // TODO remove/clean inner data structures }
+	 */
 	
 	/**
 	 * Check if all dependencies are satisfied and services can be published...
 	 */
 	private void checkAndRegisterServices()
 	{
-		if (this.monitorAdmin != null /*&& this.scheduler != null*/ && this.context != null)
+		if (this.monitorAdmin != null /* && this.scheduler != null */&& this.context != null)
 		{ // all the needed services are up and running?
 		
 			// if the needed services have been matched and the rule base has

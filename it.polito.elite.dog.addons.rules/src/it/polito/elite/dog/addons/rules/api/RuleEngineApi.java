@@ -72,5 +72,5 @@ public interface RuleEngineApi
 	 * 
 	 * @param ruleName
 	 */
-	public void removeRule(String ruleName);
+	public boolean removeRule(String ruleName);
 }
