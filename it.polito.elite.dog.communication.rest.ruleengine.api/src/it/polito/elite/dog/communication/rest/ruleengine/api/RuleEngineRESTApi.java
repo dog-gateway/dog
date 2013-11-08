@@ -17,8 +17,6 @@
  */
 package it.polito.elite.dog.communication.rest.ruleengine.api;
 
-import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -45,15 +43,16 @@ public interface RuleEngineRESTApi
 	@Produces({ MediaType.APPLICATION_XML })
 	public String getXMLRules();
 	
-	@PUT
+	@POST
 	@Consumes({ MediaType.APPLICATION_XML })
-	public void setRulesXML(RuleList xmlRules);
+	public void addRulesXML(String xmlRules);
+	
+	@PUT
+	@Path("/{ruleId}")
+	@Consumes({ MediaType.APPLICATION_XML })
+	public void updateRuleXML(@PathParam("ruleId") String ruleId, String ruleContent);
 	
 	@DELETE
 	@Path("/{ruleId}")
 	public void removeRule(@PathParam("ruleId") String ruleId);
-	
-	@POST
-	@Consumes({ MediaType.APPLICATION_XML })
-	public void addRulesXML(RuleList xmlRules);
 }

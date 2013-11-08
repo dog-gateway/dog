@@ -17,7 +17,12 @@
  */
 package it.polito.elite.dog.communication.rest.ruleengine;
 
+import java.io.StringReader;
+import java.io.StringWriter;
+
 import javax.ws.rs.Path;
+import javax.xml.bind.DataBindingException;
+import javax.xml.bind.JAXB;
 
 import it.polito.elite.dog.addons.rules.api.RuleEngineApi;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
@@ -142,33 +147,16 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public String getXMLRules()
 	{
 		// no rules at the beginning
-		String drlRules = "";
+		String xmlRules = "";
 		
-		// extract the rule from the rule engine in the DRL format
-		if (this.ruleEngine != null)
-			drlRules = this.ruleEngine.getXMLRules();
-		
-		// return existing rules
-		return drlRules;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi
-	 * #setRulesXML(it.polito.elite.dog.addons.rules.schemalibrary.RuleList)
-	 */
-	@Override
-	public void setRulesXML(RuleList xmlRules)
-	{
-		// check not null
+		// extract the rule from the rule engine in the JAXB format
 		if (this.ruleEngine != null)
 		{
-			// add received rules
-			this.ruleEngine.setRules(xmlRules);
+			xmlRules = this.generateXML(this.ruleEngine.getRules());
 		}
 		
+		// return existing rules
+		return xmlRules;
 	}
 	
 	/*
@@ -179,13 +167,26 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	 * #addRulesXML(it.polito.elite.dog.addons.rules.schemalibrary.RuleList)
 	 */
 	@Override
-	public void addRulesXML(RuleList xmlRules)
+	public void addRulesXML(String xmlRules)
 	{
 		// check not null
 		if (this.ruleEngine != null)
 		{
 			// add the received rules
-			this.ruleEngine.addRule(xmlRules);
+			this.ruleEngine.addRule(JAXB.unmarshal(new StringReader(xmlRules), RuleList.class));
+		}
+		
+	}
+	
+	@Override
+	public void updateRuleXML(String ruleId, String ruleContent)
+	{
+		// check not null
+		if (this.ruleEngine != null)
+		{
+			RuleList updatedRule = JAXB.unmarshal(new StringReader(ruleContent), RuleList.class);
+			// update received rules
+			this.ruleEngine.updateRule(ruleId, updatedRule);
 		}
 		
 	}
@@ -207,6 +208,35 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 			this.ruleEngine.removeRule(ruleId);
 		}
 		
+	}
+	
+	/**
+	 * Generate the XML to be sent
+	 * 
+	 * @param rules
+	 *            the {@link RuleList} object to marshall
+	 * @return the corresponding XML
+	 */
+	private String generateXML(RuleList rules)
+	{
+		String rulesXML = "";
+		
+		try
+		{
+			StringWriter output = new StringWriter();
+			
+			// marshall the RuleList...
+			JAXB.marshal(rules, output);
+			
+			rulesXML = output.getBuffer().toString();
+		}
+		catch (DataBindingException e)
+		{
+			// the exception can be throw by the JAXB.marshal method...
+			this.logger.log(LogService.LOG_ERROR, "Exception in JAXB Marshalling...", e);
+		}
+		
+		return rulesXML;
 	}
 	
 }
