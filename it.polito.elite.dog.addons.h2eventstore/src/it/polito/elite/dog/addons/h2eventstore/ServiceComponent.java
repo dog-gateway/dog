@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright [2013] [Claudio Degioanni claudiodegio@gmail.com]
+ * Copyright (c) [2013] [Claudio Degioanni claudiodegio@gmail.com]
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package it.polito.elite.dog.addons.h2eventstore;
 
 import it.polito.elite.dog.addons.h2eventstore.dao.MeasureDao;
 import it.polito.elite.dog.addons.h2eventstore.dao.MeasureDaoImp;
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
-import it.polito.elite.domotics.model.notification.EventNotification;
-import it.polito.elite.domotics.model.notification.ParametricNotification;
+import it.polito.elite.dog.core.library.model.notification.EventNotification;
+import it.polito.elite.dog.core.library.model.notification.ParametricNotification;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.stream.processing.addon.event.source.dog.xmlrpc.SensorDescriptor;
 import it.polito.elite.stream.processing.addon.event.source.dog.xmlrpc.xml.SensorCollectionType;
 import it.polito.elite.stream.processing.addon.event.source.dog.xmlrpc.xml.SensorData;
@@ -41,11 +41,11 @@ import javax.measure.Measure;
 import javax.measure.quantity.Quantity;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.blueprint.container.EventConstants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 
@@ -53,14 +53,8 @@ import org.osgi.service.log.LogService;
 @Component
 public class ServiceComponent implements EventHandler, ManagedService {
 
-	// The OSGi framework context
-	private BundleContext context;
-
 	// System logger
-	private LogService logger;
-
-	// the log identifier, unique for the class
-	public static String logId = "[H2eventstore]: ";
+	private LogHelper logger;
 
 	// the dao
 	private MeasureDao dao = null;
@@ -79,12 +73,9 @@ public class ServiceComponent implements EventHandler, ManagedService {
 
 	public void activate(final BundleContext context) {
 		// init the logger
-		this.logger = new DogLogInstance(context);
+		this.logger = new LogHelper(context);
 
-		this.logger.log(LogService.LOG_INFO, logId + " activate h2 database");
-
-		// store the context
-		this.context = context;
+		this.logger.log(LogService.LOG_INFO, " activate h2 database");
 
 		// init the dao
 		try {
@@ -97,7 +88,7 @@ public class ServiceComponent implements EventHandler, ManagedService {
 	}
 
 	public void deactivate() {
-		this.logger.log(LogService.LOG_INFO, logId + " deactivate h2 database");
+		this.logger.log(LogService.LOG_INFO, " deactivate h2 database");
 	}
 
 	/**
@@ -126,7 +117,7 @@ public class ServiceComponent implements EventHandler, ManagedService {
 
 		if (!sourceMappingFile.isFile()) {
 			if (logger != null)
-				logger.log(LogService.LOG_ERROR, logId + "Missing configuration param " + Constants.MAPPING_FILE);
+				logger.log(LogService.LOG_ERROR, "Missing configuration param " + Constants.MAPPING_FILE);
 			return;
 		}
 
@@ -177,7 +168,7 @@ public class ServiceComponent implements EventHandler, ManagedService {
 
 			// debug
 			if (this.logger != null) {
-				logger.log(LogService.LOG_DEBUG, logId + "Notification " + notification + " and deviceURI-> " + deviceURI + " QFParams-> "
+				logger.log(LogService.LOG_DEBUG, "Notification " + notification + " and deviceURI-> " + deviceURI + " QFParams-> "
 						+ qfParams);
 			}
 

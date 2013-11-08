@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright [2013] [Claudio Degioanni claudiodegio@gmail.com]
+ * Copyright (c) [2013] [Claudio Degioanni claudiodegio@gmail.com]
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,75 +23,70 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.measure.Measure;
-import javax.swing.text.TabExpander;
 
-import it.polito.elite.domotics.dog2.doglibrary.util.DogLogInstance;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class MeasureDaoImp implements MeasureDao {
-
-	// the log identifier, unique for the class
-	final public static String logId = "[H2eventstoreDao]: ";
-
-	// The OSGi framework context
-	private BundleContext context;
-
+public class MeasureDaoImp implements MeasureDao
+{	
 	// System logger
-	private LogService logger;
-
+	private LogHelper logger;
+	
 	// database connection
 	private Connection connection;
-
-	public MeasureDaoImp(final String url, final String user, final String password, final BundleContext context) throws SQLException {
-		// init context and logger
-
-		this.context = context;
-		this.logger = new DogLogInstance(context);
-
+	
+	public MeasureDaoImp(final String url, final String user, final String password, final BundleContext context)
+			throws SQLException
+	{
+		// init logger
+		this.logger = new LogHelper(context);
+		
 		// open database connection
 		connection = DriverManager.getConnection(url, user, password);
-
+		
 		// check table exist
 		final ResultSet tableSet = connection.getMetaData().getTables(connection.getCatalog(), null, "EVENT", null);
-
-		if (!tableSet.next()) {
+		
+		if (!tableSet.next())
+		{
 			// missing event table create it
 			connection.prepareStatement(Contants.SCHEMA).executeUpdate();
-			logger.log(LogService.LOG_INFO, logId + " schema creation success");
+			logger.log(LogService.LOG_INFO, " schema creation success");
 		}
-
+		
 		tableSet.close();
 	}
-
+	
 	@Override
-	public void insert(String name, Measure<?, ?> value, Date timestamp) throws SQLException {
-		logger.log(LogService.LOG_INFO, logId + "insert event name: " + name + " value: " + value + " timestamp: " + timestamp);
-
+	public void insert(String name, Measure<?, ?> value, Date timestamp) throws SQLException
+	{
+		logger.log(LogService.LOG_INFO, "insert event name: " + name + " value: " + value + " timestamp: "
+				+ timestamp);
+		
 		final PreparedStatement stm = connection.prepareStatement(Contants.INSERT);
-
+		
 		stm.setString(1, name);
 		stm.setBigDecimal(2, (BigDecimal) value.getValue());
 		stm.setString(3, value.getUnit().toString());
-
+		
 		java.sql.Date sqlDate = new java.sql.Date(timestamp.getTime());
 		stm.setDate(4, sqlDate);
-
+		
 		stm.executeUpdate();
 		stm.close();
 		connection.commit();
 	}
-
+	
 	@Override
-	public void close() throws SQLException {
+	public void close() throws SQLException
+	{
 		// close db connection
 		connection.close();
 	}
-
+	
 }
