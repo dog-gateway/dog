@@ -173,7 +173,8 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		if (this.ruleEngine != null)
 		{
 			// add the received rules
-			this.ruleEngine.addRule(JAXB.unmarshal(new StringReader(xmlRules), RuleList.class));
+			RuleList rules = JAXB.unmarshal(new StringReader(xmlRules), RuleList.class);
+			this.ruleEngine.addRule(rules);
 		}
 		
 	}
@@ -184,9 +185,11 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		// check not null
 		if (this.ruleEngine != null)
 		{
+			// unmarshall the rule to update
 			RuleList updatedRule = JAXB.unmarshal(new StringReader(ruleContent), RuleList.class);
 			// update received rules
 			this.ruleEngine.updateRule(ruleId, updatedRule);
+			
 		}
 		
 	}
