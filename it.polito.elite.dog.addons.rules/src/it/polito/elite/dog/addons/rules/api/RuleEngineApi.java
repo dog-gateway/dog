@@ -28,12 +28,6 @@ import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
  */
 public interface RuleEngineApi
 {
-	void addRule(String XMLRule);
-	
-	void removeRule(String ruleName);
-	
-	void setRules(String XMLRules);
-	
 	/** Sets and replaces all rules (first deleting them all) */
 	void loadRules(URI location);
 	
@@ -45,18 +39,20 @@ public interface RuleEngineApi
 	
 	/**
 	 * Add rules using JAXB objects representing them
+	 * 
 	 * @param rules
 	 */
 	public void addRule(RuleList rules);
 	
 	/**
-	 * Set/replace rules using JAXB objects representing them
+	 * Set/replace a rule using JAXB objects representing them
+	 * 
 	 * @param rules
 	 */
-	public void setRules(RuleList rules);
+	public void updateRule(String ruleId, RuleList xmlRule);
 	
 	/**
-	 * Get the locakl rule base encoded as DRL
+	 * Get the local rule base encoded as DRL
 	 * 
 	 * @return A {@link String} representation of the local rule base using the
 	 *         DRL language (DSL)
@@ -64,10 +60,17 @@ public interface RuleEngineApi
 	public String getDRLRules();
 	
 	/**
-	 * Get the local rule base encoded as XML
+	 * Get the local rule base encoded as a JAXB object
 	 * 
-	 * @return an XML {@link String} encoding the local rule base according to
-	 *         the Dog rule schema.
+	 * @return the {@link JAXB} encoding the local rule base according to the
+	 *         Dog rule schema.
 	 */
-	public String getXMLRules();
+	public RuleList getRules();
+	
+	/**
+	 * Remove the rule with the given id
+	 * 
+	 * @param ruleName
+	 */
+	public void removeRule(String ruleName);
 }

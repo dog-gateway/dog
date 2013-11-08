@@ -51,10 +51,7 @@ import java.util.Map;
 import javax.measure.DecimalMeasure;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -368,18 +365,6 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	 ***************************************************************************************************************/
 	
 	@Override
-	public void addRule(String xmlRule)
-	{
-		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to add a new rule:\n" + xmlRule);
-		
-		// the DRL rules
-		RuleList rules = this.parseXMLRule(xmlRule);
-		
-		// add the rule(s)
-		this.addRule(rules);
-	}
-	
-	@Override
 	public void addRule(RuleList rules)
 	{
 		
@@ -500,78 +485,10 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	}
 	
 	@Override
-	public void setRules(String xmlRules)
+	public void updateRule(String ruleId, RuleList xmlRule)
 	{
-		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to set the engine rules:\n"
-				+ xmlRules);
-		
-		// the DRL rules
-		RuleList rules = this.parseXMLRule(xmlRules);
-		
-		// set the new rules
-		this.setRules(rules);
-	}
-	
-	@Override
-	public void setRules(RuleList rules)
-	{
-		// debug
-		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Replacing rules...");
-		
-		// preprocess timed e-blocks
-		TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
-		//TODO Fix when a new scheduler will be developed...
-		//Set<DogMessage> timedEvents = proc.preProcess(rules);
-		
-		// translator from xml to drl
-		Xml2DrlTranslator translator = new Xml2DrlTranslator();
-		
-		// translate rules
-		String drlRules = translator.xml2drl(rules);
-		
-		if (drlRules != null)
-		{
-			// debug
-			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " translated the new rule to DRL:\n" + drlRules);
-			
-			// set the new rules
-			// here we parse the just created DRL specification and load it into
-			// the rules bundle knowledge base
-			KnowledgeBuilder kBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-			
-			// the reader for accessing the dynamically created rules
-			StringReader drlReader = new StringReader(drlRules);
-			
-			// the knowledge builder is now used to read the created DRL
-			kBuilder.add(ResourceFactory.newReaderResource(drlReader), ResourceType.DRL);
-			
-			if (kBuilder.hasErrors())
-				this.logger.log(LogService.LOG_ERROR, RuleEngine.logId
-						+ " Error while loading DRL from local rule store:" + kBuilder.getErrors());
-			
-			// create the knowledge base to which rules shall be added
-			KnowledgeBase ruleBase = KnowledgeBaseFactory.newKnowledgeBase();
-			
-			// add the just read DRL rules
-			ruleBase.addKnowledgePackages(kBuilder.getKnowledgePackages());
-			
-			this.setRuleBase(ruleBase);
-			
-			//TODO Fix when a new scheduler will be developed...
-			// schedule timed events if any available
-			//this.scheduleTimedEvents(timedEvents);
-			
-			// debug
-			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
-					+ " new rules have been set as the current rule base");
-			
-			// save the rules on the local rule store...
-			this.saveRules(this.localRuleBasePath);
-			
-			// debug
-			this.logger
-					.log(LogService.LOG_DEBUG, RuleEngine.logId + " new rules have been save to the rule repository");
-		}
+		this.removeRule(ruleId);
+		this.addRule(xmlRule);
 		
 	}
 	
@@ -617,7 +534,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	}
 	
 	@Override
-	public void saveRules(URI location)
+	public synchronized void saveRules(URI location)
 	{
 		
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to save rules in:\n" + location);
@@ -626,14 +543,14 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	}
 	
 	@Override
-	public void saveRules(String location)
+	public synchronized void saveRules(String location)
 	{
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received request to save rules in:\n" + location);
 		File checkFile = new File(location);
 		this.saveRules(checkFile);
 	}
 	
-	private void saveRules(File fileToSave)
+	private synchronized void saveRules(File fileToSave)
 	{
 		if (fileToSave.exists())
 			// overwrite the file...
@@ -691,89 +608,15 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	}
 	
 	/**
-	 * Get the local rule base encoded as XML
+	 * Get the local rule base encoded as a JAXB object
 	 * 
-	 * @return an XML {@link String} encoding the local rule base according to
+	 * @return an the {@link JAXB} encoding the local rule base according to
 	 *         the Dog rule schema.
 	 */
 	@Override
-	public String getXMLRules()
+	public RuleList getRules()
 	{
-		String drlRules = "<error>Rule base currently empty</error>";
-		
-		// if a rule base exists, marshall the rule base as an XML string
-		if (this.localRuleBaseJAXB != null)
-		{
-			// create the JAXB context for parsing the local rule store (in xml)
-			StringWriter sw = new StringWriter();
-			try
-			{
-				// get the JAXB context for marshalling
-				JAXBContext ctx = JAXBContext.newInstance(RuleList.class.getPackage().getName());
-				
-				// create the marshaller
-				Marshaller m = ctx.createMarshaller();
-				
-				// set-up the output
-				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-				m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-						"http://elite.polito.it/domotics/dog/rules/rule_definition rule_definition.xsd ");
-				
-				// marshall to a string
-				m.marshal(this.localRuleBaseJAXB, sw);
-			}
-			catch (JAXBException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			// get the marshalled string
-			drlRules = sw.toString() != null ? sw.toString() : drlRules;
-		}
-		
-		return drlRules;
-	}
-	
-	/**
-	 * Unmarshals an XML rule specification
-	 * 
-	 * @param xmlRules
-	 *            The XML rule definition
-	 * @return The {@link RuleList} representing the specification
-	 */
-	private RuleList parseXMLRule(String xmlRules)
-	{
-		// rules expressed in drl format
-		RuleList rules = null;
-		
-		try
-		{
-			// parse the xml rule to add
-			// create the JAXB context for parsing the local rule store (in xml)
-			JAXBContext ctx = JAXBContext.newInstance(RuleList.class.getPackage().getName());
-			
-			// create the corresponding un-marshaler for getting the list of
-			// JAXB classes modeling the local rule store
-			Unmarshaller um = ctx.createUnmarshaller();
-			
-			// unmarshal the xml local rule store
-			@SuppressWarnings("unchecked")
-			JAXBElement<RuleList> jaxbElement = (JAXBElement<RuleList>) um.unmarshal(new StringReader(xmlRules));
-			rules = (RuleList) jaxbElement.getValue();
-			
-		}
-		catch (JAXBException e)
-		{
-			// log the error
-			this.logger
-					.log(LogService.LOG_ERROR,
-							RuleEngine.logId
-									+ " error while unmrashalling the received xml rules, checking if a single rule has been provided.\n"
-									+ e);
-		}
-		
-		return rules;
+		return this.localRuleBaseJAXB;
 	}
 	
 	@Override
