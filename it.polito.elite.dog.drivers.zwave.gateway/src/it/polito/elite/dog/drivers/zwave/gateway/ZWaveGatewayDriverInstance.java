@@ -393,13 +393,26 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 					.get(DataConst.MANUFACTURER_PRODUCT_ID).getValue()
 					.toString();
 
+			// build the 4th id (number of instances)
+			int numberOfInstances = device.getInstances().size();
+
+			// build the device unique id
+			String extendedDeviceUniqueId = manufacturerId + "-"
+					+ manufacturerProductType + "-" + manufacturerProductId
+					+ "-" + numberOfInstances;
+
 			// build the device unique id
 			String deviceUniqueId = manufacturerId + "-"
 					+ manufacturerProductType + "-" + manufacturerProductId;
 
 			// get the device class
-			String deviceClass = this.supportedDevices.get(deviceUniqueId);
+			String deviceClass = this.supportedDevices.get(extendedDeviceUniqueId);
+			
+			//check if not extended
+			if(deviceClass == null)
+				this.supportedDevices.get(deviceUniqueId);
 
+			//normal workflow...
 			if ((deviceClass != null) && (!deviceClass.isEmpty()))
 			{
 				// create a descriptor definition map
