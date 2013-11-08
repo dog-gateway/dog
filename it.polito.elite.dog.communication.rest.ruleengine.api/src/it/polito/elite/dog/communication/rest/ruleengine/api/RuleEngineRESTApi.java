@@ -1,7 +1,7 @@
 /*
  * Dog - Communication
  * 
- * Copyright (c) 2013 Dario Bonino
+ * Copyright (c) 2013 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,41 +20,40 @@ package it.polito.elite.dog.communication.rest.ruleengine.api;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 /**
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  *
  */
-@Path("/rest/ruleengine/api")
+@Path("/api/rules/")
 public interface RuleEngineRESTApi
 {
-	@POST
-	@Path("/add")
-	@Consumes({ MediaType.APPLICATION_XML })
-	public void addRulesXML(RuleList xmlRules);
-	
-	@POST //TODO: check the right rest syntax
-	@Path("/remove/{ruleId}")
-	public void removeRule(@PathParam("ruleId") String ruleId);
-	
-	@POST
-	@Path("/set")
-	@Consumes({ MediaType.APPLICATION_XML })
-	public void setRulesXML(RuleList xmlRules);
-	
 	@GET
-	@Path("/rules/drl")
 	@Produces({MediaType.TEXT_PLAIN})
 	public String getDRLRules();
 	
 	@GET
-	@Path("/rules/xml")
 	@Produces({ MediaType.APPLICATION_XML })
 	public String getXMLRules();
+	
+	@PUT
+	@Consumes({ MediaType.APPLICATION_XML })
+	public void setRulesXML(RuleList xmlRules);
+	
+	@DELETE
+	@Path("/{ruleId}")
+	public void removeRule(@PathParam("ruleId") String ruleId);
+	
+	@POST
+	@Consumes({ MediaType.APPLICATION_XML })
+	public void addRulesXML(RuleList xmlRules);
 }

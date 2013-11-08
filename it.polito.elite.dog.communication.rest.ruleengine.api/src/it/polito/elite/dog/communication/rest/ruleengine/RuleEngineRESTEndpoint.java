@@ -1,7 +1,7 @@
 /*
  * Dog - Communication
  * 
- * Copyright (c) 2013 Dario Bonino
+ * Copyright (c) 2013 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,35 +17,29 @@
  */
 package it.polito.elite.dog.communication.rest.ruleengine;
 
+import javax.ws.rs.Path;
+
 import it.polito.elite.dog.addons.rules.api.RuleEngineApi;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
 import it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi;
 import it.polito.elite.dog.core.library.util.LogHelper;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
- *         TODO: check if string parameters are right or if JAXB objects are
- *         preferred, in such case amend the rules bundle
  */
-@Path("/rest/ruleengine/api")
+@Path("/api/rules/")
 public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 {
 	// the service logger
 	private LogHelper logger;
 	
-	// the log id
+	// the log id used for fallback
 	public static final String logId = "[RuleEngineRESTApi]: ";
 	
 	// the bundle context reference
@@ -59,8 +53,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	 */
 	public RuleEngineRESTEndpoint()
 	{
-		// TODO Auto-generated constructor stub
-		System.out.println(RuleEngineRESTEndpoint.logId + "Created RuleEngineRESTEndpoint");
+		System.out.println(RuleEngineRESTEndpoint.logId + "Creating RuleEngineRESTEndpoint...");
 	}
 	
 	/**
@@ -122,12 +115,70 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	 * 
 	 * @see
 	 * it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi
-	 * #addRulesXML()
+	 * #getDRLRules()
 	 */
 	@Override
-	@POST
-	@Path("/add")
-	@Consumes({ MediaType.APPLICATION_XML })
+	public String getDRLRules()
+	{
+		// no rules at the beginning
+		String drlRules = "";
+		
+		// extract the rule from the rule engine in the DRL format
+		if (this.ruleEngine != null)
+			drlRules = this.ruleEngine.getDRLRules();
+		
+		// return existing rules
+		return drlRules;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi
+	 * #getXMLRules()
+	 */
+	@Override
+	public String getXMLRules()
+	{
+		// no rules at the beginning
+		String drlRules = "";
+		
+		// extract the rule from the rule engine in the DRL format
+		if (this.ruleEngine != null)
+			drlRules = this.ruleEngine.getXMLRules();
+		
+		// return existing rules
+		return drlRules;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi
+	 * #setRulesXML(it.polito.elite.dog.addons.rules.schemalibrary.RuleList)
+	 */
+	@Override
+	public void setRulesXML(RuleList xmlRules)
+	{
+		// check not null
+		if (this.ruleEngine != null)
+		{
+			// add received rules
+			this.ruleEngine.setRules(xmlRules);
+		}
+		
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi
+	 * #addRulesXML(it.polito.elite.dog.addons.rules.schemalibrary.RuleList)
+	 */
+	@Override
 	public void addRulesXML(RuleList xmlRules)
 	{
 		// check not null
@@ -147,8 +198,6 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	 * #removeRule(java.lang.String)
 	 */
 	@Override
-	@POST
-	@Path("/remove/{ruleId}")
 	public void removeRule(String ruleId)
 	{
 		// check not null
@@ -158,62 +207,6 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 			this.ruleEngine.removeRule(ruleId);
 		}
 		
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * it.polito.elite.dog.communication.rest.ruleengine.api.RuleEngineRESTApi
-	 * #setRulesXML()
-	 */
-	@Override
-	@POST
-	@Path("/set")
-	@Consumes({ MediaType.APPLICATION_XML })
-	public void setRulesXML(RuleList xmlRules)
-	{
-		// check not null
-		if (this.ruleEngine != null)
-		{
-			// add received rules
-			this.ruleEngine.setRules(xmlRules);
-		}
-		
-	}
-	
-	@Override
-	@GET
-	@Path("/rules/drl")
-	@Produces({ MediaType.TEXT_PLAIN })
-	public String getDRLRules()
-	{
-		// no rules at the beginning
-		String drlRules = "";
-		
-		// extract the rule from the rule engine in the DRL format
-		if (this.ruleEngine != null)
-			drlRules = this.ruleEngine.getDRLRules();
-		
-		//return existing rules
-		return drlRules;
-	}
-	
-	@Override
-	@GET
-	@Path("/rules/xml")
-	@Produces({ MediaType.APPLICATION_XML })
-	public String getXMLRules()
-	{
-		// no rules at the beginning
-		String drlRules = "";
-		
-		// extract the rule from the rule engine in the DRL format
-		if (this.ruleEngine != null)
-			drlRules = this.ruleEngine.getXMLRules();
-		
-		//return existing rules
-		return drlRules;
 	}
 	
 }

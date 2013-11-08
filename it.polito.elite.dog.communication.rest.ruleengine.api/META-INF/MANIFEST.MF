@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RuleEngineRESTEndpoint
 Bundle-SymbolicName: it.polito.elite.dog.communication.rest.ruleengine.api
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
 Import-Package: it.polito.elite.dog.addons.rules.api,
