@@ -66,9 +66,9 @@ public class Xml2DrlTranslator
 		
 		// add the needed imports
 		drlRules.append("import it.polito.elite.dog.addons.rules.RuleEngine;\n");
-		drlRules.append("import it.polito.elite.domotics.model.state.*;\n");
-		drlRules.append("import it.polito.elite.domotics.model.notification.*;\n");
-		drlRules.append("import it.polito.elite.domotics.dog2.doglibrary.corenotifications.*;\n");
+		drlRules.append("import it.polito.elite.dog.core.library.model.state.*;\n");
+		drlRules.append("import it.polito.elite.dog.core.library.model.notification.*;\n");
+		drlRules.append("import it.polito.elite.dog.core.library.model.notification.core.*;\n");
 		drlRules.append("import it.polito.elite.dog.addons.rules.util.TimeConversion;\n");
 		
 		// add a globall reference to the SynchroState service

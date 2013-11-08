@@ -923,6 +923,11 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 	}
 	
+	public void executeCommand(String toDevice, String commandName, Object[] params)
+	{
+		Executor.getInstance().execute(context, toDevice, commandName, params);
+	}
+	
 	// TODO Review!
 	// times are given in seconds...
 	public void scheduleCommand(String toDevice, String commandName, Object[] params, Long startTimeS, Long endTimeS,
