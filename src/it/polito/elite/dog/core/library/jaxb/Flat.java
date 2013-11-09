@@ -71,6 +71,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class Flat {
 
     protected String description;
+    @JsonProperty("rooms")
     @XmlElement(required = true)
     protected List<Room> room;
     @XmlAttribute(name = "id")

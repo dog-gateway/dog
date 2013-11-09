@@ -79,7 +79,7 @@ public class Room {
     @XmlElement(required = true)
     protected Floor floor;
     @XmlElement(required = true)
-    protected List<Wall> wall;
+    @JsonProperty("walls") protected List<Wall> wall;
     @XmlAttribute(name = "id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
