@@ -19,12 +19,16 @@ package it.polito.elite.dog.communication.rest.environment;
 
 import it.polito.elite.dog.communication.rest.environment.api.EnvironmentRESTApi;
 import it.polito.elite.dog.core.housemodel.api.EnvironmentModel;
+import it.polito.elite.dog.core.library.jaxb.Building;
 import it.polito.elite.dog.core.library.jaxb.BuildingEnvironment;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
+import it.polito.elite.dog.core.library.jaxb.Flat;
 import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
+import it.polito.elite.dog.core.library.jaxb.Room;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.StringWriter;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.Path;
@@ -157,16 +161,17 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		String environmentJSON = "";
 		
 		// get the JAXB object containing all the building information
-		DogHomeConfiguration dhc = this.getBuilding();
+		DogHomeConfiguration dhc = this.getBuildingFromModel();
 		
 		try
 		{
+			// create the response string in JSON format
 			environmentJSON = this.mapper.writeValueAsString(dhc.getBuildingEnvironment().get(0));
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON representing all the configured devices",
-					e);
+			this.logger.log(LogService.LOG_ERROR,
+					"Error in creating the JSON representing the entire building environment", e);
 		}
 		
 		return environmentJSON;
@@ -185,7 +190,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		String environmentXML = "";
 		
 		// get the JAXB object containing all the configured devices
-		DogHomeConfiguration dhc = this.getBuilding();
+		DogHomeConfiguration dhc = this.getBuildingFromModel();
 		
 		// create the XML for replying the request
 		environmentXML = this.generateXML(dhc);
@@ -205,18 +210,17 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	{
 		String flatsJSON = "";
 		
-		// get the JAXB object containing all the building information
-		DogHomeConfiguration dhc = this.getBuilding();
+		// get the JAXB object containing all the information about flats
+		Building building = this.getFlatsFromModel();
 		
 		try
 		{
-			flatsJSON = this.mapper.writeValueAsString(dhc.getBuildingEnvironment().get(0).getBuilding().get(0)
-					.getFlat());
+			// create the response string in JSON format
+			flatsJSON = this.mapper.writeValueAsString(building);
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON representing all the configured devices",
-					e);
+			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON representing all the flats", e);
 		}
 		
 		return flatsJSON;
@@ -232,8 +236,22 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void addNewFlat(String addedFlat)
 	{
-		// TODO Auto-generated method stub
-		
+		try
+		{
+			// create the JAXB object from the JSON representing the flat to add
+			Flat flat = this.mapper.readValue(addedFlat, Flat.class);
+			
+			if (this.environmentModel.get() != null)
+			{
+				// add the new flat to the model
+				this.environmentModel.get().addFlatToBuilding(flat);
+			}
+		}
+		catch (Exception e)
+		{
+			// exception
+			this.logger.log(LogService.LOG_ERROR, "Impossible to add a new flat", e);
+		}
 	}
 	
 	/*
@@ -246,8 +264,24 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public String getFlat(String flatId)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		String flatJSON = "";
+		
+		// get the JAXB object containing all the information about the desired
+		// flat
+		Flat flat = this.getFlatFromModel(flatId);
+		
+		try
+		{
+			// create the response string in JSON format
+			flatJSON = this.mapper.writeValueAsString(flat);
+		}
+		catch (Exception e)
+		{
+			this.logger
+					.log(LogService.LOG_ERROR, "Error in creating the JSON representing the flat named " + flatId, e);
+		}
+		
+		return flatJSON;
 	}
 	
 	/*
@@ -260,8 +294,42 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void updateFlat(String flatId, String propertiesToUpdate)
 	{
-		// TODO Auto-generated method stub
+		// get the flat whose properties are to update
+		Flat flat = this.getFlatFromModel(flatId);
 		
+		if (flat != null)
+		{
+			try
+			{
+				// create the JAXB object from the JSON representing the flat
+				// properties to update
+				Flat partialFlat = this.mapper.readValue(propertiesToUpdate, Flat.class);
+				
+				// only the description can be updated in a flat...
+				// ... get it!
+				if (partialFlat.getDescription() != null)
+				{
+					flat.setDescription(partialFlat.getDescription());
+				}
+				
+				// put the new properties in the existing flat
+				if (this.environmentModel.get() != null)
+				{
+					// update the model with the new flat
+					this.environmentModel.get().updateBuildingConfiguration(flat);
+				}
+			}
+			catch (Exception e)
+			{
+				// exception
+				this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId, e);
+			}
+		}
+		else
+		{
+			this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId
+					+ " since it does not exists!");
+		}
 	}
 	
 	/*
@@ -274,8 +342,30 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public String getRoomsInFlat(String flatId)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		String roomsJSON = "";
+		
+		// get the JAXB object containing all the information about the desired
+		// flat
+		Flat flat = this.getFlatFromModel(flatId);
+		
+		// remove everything but the room list from the retrieved flat
+		flat.setClazz(null);
+		flat.setDescription(null);
+		flat.setId(null);
+		flat.setSvgfootprint(null);
+		
+		try
+		{
+			// create the response string in JSON format
+			roomsJSON = this.mapper.writeValueAsString(flat);
+		}
+		catch (Exception e)
+		{
+			this.logger.log(LogService.LOG_ERROR,
+					"Error in creating the JSON representing the rooms present in the flat named " + flatId, e);
+		}
+		
+		return roomsJSON;
 	}
 	
 	/*
@@ -288,8 +378,22 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void addNewRoomInFlat(String flatId, String addedRoom)
 	{
-		// TODO Auto-generated method stub
-		
+		try
+		{
+			// create the JAXB object from the JSON representing the room to add
+			Room room = this.mapper.readValue(addedRoom, Room.class);
+			
+			if (this.environmentModel.get() != null)
+			{
+				// add the new flat to the model
+				this.environmentModel.get().addRoomToBuilding(room, flatId);
+			}
+		}
+		catch (Exception e)
+		{
+			// exception
+			this.logger.log(LogService.LOG_ERROR, "Impossible to add a new room to the flat named " + flatId, e);
+		}
 	}
 	
 	/*
@@ -302,8 +406,24 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public String getSingleRoomInFlat(String flatId, String roomId)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		String roomsJSON = "";
+		
+		// get the JAXB object containing all the information about the desired
+		// room
+		Room room = this.getRoomFromModel(flatId, roomId);
+		
+		try
+		{
+			// create the response string in JSON format
+			roomsJSON = this.mapper.writeValueAsString(room);
+		}
+		catch (Exception e)
+		{
+			this.logger
+					.log(LogService.LOG_ERROR, "Error in creating the JSON representing the room named " + roomId, e);
+		}
+		
+		return roomsJSON;
 	}
 	
 	/*
@@ -316,7 +436,42 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void updateRoomInFlat(String flatId, String roomId, String propertiesToUpdate)
 	{
-		// TODO Auto-generated method stub
+		// get the room whose properties are to update
+		Room room = this.getRoomFromModel(flatId, roomId);
+		
+		if (room != null)
+		{
+			try
+			{
+				// create the JAXB object from the JSON representing the room
+				// properties to update
+				Room partialRoom = this.mapper.readValue(propertiesToUpdate, Room.class);
+				
+				// only the description can be updated in a room...
+				// ... get it!
+				if (partialRoom.getDescription() != null)
+				{
+					room.setDescription(partialRoom.getDescription());
+				}
+				
+				// put the new properties in the existing room
+				if (this.environmentModel.get() != null)
+				{
+					// update the model with the new room
+					this.environmentModel.get().updateBuildingConfiguration(room, flatId);
+				}
+			}
+			catch (Exception e)
+			{
+				// exception
+				this.logger.log(LogService.LOG_ERROR, "Impossible to update the room named " + roomId, e);
+			}
+		}
+		else
+		{
+			this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId
+					+ " since it does not exists!");
+		}
 		
 	}
 	
@@ -327,13 +482,13 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	 * @return a {@link DogHomeConfiguration} object with all the building
 	 *         information
 	 */
-	private DogHomeConfiguration getBuilding()
+	private DogHomeConfiguration getBuildingFromModel()
 	{
 		// create a JAXB Object Factory for adding the proper header...
 		ObjectFactory factory = new ObjectFactory();
 		DogHomeConfiguration dhc = factory.createDogHomeConfiguration();
 		
-		// check if the HouseModel service is available
+		// check if the EnvironmentModel service is available
 		if (this.environmentModel.get() != null)
 		{
 			// get all the building environment from the HouseModel
@@ -343,6 +498,105 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		}
 		
 		return dhc;
+	}
+	
+	/**
+	 * Get all the flats present in the first building of the configuration
+	 * 
+	 * @return a {@Building} JAXB object containing only its flats
+	 */
+	private Building getFlatsFromModel()
+	{
+		// create a JAXB Object Factory for adding the proper header...
+		ObjectFactory factory = new ObjectFactory();
+		Building building = factory.createBuilding();
+		
+		// check if the EnvironmentModel service is available
+		if (this.environmentModel.get() != null)
+		{
+			// get all the flats for the first building
+			List<Flat> flats = this.environmentModel.get().getJAXBBuildingEnvironment().get(0).getBuilding().get(0)
+					.getFlat();
+			
+			// build the flats container
+			building.getFlat().addAll(flats);
+		}
+		
+		return building;
+	}
+	
+	/**
+	 * Get a desired flat from the {@link EnvironmentModel}.
+	 * 
+	 * @param flatId
+	 *            the unique flat identifier
+	 * @return a {@Flat} JAXB object representing the desired flat
+	 */
+	private Flat getFlatFromModel(String flatId)
+	{
+		// init
+		Flat flat = null;
+		
+		// check if the EnvironmentModel service is available
+		if (this.environmentModel.get() != null)
+		{
+			// get all the flats for the first building
+			List<Flat> flats = this.environmentModel.get().getJAXBBuildingEnvironment().get(0).getBuilding().get(0)
+					.getFlat();
+			
+			// look for the desired flat
+			for (Flat singleFlat : flats)
+			{
+				if (singleFlat.getId().equals(flatId))
+				{
+					// found: store the flat
+					flat = singleFlat;
+				}
+			}
+		}
+		
+		return flat;
+	}
+	
+	/**
+	 * Get a desired room in a given flat from the {@link EnvironmentModel}.
+	 * 
+	 * @param flatId
+	 *            the given flat unique identifier
+	 * @param roomId
+	 *            the desired room unique identifier
+	 * @return a {@Room} JAXB object representing the requested room info
+	 */
+	private Room getRoomFromModel(String flatId, String roomId)
+	{
+		// init
+		Room room = null;
+		
+		// check if the EnvironmentModel service is available
+		if (this.environmentModel.get() != null)
+		{
+			// get all the flats for the first building
+			List<Flat> flats = this.environmentModel.get().getJAXBBuildingEnvironment().get(0).getBuilding().get(0)
+					.getFlat();
+			
+			// look for the desired room in the given flat
+			for (Flat singleFlat : flats)
+			{
+				if (singleFlat.getId().equals(flatId))
+				{
+					for (Room singleRoom : singleFlat.getRoom())
+					{
+						if (singleRoom.getId().equals(roomId))
+						{
+							// found: store the room
+							room = singleRoom;
+						}
+					}
+				}
+			}
+		}
+		
+		return room;
 	}
 	
 	/**
