@@ -75,7 +75,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class Building {
 
     protected List<Storey> storey;
-    protected List<Flat> flat;
+    @JsonProperty("flats") protected List<Flat> flat;
     protected List<Garden> garden;
     protected List<Garage> garage;
     @XmlAttribute(name = "id")
