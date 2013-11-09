@@ -25,18 +25,18 @@ import it.polito.elite.dog.core.library.jaxb.Storey;
 import java.util.List;
 
 /**
- * The API for providing the EnvironmentModel service, i.e., the configuration of the
- * environment and its update.
+ * The API for providing the EnvironmentModel service, i.e., the configuration
+ * of the environment and its update.
  * 
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public interface EnvironmentModel
-{	
+{
 	/**
-	 * Get the JAXB representation of the building environment (flats, rooms,
-	 * etc.)
+	 * Get a copy of the JAXB representation of the building environment (flats,
+	 * rooms, etc.)
 	 * 
 	 * @return a {@link List} of {@link BuildingEnvironment}, i.e., all the
 	 *         building-related environments (flats, rooms, etc.)

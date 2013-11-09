@@ -108,8 +108,8 @@ public interface HouseModel
 	public DogHomeConfiguration getJAXBConfiguration();
 	
 	/**
-	 * Get the JAXB representation of the devices configured in the environment,
-	 * with their properties
+	 * Get a copy of the JAXB representation of the devices configured in the
+	 * environment, with their properties
 	 * 
 	 * @return a {@link List} of {@link Controllables}, i.e., all the configured
 	 *         devices

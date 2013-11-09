@@ -607,7 +607,22 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		
 		if ((this.xmlConfiguration != null) && (!this.xmlConfiguration.getBuildingEnvironment().isEmpty()))
 		{
-			building.addAll(this.xmlConfiguration.getBuildingEnvironment());
+			try
+			{
+				// deep copy
+				// TODO Implement as clone() for better performance (look for a
+				// plugin on the Internet... it exists!)
+				JAXBElement<DogHomeConfiguration> contentObj = new JAXBElement<DogHomeConfiguration>(new QName(
+						DogHomeConfiguration.class.getSimpleName()), DogHomeConfiguration.class, this.xmlConfiguration);
+				JAXBSource source = new JAXBSource(this.jaxbContext, contentObj);
+				// marshall the JAXBSource to obtain a deep copy
+				building.addAll((jaxbContext.createUnmarshaller().unmarshal(source, DogHomeConfiguration.class)
+						.getValue()).getBuildingEnvironment());
+			}
+			catch (JAXBException e)
+			{
+				this.logger.log(LogService.LOG_ERROR, "Exception in cloning the XML configuration", e);
+			}
 		}
 		
 		// return the building structures (flats, rooms, etc.) in their JAXB
