@@ -92,18 +92,17 @@ public interface EnvironmentRESTApi
 	public String getFlat(@PathParam("flat-id") String flatId);
 	
 	/**
-	 * Update some properties of the flat identified by the given flat-id.
+	 * Update the flat identified by the given flat-id.
 	 * 
 	 * @param flatId
 	 *            the unique identifier of an existing flat
-	 * @param propertiesToUpdate
-	 *            the properties to update in JSON format (i.e., the flat
-	 *            description)
+	 * @param updatedFlat
+	 *            the updated flat in JSON format
 	 */
 	@PUT
 	@Path("/flats/{flat-id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void updateFlat(@PathParam("flat-id") String flatId, String propertiesToUpdate);
+	public void updateFlat(@PathParam("flat-id") String flatId, String updatedFlat);
 	
 	/**
 	 * List all the rooms present in the flat identified by the given flat-id.
@@ -147,20 +146,19 @@ public interface EnvironmentRESTApi
 	public String getSingleRoomInFlat(@PathParam("flat-id") String flatId, @PathParam("room-id") String roomId);
 	
 	/**
-	 * Update some properties of the room identified by the given room-id and
-	 * located in the given flat.
+	 * Update the room identified by the given room-id and located in the given
+	 * flat.
 	 * 
 	 * @param flatId
 	 *            the unique identifier of an existing flat
 	 * @param roomId
 	 *            the unique identifier of an existing room
-	 * @param propertiesToUpdate
-	 *            the properties to update in JSON format (i.e., the room
-	 *            description)
+	 * @param updatedRoom
+	 *            the updated room in JSON format
 	 */
 	@PUT
 	@Path("/flats/{flat-id}/rooms/{room-id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void updateRoomInFlat(@PathParam("flat-id") String flatId, @PathParam("room-id") String roomId,
-			String propertiesToUpdate);
+			String updatedRoom);
 }

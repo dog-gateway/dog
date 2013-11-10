@@ -292,43 +292,37 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	 * #updateFlat(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void updateFlat(String flatId, String propertiesToUpdate)
+	public void updateFlat(String flatId, String updatedFlat)
 	{
-		// get the flat whose properties are to update
+		// check if the flat exists
 		Flat flat = this.getFlatFromModel(flatId);
 		
-		if (flat != null)
+		try
 		{
-			try
+			// create the JAXB object from the JSON representing the flat
+			// to update
+			Flat flatToUpdate = this.mapper.readValue(updatedFlat, Flat.class);
+			
+			// check if the updated flat is the one declared
+			if ((flat != null) && (flatToUpdate.getId().equals(flatId)))
 			{
-				// create the JAXB object from the JSON representing the flat
-				// properties to update
-				Flat partialFlat = this.mapper.readValue(propertiesToUpdate, Flat.class);
-				
-				// only the description can be updated in a flat...
-				// ... get it!
-				if (partialFlat.getDescription() != null)
-				{
-					flat.setDescription(partialFlat.getDescription());
-				}
-				
 				// put the new properties in the existing flat
 				if (this.environmentModel.get() != null)
 				{
 					// update the model with the new flat
-					this.environmentModel.get().updateBuildingConfiguration(flat);
+					this.environmentModel.get().updateBuildingConfiguration(flatToUpdate);
 				}
 			}
-			catch (Exception e)
+			else
 			{
-				// exception
-				this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId, e);
+				this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId
+						+ " since it does not exists!");
 			}
 		}
-		else
+		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId
-					+ " since it does not exists!");
+			// exception
+			this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId, e);
 		}
 	}
 	
@@ -434,45 +428,37 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	 * #updateRoomInFlat(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void updateRoomInFlat(String flatId, String roomId, String propertiesToUpdate)
+	public void updateRoomInFlat(String flatId, String roomId, String updatedRoom)
 	{
-		// get the room whose properties are to update
+		// get the room to check if it exists
 		Room room = this.getRoomFromModel(flatId, roomId);
 		
-		if (room != null)
+		try
 		{
-			try
+			// create the JAXB object from the JSON representing the room
+			// to update
+			Room roomToUpdate = this.mapper.readValue(updatedRoom, Room.class);
+			
+			// check if the update is possible
+			if ((room != null) && (roomToUpdate.getId().equals(roomId)))
 			{
-				// create the JAXB object from the JSON representing the room
-				// properties to update
-				Room partialRoom = this.mapper.readValue(propertiesToUpdate, Room.class);
-				
-				// only the description can be updated in a room...
-				// ... get it!
-				if (partialRoom.getDescription() != null)
-				{
-					room.setDescription(partialRoom.getDescription());
-				}
-				
-				// put the new properties in the existing room
 				if (this.environmentModel.get() != null)
 				{
 					// update the model with the new room
-					this.environmentModel.get().updateBuildingConfiguration(room, flatId);
+					this.environmentModel.get().updateBuildingConfiguration(roomToUpdate, flatId);
 				}
 			}
-			catch (Exception e)
+			else
 			{
-				// exception
-				this.logger.log(LogService.LOG_ERROR, "Impossible to update the room named " + roomId, e);
+				this.logger.log(LogService.LOG_ERROR, "Impossible to update the room named " + roomId
+						+ " since it does not exists!");
 			}
 		}
-		else
+		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId
-					+ " since it does not exists!");
+			// exception
+			this.logger.log(LogService.LOG_ERROR, "Impossible to update the room named " + roomId, e);
 		}
-		
 	}
 	
 	/**
