@@ -972,7 +972,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		
 		for (Flat flat : this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getFlat())
 		{
-			if (flat.equals(flatURI) && (!found))
+			if (flat.getId().equals(flatURI) && (!found))
 			{
 				flatToRemove = flat;
 				found = true;
@@ -986,7 +986,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			{
 				for (Flat flat : storey.getFlat())
 				{
-					if (flat.equals(flatURI) && (!found))
+					if (flat.getId().equals(flatURI) && (!found))
 					{
 						flatToRemove = flat;
 						found = true;
@@ -1029,7 +1029,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		
 		for (Storey storey : this.xmlConfiguration.getBuildingEnvironment().get(0).getBuilding().get(0).getStorey())
 		{
-			if (storey.equals(storeyURI) && (!found))
+			if (storey.getId().equals(storeyURI) && (!found))
 			{
 				storeyToRemove = storey;
 				found = true;
