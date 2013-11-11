@@ -90,24 +90,35 @@ public interface DeviceRESTApi
 	public String getDeviceInXml(@PathParam("device-id") String deviceId);
 	
 	/**
-	 * Represents a single domotic device handled by Dog, identified by a unique
-	 * device-id, and "controllable" by applications using this API.
+	 * Update the location of a single domotic device handled by Dog, identified by a unique
+	 * device-id.
 	 * 
 	 * @param deviceId
 	 *            the device unique identifier
-	 * @return the XML representation of the required device
 	 */
 	@PUT
-	@Path("/{device-id}")
+	@Path("/{device-id}/location")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void updateDevice(@PathParam("device-id") String deviceId, String propertiesToUpdate);
+	public void updateDeviceLocation(@PathParam("device-id") String deviceId, String location);
+	
+	/**
+	 * Update the description (i.e., the long name) of a single domotic device handled by Dog, identified by a unique
+	 * device-id.
+	 * 
+	 * @param deviceId
+	 *            the device unique identifier
+	 */
+	@PUT
+	@Path("/{device-id}/description")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void updateDeviceDescription(@PathParam("device-id") String deviceId, String description);
 	
 	/**
 	 * Represents the status of the device identified by the given device-id and
 	 * registered in the Dog gateway runtime, i.e., defined in the Dog
 	 * configuration and successfully registered within the gateway runtime.
 	 * 
-	 * @return The JSON description of the current device status
+	 * @return the JSON description of the current device status
 	 */
 	@GET
 	@Path("/{device-id}/status")

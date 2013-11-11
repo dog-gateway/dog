@@ -319,17 +319,20 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// get the requested device configuration, in JAXB
 		DogHomeConfiguration dhc = this.getDevice(deviceId);
 		
-		// get the JAXB representation of the desired device
-		Device requestedDevice = dhc.getControllables().get(0).getDevice().get(0);
-		
-		try
+		if (dhc.getControllables().get(0).getDevice() != null)
 		{
-			deviceJSON = this.mapper.writeValueAsString(requestedDevice);
-		}
-		catch (Exception e)
-		{
-			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON representing all the configured devices",
-					e);
+			// get the JAXB representation of the desired device
+			Device requestedDevice = dhc.getControllables().get(0).getDevice().get(0);
+			
+			try
+			{
+				deviceJSON = this.mapper.writeValueAsString(requestedDevice);
+			}
+			catch (Exception e)
+			{
+				this.logger.log(LogService.LOG_ERROR,
+						"Error in creating the JSON representing all the configured devices", e);
+			}
 		}
 		
 		return deviceJSON;
@@ -402,14 +405,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#updateDevice
-	 * (java.lang.String)
+	 * @see it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#
+	 * updateDeviceLocation(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void updateDevice(String deviceId, String propertiesToUpdate)
+	public void updateDeviceLocation(String deviceId, String location)
 	{
-		if (propertiesToUpdate != null && !propertiesToUpdate.isEmpty())
+		if (location != null && !location.isEmpty())
 		{
 			// create filter for getting the desired device
 			String deviceFilter = String.format("(&(%s=*)(%s=%s))", Constants.DEVICE_CATEGORY,
@@ -418,8 +420,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			try
 			{
 				// try to read the value from the JSON
-				DeviceUpdatePayload deviceUpdatedPayload = this.mapper.readValue(propertiesToUpdate,
-						DeviceUpdatePayload.class);
+				Device deviceLocation = this.mapper.readValue(location, Device.class);
 				
 				// get the device service references
 				ServiceReference<?>[] deviceService = this.context.getAllServiceReferences(
@@ -440,35 +441,98 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						// get the associated device descriptor
 						DeviceDescriptor currentDeviceDescr = currentDevice.getDeviceDescriptor();
 						
-						// update the device properties, if available
-						if ((deviceUpdatedPayload.getIsIn() != null) && (!deviceUpdatedPayload.getIsIn().isEmpty()))
+						// update the device location, if available
+						if ((deviceLocation.getIsIn() != null) && (!deviceLocation.getIsIn().isEmpty()))
 						{
-							currentDeviceDescr.setLocation(deviceUpdatedPayload.getIsIn());
-						}
-						if ((deviceUpdatedPayload.getDescription() != null)
-								&& (!deviceUpdatedPayload.getDescription().isEmpty()))
-						{
-							currentDeviceDescr.setDescription(deviceUpdatedPayload.getDescription());
-						}
-						
-						// check if the DeviceFactory service is available
-						if (this.deviceFactory.get() != null)
-						{
-							// update the device configuration
-							this.deviceFactory.get().updateDevice(currentDeviceDescr);
-						}
-						else
-						{
-							this.logger
-									.log(LogService.LOG_WARNING,
-											"Impossible to update the device information: the Device Factory is not available!");
+							currentDeviceDescr.setLocation(deviceLocation.getIsIn());
+							
+							// check if the DeviceFactory service is available
+							if (this.deviceFactory.get() != null)
+							{
+								// update the device configuration
+								this.deviceFactory.get().updateDevice(currentDeviceDescr);
+							}
+							else
+							{
+								this.logger
+										.log(LogService.LOG_WARNING,
+												"Impossible to update the device location: the Device Factory is not available!");
+							}
 						}
 					}
 				}
 			}
 			catch (Exception e)
 			{
-				this.logger.log(LogService.LOG_ERROR, "Error in updating the information of device " + deviceId, e);
+				this.logger.log(LogService.LOG_ERROR, "Error in updating the location of device " + deviceId, e);
+			}
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#
+	 * updateDeviceDescription(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void updateDeviceDescription(String deviceId, String description)
+	{
+		if (description != null && !description.isEmpty())
+		{
+			// create filter for getting the desired device
+			String deviceFilter = String.format("(&(%s=*)(%s=%s))", Constants.DEVICE_CATEGORY,
+					DeviceCostants.DEVICEURI, deviceId);
+			
+			try
+			{
+				// try to read the value from the JSON
+				Device deviceDescription = this.mapper.readValue(description, Device.class);
+				
+				// get the device service references
+				ServiceReference<?>[] deviceService = this.context.getAllServiceReferences(
+						org.osgi.service.device.Device.class.getName(), deviceFilter);
+				
+				// only one device with the given deviceId can exists in the
+				// framework...
+				if (deviceService != null && deviceService.length == 1)
+				{
+					// get the OSGi service pointed by the current device
+					// reference
+					Object device = this.context.getService(deviceService[0]);
+					
+					if ((device != null) && (device instanceof ControllableDevice))
+					{
+						// get the device instance
+						ControllableDevice currentDevice = (ControllableDevice) device;
+						// get the associated device descriptor
+						DeviceDescriptor currentDeviceDescr = currentDevice.getDeviceDescriptor();
+						
+						// update the device description, if available
+						if ((deviceDescription.getDescription() != null)
+								&& (!deviceDescription.getDescription().isEmpty()))
+						{
+							currentDeviceDescr.setDescription(deviceDescription.getDescription());
+							
+							// check if the DeviceFactory service is available
+							if (this.deviceFactory.get() != null)
+							{
+								// update the device configuration
+								this.deviceFactory.get().updateDevice(currentDeviceDescr);
+							}
+							else
+							{
+								this.logger
+										.log(LogService.LOG_WARNING,
+												"Impossible to update the device description: the Device Factory is not available!");
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				this.logger.log(LogService.LOG_ERROR, "Error in updating the description of device " + deviceId, e);
 			}
 		}
 	}
