@@ -366,13 +366,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 
 		if (drv != null)
 		{
-			// removes the register from the corresponding set
-			Set<ZWaveNodeInfo> driverNodeInfo = this.driver2NodeInfo.get(drv);
-			driverNodeInfo.remove(nodeInfo);
-
-			// if after removal the set is empty, removes the reverse map entry
-			if (driverNodeInfo.isEmpty())
-				driver2NodeInfo.remove(drv);
+			driver2NodeInfo.remove(drv);
 		}
 	}
 
@@ -473,6 +467,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	 * 
 	 * @return
 	 */
+	@Override
 	public long getPollingTimeMillis()
 	{
 		return pollingTimeMillis;
@@ -530,4 +525,6 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 
 		return deviceId;
 	}
+	
+	
 }

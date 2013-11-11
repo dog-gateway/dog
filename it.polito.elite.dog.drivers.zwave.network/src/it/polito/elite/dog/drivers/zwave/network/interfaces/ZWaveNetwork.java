@@ -111,9 +111,10 @@ public interface ZWaveNetwork
 	 *            the unique identifier.
 	 */
 	void removeDriver(ZWaveNodeInfo nodeInfo);
-	
+
 	/**
 	 * removes a specific device/driver association
+	 * 
 	 * @param nodeId
 	 */
 	public void removeDriver(int nodeId);
@@ -152,4 +153,12 @@ public interface ZWaveNetwork
 	 *         neither active nor attached.
 	 */
 	public String getControllableDeviceURIFromNodeId(int nodeId);
+
+	/**
+	 * Returns the network-level polling time (base time upon which all
+	 * device-specific polling times are based).
+	 * 
+	 * @return
+	 */
+	public long getPollingTimeMillis();
 }

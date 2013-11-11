@@ -394,7 +394,20 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 					.toString();
 
 			// build the 4th id (number of instances)
-			int numberOfInstances = device.getInstances().size();
+			try
+			{
+				Thread.sleep(this.network.getPollingTimeMillis());
+			}
+			catch (InterruptedException e1)
+			{
+				this.logger
+						.log(LogService.LOG_WARNING,
+								"Instance wait time was less than necessary due to interrupted thread, device instantiation might not be accurate.",
+								e1);
+			}
+
+			int numberOfInstances = network.getRawDevice(nodeId).getInstances()
+					.size();
 
 			// build the device unique id
 			String extendedDeviceUniqueId = manufacturerId + "-"
@@ -406,13 +419,14 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 					+ manufacturerProductType + "-" + manufacturerProductId;
 
 			// get the device class
-			String deviceClass = this.supportedDevices.get(extendedDeviceUniqueId);
-			
-			//check if not extended
-			if(deviceClass == null)
-				this.supportedDevices.get(deviceUniqueId);
+			String deviceClass = this.supportedDevices
+					.get(extendedDeviceUniqueId);
 
-			//normal workflow...
+			// check if not extended
+			if (deviceClass == null)
+				deviceClass = this.supportedDevices.get(deviceUniqueId);
+
+			// normal workflow...
 			if ((deviceClass != null) && (!deviceClass.isEmpty()))
 			{
 				// create a descriptor definition map
