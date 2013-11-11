@@ -32,6 +32,7 @@ import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -199,7 +200,14 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			if (type.equals(DeviceCostants.DEVICES))
 			{
 				// store the configuration path
-				this.configurationPath = System.getProperty("configFolder") + "/" + xmlFilename;
+				this.configurationPath = xmlFilename;
+			
+				// check absolute vs relative
+				File xmlFile = new File(
+						this.configurationPath);
+				if (!xmlFile.isAbsolute())
+					this.configurationPath = System.getProperty("configFolder")
+							+ "/" + this.configurationPath;		
 				
 				// unmarshall
 				this.xmlConfiguration = (DogHomeConfiguration) ((JAXBElement<DogHomeConfiguration>) unmarshaller
