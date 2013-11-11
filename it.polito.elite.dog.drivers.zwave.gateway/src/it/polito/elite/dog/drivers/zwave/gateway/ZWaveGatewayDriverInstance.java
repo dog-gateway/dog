@@ -279,45 +279,49 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		}
 
 		/*-------------- HANDLE STATE ----------------------------*/
-		int controllerState = this.controller.getData().getControllerState();
+		if (this.currentState != null)
+		{
+			int controllerState = this.controller.getData()
+					.getControllerState();
 
-		// handle controller states
-		switch (controllerState)
-		{
-		case 0: // idle
-		{
-			State currentAssociationState = this.currentState
-					.getState(DeviceAssociationState.class.getSimpleName());
-			if ((currentAssociationState != null)
-					&& (currentAssociationState.getCurrentStateValue()[0]
-							.getClass().getName()
-							.equals(AssociatingStateValue.class.getName())))
+			// handle controller states
+			switch (controllerState)
 			{
-				// enable dynamic device detection
-				this.detectionEnabled = true;
+			case 0: // idle
+			{
+				State currentAssociationState = this.currentState
+						.getState(DeviceAssociationState.class.getSimpleName());
+				if ((currentAssociationState != null)
+						&& (currentAssociationState.getCurrentStateValue()[0]
+								.getClass().getName()
+								.equals(AssociatingStateValue.class.getName())))
+				{
+					// enable dynamic device detection
+					this.detectionEnabled = true;
+				}
+
+				this.notifyStateChanged(new DeviceAssociationState(
+						new IdleStateValue()));
+				break;
 			}
+			case 1: // associating
+			{
+				this.notifyStateChanged(new DeviceAssociationState(
+						new AssociatingStateValue()));
 
-			this.notifyStateChanged(new DeviceAssociationState(
-					new IdleStateValue()));
-			break;
-		}
-		case 1: // associating
-		{
-			this.notifyStateChanged(new DeviceAssociationState(
-					new AssociatingStateValue()));
-
-			break;
-		}
-		case 5: // disassociating
-		{
-			this.notifyStateChanged(new DeviceAssociationState(
-					new DisassociatingStateValue()));
-			break;
-		}
-		default:
-		{
-			break;
-		}
+				break;
+			}
+			case 5: // disassociating
+			{
+				this.notifyStateChanged(new DeviceAssociationState(
+						new DisassociatingStateValue()));
+				break;
+			}
+			default:
+			{
+				break;
+			}
+			}
 		}
 	}
 
