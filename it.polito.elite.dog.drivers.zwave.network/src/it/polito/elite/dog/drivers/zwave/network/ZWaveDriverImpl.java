@@ -359,7 +359,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	 * ZWaveNodeInfo)
 	 */
 	@Override
-	public void removeDriver(ZWaveNodeInfo nodeInfo)
+	public void removeDriver(ZWaveNodeInfo nodeInfo) 
 	{
 		// removes a given register-driver association
 		ZWaveDriver drv = nodeInfo2Driver.remove(nodeInfo);
