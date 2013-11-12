@@ -129,8 +129,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 			if (conManager.testConnection())
 			{
 				bValidConfig = true;
-			}
-			else
+			} else
 				sError = conManager.getLastError();
 
 			// If not valid configuration: log the error and throw exception
@@ -230,43 +229,34 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 				{
 					for (Integer instanceId : nodeInfo.getInstanceSet())
 					{
-						if (device.getInstances() != null)
-						{
-							instanceNode = device.getInstances()
-									.get(instanceId);
+						instanceNode = device.getInstances().get(instanceId);
 
-							// instance can be null if house xml configuration
-							// is
-							// wrong
-							if (instanceNode != null)
-							{
-								ZWaveDriver driver = nodeInfo2Driver
-										.get(nodeInfo);
-								driver.newMessageFromHouse(deviceNode,
-										instanceNode, controllerNode, null);
-							}
-							else
-							{
-								logger.log(
-										LogService.LOG_ERROR,
-										LOG_ID + "Device id: "
-												+ nodeInfo.getDeviceNodeId()
-												+ " instance id: " + instanceId
-												+ " does not exists!");
-							}
+						// instance can be null if house xml configuration is
+						// wrong
+						if (instanceNode != null)
+						{
+							ZWaveDriver driver = nodeInfo2Driver.get(nodeInfo);
+							driver.newMessageFromHouse(deviceNode,
+									instanceNode, controllerNode, null);
+						} else
+						{
+							logger.log(
+									LogService.LOG_ERROR,
+									LOG_ID + "Device id: "
+											+ nodeInfo.getDeviceNodeId()
+											+ " instance id: " + instanceId
+											+ " does not exists!");
 						}
 					}
-				}
-				else
+				} else
 				{
 					logger.log(LogService.LOG_ERROR, LOG_ID + "Device id: "
 							+ nodeInfo.getDeviceNodeId() + " does not exists!");
 				}
-			}
-			catch (Exception e)
+			} catch (Exception e)
 			{
 				logger.log(LogService.LOG_ERROR, LOG_ID, e);
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 	}
@@ -289,8 +279,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 						read(nodeInfo, false);
 					}
 				}
-			}
-			catch (Exception e)
+			} catch (Exception e)
 			{
 				logger.log(LogService.LOG_ERROR, LOG_ID, e);
 
@@ -312,8 +301,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 							+ nodeInfo.getDeviceNodeId() + "].instances["
 							+ instanceCC.getKey() + "].commandClasses["
 							+ ccToTrigger + "].Get()");
-				}
-				catch (ConfigurationException e)
+				} catch (ConfigurationException e)
 				{
 					logger.log(LogService.LOG_ERROR, LOG_ID
 							+ "Can't send command", e);
@@ -385,9 +373,6 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	@Override
 	public void removeDriver(int nodeId)
 	{
-
-		this.poller.removeDeviceFromQueue(nodeId);
-
 		ZWaveNodeInfo infoToRemove = null;
 		// look for nodeinfos
 		for (ZWaveNodeInfo info : this.nodeInfo2Driver.keySet())
@@ -403,8 +388,10 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 
 		if (infoToRemove != null)
 		{
+			this.poller.removeDeviceFromQueue(infoToRemove);
 			this.removeDriver(infoToRemove);
 		}
+			
 
 	}
 
@@ -442,8 +429,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 			conManager.sendCommand("devices[" + deviceId + "].instances["
 					+ instanceId + "].commandClasses[" + nCommandClass
 					+ "].Set(" + commandValue + ")");
-		}
-		catch (ConfigurationException e)
+		} catch (ConfigurationException e)
 		{
 			logger.log(LogService.LOG_ERROR, LOG_ID + "Can't send command", e);
 
@@ -457,8 +443,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 		try
 		{
 			conManager.sendCommand(sCommand + "(" + commandValue + ")");
-		}
-		catch (ConfigurationException e)
+		} catch (ConfigurationException e)
 		{
 			logger.log(LogService.LOG_ERROR, LOG_ID + "Can't send command", e);
 
@@ -540,5 +525,6 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 
 		return deviceId;
 	}
-
+	
+	
 }
