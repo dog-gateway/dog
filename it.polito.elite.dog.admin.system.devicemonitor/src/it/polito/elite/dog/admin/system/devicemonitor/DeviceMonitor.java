@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.device.Constants;
 import org.osgi.service.device.Device;
 import org.osgi.service.log.LogService;
 
@@ -169,8 +170,8 @@ public class DeviceMonitor implements DeviceMonitorInterface
 							if (active.equals("true"))
 							{
 								htmlOut.append("<span class=\"label label-success pull-right\">Active</span></p>");
-								htmlOut.append("<ul style=\"list-style-type: none\"><li>"
-										+ this.getDeviceState(currentDevice)
+								htmlOut.append("<ul style=\"list-style-type: none\"><li data-load=\"ajax\" data-src=\"/admin/system/devicemonitor/devices/"+currentDevice.getDeviceId()+"/state\" data-refresh=\"1000\">"
+										+ this.getDeviceState(currentDevice.getDeviceId())
 										+ "</li><li>"
 										+ this.getCommands(currentDevice)
 										+ "</li></ul>");
@@ -264,38 +265,63 @@ public class DeviceMonitor implements DeviceMonitorInterface
 		return htmlOut.toString();
 	}
 
-	private String getDeviceState(ControllableDevice currentDevice)
+	@Override
+	public String getDeviceState(String deviceId)
 	{
 		StringBuffer stateAsString = new StringBuffer();
-		DeviceStatus state = ((Controllable) currentDevice).getState();
+		// create filter for getting the desired device
+		String deviceFilter = String.format("(&(%s=*)(%s=%s))",
+				Constants.DEVICE_CATEGORY, DeviceCostants.DEVICEURI, deviceId);
 
-		// check not null
-		if (state != null)
+		try
 		{
-			Map<String, State> allStates = state.getStates();
-
-			// iterate over all states
-			for (String stateKey : allStates.keySet())
+			// get the device service references
+			ServiceReference<?>[] deviceService = this.context
+					.getAllServiceReferences(
+							org.osgi.service.device.Device.class.getName(),
+							deviceFilter);
+			if (deviceService != null)
 			{
-				// get the current state
-				State currentState = allStates.get(stateKey);
 
-				// get the values associate to the current state
-				StateValue currentStateValues[] = currentState
-						.getCurrentStateValue();
+				Object device = this.context.getService(deviceService[0]);
+				DeviceStatus state = ((Controllable) device).getState();
 
-				// iterate over the values
-				stateAsString.append("<p>" + currentState.getStateName() + " ");
-				for (int i = 0; i < currentStateValues.length; i++)
+				// check not null
+				if (state != null)
 				{
-					stateAsString
-							.append("<span class=\"label label-info pull-right\">"
-									+ currentStateValues[i].getValue()
-									+ "</span>");
+					Map<String, State> allStates = state.getStates();
+
+					// iterate over all states
+					for (String stateKey : allStates.keySet())
+					{
+						// get the current state
+						State currentState = allStates.get(stateKey);
+
+						// get the values associate to the current state
+						StateValue currentStateValues[] = currentState
+								.getCurrentStateValue();
+
+						// iterate over the values
+						stateAsString.append("<p>"
+								+ currentState.getStateName() + " ");
+						for (int i = 0; i < currentStateValues.length; i++)
+						{
+							stateAsString
+									.append("<span class=\"label label-info pull-right\">"
+											+ currentStateValues[i].getValue()
+											+ "</span>");
+						}
+						stateAsString.append("<p/>");
+					}
 				}
-				stateAsString.append("<p/>");
 			}
+		} catch (Exception e)
+		{
+			this.logger.log(LogService.LOG_ERROR,
+					"Error while composing the response for the status of "
+							+ deviceId, e);
 		}
+
 		return stateAsString.toString();
 	}
 
@@ -311,7 +337,8 @@ public class DeviceMonitor implements DeviceMonitorInterface
 		{
 			String commandName = availableCommands[i].getName();
 
-			if ((!commandName.contains("get"))&&(!commandName.contains("notify")))
+			if ((!commandName.contains("get"))
+					&& (!commandName.contains("notify")))
 			{
 				if (availableCommands[i].getParameterTypes().length == 0)
 				{
@@ -320,7 +347,10 @@ public class DeviceMonitor implements DeviceMonitorInterface
 							.append("<input type=\"button\" class=\"btn\" command=\"true\" command-dst=\"/api/devices/"
 									+ device.getDeviceId()
 									+ "/commands/"
-									+ commandName +"\" value=\""+commandName+"\"/>");
+									+ commandName
+									+ "\" value=\""
+									+ commandName
+									+ "\"/>");
 				}
 			}
 		}
