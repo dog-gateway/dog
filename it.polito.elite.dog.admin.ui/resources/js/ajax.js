@@ -31,7 +31,9 @@ function loadAjaxContent(rootElement) {
 
 // the actualt content loading function
 function loadContent(element, uri) {
-	jQuery(element).load(uri);
+	$("div.active").find(jQuery(element)).each(function(index) {
+		jQuery(element).load(uri);
+	});
 }
 
 function attachCommandButtons(rootElement) {
