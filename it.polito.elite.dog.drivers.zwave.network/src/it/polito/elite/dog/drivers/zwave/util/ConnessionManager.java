@@ -21,7 +21,6 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.ZWaveModelTree;
 
 import java.io.IOException;
 
-
 //import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
@@ -36,7 +35,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.glassfish.jersey.internal.util.Base64;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.log.LogService;
 
 public class ConnessionManager {
@@ -234,7 +232,7 @@ public class ConnessionManager {
 
 		try {
 			sendCommand(sCommand);
-		} catch (ConfigurationException e) {
+		} catch (Exception e) {
 			bSuccess = false;
 			sLastError = e.getMessage();
 		}
@@ -242,7 +240,7 @@ public class ConnessionManager {
 		return bSuccess;
 	}
 
-	public String sendCommand(String sCommand) throws ConfigurationException {
+	public String sendCommand(String sCommand) throws Exception {
 		String jsonResponse = null;
 
 		Response response = service.path(RUN_PATH).path(sCommand)
@@ -254,14 +252,14 @@ public class ConnessionManager {
 		if (response.getStatus() == Status.OK.getStatusCode()) {
 			jsonResponse = response.readEntity(String.class);
 		} else {
-			throw new ConfigurationException(null,
+			throw new Exception(
 					"Can't read json from Z-Way server: " + response.toString());
 		}
 
 		return jsonResponse;
 	}
 
-	public String pingDevice(String sNodeId) throws ConfigurationException {
+	public String pingDevice(String sNodeId) throws Exception {
 		return sendCommand("devices[" + sNodeId + "].SendNoOperation()");
 	}
 

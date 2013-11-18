@@ -17,19 +17,22 @@
  */
 package it.polito.elite.dog.drivers.zwave.gateway;
 
+import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.devicecategory.ZWaveGateway;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
-import it.polito.elite.dog.core.library.model.DeviceCostants;
-import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.core.library.model.devicecategory.ZWaveGateway;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,6 +54,10 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 	public static final String CMD_EXCLUDE = "controller.RemoveNodeFromNetwork";
 	public static final String CMD_LEARN = "controller.SetLearnMode";
 	public static final String CMD_RESET = "controller.SetDefault";
+
+	// the key to identify the proper configuration value
+	private static final String WAIT_BEFORE_DEVICE_INSTALL = "waitBeforeDeviceInstall";
+	private static final String DEVICE_DB = "deviceDB";
 
 	// The OSGi framework context
 	protected BundleContext context;
@@ -84,12 +91,19 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 	private ServiceRegistration<?> regZWaveGateway;
 
 	// the set of currently connected gateways... indexed by their ids
-	private Map<String, ZWaveGatewayDriverInstance> connectedGateways;
+	private ConcurrentHashMap<String, ZWaveGatewayDriverInstance> connectedGateways;
 
 	// the dictionary containing the current snapshot of the driver
 	// configuration, i.e., the list of supported devices and the corresponding
 	// DogOnt types.
 	private ConcurrentHashMap<String, String> supportedDevices;
+
+	// the time to wait before auto-installing devices (to enable complete
+	// command class reporting)
+	private long waitBeforeDeviceInstall;
+
+	// the device database location
+	private String deviceDBLocation;
 
 	// the LDAP query used to match the ModbusNetworkDriver
 	String filterQuery = String.format("(%s=%s)", Constants.OBJECTCLASS,
@@ -108,6 +122,9 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 
 		// initialize the device factory reference
 		this.deviceFactory = new AtomicReference<DeviceFactory>();
+
+		// init the wait before install time at 0
+		this.waitBeforeDeviceInstall = 0;
 	}
 
 	/**
@@ -120,8 +137,6 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 
 		// init the logger
 		logger = new LogHelper(context);
-
-		registerDriver();
 	}
 
 	public void deactivate()
@@ -225,7 +240,11 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 					if ((this.supportedDevices != null)
 							&& (!this.supportedDevices.isEmpty()))
 						driver.setSupportedDevices(this.supportedDevices);
-					
+				
+					// set the time to wait before automatic device detection / installation
+					driver.setWaitBeforeDeviceInstall(this.waitBeforeDeviceInstall);
+
+					//store the just created gateway instance
 					synchronized (connectedGateways)
 					{
 						// store a reference to the gateway driver
@@ -241,7 +260,8 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 
 					regDriver.setProperties(propDriver);
 				}
-			} else
+			}
+			else
 			{
 				// do not attach, log and throw exception
 				logger.log(
@@ -252,7 +272,8 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 						LOG_ID
 								+ "Unable to get the current gateway node id, this prevents the device from being attached!");
 			}
-		} else
+		}
+		else
 		{
 			// do not attach, log and throw exception
 			logger.log(
@@ -333,9 +354,26 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 		return connectedGateways.get(gatewayId);
 	}
 
+	/**
+	 * Returns a live reference to the specific network driver service to which
+	 * this {@link ZWaveGatewayDriver} is connected.
+	 * 
+	 * @return
+	 */
 	public ZWaveNetwork getNetwork()
 	{
 		return network.get();
+	}
+
+	/**
+	 * Returns the number of milliseconds to wait before attempting automatic
+	 * device recognition
+	 * 
+	 * @return
+	 */
+	public long getWaitBeforeDeviceInstall()
+	{
+		return waitBeforeDeviceInstall;
 	}
 
 	@Override
@@ -346,38 +384,121 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 		// creation will be disabled
 		if (config != null)
 		{
-			// debug
-			if (this.supportedDevices.isEmpty())
-				this.logger.log(LogService.LOG_DEBUG,
-						"Creating dynamic device creation db...");
-			else
-				this.logger.log(LogService.LOG_DEBUG,
-						"Updating dynamic device creation db...");
-			// store the configuration (deep copy, check if needed)
-			Enumeration<String> keys = config.keys();
+			// get the time to wait before auto-installation of devices
+			String waitBeforeDeviceInstallAsString = (String) config
+					.get(ZWaveGatewayDriver.WAIT_BEFORE_DEVICE_INSTALL);
 
-			// iterate over the keys
-			while (keys.hasMoreElements())
+			// try to convert it to a number
+			try
 			{
-				// get the device unique id
-				// (manufacturer-productseries-productid)
-				String deviceId = keys.nextElement();
-				String deviceType = (String) config.get(deviceId);
-
-				// store the couple
-				this.supportedDevices.put(deviceId, deviceType);
+				this.waitBeforeDeviceInstall = Long
+						.valueOf(waitBeforeDeviceInstallAsString);
+			}
+			catch (NumberFormatException e)
+			{
+				// use the network polling time if available
+				ZWaveNetwork networkDriver = this.network.get();
+				if (networkDriver != null)
+					this.waitBeforeDeviceInstall = networkDriver
+							.getPollingTimeMillis();
+				else
+					// no wait
+					this.waitBeforeDeviceInstall = 0;
 			}
 
+			// get the device db
+			// try to get the persistence store directory
+			this.deviceDBLocation = (String) config
+					.get(ZWaveGatewayDriver.DEVICE_DB);
+
+			// trim leading and trailing spaces
+			this.deviceDBLocation = deviceDBLocation.trim();
+
+			// check not null
+			if (deviceDBLocation != null)
+			{
+				// check absolute vs relative
+				File deviceDBLocationFile = new File(deviceDBLocation);
+				if (!deviceDBLocationFile.isAbsolute())
+					this.deviceDBLocation = System.getProperty("configFolder")
+							+ "/" + this.deviceDBLocation;
+
+				// load the device db
+				Properties deviceDB = new Properties();
+
+				try
+				{
+					deviceDB.load(new FileReader(this.deviceDBLocation));
+
+					// update the device databse
+					this.updateDeviceDatabase(deviceDB);
+
+					// sync the gateway instances
+					this.syncDeviceDBs();
+				}
+				catch (IOException e)
+				{
+					this.logger
+							.log(LogService.LOG_ERROR,
+									"Error while opening the device database.... dynamic device creation will not be supported!");
+				}
+
+			}
+			
+			//register the gateway only when it is fully configured
+			registerDriver();
+		}
+	}
+
+	/**
+	 * Updates the inner device database data structure on the basis of the
+	 * given device db as Java properties
+	 * 
+	 * @param config
+	 */
+	private void updateDeviceDatabase(Properties config)
+	{
+		// debug
+		if (this.supportedDevices.isEmpty())
+			this.logger.log(LogService.LOG_DEBUG,
+					"Creating dynamic device creation db...");
+		else
+			this.logger.log(LogService.LOG_DEBUG,
+					"Updating dynamic device creation db...");
+		// store the configuration (deep copy, check if needed)
+		Enumeration<?> keys = config.propertyNames();
+
+		// iterate over the keys
+		while (keys.hasMoreElements())
+		{
+			// get the device unique id
+			// (manufacturer-productseries-productid)
+			String deviceId = (String) keys.nextElement();
+			String deviceType = (String) config.get(deviceId);
+
+			// store the couple
+			this.supportedDevices.put(deviceId, deviceType);
+		}
+
+		// debug
+		this.logger.log(LogService.LOG_DEBUG,
+				"Completed dynamic device creation db");
+	}
+
+	/**
+	 * sync the current device database for all gateway instances
+	 */
+	private void syncDeviceDBs()
+	{
+		// synchronize over the connected gateways list
+		synchronized (this.connectedGateways)
+		{
 			// update connected drivers
 			for (String key : this.connectedGateways.keySet())
 			{
 				this.connectedGateways.get(key).setSupportedDevices(
 						this.supportedDevices);
 			}
-
-			// debug
-			this.logger.log(LogService.LOG_DEBUG,
-					"Completed dynamic device creation db");
 		}
 	}
 }

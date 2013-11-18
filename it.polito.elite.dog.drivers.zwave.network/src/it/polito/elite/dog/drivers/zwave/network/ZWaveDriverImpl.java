@@ -66,10 +66,10 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	private ZWaveModelTree modelTree;
 
 	// the register to driver map
-	private Map<ZWaveNodeInfo, ZWaveDriver> nodeInfo2Driver;
+	private ConcurrentHashMap<ZWaveNodeInfo, ZWaveDriver> nodeInfo2Driver;
 
 	// the inverse map
-	private Map<ZWaveDriver, Set<ZWaveNodeInfo>> driver2NodeInfo;
+	private ConcurrentHashMap<ZWaveDriver, Set<ZWaveNodeInfo>> driver2NodeInfo;
 
 	// the zwave poller
 	private ZWavePoller poller;
@@ -129,7 +129,8 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 			if (conManager.testConnection())
 			{
 				bValidConfig = true;
-			} else
+			}
+			else
 				sError = conManager.getLastError();
 
 			// If not valid configuration: log the error and throw exception
@@ -238,7 +239,8 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 							ZWaveDriver driver = nodeInfo2Driver.get(nodeInfo);
 							driver.newMessageFromHouse(deviceNode,
 									instanceNode, controllerNode, null);
-						} else
+						}
+						else
 						{
 							logger.log(
 									LogService.LOG_ERROR,
@@ -248,12 +250,14 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 											+ " does not exists!");
 						}
 					}
-				} else
+				}
+				else
 				{
 					logger.log(LogService.LOG_ERROR, LOG_ID + "Device id: "
 							+ nodeInfo.getDeviceNodeId() + " does not exists!");
 				}
-			} catch (Exception e)
+			}
+			catch (Exception e)
 			{
 				logger.log(LogService.LOG_ERROR, LOG_ID, e);
 				e.printStackTrace();
@@ -277,9 +281,12 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 					for (ZWaveNodeInfo nodeInfo : nodeInfos)
 					{
 						read(nodeInfo, false);
+						// yield to other processes
+						Thread.yield();
 					}
 				}
-			} catch (Exception e)
+			}
+			catch (Exception e)
 			{
 				logger.log(LogService.LOG_ERROR, LOG_ID, e);
 
@@ -290,22 +297,37 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	@Override
 	public void updateSensor(ZWaveNodeInfo nodeInfo)
 	{
-		for (Entry<Integer, Set<Integer>> instanceCC : nodeInfo
-				.getInstanceSensorCC().entrySet())
+		// check if the node info is registered...
+		if (this.nodeInfo2Driver.containsKey(nodeInfo))
 		{
-			for (Integer ccToTrigger : instanceCC.getValue())
+			// send one update command per each command class
+			for (Entry<Integer, Set<Integer>> instanceCC : nodeInfo
+					.getInstanceSensorCC().entrySet())
 			{
-				try
+				for (Integer ccToTrigger : instanceCC.getValue())
 				{
-					conManager.sendCommand("devices["
-							+ nodeInfo.getDeviceNodeId() + "].instances["
-							+ instanceCC.getKey() + "].commandClasses["
-							+ ccToTrigger + "].Get()");
-				} catch (ConfigurationException e)
-				{
-					logger.log(LogService.LOG_ERROR, LOG_ID
-							+ "Can't send command", e);
+					try
+					{
+						// check if the model still contains the device: in some
+						// cases device removal at the z-wave network-level may
+						// happen before than the time in which the gateway
+						// driver detects it.
+						if (modelTree.getDevices().containsKey(
+								nodeInfo.getDeviceNodeId()))
+						{
+							conManager.sendCommand("devices["
+									+ nodeInfo.getDeviceNodeId()
+									+ "].instances[" + instanceCC.getKey()
+									+ "].commandClasses[" + ccToTrigger
+									+ "].Get()");
+						}
+					}
+					catch (Exception e)
+					{
+						logger.log(LogService.LOG_ERROR, LOG_ID
+								+ "Can't send command", e);
 
+					}
 				}
 			}
 		}
@@ -359,7 +381,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	 * ZWaveNodeInfo)
 	 */
 	@Override
-	public void removeDriver(ZWaveNodeInfo nodeInfo) 
+	public void removeDriver(ZWaveNodeInfo nodeInfo)
 	{
 		// removes a given register-driver association
 		ZWaveDriver drv = nodeInfo2Driver.remove(nodeInfo);
@@ -388,10 +410,9 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 
 		if (infoToRemove != null)
 		{
-			this.poller.removeDeviceFromQueue(infoToRemove);
+			this.poller.removeDeviceFromQueue(nodeId);
 			this.removeDriver(infoToRemove);
 		}
-			
 
 	}
 
@@ -429,7 +450,8 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 			conManager.sendCommand("devices[" + deviceId + "].instances["
 					+ instanceId + "].commandClasses[" + nCommandClass
 					+ "].Set(" + commandValue + ")");
-		} catch (ConfigurationException e)
+		}
+		catch (Exception e)
 		{
 			logger.log(LogService.LOG_ERROR, LOG_ID + "Can't send command", e);
 
@@ -443,7 +465,8 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 		try
 		{
 			conManager.sendCommand(sCommand + "(" + commandValue + ")");
-		} catch (ConfigurationException e)
+		}
+		catch (Exception e)
 		{
 			logger.log(LogService.LOG_ERROR, LOG_ID + "Can't send command", e);
 
@@ -525,6 +548,5 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 
 		return deviceId;
 	}
-	
-	
+
 }

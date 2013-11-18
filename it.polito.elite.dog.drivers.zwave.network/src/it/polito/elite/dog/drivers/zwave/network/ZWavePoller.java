@@ -21,7 +21,7 @@ import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.service.log.LogService;
 
@@ -50,7 +50,7 @@ public class ZWavePoller extends Thread
 	public static String logId = "[ZWavePoller]: ";
 	
 	// set of device to trigger for update
-	public HashMap<Integer,TriggerElem> deviceSet = new HashMap<Integer,TriggerElem>();
+	public ConcurrentHashMap<Integer,TriggerElem> deviceSet = new ConcurrentHashMap<Integer,TriggerElem>();
 
 	public ZWavePoller(ZWaveDriverImpl zwaveDriveImpl)
 	{		
@@ -86,13 +86,13 @@ public class ZWavePoller extends Thread
 					this.driver.updateSensor(elem.getNodeInfo());
 					//update value for next trigger
 					elem.setTriggerTime(elem.getTriggerTime() + elem.getUpdateTimeMillis());
+					
+					//yield to other processes
+					Thread.yield();
 				}
 			}
 			
 			this.driver.readAll(true);
-
-			// since this can be a time intensive inner task, yield to other processes
-			Thread.yield();
 
 			// ok now the polling cycle has ended and the poller can sleep for the given polling time
 			try
@@ -151,9 +151,9 @@ public class ZWavePoller extends Thread
 	 * @param nodeInfo {@link ZWaveNodeInfo} representing the node
 	 * @param updateTimeMillis how much the device must be triggered for a full update. 0 means no trigger for this node
 	 */
-	public void removeDeviceFromQueue(ZWaveNodeInfo nodeInfo)
+	public void removeDeviceFromQueue(int nodeId)
 	{
-		this.deviceSet.remove(nodeInfo.getDeviceNodeId());
+		this.deviceSet.remove(nodeId);
 	}
 	
 	public class TriggerElem

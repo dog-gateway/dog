@@ -77,6 +77,9 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 
 	// enable dynamic device detection
 	private boolean detectionEnabled = false;
+	
+	// the time to wait before attempting automatic device detection
+	private long waitBeforeDeviceInstall = 0;
 
 	public ZWaveGatewayDriverInstance(ZWaveNetwork network,
 			DeviceFactory deviceFactory, ControllableDevice controllableDevice,
@@ -374,6 +377,25 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		this.logger.log(LogService.LOG_DEBUG,
 				"Updated dynamic device creation db");
 	}
+	
+	
+	/**
+	 * Gets the time to wait before automatic device detection, in milliseconds
+	 * @return
+	 */
+	public long getWaitBeforeDeviceInstall()
+	{
+		return waitBeforeDeviceInstall;
+	}
+
+	/**
+	 * Sets the time to wait before automatic device detection, in milliseconds
+	 * @param waitBeforeDeviceInstall
+	 */
+	public void setWaitBeforeDeviceInstall(long waitBeforeDeviceInstall)
+	{
+		this.waitBeforeDeviceInstall = waitBeforeDeviceInstall;
+	}
 
 	// TODO: implement better.... just a trial
 	private DeviceDescriptor buildDeviceDescriptor(Device device, int nodeId)
@@ -397,10 +419,10 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 					.get(DataConst.MANUFACTURER_PRODUCT_ID).getValue()
 					.toString();
 
-			// build the 4th id (number of instances)
+			// wait for instances to be read.... (may be read with a certain variable delay)
 			try
 			{
-				Thread.sleep(this.network.getPollingTimeMillis());
+				Thread.sleep(this.waitBeforeDeviceInstall);
 			}
 			catch (InterruptedException e1)
 			{
@@ -410,6 +432,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 								e1);
 			}
 
+			// build the 4th id (number of instances)
 			int numberOfInstances = network.getRawDevice(nodeId).getInstances()
 					.size();
 
