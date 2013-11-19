@@ -23,7 +23,7 @@ import it.polito.elite.dog.addons.rules.schemalibrary.Rule;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
 import it.polito.elite.dog.addons.rules.util.ThreadedRuleBundleInitializer;
 import it.polito.elite.dog.addons.rules.util.TimeConversion;
-import it.polito.elite.dog.addons.rules.util.TimedNotificationsPreProcessor;
+//import it.polito.elite.dog.addons.rules.util.TimedNotificationsPreProcessor;
 import it.polito.elite.dog.addons.rules.util.Xml2DrlTranslator;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
@@ -374,7 +374,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		this.localRuleBaseJAXB = this.mergeRules(rules);
 		
 		// preprocess timed e-blocks
-		TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
+		//TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
 		// TODO Fix when a new scheduler will be developed...
 		// Set<DogMessage> timedEvents =
 		// proc.preProcess(this.localRuleBaseJAXB);
