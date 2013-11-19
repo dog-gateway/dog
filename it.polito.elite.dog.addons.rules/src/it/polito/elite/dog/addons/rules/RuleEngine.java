@@ -670,8 +670,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 				
 				catch (Exception e)
 				{
-					this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error "
-							+ e.getClass().getSimpleName());
+					this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error", e);
 				}
 				
 				// If the deserialization works
