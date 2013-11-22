@@ -121,8 +121,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	// the rule bundle drools rule base
 	private KnowledgeBase ruleBase;
 	
-	// the knowledge sessio to be used for firing rules
-	// private StatefulKnowledgeSession runtimeRuleSession;
+	// the knowledge session to be used for firing rules
+	private StatefulKnowledgeSession runtimeRuleSession;
 	
 	/**
 	 * Class constructor
@@ -251,23 +251,24 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	public synchronized void setRuleBase(KnowledgeBase ruleBase)
 	{
 		this.ruleBase = ruleBase;
+		this.initRuleEvaluationSession();
 	}
 	
-	public synchronized StatefulKnowledgeSession initRuleEvaluationSession()
+	public synchronized void initRuleEvaluationSession()
 	{
 		// prepare the new knowledge session...
-		StatefulKnowledgeSession runtimeRuleSession = this.ruleBase.newStatefulKnowledgeSession();
+		this.runtimeRuleSession = this.ruleBase.newStatefulKnowledgeSession();
 		
 		// asserting this as global variable
-		runtimeRuleSession.setGlobal("dogRule", this);
+		this.runtimeRuleSession.setGlobal("dogRule", this);
 		
 		// add a time converter object
 		TimeConversion converter = new TimeConversion();
-		runtimeRuleSession.setGlobal("timeConverter", converter);
+		this.runtimeRuleSession.setGlobal("timeConverter", converter);
 		
 		// debug
-		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " runtime session created... " + runtimeRuleSession);
-		return runtimeRuleSession;
+		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " runtime session created... "
+				+ this.runtimeRuleSession);
 	}
 	
 	/**
@@ -373,8 +374,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		this.localRuleBaseJAXB = this.mergeRules(rules);
 		
 		// preprocess timed e-blocks
-		// TimedNotificationsPreProcessor proc = new
-		// TimedNotificationsPreProcessor(this.logger);
+		//TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
 		// TODO Fix when a new scheduler will be developed...
 		// Set<DogMessage> timedEvents =
 		// proc.preProcess(this.localRuleBaseJAXB);
@@ -652,8 +652,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 		Notification receivedNotification = null;
 		
-		StatefulKnowledgeSession runtimeRuleSession = this.initRuleEvaluationSession();
-		if (runtimeRuleSession != null)
+		if (this.runtimeRuleSession != null)
 		{
 			// Received a generic MonitorAdmin event (No MonitoringJob, so
 			// mon.listener.id property is null)
@@ -689,14 +688,14 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 								+ " handling state change notification(s): " + receivedNotification);
 						
 						// insert the notification in the working memory
-						FactHandle notificationHandle = runtimeRuleSession
+						FactHandle notificationHandle = this.runtimeRuleSession
 								.insert((StateChangeNotification) receivedNotification);
 						
 						// fire rules
-						runtimeRuleSession.fireAllRules();
+						this.runtimeRuleSession.fireAllRules();
 						
 						// retract the notification
-						runtimeRuleSession.retract(notificationHandle);
+						this.runtimeRuleSession.retract(notificationHandle);
 						
 					}
 				}
@@ -724,17 +723,15 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 							+ receivedNotification);
 					
 					// insert the notification in the working memory
-					FactHandle notificationHandle = runtimeRuleSession.insert(receivedNotification);
+					FactHandle notificationHandle = this.runtimeRuleSession.insert(receivedNotification);
 					
 					// fire rules
-					runtimeRuleSession.fireAllRules();
+					this.runtimeRuleSession.fireAllRules();
 					
 					// retract the notification
-					runtimeRuleSession.retract(notificationHandle);
-					
+					this.runtimeRuleSession.retract(notificationHandle);
 				}
 			}
-			runtimeRuleSession.dispose();
 		}
 		
 	}
@@ -773,7 +770,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error ", e);
+			this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error "
+					+ e.getClass().getSimpleName());
 			return returningState;
 		}
 		
@@ -927,8 +925,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	 */
 	private void checkAndRegisterServices()
 	{
-		if (this.monitorAdmin != null /* && this.scheduler != null */
-				&& this.context != null)
+		if (this.monitorAdmin != null /* && this.scheduler != null */&& this.context != null)
 		{ // all the needed services are up and running?
 		
 			// if the needed services have been matched and the rule base has
