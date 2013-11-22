@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.Path;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import it.polito.elite.dog.addons.rules.api.RuleEngineApi;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
@@ -53,6 +54,8 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	
 	// the JAXB context
 	private JAXBContext jaxbContext;
+	// the JAXB unmarshaller
+	private AtomicReference<Unmarshaller> unmarshaller;
 	
 	/**
 	 * Default constructor
@@ -61,12 +64,14 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	{
 		// init
 		this.ruleEngine = new AtomicReference<RuleEngineApi>();
+		this.unmarshaller = new AtomicReference<Unmarshaller>();
 		
 		try
 		{
-			// init here the JAXB context (hoping to improve the performance of
+			// int here JAXB objects (hoping to improve the performance of
 			// the bundle)
 			this.jaxbContext = JAXBContext.newInstance(RuleList.class.getPackage().getName());
+			this.unmarshaller.set(this.jaxbContext.createUnmarshaller());
 		}
 		catch (JAXBException e)
 		{
@@ -183,12 +188,12 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public void addRulesXML(String xmlRules)
 	{
 		// check not null
-		if (this.ruleEngine != null && this.jaxbContext != null)
+		if (this.ruleEngine != null && this.unmarshaller != null)
 		{
 			try
 			{
 				// add the received rules
-				RuleList rules = (RuleList) this.jaxbContext.createUnmarshaller().unmarshal(new StringReader(xmlRules));
+				RuleList rules = (RuleList) this.unmarshaller.get().unmarshal(new StringReader(xmlRules));
 				this.ruleEngine.get().addRule(rules);
 			}
 			catch (JAXBException e)
@@ -208,17 +213,17 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public void updateRuleXML(String ruleId, String ruleContent)
 	{
 		// check not null
-		if (this.ruleEngine != null && this.jaxbContext != null)
+		if (this.ruleEngine != null && this.unmarshaller != null)
 		{
 			try
 			{
 				// unmarshall the rule to update
-				RuleList updatedRule = (RuleList) this.jaxbContext.createUnmarshaller().unmarshal(
+				RuleList updatedRule = (RuleList) this.unmarshaller.get().unmarshal(
 						new StringReader(ruleContent));
 				// update received rules
 				this.ruleEngine.get().updateRule(ruleId, updatedRule);
 			}
-			catch (JAXBException e)
+			catch (Exception e)
 			{
 				this.logger.log(LogService.LOG_ERROR, "JAXB Error", e);
 			}
