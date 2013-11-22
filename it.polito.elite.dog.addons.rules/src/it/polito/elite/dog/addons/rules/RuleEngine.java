@@ -51,6 +51,7 @@ import java.util.Map;
 import javax.measure.DecimalMeasure;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.drools.KnowledgeBase;
@@ -108,6 +109,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	private boolean rulesAreReady;
 	private boolean servicesHaveBeenMatched;
 	
+	private JAXBContext jaxbContext;
+	
 	/**********************************************************************************
 	 * Rules specific part
 	 */
@@ -151,6 +154,15 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 		// prepare the drools rule base object
 		this.ruleBase = KnowledgeBaseFactory.newKnowledgeBase();
+		
+		try
+		{
+			this.jaxbContext = JAXBContext.newInstance(RuleList.class.getPackage().getName());
+		}
+		catch (JAXBException e)
+		{
+			this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + "Exception in creating the JAXB context", e);
+		}
 		
 		// debug
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Activated...");
@@ -584,8 +596,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 			
 			// marshal rules on file...
 			// create the JAXB context for parsing the local rule store (in xml)
-			JAXBContext ctx = JAXBContext.newInstance(RuleList.class.getPackage().getName());
-			Marshaller m = ctx.createMarshaller();
+			Marshaller m = this.jaxbContext.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
 					"http://elite.polito.it/domotics/dog/rules/rule_definition rule_definition.xsd ");
