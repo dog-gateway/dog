@@ -377,7 +377,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	 ***************************************************************************************************************/
 	
 	@Override
-	public void addRule(RuleList rules)
+	public synchronized void addRule(RuleList rules)
 	{
 		
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Adding new rules...");
@@ -469,7 +469,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	}
 	
 	@Override
-	public boolean removeRule(String ruleName)
+	public synchronized boolean removeRule(String ruleName)
 	{
 		boolean ruleExist = false;
 		
@@ -515,7 +515,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	}
 	
 	@Override
-	public void updateRule(String ruleId, RuleList xmlRule)
+	public synchronized void updateRule(String ruleId, RuleList xmlRule)
 	{
 		boolean removed = this.removeRule(ruleId);
 		if (removed)
