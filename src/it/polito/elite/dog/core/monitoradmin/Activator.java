@@ -76,7 +76,7 @@ public class Activator implements BundleActivator, OsgiVisitor, LogVisitor {
     private ServiceTracker<?, ?> logServiceTracker;
 
 
-    public void start(BundleContext bundleContext) {
+    public void start(BundleContext bundleContext) throws Exception {
         bc = bundleContext;
 
         // init LogService tracker
@@ -100,7 +100,7 @@ public class Activator implements BundleActivator, OsgiVisitor, LogVisitor {
         info("MonitorAdmin started", null);
     }
 
-    public void stop(BundleContext bundleContext) {
+    public void stop(BundleContext bundleContext) throws Exception {
         // unregister MonitorAdmin service
         if (monitorAdminRegistration != null) {
             monitorAdminRegistration.unregister();
