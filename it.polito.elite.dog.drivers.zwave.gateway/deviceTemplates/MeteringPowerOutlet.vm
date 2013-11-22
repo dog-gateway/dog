@@ -17,7 +17,7 @@
 			</dhc:command>
 			<dhc:command id="OnCommand_$name" name="OnCommand_$name"
 				class="OnCommand">
-				<param value="on" name="realCommandName" />
+				<dhc:param value="on" name="realCommandName" />
 			</dhc:command>
 		</dhc:commands>
 	</dhc:controlFunctionality>
