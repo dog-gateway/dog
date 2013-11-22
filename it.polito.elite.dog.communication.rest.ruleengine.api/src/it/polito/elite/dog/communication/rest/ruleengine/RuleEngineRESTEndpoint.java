@@ -19,10 +19,11 @@ package it.polito.elite.dog.communication.rest.ruleengine;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.Path;
-import javax.xml.bind.DataBindingException;
-import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import it.polito.elite.dog.addons.rules.api.RuleEngineApi;
 import it.polito.elite.dog.addons.rules.schemalibrary.RuleList;
@@ -44,21 +45,33 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	// the service logger
 	private LogHelper logger;
 	
-	// the log id used for fallback
-	public static final String logId = "[RuleEngineRESTApi]: ";
-	
 	// the bundle context reference
 	private BundleContext context;
 	
 	// the rule service for which this bundle offers a rest interface
-	private RuleEngineApi ruleEngine;
+	private AtomicReference<RuleEngineApi> ruleEngine;
+	
+	// the JAXB context
+	private JAXBContext jaxbContext;
 	
 	/**
-	 * 
+	 * Default constructor
 	 */
 	public RuleEngineRESTEndpoint()
 	{
-		System.out.println(RuleEngineRESTEndpoint.logId + "Creating RuleEngineRESTEndpoint...");
+		// init
+		this.ruleEngine = new AtomicReference<RuleEngineApi>();
+		
+		try
+		{
+			// init here the JAXB context (hoping to improve the performance of
+			// the bundle)
+			this.jaxbContext = JAXBContext.newInstance(RuleList.class.getPackage().getName());
+		}
+		catch (JAXBException e)
+		{
+			System.out.println("[RuleEngineRESTEndpoint] Error creating the JAXB Context" + e);
+		}
 	}
 	
 	/**
@@ -97,13 +110,13 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public void addedRuleEngine(RuleEngineApi ruleEngine)
 	{
 		// store a reference to the rule service
-		this.ruleEngine = ruleEngine;
+		this.ruleEngine.set(ruleEngine);
 		
 		// debug
 		if (this.logger != null)
 			this.logger.log(LogService.LOG_DEBUG, "Connected to the RuleEngineApi");
 		else
-			System.out.println(RuleEngineRESTEndpoint.logId + "Connected to the RuleEngineApi");
+			System.out.println("[RuleEngineRESTEndpoint] Connected to the RuleEngineApi");
 	}
 	
 	public void removedRuleEngine(RuleEngineApi ruleEngine)
@@ -112,7 +125,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		this.ruleEngine = null;
 		
 		// debug
-		this.logger.log(LogService.LOG_DEBUG, RuleEngineRESTEndpoint.logId + "Disconnected from the RuleEngineApi");
+		this.logger.log(LogService.LOG_DEBUG, "Disconnected from the RuleEngineApi");
 	}
 	
 	/*
@@ -130,7 +143,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		
 		// extract the rule from the rule engine in the DRL format
 		if (this.ruleEngine != null)
-			drlRules = this.ruleEngine.getDRLRules();
+			drlRules = this.ruleEngine.get().getDRLRules();
 		
 		// return existing rules
 		return drlRules;
@@ -152,7 +165,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		// extract the rule from the rule engine in the JAXB format
 		if (this.ruleEngine != null)
 		{
-			xmlRules = this.generateXML(this.ruleEngine.getRules());
+			xmlRules = this.generateXML(this.ruleEngine.get().getRules());
 		}
 		
 		// return existing rules
@@ -170,11 +183,23 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public void addRulesXML(String xmlRules)
 	{
 		// check not null
-		if (this.ruleEngine != null)
+		if (this.ruleEngine != null && this.jaxbContext != null)
 		{
-			// add the received rules
-			RuleList rules = JAXB.unmarshal(new StringReader(xmlRules), RuleList.class);
-			this.ruleEngine.addRule(rules);
+			try
+			{
+				// add the received rules
+				RuleList rules = (RuleList) this.jaxbContext.createUnmarshaller().unmarshal(new StringReader(xmlRules));
+				this.ruleEngine.get().addRule(rules);
+			}
+			catch (JAXBException e)
+			{
+				this.logger.log(LogService.LOG_ERROR, "JAXB Error", e);
+			}
+			
+		}
+		else
+		{
+			this.logger.log(LogService.LOG_ERROR, "Error in adding a new rule");
 		}
 		
 	}
@@ -183,15 +208,25 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 	public void updateRuleXML(String ruleId, String ruleContent)
 	{
 		// check not null
-		if (this.ruleEngine != null)
+		if (this.ruleEngine != null && this.jaxbContext != null)
 		{
-			// unmarshall the rule to update
-			RuleList updatedRule = JAXB.unmarshal(new StringReader(ruleContent), RuleList.class);
-			// update received rules
-			this.ruleEngine.updateRule(ruleId, updatedRule);
-			
+			try
+			{
+				// unmarshall the rule to update
+				RuleList updatedRule = (RuleList) this.jaxbContext.createUnmarshaller().unmarshal(
+						new StringReader(ruleContent));
+				// update received rules
+				this.ruleEngine.get().updateRule(ruleId, updatedRule);
+			}
+			catch (JAXBException e)
+			{
+				this.logger.log(LogService.LOG_ERROR, "JAXB Error", e);
+			}
 		}
-		
+		else
+		{
+			this.logger.log(LogService.LOG_ERROR, "Error in updating the rule " + ruleId);
+		}
 	}
 	
 	/*
@@ -208,7 +243,7 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 		if (this.ruleEngine != null)
 		{
 			// add received rules
-			this.ruleEngine.removeRule(ruleId);
+			this.ruleEngine.get().removeRule(ruleId);
 		}
 		
 	}
@@ -229,11 +264,11 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 			StringWriter output = new StringWriter();
 			
 			// marshall the RuleList...
-			JAXB.marshal(rules, output);
+			this.jaxbContext.createMarshaller().marshal(rules, output);
 			
 			rulesXML = output.getBuffer().toString();
 		}
-		catch (DataBindingException e)
+		catch (Exception e)
 		{
 			// the exception can be throw by the JAXB.marshal method...
 			this.logger.log(LogService.LOG_ERROR, "Exception in JAXB Marshalling...", e);
