@@ -111,9 +111,6 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriver 
 		
 		// create a logger
 		this.logger = new LogHelper(context);
-		
-		// connect this driver instance with the device
-		this.device.setDriver(this);
 	}
 	
 	/**

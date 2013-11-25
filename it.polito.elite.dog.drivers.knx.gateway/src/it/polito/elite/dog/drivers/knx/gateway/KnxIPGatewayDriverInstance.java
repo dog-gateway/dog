@@ -54,9 +54,6 @@ public class KnxIPGatewayDriverInstance extends KnxIPDriver implements KNXNetIPG
 		// create a new device state (according to the current DogOnt model, no
 		// state is actually associated to a KnxIP gateway)
 		this.currentState = new DeviceStatus(device.getDeviceId());
-		
-		// connect this driver instance with the device
-		this.device.setDriver(this);
 	}
 
 	@Override

@@ -113,11 +113,7 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriver i
 		super(network, device, gatewayAddress);
 		
 		// create a logger
-		this.logger = new LogHelper(context);
-		
-		// connect this driver instance with the device
-		this.device.setDriver(this);
-		
+		this.logger = new LogHelper(context);		
 	}
 	
 	/**

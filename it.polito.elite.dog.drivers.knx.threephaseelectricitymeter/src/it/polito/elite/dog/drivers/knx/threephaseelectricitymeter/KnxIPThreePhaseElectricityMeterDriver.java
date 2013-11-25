@@ -204,7 +204,7 @@ public class KnxIPThreePhaseElectricityMeterDriver implements Driver
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public int match(ServiceReference reference) throws Exception
+	public synchronized int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
 		
@@ -242,23 +242,33 @@ public class KnxIPThreePhaseElectricityMeterDriver implements Driver
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public String attach(ServiceReference reference) throws Exception
+	public synchronized String attach(ServiceReference reference) throws Exception
 	{
 		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
 		{
+			//get the referenced device
+			ControllableDevice device = (ControllableDevice) this.context.getService(reference);
+			
 			// get the gateway to which the device is connected
-			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
+			String gateway = (String) device.getDeviceDescriptor()
 					.getGateway();
 			
+			// get the associated gateway instance
 			KnxIPGatewayDriverInstance gwInstance = this.gateway.get().getSpecificGateway(gateway);
 			
-			KnxIPThreePhaseElectricityMeterDriverInstance instance = new KnxIPThreePhaseElectricityMeterDriverInstance(
-					this.network.get(), (ControllableDevice) this.context.getService(reference),
+			// create a driver instance
+			KnxIPThreePhaseElectricityMeterDriverInstance driver = new KnxIPThreePhaseElectricityMeterDriverInstance(
+					this.network.get(), device,
 					gwInstance.getGatewayAddress(), this.context);
+			
+			//attach the driver to the device
+			device.setDriver(driver);
+			
+			// store the driver instance as connected to a device
 			synchronized (this.connectedDrivers)
 			{
 				
-				this.connectedDrivers.add(instance);
+				this.connectedDrivers.add(driver);
 			}
 		}
 		return null;

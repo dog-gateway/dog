@@ -82,9 +82,6 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriver implements Lamp,
 		
 		// ... then ask the (real) initial state to the KNX gateway
 		this.getInitialState();
-		
-		// attach this driver to the given device
-		this.device.setDriver(this);
 	}
 	
 	/**

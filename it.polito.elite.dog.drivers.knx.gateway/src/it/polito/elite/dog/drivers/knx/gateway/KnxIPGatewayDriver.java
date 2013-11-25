@@ -165,7 +165,7 @@ public class KnxIPGatewayDriver implements Driver
 	
 	@SuppressWarnings("rawtypes")
 	@Override
-	public int match(ServiceReference reference) throws Exception
+	public synchronized int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
 		
@@ -196,16 +196,17 @@ public class KnxIPGatewayDriver implements Driver
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public String attach(ServiceReference reference) throws Exception
+	public synchronized String attach(ServiceReference reference) throws Exception
 	{
 		if ((this.regDriver != null) && (this.regKnxIPGateway != null))
 		{
-			// get the corresponding end point set
+			//get the referenced device
+			ControllableDevice gatewayDevice = (ControllableDevice) this.context.getService(reference);
 			
-			Set<String> gatewayAddressSet = ((ControllableDevice) this.context.getService(reference))
-					.getDeviceDescriptor().getSimpleConfigurationParams().get(KnxIPInfo.GATEWAY_ADDRESS);
+			// get the corresponding end point set		
+			Set<String> gatewayAddressSet = gatewayDevice.getDeviceDescriptor().getSimpleConfigurationParams().get(KnxIPInfo.GATEWAY_ADDRESS);
 			
-			String deviceId = ((ControllableDevice) this.context.getService(reference)).getDeviceId();
+			String deviceId = gatewayDevice.getDeviceId();
 			
 			// if not null, it is a singleton
 			if (gatewayAddressSet != null)
@@ -220,8 +221,12 @@ public class KnxIPGatewayDriver implements Driver
 					{
 						// create a new instance of the gateway driver
 						KnxIPGatewayDriverInstance driver = new KnxIPGatewayDriverInstance(this.network.get(),
-								(ControllableDevice) this.context.getService(reference), gatewayAddress, this.context);
+								gatewayDevice, gatewayAddress, this.context);
 						
+						// connect this driver instance with the device
+						gatewayDevice.setDriver(driver);
+						
+						// store a reference to the gateway driver
 						synchronized (this.connectedGateways)
 						{
 							// store a reference to the gateway driver
