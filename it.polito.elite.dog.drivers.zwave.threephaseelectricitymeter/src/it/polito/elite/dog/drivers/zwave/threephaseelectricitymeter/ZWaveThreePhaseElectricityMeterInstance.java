@@ -63,8 +63,6 @@ import org.osgi.framework.BundleContext;
 public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriver
 		implements ThreePhaseElectricityMeter
 {
-	// the class logger
-	// private LogHelper logger;
 
 	public ZWaveThreePhaseElectricityMeterInstance(ZWaveNetwork network,
 			ControllableDevice device, int deviceId, Set<Integer> instancesId,
@@ -72,9 +70,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriver
 	{
 		super(network, device, deviceId, instancesId, gatewayNodeId,
 				updateTimeMillis, context);
-
-		// create a logger
-		// logger = new LogHelper(context);
 
 		// initialize states
 		this.initializeStates();
@@ -340,8 +335,8 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriver
 			// devices.X.instances.1.commandClasses.50.data.2 (W)
 			CommandClasses ccElectricityEntry = instanceNode
 					.getCommandClasses().get(ZWaveAPI.COMMAND_CLASS_METER);
-			
-			//tin pants...
+
+			// tin pants...
 			if (ccElectricityEntry != null)
 			{
 				// prevent errors on first inclusion

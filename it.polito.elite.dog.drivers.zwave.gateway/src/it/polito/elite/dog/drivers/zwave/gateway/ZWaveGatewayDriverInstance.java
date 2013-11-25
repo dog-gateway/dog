@@ -114,10 +114,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
 		// create a new device state (according to the current DogOnt model, no
 		// state is actually associated to a Modbus gateway)
 		currentState = new DeviceStatus(device.getDeviceId());
-
-		// connect this driver instance with the device
-		device.setDriver(this);
-
+		
 		// initialize device states
 		this.initializeStates();
 	}

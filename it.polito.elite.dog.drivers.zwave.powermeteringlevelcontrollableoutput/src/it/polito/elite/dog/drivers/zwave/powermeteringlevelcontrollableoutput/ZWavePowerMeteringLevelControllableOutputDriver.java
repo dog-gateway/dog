@@ -140,7 +140,7 @@ public class ZWavePowerMeteringLevelControllableOutputDriver implements Driver,
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public int match(ServiceReference reference) throws Exception
+	public synchronized int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
 
@@ -177,20 +177,22 @@ public class ZWavePowerMeteringLevelControllableOutputDriver implements Driver,
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public String attach(ServiceReference reference) throws Exception
+	public synchronized String attach(ServiceReference reference)
+			throws Exception
 	{
+		// get the referenced device
+		ControllableDevice device = ((ControllableDevice) context
+				.getService(reference));
+
 		// get the gateway to which the device is connected
-		String gateway = (String) ((ControllableDevice) context
-				.getService(reference)).getDeviceDescriptor().getGateway();
+		String gateway = (String) device.getDeviceDescriptor().getGateway();
 
 		// get the corresponding end point set
-		Set<String> nodeIdSet = ((ControllableDevice) context
-				.getService(reference)).getDeviceDescriptor()
+		Set<String> nodeIdSet = device.getDeviceDescriptor()
 				.getSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
 
 		// get the corresponding end point set
-		Set<String> instanceIdSet = ((ControllableDevice) context
-				.getService(reference)).getDeviceDescriptor()
+		Set<String> instanceIdSet = device.getDeviceDescriptor()
 				.getSimpleConfigurationParams().get(ZWaveInfo.INSTANCE_ID);
 
 		// get the nodeId
@@ -204,15 +206,16 @@ public class ZWavePowerMeteringLevelControllableOutputDriver implements Driver,
 		// create a new driver instance
 		ZWavePowerMeteringLevelControllableOutputDriverInstance driverInstance = new ZWavePowerMeteringLevelControllableOutputDriverInstance(
 				this.network.get(),
-				(ControllableDevice) this.context.getService(reference),
+				device,
 				Integer.parseInt(sNodeID), instancesId, this.gateway.get()
 						.getSpecificGateway(gateway).getNodeInfo()
 						.getDeviceNodeId(), this.updateTimeMillis,
 				this.stepPercentage, this.context);
 
-		((ControllableDevice) context.getService(reference))
-				.setDriver(driverInstance);
+		// connect this driver instance with the device
+		device.setDriver(driverInstance);
 
+		// store a reference to the connected driver
 		synchronized (connectedDrivers)
 		{
 			connectedDrivers.add(driverInstance);

@@ -173,7 +173,7 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public int match(ServiceReference reference) throws Exception
+	public synchronized int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
 
@@ -202,17 +202,19 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public String attach(ServiceReference reference) throws Exception
+	public synchronized String attach(ServiceReference reference) throws Exception
 	{
-		// get the corresponding end point set
+		// get the referenced device
 		@SuppressWarnings("unchecked")
-		Set<String> gatewayNodeIdSet = ((ControllableDevice) context
-				.getService(reference)).getDeviceDescriptor()
+		ControllableDevice device = ((ControllableDevice) context
+				.getService(reference));
+		
+		// get the corresponding end point set
+		Set<String> gatewayNodeIdSet = device.getDeviceDescriptor()
 				.getSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
 
-		@SuppressWarnings("unchecked")
-		String deviceId = ((ControllableDevice) context.getService(reference))
-				.getDeviceId();
+		//get the device id
+		String deviceId = device.getDeviceId();
 
 		// if not null, it is a singleton
 		if (gatewayNodeIdSet != null)
@@ -225,15 +227,14 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 			{
 				if (!this.isGatewayAvailable(deviceId))
 				{
-					// gateway has only one instance and its id is 0
+					// gateway has only one instance and it is 0
 					Set<Integer> instancesId = new HashSet<Integer>();
 					instancesId.add(0);
 
 					// create a new instance of the gateway driver
-					@SuppressWarnings("unchecked")
 					ZWaveGatewayDriverInstance driver = new ZWaveGatewayDriverInstance(
 							this.network.get(), this.deviceFactory.get(),
-							(ControllableDevice) context.getService(reference),
+							device,
 							Integer.parseInt(sNodeID), instancesId, context);
 
 					// set the supported devices
@@ -243,6 +244,9 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 				
 					// set the time to wait before automatic device detection / installation
 					driver.setWaitBeforeDeviceInstall(this.waitBeforeDeviceInstall);
+					
+					// connect the driver instance with the device
+					device.setDriver(driver);
 
 					//store the just created gateway instance
 					synchronized (connectedGateways)
