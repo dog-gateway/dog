@@ -21,6 +21,7 @@ import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 
 import java.util.Hashtable;
 
+import org.osgi.service.device.Constants;
 import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
 
@@ -93,10 +94,17 @@ public abstract class ControllableDevice implements Device
 	 */
 	private void parseDescriptor(DeviceDescriptor deviceDescriptor)
 	{
-		this.deviceProp.put(DeviceCostants.DEVICE_CATEGORY, defaultPackage + "." + deviceDescriptor.getDeviceCategory());
+		// ----------- Device Access Specification ---------------
+		this.deviceProp.put(Constants.DEVICE_CATEGORY, defaultPackage + "." + deviceDescriptor.getDeviceCategory());
+		this.deviceProp.put(Constants.DEVICE_SERIAL, deviceDescriptor.getDeviceURI());
+		this.deviceProp.put(Constants.DEVICE_DESCRIPTION, deviceDescriptor.getDescription());
+		
+		// ----------- Custom properties ---------------------
 		this.deviceProp.put(DeviceCostants.DEVICEURI, deviceDescriptor.getDeviceURI());
 		this.deviceProp.put(DeviceCostants.MANUFACTURER, deviceDescriptor.getTechnology());
 		this.deviceProp.put(DeviceCostants.DEVICELOCATION, deviceDescriptor.getLocation());
+		if(deviceDescriptor.getGateway()!=null)
+			this.deviceProp.put(DeviceCostants.GATEWAY, deviceDescriptor.getGateway());
 		this.deviceId = deviceDescriptor.getDeviceURI();
 		this.deviceDescriptor = deviceDescriptor;
 	}

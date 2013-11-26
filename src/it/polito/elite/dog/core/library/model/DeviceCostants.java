@@ -45,6 +45,7 @@ public interface DeviceCostants extends Constants
 	// to re-start attachment of idle devices every time a new gateway joins its
 	// driver.
 	public static final String GATEWAY_COUNT = "GATEWAY_COUNT";
+	public static final String GATEWAY = "GATEWAY";
 	
 	/* Constants that represent properties needed by the HouseModel */
 	// Simple House Model
