@@ -17,10 +17,11 @@
  */
 package it.polito.elite.dog.drivers.knx.singlephaseelectricitymeter;
 
-import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.SinglePhaseElectricityMeter;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriver;
 import it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPInfo;
@@ -48,29 +49,30 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 {
 	// a reference to the bundle context
 	BundleContext context;
-	
+
 	// the driver logger
 	LogHelper logger;
-	
+
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIPSinglePhaseElectricityMeterDriver]: ";
-	
+
 	// the LDAP query for selecting services implementing the KnxIPNetwork
 	// interface
-	String filterQuery = String.format("(%s=%s)", Constants.OBJECTCLASS, KnxIPGatewayDriver.class.getName());
-	
+	String filterQuery = String.format("(%s=%s)", Constants.OBJECTCLASS,
+			KnxIPGatewayDriver.class.getName());
+
 	// a reference to the network driver
 	private AtomicReference<KnxIPNetwork> network;
-	
+
 	// a reference to the gateway driver
 	private AtomicReference<KnxIPGatewayDriver> gateway;
-	
+
 	// the service registration handle
 	private ServiceRegistration<?> regDriver;
-	
+
 	// the set of connected drivers
 	private Vector<KnxIPSinglePhaseElectricityMeterDriverInstance> connectedDrivers;
-	
+
 	/**
 	 * Class constructor, creates a new driver for single phase electricity
 	 * meters
@@ -81,37 +83,37 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 		this.network = new AtomicReference<KnxIPNetwork>();
 		this.gateway = new AtomicReference<KnxIPGatewayDriver>();
 	}
-	
+
 	public void activate(BundleContext bundleContext)
 	{
 		// store the context reference
 		this.context = bundleContext;
-		
+
 		// create the vector holding the instances of this driver that are
 		// connected to a device
 		this.connectedDrivers = new Vector<KnxIPSinglePhaseElectricityMeterDriverInstance>();
-		
+
 		// create a logger
 		this.logger = new LogHelper(bundleContext);
-		
+
 		// try to register the service
 		this.register();
 	}
-	
+
 	public void deactivate()
 	{
 		// remove the service from the OSGi framework
 		this.unRegister();
-		
+
 		for (KnxIPSinglePhaseElectricityMeterDriverInstance driver : this.connectedDrivers)
 			this.network.get().removeDriver(driver);
-		
+
 		this.context = null;
 		this.connectedDrivers.clear();
 		this.connectedDrivers = null;
 		this.logger = null;
 	}
-	
+
 	/**
 	 * Unregister the service-related part of the driver from the OSGi framework
 	 */
@@ -123,7 +125,7 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 			this.regDriver = null;
 		}
 	}
-	
+
 	/**
 	 * Handles the "availability" of a KnxIP network driver (store a reference
 	 * to the driver and try to start).
@@ -135,11 +137,11 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 	{
 		// store a reference to the network driver
 		this.network.set(netDriver);
-		
+
 		// try to start service offering
 		this.register();
 	}
-	
+
 	/**
 	 * Handles the removal of the connected KnxIP network driver by
 	 * unregistering the services provided by this driver
@@ -148,11 +150,11 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 	{
 		// un-register this service
 		this.unRegister();
-		
+
 		// null the reference to the network driver
 		this.network.compareAndSet(network, null);
 	}
-	
+
 	/**
 	 * Handles the "availability" of a KnxIP gateway driver (store a reference
 	 * to the driver and try to start).
@@ -164,11 +166,11 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 	{
 		// store a reference to the gateway driver
 		this.gateway.set(gwDriver);
-		
+
 		// try to start service offering
 		this.register();
 	}
-	
+
 	/**
 	 * Handles the removal of the connected KnxIP gateway driver by
 	 * unregistering the services provided by this driver
@@ -177,97 +179,114 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 	{
 		// un-register this service
 		this.unRegister();
-		
+
 		// null the reference to the network driver
 		this.gateway.compareAndSet(gateway, null);
 	}
-	
+
 	/**
 	 * Registers this driver in the OSGi framework making its services available
 	 * for all the other Dog bundles
 	 */
 	private void register()
 	{
-		if ((this.network != null) && (this.gateway != null) && (this.context != null) && (this.regDriver == null))
+		if ((this.network != null) && (this.gateway != null)
+				&& (this.context != null) && (this.regDriver == null))
 		{
 			// create a new property object describing this driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-			
+
 			// add the id of this driver to the properties
-			propDriver.put(DeviceCostants.DRIVER_ID, KnxIPSinglePhaseElectricityMeterDriver.class.getName());
-			
+			propDriver.put(DeviceCostants.DRIVER_ID,
+					KnxIPSinglePhaseElectricityMeterDriver.class.getName());
+
 			// register this driver in the OSGi framework
-			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
+			this.regDriver = this.context.registerService(
+					Driver.class.getName(), this, propDriver);
 		}
 	}
-	
-	public void removedService(ServiceReference<Object> reference, Object service)
+
+	public void removedService(ServiceReference<Object> reference,
+			Object service)
 	{
 		this.unRegister();
 	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public synchronized int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
-		
-		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
+
+		if ((this.network != null) && (this.gateway != null)
+				&& (this.regDriver != null))
 		{
-			if (this.context.getService(reference) instanceof ControllableDevice)
+			// the device category for this device
+			String deviceCategory = (String) reference
+					.getProperty(DeviceCostants.DEVICE_CATEGORY);
+
+			if (Controllable.class
+					.isAssignableFrom(KnxIPSinglePhaseElectricityMeterDriver.class
+							.getClassLoader().loadClass(deviceCategory)))
 			{
-				// get the given device category
-				String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
-				
-				// get the given device manufacturer
-				String manifacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
-				
+
+				// the manufacturer
+				String manufacturer = (String) reference
+						.getProperty(DeviceCostants.MANUFACTURER);
+
 				// get the gateway to which the device is connected
-				String gateway = (String) ((ControllableDevice) this.context.getService(reference))
-						.getDeviceDescriptor().getGateway();
-				
+				String gateway = (String) reference
+						.getProperty(DeviceCostants.GATEWAY);
+
 				// compute the matching score between the given device and this
 				// driver
 				if (deviceCategory != null)
 				{
-					if (manifacturer != null && manifacturer.equals(KnxIPInfo.MANUFACTURER)
-							&& (deviceCategory.equals(SinglePhaseElectricityMeter.class.getName()))
+					if (manufacturer != null
+							&& manufacturer.equals(KnxIPInfo.MANUFACTURER)
+							&& (deviceCategory
+									.equals(SinglePhaseElectricityMeter.class
+											.getName()))
 							&& (this.gateway.get().isGatewayAvailable(gateway)))
 					{
 						matchValue = SinglePhaseElectricityMeter.MATCH_MANUFACTURER
 								+ SinglePhaseElectricityMeter.MATCH_TYPE;
 					}
-					
+
 				}
 			}
 		}
+
 		return matchValue;
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public synchronized String attach(ServiceReference reference) throws Exception
+	public synchronized String attach(ServiceReference reference)
+			throws Exception
 	{
-		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
+		if ((this.network != null) && (this.gateway != null)
+				&& (this.regDriver != null))
 		{
-			//get the referenced device
-			ControllableDevice device = (ControllableDevice) this.context.getService(reference);
-			
+			// get the referenced device
+			ControllableDevice device = (ControllableDevice) this.context
+					.getService(reference);
+
 			// get the gateway to which the device is connected
-			String gateway = (String) device.getDeviceDescriptor()
-					.getGateway();
-			
+			String gateway = (String) device.getDeviceDescriptor().getGateway();
+
 			// get the associated gateway instance
-			KnxIPGatewayDriverInstance gwInstance = this.gateway.get().getSpecificGateway(gateway);
-			
+			KnxIPGatewayDriverInstance gwInstance = this.gateway.get()
+					.getSpecificGateway(gateway);
+
 			// create a driver instance
 			KnxIPSinglePhaseElectricityMeterDriverInstance driver = new KnxIPSinglePhaseElectricityMeterDriverInstance(
-					this.network.get(), device,
-					gwInstance.getGatewayAddress(), this.context);
-			
-			//attach the driver to the device
+					this.network.get(), device, gwInstance.getGatewayAddress(),
+					this.context);
+
+			// attach the driver to the device
 			device.setDriver(driver);
-			
+
 			// store the driver instance as connected to a device
 			synchronized (this.connectedDrivers)
 			{
@@ -276,5 +295,5 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 		}
 		return null;
 	}
-	
+
 }

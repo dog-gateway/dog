@@ -20,6 +20,7 @@ package it.polito.elite.dog.drivers.knx.onoffdevice;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
 import it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriver;
 import it.polito.elite.dog.drivers.knx.gateway.KnxIPGatewayDriverInstance;
@@ -50,31 +51,31 @@ public class KnxIPOnOffDeviceDriver implements Driver
 {
 	// OSGi framework context
 	BundleContext context;
-	
+
 	// System logger
 	LogHelper logger;
-	
+
 	// the log identifier, unique for the class
 	public static String logId = "[KnxIpOnOffDeviceDriver]: ";
-	
+
 	// a reference to the network driver
 	private AtomicReference<KnxIPNetwork> network;
-	
+
 	// a reference to the gateway driver
 	private AtomicReference<KnxIPGatewayDriver> gateway;
-	
+
 	// the registration object needed to handle the lifespan of this bundle in
 	// the OSGi framework (it is a ServiceRegistration object for use by the
 	// bundle registering the service to update the service's properties or to
 	// unregister the service).
 	private ServiceRegistration<?> regDriver;
-	
+
 	// a vector to store all the connected On/Off device drivers
 	private Vector<KnxIPOnOffDeviceDriverInstance> connectedDriver;
-	
+
 	// what are the on/off device categories that can match with this driver?
 	private Set<String> OnOffDeviceCategories;
-	
+
 	/**
 	 * The (standard) constructor for the On/Off device driver. I
 	 */
@@ -84,29 +85,29 @@ public class KnxIPOnOffDeviceDriver implements Driver
 		this.network = new AtomicReference<KnxIPNetwork>();
 		this.gateway = new AtomicReference<KnxIPGatewayDriver>();
 	}
-	
+
 	public void activate(BundleContext context)
 	{
 		// init the logger
 		this.logger = new LogHelper(context);
-		
+
 		// store the context
 		this.context = context;
-		
+
 		// initialize the connected drivers list
 		this.connectedDriver = new Vector<KnxIPOnOffDeviceDriverInstance>();
-		
+
 		// initialize the set of implemented device categories
 		this.OnOffDeviceCategories = new HashSet<String>();
-		
+
 		// fill the categories
 		this.properFillDeviceCategories();
-		
+
 		// try to register the service
 		this.register();
-		
+
 	}
-	
+
 	public void deactivate()
 	{
 		this.unRegister();
@@ -117,7 +118,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 		this.OnOffDeviceCategories = null;
 		this.logger = null;
 	}
-	
+
 	/**
 	 * Fill a set with all the device categories whose devices can match with
 	 * this driver. Automatically retrieve the device categories list by reading
@@ -125,12 +126,13 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	 */
 	private void properFillDeviceCategories()
 	{
-		for (Class<?> devCat : KnxIPOnOffDeviceDriverInstance.class.getInterfaces())
+		for (Class<?> devCat : KnxIPOnOffDeviceDriverInstance.class
+				.getInterfaces())
 		{
 			this.OnOffDeviceCategories.add(devCat.getName());
 		}
 	}
-	
+
 	/**
 	 * Try to unregister the service-related part of the driver from the OSGi
 	 * framework
@@ -144,7 +146,7 @@ public class KnxIPOnOffDeviceDriver implements Driver
 			this.regDriver = null;
 		}
 	}
-	
+
 	/**
 	 * Handles the "availability" of a KnxIP network driver (store a reference
 	 * to the driver and try to start).
@@ -156,11 +158,11 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	{
 		// store a reference to the network driver
 		this.network.set(netDriver);
-		
+
 		// try to start service offering
 		// this.register();
 	}
-	
+
 	/**
 	 * Handles the removal of the connected KnxIP network driver by
 	 * unregistering the services provided by this driver
@@ -169,11 +171,11 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	{
 		// un-register this service
 		this.unRegister();
-		
+
 		// null the reference to the network driver
 		this.network.compareAndSet(network, null);
 	}
-	
+
 	/**
 	 * Handles the "availability" of a KnxIP gateway driver (store a reference
 	 * to the driver and try to start).
@@ -185,11 +187,11 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	{
 		// store a reference to the gateway driver
 		this.gateway.set(gwDriver);
-		
+
 		// try to start service offering
 		// this.register();
 	}
-	
+
 	/**
 	 * Handles the removal of the connected KnxIP gateway driver by
 	 * unregistering the services provided by this driver
@@ -198,57 +200,68 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	{
 		// un-register this service
 		this.unRegister();
-		
+
 		// null the reference to the network driver
 		this.gateway.compareAndSet(gateway, null);
 	}
-	
+
 	/**
 	 * Register the driver in the OSGi framework.
 	 */
 	private void register()
 	{
-		if ((this.network != null) && (this.gateway != null) && (this.context != null) && (this.regDriver == null))
+		if ((this.network != null) && (this.gateway != null)
+				&& (this.context != null) && (this.regDriver == null))
 		{
 			// create a new property object describing this driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-			
+
 			// add the id of this driver to the properties
-			propDriver.put(DeviceCostants.DRIVER_ID, KnxIPOnOffDeviceDriver.class.getName());
-			
+			propDriver.put(DeviceCostants.DRIVER_ID,
+					KnxIPOnOffDeviceDriver.class.getName());
+
 			// register this driver in the OSGi framework
-			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
+			this.regDriver = this.context.registerService(
+					Driver.class.getName(), this, propDriver);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.osgi.service.device.Driver#match(org.osgi.framework.ServiceReference)
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public synchronized int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
-		
-		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
+
+		if ((this.network != null) && (this.gateway != null)
+				&& (this.regDriver != null))
 		{
-			if (this.context.getService(reference) instanceof ControllableDevice)
+			// the device category for this device
+			String deviceCategory = (String) reference
+					.getProperty(DeviceCostants.DEVICE_CATEGORY);
+
+			if (Controllable.class
+					.isAssignableFrom(KnxIPOnOffDeviceDriver.class
+							.getClassLoader().loadClass(deviceCategory)))
 			{
-				// the device category for this device
-				String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
+
 				// the manufacturer
-				String manufacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
-				
+				String manufacturer = (String) reference
+						.getProperty(DeviceCostants.MANUFACTURER);
+
 				// get the gateway to which the device is connected
-				String gateway = (String) ((ControllableDevice) this.context.getService(reference))
-						.getDeviceDescriptor().getGateway();
-				
+				String gateway = (String) reference
+						.getProperty(DeviceCostants.GATEWAY);
+
 				if (deviceCategory != null)
 				{
-					if ((manufacturer != null) && (gateway != null) && (manufacturer.equals(KnxIPInfo.MANUFACTURER))
+					if ((manufacturer != null) && (gateway != null)
+							&& (manufacturer.equals(KnxIPInfo.MANUFACTURER))
 							&& (OnOffDeviceCategories.contains(deviceCategory))
 							&& (this.gateway.get().isGatewayAvailable(gateway)))
 					{
@@ -260,13 +273,14 @@ public class KnxIPOnOffDeviceDriver implements Driver
 						// DogDeviceConstant, to be general...
 						matchValue = Lamp.MATCH_MANUFACTURER + Lamp.MATCH_TYPE;
 					}
-					
+
 				}
 			}
 		}
+
 		return matchValue;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -276,36 +290,40 @@ public class KnxIPOnOffDeviceDriver implements Driver
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public synchronized String attach(ServiceReference reference) throws Exception
+	public synchronized String attach(ServiceReference reference)
+			throws Exception
 	{
-		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
+		if ((this.network != null) && (this.gateway != null)
+				&& (this.regDriver != null))
 		{
-			//get the referenced device
-			ControllableDevice device = (ControllableDevice) this.context.getService(reference);
-			
+			// get the referenced device: from this moment on the driver will be
+			// tracked as using the device
+			ControllableDevice device = (ControllableDevice) this.context
+					.getService(reference);
+
 			// get the gateway to which the device is connected
-			String gateway = (String) device.getDeviceDescriptor()
-					.getGateway();
-			
+			String gateway = (String) device.getDeviceDescriptor().getGateway();
+
 			// get the associated gateway instance
-			KnxIPGatewayDriverInstance gwInstance = this.gateway.get().getSpecificGateway(gateway);
-			
+			KnxIPGatewayDriverInstance gwInstance = this.gateway.get()
+					.getSpecificGateway(gateway);
+
 			// create a driver instance
-			KnxIPOnOffDeviceDriverInstance driver = new KnxIPOnOffDeviceDriverInstance(this.network.get(),
-					device, gwInstance.getGatewayAddress(),
+			KnxIPOnOffDeviceDriverInstance driver = new KnxIPOnOffDeviceDriverInstance(
+					this.network.get(), device, gwInstance.getGatewayAddress(),
 					this.context);
-			
-			//attach the driver to the device
+
+			// attach the driver to the device
 			device.setDriver(driver);
-			
+
 			// store the driver instance as connected to a device
 			synchronized (this.connectedDriver)
 			{
 				this.connectedDriver.add(driver);
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 }
