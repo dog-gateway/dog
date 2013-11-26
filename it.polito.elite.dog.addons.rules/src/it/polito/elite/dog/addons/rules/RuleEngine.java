@@ -47,6 +47,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.unit.Unit;
@@ -109,6 +111,9 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	private boolean rulesAreReady;
 	private boolean servicesHaveBeenMatched;
 	
+	/** executor service for handling events **/
+	private ExecutorService executor;
+	
 	private JAXBContext jaxbContext;
 	
 	/**********************************************************************************
@@ -151,6 +156,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// initially the bundle is not ready to offer his services
 		this.rulesAreReady = false;
 		this.servicesHaveBeenMatched = false;
+		
+		this.executor = Executors.newSingleThreadExecutor();
 		
 		// prepare the drools rule base object
 		this.ruleBase = KnowledgeBaseFactory.newKnowledgeBase();
@@ -653,98 +660,106 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	}
 	
 	@Override
-	public void handleEvent(Event event)
+	public void handleEvent(final Event event)
 	{
-		// Handle events...
-		String eventTopic = event.getTopic();
-		
-		// Debug
-		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received event of topic: " + eventTopic);
-		
-		Notification receivedNotification = null;
-		
-		if (this.runtimeRuleSession != null)
+		this.executor.execute(new Runnable()
 		{
-			// Received a generic MonitorAdmin event (No MonitoringJob, so
-			// mon.listener.id property is null)
-			if (eventTopic != null && eventTopic.equals("org/osgi/service/monitor")
-					&& event.getProperty("mon.listener.id") == null)
+			
+			@Override
+			public void run()
 			{
-				DeviceStatus currentDeviceStatus = null;
-				try
-				{
-					// Try the deserialization of the DeviceStatus (property
-					// mon.statusvariable.value)
-					currentDeviceStatus = DeviceStatus.deserializeFromString((String) event
-							.getProperty("mon.statusvariable.value"));
-				}
+				// Handle events...
+				String eventTopic = event.getTopic();
 				
-				catch (Exception e)
-				{
-					this.logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error", e);
-				}
+				// Debug
+				logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " received event of topic: " + eventTopic);
 				
-				// If the deserialization works
-				if (currentDeviceStatus != null)
+				Notification receivedNotification = null;
+				
+				if (runtimeRuleSession != null)
 				{
-					Map<String, State> allStates = currentDeviceStatus.getStates();
-					for (State cState : allStates.values())
+					// Received a generic MonitorAdmin event (No MonitoringJob, so
+					// mon.listener.id property is null)
+					if (eventTopic != null && eventTopic.equals("org/osgi/service/monitor")
+							&& event.getProperty("mon.listener.id") == null)
 					{
-						// store the received notification
-						receivedNotification = new StateChangeNotification(cState);
-						receivedNotification.setDeviceUri(currentDeviceStatus.getDeviceURI());
+						DeviceStatus currentDeviceStatus = null;
+						try
+						{
+							// Try the deserialization of the DeviceStatus (property
+							// mon.statusvariable.value)
+							currentDeviceStatus = DeviceStatus.deserializeFromString((String) event
+									.getProperty("mon.statusvariable.value"));
+						}
 						
+						catch (Exception e)
+						{
+							logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error", e);
+						}
+						
+						// If the deserialization works
+						if (currentDeviceStatus != null)
+						{
+							Map<String, State> allStates = currentDeviceStatus.getStates();
+							for (State cState : allStates.values())
+							{
+								// store the received notification
+								receivedNotification = new StateChangeNotification(cState);
+								receivedNotification.setDeviceUri(currentDeviceStatus.getDeviceURI());
+								
+								// debug
+								logger.log(LogService.LOG_DEBUG, RuleEngine.logId
+										+ " handling state change notification(s): " + receivedNotification);
+								
+								// insert the notification in the working memory
+								FactHandle notificationHandle = runtimeRuleSession
+										.insert((StateChangeNotification) receivedNotification);
+								
+								// fire rules
+								runtimeRuleSession.fireAllRules();
+								
+								// retract the notification
+								runtimeRuleSession.retract(notificationHandle);
+								
+							}
+						}
+						
+					}
+					// Received a notification from the devices or a
+					// TimedTriggerNotification (DogScheduler)
+					else if (eventTopic != null
+							&& (eventTopic.startsWith("it/polito/elite/domotics/model/notification/") || eventTopic
+									.equals(TimedTriggerNotification.notificationTopic)))
+					{
 						// debug
-						this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
-								+ " handling state change notification(s): " + receivedNotification);
+						logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " trigger event: " + event);
 						
-						// insert the notification in the working memory
-						FactHandle notificationHandle = this.runtimeRuleSession
-								.insert((StateChangeNotification) receivedNotification);
+						// handle Notification
+						Object eventContent = event.getProperty(EventConstants.EVENT);
 						
-						// fire rules
-						this.runtimeRuleSession.fireAllRules();
-						
-						// retract the notification
-						this.runtimeRuleSession.retract(notificationHandle);
-						
+						if (eventContent instanceof Notification)
+						{
+							// store the received notification
+							receivedNotification = (Notification) eventContent;
+							
+							// debug
+							logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " handling notification: "
+									+ receivedNotification);
+							
+							// insert the notification in the working memory
+							FactHandle notificationHandle = runtimeRuleSession.insert(receivedNotification);
+							
+							// fire rules
+							runtimeRuleSession.fireAllRules();
+							
+							// retract the notification
+							runtimeRuleSession.retract(notificationHandle);
+						}
 					}
 				}
 				
 			}
-			// Received a notification from the devices or a
-			// TimedTriggerNotification (DogScheduler)
-			else if (eventTopic != null
-					&& (eventTopic.startsWith("it/polito/elite/domotics/model/notification/") || eventTopic
-							.equals(TimedTriggerNotification.notificationTopic)))
-			{
-				// debug
-				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " trigger event: " + event);
-				
-				// handle Notification
-				Object eventContent = event.getProperty(EventConstants.EVENT);
-				
-				if (eventContent instanceof Notification)
-				{
-					// store the received notification
-					receivedNotification = (Notification) eventContent;
-					
-					// debug
-					this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + " handling notification: "
-							+ receivedNotification);
-					
-					// insert the notification in the working memory
-					FactHandle notificationHandle = this.runtimeRuleSession.insert(receivedNotification);
-					
-					// fire rules
-					this.runtimeRuleSession.fireAllRules();
-					
-					// retract the notification
-					this.runtimeRuleSession.retract(notificationHandle);
-				}
-			}
-		}
-		
+		});
 	}
 	
 	/*********************************************************************************************************
