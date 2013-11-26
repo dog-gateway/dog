@@ -219,35 +219,44 @@ public class KnxIPThreePhaseElectricityMeterDriver implements Driver
 			String deviceCategory = (String) reference
 					.getProperty(DeviceCostants.DEVICE_CATEGORY);
 
-			if (Controllable.class
-					.isAssignableFrom(KnxIPThreePhaseElectricityMeterDriver.class
-							.getClassLoader().loadClass(deviceCategory)))
+			try
 			{
-
-				// the manufacturer
-				String manufacturer = (String) reference
-						.getProperty(DeviceCostants.MANUFACTURER);
-
-				// get the gateway to which the device is connected
-				String gateway = (String) reference
-						.getProperty(DeviceCostants.GATEWAY);
-
-				// compute the matching score between the given device and this
-				// driver
-				if (deviceCategory != null)
+				if (Controllable.class
+						.isAssignableFrom(KnxIPThreePhaseElectricityMeterDriver.class
+								.getClassLoader().loadClass(deviceCategory)))
 				{
-					if (manufacturer != null
-							&& manufacturer.equals(KnxIPInfo.MANUFACTURER)
-							&& (deviceCategory
-									.equals(ThreePhaseElectricityMeter.class
-											.getName()))
-							&& (this.gateway.get().isGatewayAvailable(gateway)))
-					{
-						matchValue = ThreePhaseElectricityMeter.MATCH_MANUFACTURER
-								+ ThreePhaseElectricityMeter.MATCH_TYPE;
-					}
 
+					// the manufacturer
+					String manufacturer = (String) reference
+							.getProperty(DeviceCostants.MANUFACTURER);
+
+					// get the gateway to which the device is connected
+					String gateway = (String) reference
+							.getProperty(DeviceCostants.GATEWAY);
+
+					// compute the matching score between the given device and
+					// this
+					// driver
+					if (deviceCategory != null)
+					{
+						if (manufacturer != null
+								&& manufacturer.equals(KnxIPInfo.MANUFACTURER)
+								&& (deviceCategory
+										.equals(ThreePhaseElectricityMeter.class
+												.getName()))
+								&& (this.gateway.get()
+										.isGatewayAvailable(gateway)))
+						{
+							matchValue = ThreePhaseElectricityMeter.MATCH_MANUFACTURER
+									+ ThreePhaseElectricityMeter.MATCH_TYPE;
+						}
+
+					}
 				}
+			}
+			catch (ClassNotFoundException e)
+			{
+				// skip --> no match
 			}
 		}
 		return matchValue;

@@ -245,37 +245,50 @@ public class KnxIPOnOffDeviceDriver implements Driver
 			String deviceCategory = (String) reference
 					.getProperty(DeviceCostants.DEVICE_CATEGORY);
 
-			if (Controllable.class
-					.isAssignableFrom(KnxIPOnOffDeviceDriver.class
-							.getClassLoader().loadClass(deviceCategory)))
+			try
 			{
-
-				// the manufacturer
-				String manufacturer = (String) reference
-						.getProperty(DeviceCostants.MANUFACTURER);
-
-				// get the gateway to which the device is connected
-				String gateway = (String) reference
-						.getProperty(DeviceCostants.GATEWAY);
-
-				if (deviceCategory != null)
+				//get the device class
+				if (Controllable.class.isAssignableFrom(KnxIPOnOffDeviceDriver.class
+						.getClassLoader().loadClass(deviceCategory)))
 				{
-					if ((manufacturer != null) && (gateway != null)
-							&& (manufacturer.equals(KnxIPInfo.MANUFACTURER))
-							&& (OnOffDeviceCategories.contains(deviceCategory))
-							&& (this.gateway.get().isGatewayAvailable(gateway)))
-					{
-						// use Lamp as a generic on/off device, for its match
-						// values...
-						// TODO: evaluate if it is better to store this
-						// information
-						// in
-						// DogDeviceConstant, to be general...
-						matchValue = Lamp.MATCH_MANUFACTURER + Lamp.MATCH_TYPE;
-					}
 
+					// the manufacturer
+					String manufacturer = (String) reference
+							.getProperty(DeviceCostants.MANUFACTURER);
+
+					// get the gateway to which the device is connected
+					String gateway = (String) reference
+							.getProperty(DeviceCostants.GATEWAY);
+
+					if (deviceCategory != null)
+					{
+						if ((manufacturer != null)
+								&& (gateway != null)
+								&& (manufacturer.equals(KnxIPInfo.MANUFACTURER))
+								&& (OnOffDeviceCategories
+										.contains(deviceCategory))
+								&& (this.gateway.get()
+										.isGatewayAvailable(gateway)))
+						{
+							// use Lamp as a generic on/off device, for its
+							// match
+							// values...
+							// TODO: evaluate if it is better to store this
+							// information
+							// in
+							// DogDeviceConstant, to be general...
+							matchValue = Lamp.MATCH_MANUFACTURER
+									+ Lamp.MATCH_TYPE;
+						}
+
+					}
 				}
 			}
+			catch (ClassNotFoundException e)
+			{
+				// skip --> no match
+			}
+
 		}
 
 		return matchValue;

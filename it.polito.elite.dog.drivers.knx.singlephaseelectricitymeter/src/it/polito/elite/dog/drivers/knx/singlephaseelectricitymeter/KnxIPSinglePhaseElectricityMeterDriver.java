@@ -224,36 +224,44 @@ public class KnxIPSinglePhaseElectricityMeterDriver implements Driver
 			// the device category for this device
 			String deviceCategory = (String) reference
 					.getProperty(DeviceCostants.DEVICE_CATEGORY);
-
-			if (Controllable.class
-					.isAssignableFrom(KnxIPSinglePhaseElectricityMeterDriver.class
-							.getClassLoader().loadClass(deviceCategory)))
+			try
 			{
-
-				// the manufacturer
-				String manufacturer = (String) reference
-						.getProperty(DeviceCostants.MANUFACTURER);
-
-				// get the gateway to which the device is connected
-				String gateway = (String) reference
-						.getProperty(DeviceCostants.GATEWAY);
-
-				// compute the matching score between the given device and this
-				// driver
-				if (deviceCategory != null)
+				if (Controllable.class
+						.isAssignableFrom(KnxIPSinglePhaseElectricityMeterDriver.class
+								.getClassLoader().loadClass(deviceCategory)))
 				{
-					if (manufacturer != null
-							&& manufacturer.equals(KnxIPInfo.MANUFACTURER)
-							&& (deviceCategory
-									.equals(SinglePhaseElectricityMeter.class
-											.getName()))
-							&& (this.gateway.get().isGatewayAvailable(gateway)))
-					{
-						matchValue = SinglePhaseElectricityMeter.MATCH_MANUFACTURER
-								+ SinglePhaseElectricityMeter.MATCH_TYPE;
-					}
 
+					// the manufacturer
+					String manufacturer = (String) reference
+							.getProperty(DeviceCostants.MANUFACTURER);
+
+					// get the gateway to which the device is connected
+					String gateway = (String) reference
+							.getProperty(DeviceCostants.GATEWAY);
+
+					// compute the matching score between the given device and
+					// this
+					// driver
+					if (deviceCategory != null)
+					{
+						if (manufacturer != null
+								&& manufacturer.equals(KnxIPInfo.MANUFACTURER)
+								&& (deviceCategory
+										.equals(SinglePhaseElectricityMeter.class
+												.getName()))
+								&& (this.gateway.get()
+										.isGatewayAvailable(gateway)))
+						{
+							matchValue = SinglePhaseElectricityMeter.MATCH_MANUFACTURER
+									+ SinglePhaseElectricityMeter.MATCH_TYPE;
+						}
+
+					}
 				}
+			}
+			catch (ClassNotFoundException e)
+			{
+				// skip --> no match
 			}
 		}
 
