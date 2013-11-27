@@ -19,6 +19,7 @@ package it.polito.elite.dog.drivers.modbus.humiditysensor;
 
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.HumiditySensor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.gateway.ModbusGatewayDriver;
@@ -180,36 +181,48 @@ public class ModbusHumiditySensorDriver implements Driver
 	{
 		int matchValue = Device.MATCH_NONE;
 		
-		if (this.regDriver != null)
+		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
 		{
-			// get the given device category
+			// the device category for this device
 			String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
 			
-			// get the given device manufacturer
-			String manifacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
-			
-			// get the gateway to which the device is connected
-			@SuppressWarnings("unchecked")
-			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-					.getGateway();
-			
-			// compute the matching score between the given device and this
-			// driver
-			if (deviceCategory != null)
+			try
 			{
-				if (manifacturer != null
-						&& (gateway != null)
-						&& (manifacturer.equals(ModbusInfo.MANUFACTURER))
-						&& (deviceCategory.equals(HumiditySensor.class.getName()) && (this.gateway
-								.isGatewayAvailable(gateway))
-						
-						))
+				// get the device class
+				if (Controllable.class.isAssignableFrom(ModbusHumiditySensorDriver.class.getClassLoader().loadClass(
+						deviceCategory)))
 				{
-					matchValue = HumiditySensor.MATCH_MANUFACTURER + HumiditySensor.MATCH_TYPE;
+					
+					// the manufacturer
+					String manufacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
+					
+					// get the gateway to which the device is connected
+					String gateway = (String) reference.getProperty(DeviceCostants.GATEWAY);
+					
+					// compute the matching score between the given device and
+					// this driver
+					if (deviceCategory != null)
+					{
+						if (manufacturer != null
+								&& (gateway != null)
+								&& (manufacturer.equals(ModbusInfo.MANUFACTURER))
+								&& (deviceCategory.equals(HumiditySensor.class.getName()) && (this.gateway
+										.isGatewayAvailable(gateway))
+								
+								))
+						{
+							matchValue = HumiditySensor.MATCH_MANUFACTURER + HumiditySensor.MATCH_TYPE;
+						}
+						
+					}
 				}
-				
+			}
+			catch (ClassNotFoundException e)
+			{
+				// skip --> no match
 			}
 		}
+		
 		return matchValue;
 	}
 	
