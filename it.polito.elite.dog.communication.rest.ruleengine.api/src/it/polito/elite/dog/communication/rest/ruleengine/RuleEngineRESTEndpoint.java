@@ -19,6 +19,8 @@ package it.polito.elite.dog.communication.rest.ruleengine;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.Path;
@@ -193,8 +195,17 @@ public class RuleEngineRESTEndpoint implements RuleEngineRESTApi
 			try
 			{
 				// add the received rules
-				RuleList rules = (RuleList) this.unmarshaller.get().unmarshal(new StringReader(xmlRules));
-				this.ruleEngine.get().addRule(rules);
+				final RuleList rules = (RuleList) this.unmarshaller.get().unmarshal(new StringReader(xmlRules));
+				// thread for asynchronous call
+				ExecutorService executor = Executors.newSingleThreadExecutor();
+				executor.execute(new Runnable() {
+					
+					@Override
+					public void run()
+					{
+						ruleEngine.get().addRule(rules);
+					}
+				});
 			}
 			catch (JAXBException e)
 			{
