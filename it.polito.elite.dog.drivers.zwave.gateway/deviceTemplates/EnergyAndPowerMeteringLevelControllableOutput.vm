@@ -40,19 +40,22 @@
 					</dhc:command>
 				</dhc:commands>
 			</dhc:controlFunctionality>
-			<dhc:controlFunctionality class="ActivePowerMeasurementFunctionality">
+			<dhc:controlFunctionality class="SinglePhaseActivePowerMeasurementFunctionality">
 				<dhc:commands>
-					<dhc:command class="GetActivePowerCommand"
-						name="GetActivePowerCommand_$name" id="GetActivePowerCommand_$name">
+					<dhc:command class="Get1PhaseActivePowerCommand"
+						name="Get1PhaseActivePowerCommand_$name" id="Get1PhaseActivePowerCommand_$name">
 						<dhc:param name="realCommandName" value="getActivePower" />
 						<dhc:param name="returnType" value="Measure" />
 					</dhc:command>
 				</dhc:commands>
 			</dhc:controlFunctionality>
-			<dhc:controlFunctionality class="ActiveEnergyMeasurementFunctionality">
+			<dhc:controlFunctionality class="SinglePhaseActiveEnergyMeasurementFunctionality">
 				<dhc:commands>
-					<dhc:command class="GetActiveEnergyCommand"
-						name="GetActiveEnergyValueCommand_$name" id="GetActiveEnergyValueCommand_$name" />
+					<dhc:command class="Get1PhaseActiveEnergyCommand"
+						name="Get1PhaseActiveEnergyCommand_$name" id="Get1PhaseActiveEnergyCommand_$name">
+						<dhc:param value="getActiveEnergyValue" name="realCommandName" />
+						<dhc:param name="returnType" value="Measure" />
+					</dhc:command>
 				</dhc:commands>
 			</dhc:controlFunctionality>
 			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
@@ -66,10 +69,10 @@
 				</dhc:notifications>
 			</dhc:notificationFunctionality>
 			<dhc:notificationFunctionality
-				class="ActivePowerMeasurementNotificationFunctionality">
+				class="SinglePhaseActivePowerMeasurementNotificationFunctionality">
 				<dhc:notifications>
-					<dhc:notification class="ActivePowerMeasurementNotification"
-						name="ActivePowerMeasurementNotification_$name">
+					<dhc:notification class="SinglePhaseActivePowerMeasurementNotification"
+						name="SinglePhaseActivePowerMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newActivePowerValue" />
 						<dhc:param name="unitOfMeasure" value="W" />
@@ -79,10 +82,10 @@
 				</dhc:notifications>
 			</dhc:notificationFunctionality>
 			<dhc:notificationFunctionality
-				class="ActiveEnergyMeasurementNotificationFunctionality">
+				class="SinglePhaseActiveEnergyMeasurementNotificationFunctionality">
 				<dhc:notifications>
-					<dhc:notification class="ActiveEnergyMeasurementNotification"
-						name="ActiveEnergyMeasurementNotification_$name">
+					<dhc:notification class="SinglePhaseActiveEnergyMeasurementNotification"
+						name="SinglePhaseActiveEnergyMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newActiveEnergyValue" />
 						<dhc:param name="unitOfMeasure" value="Wh" />
