@@ -39,6 +39,7 @@ import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
@@ -53,8 +54,11 @@ import java.util.concurrent.Executors;
 import javax.measure.DecimalMeasure;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.util.JAXBSource;
+import javax.xml.namespace.QName;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -389,11 +393,31 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		
 		this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId + "Adding new rules...");
 		
+		// clone the original rule list
+		List<Rule> originalRules = new ArrayList<Rule>();
+		try
+		{
+			// TODO Implement as clone() for better performance (look for a
+			// plugin on the Internet... it exists!)
+			JAXBElement<RuleList> contentObj = new JAXBElement<RuleList>(new QName(RuleList.class.getSimpleName()),
+					RuleList.class, this.localRuleBaseJAXB);
+			JAXBSource source = new JAXBSource(this.jaxbContext, contentObj);
+			// marshall the JAXBSource to obtain a deep copy
+			originalRules.addAll((jaxbContext.createUnmarshaller().unmarshal(source, RuleList.class).getValue())
+					.getRule());
+		}
+		catch (JAXBException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		// filter out duplicate rules....
 		this.localRuleBaseJAXB = this.mergeRules(rules);
 		
 		// preprocess timed e-blocks
-		//TimedNotificationsPreProcessor proc = new TimedNotificationsPreProcessor(this.logger);
+		// TimedNotificationsPreProcessor proc = new
+		// TimedNotificationsPreProcessor(this.logger);
 		// TODO Fix when a new scheduler will be developed...
 		// Set<DogMessage> timedEvents =
 		// proc.preProcess(this.localRuleBaseJAXB);
@@ -404,43 +428,56 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// translate rules
 		String drlRules = translator.xml2drl(this.localRuleBaseJAXB);
 		
-		if (drlRules != null)
+		try
 		{
-			// debug
-			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
-					+ " Merged existing and new rules and translated them to DRL:\n" + drlRules);
+			if (drlRules != null)
+			{
+				// debug
+				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
+						+ " Merged existing and new rules and translated them to DRL:\n" + drlRules);
+				
+				// here we parse the just created DRL specification and load it
+				// into
+				// the rules bundle knowledge base
+				KnowledgeBuilder kBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+				
+				// the reader for accessing the dynamically created rules
+				StringReader drlReader = new StringReader(drlRules);
+				
+				// the knowledge builder is now used to read the created DRL
+				kBuilder.add(ResourceFactory.newReaderResource(drlReader), ResourceType.DRL);
+				
+				// create the knowledge base to which rules shall be added
+				KnowledgeBase ruleBase = KnowledgeBaseFactory.newKnowledgeBase();
+				
+				// add the just read DRL rules
+				ruleBase.addKnowledgePackages(kBuilder.getKnowledgePackages());
+				this.setRuleBase(ruleBase);
+				
+				// TODO Fix when a new scheduler will be developed...
+				// schedule timed events if any available
+				// this.scheduleTimedEvents(timedEvents);
+				
+				// debug
+				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
+						+ " new rules have been added to the current rule base");
+				
+				// save
+				this.saveRules(this.localRuleBasePath);
+				
+				// debug
+				this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
+						+ " new rules have been save to the rule repository");
+			}
+		}
+		catch (Exception e)
+		{
+			// log the exception
+			this.logger.log(LogService.LOG_ERROR, "Error adding the rule " + rules.getRule().get(0), e);
 			
-			// here we parse the just created DRL specification and load it into
-			// the rules bundle knowledge base
-			KnowledgeBuilder kBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-			
-			// the reader for accessing the dynamically created rules
-			StringReader drlReader = new StringReader(drlRules);
-			
-			// the knowledge builder is now used to read the created DRL
-			kBuilder.add(ResourceFactory.newReaderResource(drlReader), ResourceType.DRL);
-			
-			// create the knowledge base to which rules shall be added
-			KnowledgeBase ruleBase = KnowledgeBaseFactory.newKnowledgeBase();
-			
-			// add the just read DRL rules
-			ruleBase.addKnowledgePackages(kBuilder.getKnowledgePackages());
-			this.setRuleBase(ruleBase);
-			
-			// TODO Fix when a new scheduler will be developed...
-			// schedule timed events if any available
-			// this.scheduleTimedEvents(timedEvents);
-			
-			// debug
-			this.logger.log(LogService.LOG_DEBUG, RuleEngine.logId
-					+ " new rules have been added to the current rule base");
-			
-			// save
-			this.saveRules(this.localRuleBasePath);
-			
-			// debug
-			this.logger
-					.log(LogService.LOG_DEBUG, RuleEngine.logId + " new rules have been save to the rule repository");
+			// restore the original rule list
+			this.localRuleBaseJAXB.getRule().clear();
+			this.localRuleBaseJAXB.getRule().addAll(originalRules);
 		}
 		
 	}
@@ -662,8 +699,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	@Override
 	public void handleEvent(final Event event)
 	{
-		this.executor.execute(new Runnable()
-		{
+		this.executor.execute(new Runnable() {
 			
 			@Override
 			public void run()
@@ -678,7 +714,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 				
 				if (runtimeRuleSession != null)
 				{
-					// Received a generic MonitorAdmin event (No MonitoringJob, so
+					// Received a generic MonitorAdmin event (No MonitoringJob,
+					// so
 					// mon.listener.id property is null)
 					if (eventTopic != null && eventTopic.equals("org/osgi/service/monitor")
 							&& event.getProperty("mon.listener.id") == null)
@@ -686,7 +723,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 						DeviceStatus currentDeviceStatus = null;
 						try
 						{
-							// Try the deserialization of the DeviceStatus (property
+							// Try the deserialization of the DeviceStatus
+							// (property
 							// mon.statusvariable.value)
 							currentDeviceStatus = DeviceStatus.deserializeFromString((String) event
 									.getProperty("mon.statusvariable.value"));
@@ -694,7 +732,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 						
 						catch (Exception e)
 						{
-							logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error", e);
+							logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error",
+									e);
 						}
 						
 						// If the deserialization works
