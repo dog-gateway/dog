@@ -170,7 +170,7 @@ public class DeviceMonitor implements DeviceMonitorInterface
 							if (active.equals("true"))
 							{
 								htmlOut.append("<span class=\"label label-success pull-right\">Active</span></p>");
-								htmlOut.append("<ul style=\"list-style-type: none\"><li data-load=\"ajax\" data-src=\"/admin/system/devicemonitor/devices/"+currentDevice.getDeviceId()+"/state\" data-refresh=\"1000\">"
+								htmlOut.append("<ul style=\"list-style-type: none\"><li data-load=\"ajax\" data-src=\"/admin/system/devicemonitor/devices/"+currentDevice.getDeviceId()+"/state\" data-refresh=\"2000\">"
 										+ this.getDeviceState(currentDevice.getDeviceId())
 										+ "</li><li>"
 										+ this.getCommands(currentDevice)
