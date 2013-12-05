@@ -1,7 +1,8 @@
+var lastContent = [];
+
 $(document).ready(function() {
 	var body = $("body");
 	loadAjaxContent(body);
-
 });
 
 // ajax loading of content items having a data-load=ajax attribute,
@@ -18,8 +19,7 @@ function loadAjaxContent(rootElement) {
 				loadContent(element, src);
 				// attachCommandButtons();
 			}, parseInt(refreshTime));
-		else 
-		{
+		else {
 			jQuery(element).load(src, function() {
 				attachCommandButtons(jQuery(element));
 				loadAjaxContent(jQuery(element));
@@ -32,7 +32,35 @@ function loadAjaxContent(rootElement) {
 // the actualt content loading function
 function loadContent(element, uri) {
 	$("div.active").find(jQuery(element)).each(function(index) {
-		jQuery(element).load(uri);
+		
+		var $element = jQuery(element);
+
+		// load the element content
+		$element.load(uri);
+
+		//get the element id if available
+		var id = $element.attr('id');
+		
+		// store the loaded content
+		if (id != null)
+			lastContent[id] = $element.html();
+
+		// check if the element is trigger for other elements
+		if ($element.attr('data-toggle') == 'update') {
+			// if the element content is different from the last time, trigger
+			// an update
+			if (id != null) {
+				if ((lastContent[id]==null)||($element.html() != lastContent[id])) {
+					// trigger an update of the target element
+					var $target = jQuery($element.attr('href'));
+
+					// if target is not null update the target
+					if ($target != null) {
+						loadContent($target, $target.attr('data-src'));
+					}
+				}
+			}
+		}
 	});
 }
 
