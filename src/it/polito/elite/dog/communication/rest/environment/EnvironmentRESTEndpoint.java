@@ -32,6 +32,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.DataBindingException;
 import javax.xml.bind.JAXB;
 
@@ -236,6 +239,10 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void addNewFlat(String addedFlat)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		try
 		{
 			// create the JAXB object from the JSON representing the flat to add
@@ -245,13 +252,23 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			{
 				// add the new flat to the model
 				this.environmentModel.get().addFlatToBuilding(flat);
+				// set the variable used to store the HTTP response by the right
+				// value: CREATED (the flat was added successfully)
+				response = Response.Status.CREATED;
 			}
 		}
 		catch (Exception e)
 		{
 			// exception
 			this.logger.log(LogService.LOG_ERROR, "Impossible to add a new flat", e);
+			// set the variable used to store the HTTP response by the right
+			// value: NOT_MODIFIED (the flat was not added)
+			// it was the best response status available
+			response = Response.Status.NOT_MODIFIED;
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 	}
 	
 	/*
@@ -294,6 +311,10 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void updateFlat(String flatId, String updatedFlat)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		// check if the flat exists
 		Flat flat = this.getFlatFromModel(flatId);
 		
@@ -311,19 +332,33 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 				{
 					// update the model with the new flat
 					this.environmentModel.get().updateBuildingConfiguration(flatToUpdate);
+					// set the variable used to store the HTTP response by the
+					// right value: OK (the flat was updated)
+					response = Response.Status.OK;
 				}
 			}
 			else
 			{
 				this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId
 						+ " since it does not exists!");
+				// set the variable used to store the HTTP response by the right
+				// value: PRECONDITION_FAILED (Impossible to update the flat
+				// since it does not exists)
+				// it was the best response status available
+				response = Response.Status.PRECONDITION_FAILED;
 			}
 		}
 		catch (Exception e)
 		{
 			// exception
 			this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId, e);
+			// set the variable used to store the HTTP response by the right
+			// value: NOT_MODIFIED (Impossible to update the flat)
+			response = Response.Status.NOT_MODIFIED;
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 	}
 	
 	/*
@@ -372,6 +407,10 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void addNewRoomInFlat(String flatId, String addedRoom)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		try
 		{
 			// create the JAXB object from the JSON representing the room to add
@@ -381,13 +420,22 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			{
 				// add the new flat to the model
 				this.environmentModel.get().addRoomToBuilding(room, flatId);
+				// set the variable used to store the HTTP response by the right
+				// value: CREATED (The room was successfully added)
+				response = Response.Status.CREATED;
 			}
 		}
 		catch (Exception e)
 		{
 			// exception
 			this.logger.log(LogService.LOG_ERROR, "Impossible to add a new room to the flat named " + flatId, e);
+			// set the variable used to store the HTTP response by the right
+			// value: NOT_MODIFIED (Impossible to add a new room to the flat)
+			response = Response.Status.NOT_MODIFIED;
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 	}
 	
 	/*
@@ -430,6 +478,10 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void updateRoomInFlat(String flatId, String roomId, String updatedRoom)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		// get the room to check if it exists
 		Room room = this.getRoomFromModel(flatId, roomId);
 		
@@ -446,19 +498,34 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 				{
 					// update the model with the new room
 					this.environmentModel.get().updateBuildingConfiguration(roomToUpdate, flatId);
+					// set the variable used to store the HTTP response by the
+					// right value: OK (The room was successfully updated)
+					response = Response.Status.OK;
 				}
 			}
 			else
 			{
 				this.logger.log(LogService.LOG_ERROR, "Impossible to update the room named " + roomId
 						+ " since it does not exists!");
+				// set the variable used to store the HTTP response by the right
+				// value: PRECONDITION_FAILED (Impossible to update the room
+				// since it does not exists)
+				// it was the best response status available
+				response = Response.Status.PRECONDITION_FAILED;
 			}
 		}
 		catch (Exception e)
 		{
 			// exception
 			this.logger.log(LogService.LOG_ERROR, "Impossible to update the room named " + roomId, e);
+			
+			// set the variable used to store the HTTP response by the right
+			// value: NOT_MODIFIED (Impossible to update the room)
+			response = Response.Status.NOT_MODIFIED;
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 	}
 	
 	/**
