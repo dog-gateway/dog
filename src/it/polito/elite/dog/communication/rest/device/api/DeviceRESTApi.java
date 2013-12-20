@@ -150,10 +150,11 @@ public interface DeviceRESTApi
 	 *            The device unique identifier (URI)
 	 * @param commandName
 	 *            The command to be executed
+	 * @return 
 	 */
 	@GET
 	@Path("{device-id}/commands/{command-name}")
-	public void executeCommandGet(@PathParam("device-id") String deviceId,
+	public String executeCommandGet(@PathParam("device-id") String deviceId,
 			@PathParam("command-name") String commandName);
 	
 	/**

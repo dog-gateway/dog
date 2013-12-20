@@ -825,9 +825,10 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Override
 	@GET
 	@Path("{device-id}/commands/{command-name}")
-	public void executeCommandGet(@PathParam("device-id") String deviceId, @PathParam("command-name") String commandName)
+	public String executeCommandGet(@PathParam("device-id") String deviceId, @PathParam("command-name") String commandName)
 	{
 		this.executeCommand(deviceId, commandName, null);
+		return "Ok";
 	}
 	
 	@Override
