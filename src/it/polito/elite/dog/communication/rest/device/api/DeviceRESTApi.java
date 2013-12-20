@@ -44,8 +44,8 @@ import javax.ws.rs.core.MediaType;
 public interface DeviceRESTApi
 {
 	/**
-	 * Represents domotic devices handled by Dog and "controllable"
-	 * applications using this API.
+	 * Represents domotic devices handled by Dog and "controllable" applications
+	 * using this API.
 	 * 
 	 * @return the JSON representation of the configured devices
 	 */
@@ -54,8 +54,8 @@ public interface DeviceRESTApi
 	public String getAllDevicesInJson();
 	
 	/**
-	 * Represents domotic devices handled by Dog and "controllable"
-	 * applications using this API.
+	 * Represents domotic devices handled by Dog and "controllable" applications
+	 * using this API.
 	 * 
 	 * @return the XML representation of the configured devices
 	 */
@@ -90,8 +90,8 @@ public interface DeviceRESTApi
 	public String getDeviceInXml(@PathParam("device-id") String deviceId);
 	
 	/**
-	 * Update the location of a single domotic device handled by Dog, identified by a unique
-	 * device-id.
+	 * Update the location of a single domotic device handled by Dog, identified
+	 * by a unique device-id.
 	 * 
 	 * @param deviceId
 	 *            the device unique identifier
@@ -102,8 +102,8 @@ public interface DeviceRESTApi
 	public void updateDeviceLocation(@PathParam("device-id") String deviceId, String location);
 	
 	/**
-	 * Update the description (i.e., the long name) of a single domotic device handled by Dog, identified by a unique
-	 * device-id.
+	 * Update the description (i.e., the long name) of a single domotic device
+	 * handled by Dog, identified by a unique device-id.
 	 * 
 	 * @param deviceId
 	 *            the device unique identifier
@@ -150,7 +150,7 @@ public interface DeviceRESTApi
 	 *            The device unique identifier (URI)
 	 * @param commandName
 	 *            The command to be executed
-	 * @return 
+	 * @return
 	 */
 	@GET
 	@Path("{device-id}/commands/{command-name}")
