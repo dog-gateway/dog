@@ -46,7 +46,6 @@ import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.util.Executor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +61,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.DataBindingException;
 import javax.xml.bind.JAXB;
 
@@ -411,6 +413,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Override
 	public void updateDeviceLocation(String deviceId, String location)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
 		if (location != null && !location.isEmpty())
 		{
 			// create filter for getting the desired device
@@ -451,12 +456,24 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 							{
 								// update the device configuration
 								this.deviceFactory.get().updateDevice(currentDeviceDescr);
+								// set the variable used to store the HTTP
+								// response by the right value: OK (The device
+								// location was successfully updated)
+								response = Response.Status.OK;
+								
 							}
 							else
 							{
 								this.logger
 										.log(LogService.LOG_WARNING,
 												"Impossible to update the device location: the Device Factory is not available!");
+								// set the variable used to store the HTTP
+								// response by the right value:
+								// PRECONDITION_FAILED (Impossible to update the
+								// device location since the Device Factory is
+								// not available)
+								// it was the best response status available
+								response = Response.Status.PRECONDITION_FAILED;
 							}
 						}
 					}
@@ -465,7 +482,14 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			catch (Exception e)
 			{
 				this.logger.log(LogService.LOG_ERROR, "Error in updating the location of device " + deviceId, e);
+				// set the variable used to store the HTTP response by the right
+				// value: NOT_MODIFIED (Impossible to update the location of
+				// device)
+				response = Response.Status.NOT_MODIFIED;
 			}
+			
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(response);
 		}
 	}
 	
@@ -478,6 +502,10 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Override
 	public void updateDeviceDescription(String deviceId, String description)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		if (description != null && !description.isEmpty())
 		{
 			// create filter for getting the desired device
@@ -519,12 +547,23 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 							{
 								// update the device configuration
 								this.deviceFactory.get().updateDevice(currentDeviceDescr);
+								// set the variable used to store the HTTP
+								// response by the right value: OK (The
+								// description was successfully updated)
+								response = Response.Status.OK;
 							}
 							else
 							{
 								this.logger
 										.log(LogService.LOG_WARNING,
 												"Impossible to update the device description: the Device Factory is not available!");
+								// set the variable used to store the HTTP
+								// response by the right value:
+								// PRECONDITION_FAILED (Impossible to update the
+								// device description since the Device Factory
+								// is not available)
+								// it was the best response status available
+								response = Response.Status.PRECONDITION_FAILED;
 							}
 						}
 					}
@@ -533,7 +572,15 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			catch (Exception e)
 			{
 				this.logger.log(LogService.LOG_ERROR, "Error in updating the description of device " + deviceId, e);
+				// set the variable used to store the HTTP response by the right
+				// value: NOT_MODIFIED (Impossible to update the description of
+				// the device)
+				// it was the best response status available
+				response = Response.Status.NOT_MODIFIED;
 			}
+			
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(response);
 		}
 	}
 	
@@ -778,11 +825,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Override
 	@GET
 	@Path("{device-id}/commands/{command-name}")
-	public String executeCommandGet(@PathParam("device-id") String deviceId,
-			@PathParam("command-name") String commandName)
+	public void executeCommandGet(@PathParam("device-id") String deviceId, @PathParam("command-name") String commandName)
 	{
 		this.executeCommand(deviceId, commandName, null);
-		return "Ok";
 	}
 	
 	@Override
@@ -813,6 +858,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	 */
 	private void executeCommand(String deviceId, String commandName, String commandParameters)
 	{
+		
+		// set default value for the variable used to store the HTTP response by
+		// the right value: EXPECTATION_FAILED (If something go wrong we will
+		// say to user that the command was not executed successfully)
+		// it was the best response status available
+		Status response = Response.Status.EXPECTATION_FAILED;
+		
 		// get the executor instance
 		Executor executor = Executor.getInstance();
 		
@@ -833,14 +885,20 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					
 					// if payload !=null
 					executor.execute(context, deviceId, commandName, new Object[] { payload.getValue() });
-					
+					// set the variable used to store the HTTP response by the
+					// right value: OK (The command was executed without
+					// exception)
+					response = Response.Status.OK;
 					break;
 				}
-				catch (IOException e)
+				catch (Exception e)
 				{
-					// TODO Auto-generated catch block
-					// do nothing and proceed to the next trial
-					// e.printStackTrace();
+					// set the variable used to store the HTTP response by the
+					// right value: EXPECTATION_FAILED (An exception occured so
+					// the command was not executed as expected)
+					// it was the best response status available
+					response = Response.Status.EXPECTATION_FAILED;
+					// then proceed to the next trial
 				}
 			}
 			
@@ -848,8 +906,24 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		else
 		{
 			// exec the command
-			executor.execute(context, deviceId, commandName, new Object[] {});
+			try
+			{
+				executor.execute(context, deviceId, commandName, new Object[] {});
+				// set the variable used to store the HTTP response by the right
+				// value: OK (The command was executed without exception)
+				response = Response.Status.OK;
+			}
+			catch (Exception e)
+			{
+				// set the variable used to store the HTTP response by the right
+				// value: EXPECTATION_FAILED (An exception occured so the
+				// command was not executed as expected)
+				response = Response.Status.EXPECTATION_FAILED;
+			}
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 		
 	}
 	
