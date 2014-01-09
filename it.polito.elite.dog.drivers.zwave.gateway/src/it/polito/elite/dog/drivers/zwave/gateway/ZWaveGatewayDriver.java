@@ -38,7 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -104,10 +103,6 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 
 	// the device database location
 	private String deviceDBLocation;
-
-	// the LDAP query used to match the ModbusNetworkDriver
-	String filterQuery = String.format("(%s=%s)", Constants.OBJECTCLASS,
-			ZWaveNetwork.class.getName());
 
 	public ZWaveGatewayDriver()
 	{
