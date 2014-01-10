@@ -197,18 +197,19 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public synchronized String attach(ServiceReference reference) throws Exception
+	public synchronized String attach(ServiceReference reference)
+			throws Exception
 	{
 		// get the referenced device
 		@SuppressWarnings("unchecked")
 		ControllableDevice device = ((ControllableDevice) context
 				.getService(reference));
-		
+
 		// get the corresponding end point set
 		Set<String> gatewayNodeIdSet = device.getDeviceDescriptor()
 				.getSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
 
-		//get the device id
+		// get the device id
 		String deviceId = device.getDeviceId();
 
 		// if not null, it is a singleton
@@ -229,21 +230,22 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 					// create a new instance of the gateway driver
 					ZWaveGatewayDriverInstance driver = new ZWaveGatewayDriverInstance(
 							this.network.get(), this.deviceFactory.get(),
-							device,
-							Integer.parseInt(sNodeID), instancesId, context);
+							device, Integer.parseInt(sNodeID), instancesId,
+							context);
 
 					// set the supported devices
 					if ((this.supportedDevices != null)
 							&& (!this.supportedDevices.isEmpty()))
 						driver.setSupportedDevices(this.supportedDevices);
-				
-					// set the time to wait before automatic device detection / installation
+
+					// set the time to wait before automatic device detection /
+					// installation
 					driver.setWaitBeforeDeviceInstall(this.waitBeforeDeviceInstall);
-					
+
 					// connect the driver instance with the device
 					device.setDriver(driver);
 
-					//store the just created gateway instance
+					// store the just created gateway instance
 					synchronized (connectedGateways)
 					{
 						// store a reference to the gateway driver
@@ -410,12 +412,12 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 			this.deviceDBLocation = (String) config
 					.get(ZWaveGatewayDriver.DEVICE_DB);
 
-			// trim leading and trailing spaces
-			this.deviceDBLocation = deviceDBLocation.trim();
-
 			// check not null
 			if (deviceDBLocation != null)
 			{
+				// trim leading and trailing spaces
+				this.deviceDBLocation = deviceDBLocation.trim();
+
 				// check absolute vs relative
 				File deviceDBLocationFile = new File(deviceDBLocation);
 				if (!deviceDBLocationFile.isAbsolute())
@@ -443,8 +445,8 @@ public class ZWaveGatewayDriver implements Driver, ManagedService
 				}
 
 			}
-			
-			//register the gateway only when it is fully configured
+
+			// register the gateway only when it is fully configured
 			registerDriver();
 		}
 	}
