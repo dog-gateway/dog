@@ -30,6 +30,22 @@ public class DogZigBeeGateway extends AbstractDevice implements ZigBeeGateway
 		this.registerDevice(Device.class.getName());
 	}
 
+	public void installAppliance(String applianceId)
+	{
+		if (this.driver != null)
+		{
+			((ZigBeeGateway) this.driver).installAppliance(applianceId);
+		}
+	}
+
+	public void openNetwork()
+	{
+		if (this.driver != null)
+		{
+			((ZigBeeGateway) this.driver).openNetwork();
+		}
+	}
+
 	public DeviceStatus getState()
 	{
 		if (this.driver != null)
@@ -39,19 +55,19 @@ public class DogZigBeeGateway extends AbstractDevice implements ZigBeeGateway
 		return null;
 	}
 
-	public void associate()
+	public void deleteAppliance(String applianceId)
 	{
 		if (this.driver != null)
 		{
-			((ZigBeeGateway) this.driver).associate();
+			((ZigBeeGateway) this.driver).deleteAppliance(applianceId);
 		}
 	}
 
-	public void disassociate()
+	public void closeNetwork()
 	{
 		if (this.driver != null)
 		{
-			((ZigBeeGateway) this.driver).disassociate();
+			((ZigBeeGateway) this.driver).closeNetwork();
 		}
 	}
 

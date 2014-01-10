@@ -16,9 +16,11 @@ public interface ZigBeeGateway extends HomeGateway
 	public static int MATCH_SUB_TYPE=50;
 	public static int MATCH_MANUFACTURER=0;
 
+	public void installAppliance(String applianceId);
+	public void openNetwork();
 	public DeviceStatus getState();
-	public void associate();
-	public void disassociate();
+	public void deleteAppliance(String applianceId);
+	public void closeNetwork();
 
 
 	/*Generated Notifications*/
