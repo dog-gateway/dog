@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.equinox.http.registry.resources">
       <resource
-            alias="/admin/ui"
+            alias="/admin"
             base-name="/resources">
       </resource>
    </extension>
