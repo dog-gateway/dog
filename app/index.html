@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" ng-app="myApp">
+<html lang="en" ng-app="dogUI">
 <head>
   <meta charset="utf-8">
   <title>Admin UI</title>
@@ -14,13 +14,36 @@
 
   <div ng-view></div>
 
-  <div>Angular seed app: v<span app-version></span></div>
+  <div ng-controller="DeviceListCtrl">
+    <p>Devices status</p>
+    <pre>{{deviceStatus}}</pre>
+  	<ul>
+    <li ng-repeat="device in devices">
+      {{device.id}}
+      <p>{{device.description}}</p>
+      <p>{{device.isIn}}</p>
+      <p>Commands:</p>
+      <ul ng-repeat="controlFunctionality in device.controlFunctionality">
+        <li ng-repeat="command in controlFunctionality.commands">
+          {{command[0].param[0].value}}
+        </li>
+      </ul>
+      <p>States</p>
+      <ul ng-repeat="states in device.state">
+        <li ng-repeat="statevalues in states.statevalues">
+          {{statevalues[0].class}}
+        </li>
+      </ul>
+    </li>
+  </ul>
+  </div>
 
   <!-- In production use:
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
   -->
   <script src="lib/angular/angular.js"></script>
   <script src="lib/angular/angular-route.js"></script>
+  <script src="lib/angular/angular-resource.js"></script>
   <script src="lib/ui-bootstrap-tpls-0.10.0.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/services.js"></script>
