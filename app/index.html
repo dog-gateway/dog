@@ -16,22 +16,24 @@
 
   <div ng-controller="DeviceListCtrl">
     <p>Devices status</p>
-    <pre>{{deviceStatus}}</pre>
+    <pre>{{data.devices['zwave-gateway'].status}}</pre>
   	<ul>
-    <li ng-repeat="device in devices">
+    <li ng-repeat="device in data.devices">
       {{device.id}}
       <p>{{device.description}}</p>
       <p>{{device.isIn}}</p>
       <p>Commands:</p>
       <ul ng-repeat="controlFunctionality in device.controlFunctionality">
         <li ng-repeat="command in controlFunctionality.commands">
-          {{command[0].param[0].value}}
+          <div ng-repeat="single in command | filter:'!get'">
+            {{single.param[0].value}}
+          </div>
         </li>
       </ul>
       <p>States</p>
-      <ul ng-repeat="states in device.state">
-        <li ng-repeat="statevalues in states.statevalues">
-          {{statevalues[0].class}}
+      <ul ng-repeat="(state, values) in device.status">
+        <li ng-repeat="number in values">
+          {{state}} : {{number.value}}
         </li>
       </ul>
     </li>
