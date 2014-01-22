@@ -24,10 +24,8 @@
       <p>{{device.isIn}}</p>
       <p>Commands:</p>
       <ul ng-repeat="controlFunctionality in device.controlFunctionality">
-        <li ng-repeat="command in controlFunctionality.commands">
-          <div ng-repeat="single in command | filter:'!get'">
-            {{single.param[0].value}}
-          </div>
+        <li ng-repeat="command in controlFunctionality.commands | filter:'!get'">
+            {{command.param[0].value}}
         </li>
       </ul>
       <p>States</p>

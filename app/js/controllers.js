@@ -28,8 +28,8 @@ angular.module('dogUI.controllers', [])
     var poll = function() {
         $timeout(function() {
             var deviceStatus = DeviceStatus.get(function(){
-              for(var num in deviceStatus.devices) {
-                $scope.data.devices[deviceStatus.devices[num].id].status = deviceStatus.devices[num].status;
+              for(var num in deviceStatus.devicesStatus) {
+                $scope.data.devices[deviceStatus.devicesStatus[num].id].status = deviceStatus.devicesStatus[num].status;
               }
             });
             poll();
