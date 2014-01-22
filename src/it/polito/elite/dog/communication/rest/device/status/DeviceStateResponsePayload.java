@@ -1,7 +1,7 @@
 /*
  * Dog - Device Rest Endpoint
  * 
- * Copyright (c) 2013 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2013-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.Map;
 /**
  * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
