@@ -25,7 +25,7 @@ package it.polito.elite.dog.communication.rest.device.status;
  */
 public class AllDeviceStatesResponsePayload
 {
-	private DeviceStateResponsePayload[] devices;
+	private DeviceStateResponsePayload[] devicesStatus;
 
 	/**
 	 * 
@@ -38,16 +38,16 @@ public class AllDeviceStatesResponsePayload
 	/**
 	 * @return the devices
 	 */
-	public DeviceStateResponsePayload[] getDevices()
+	public DeviceStateResponsePayload[] getDevicesStatus()
 	{
-		return devices;
+		return devicesStatus;
 	}
 
 	/**
-	 * @param devices the devices to set
+	 * @param devicesStatus the devices status to set
 	 */
-	public void setDevices(DeviceStateResponsePayload[] devices)
+	public void setDevicesStatus(DeviceStateResponsePayload[] devicesStatus)
 	{
-		this.devices = devices;
+		this.devicesStatus = devicesStatus;
 	}
 }

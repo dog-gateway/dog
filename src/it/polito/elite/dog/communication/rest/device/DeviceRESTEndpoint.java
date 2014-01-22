@@ -40,7 +40,6 @@ import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
-import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
@@ -570,7 +569,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				DeviceStateResponsePayload[] deviceStateResponsePayload = new DeviceStateResponsePayload[allDevices.length];
 				
 				// set the array as part of the response payload
-				responsePayload.setDevices(deviceStateResponsePayload);
+				responsePayload.setDevicesStatus(deviceStateResponsePayload);
 				
 				// iterate over all devices
 				for (int i = 0; i < allDevices.length; i++)
@@ -590,7 +589,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					}
 				}
 				// store the device
-				responsePayload.setDevices(deviceStateResponsePayload);
+				responsePayload.setDevicesStatus(deviceStateResponsePayload);
 				
 				// convert the response body to json
 				responseAsString = this.mapper.writeValueAsString(responsePayload);
@@ -690,32 +689,17 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// set the device id
 		deviceStateResponsePayload.setId(deviceDescriptor.getDeviceURI());
 		
-		// get the device description
-		String deviceDescription = deviceDescriptor.getDescription();
-		
-		// clean the description
-		deviceDescription = deviceDescription.trim();
-		deviceDescription = deviceDescription.replaceAll("\t", "");
-		deviceDescription = deviceDescription.replaceAll("\n", " ");
-		
-		// set the description
-		deviceStateResponsePayload.setDescription(deviceDescription);
-		
 		// set the activation status of the device
 		deviceStateResponsePayload
 				.setActive(Boolean.valueOf((String) deviceService.getProperty(DeviceCostants.ACTIVE)));
 		
 		// get the device status
-		DeviceStatus state = ((Controllable) device).getState();
+		Map<String, State> allStates = ((Controllable) device).getState().getStates();
 		
 		// check if the device state is available, i.e., not
 		// null
-		if (state != null)
-		{
-			// get the states composing the overall device
-			// status
-			Map<String, State> allStates = state.getStates();
-			
+		if (allStates != null)
+		{	
 			// iterate over all states
 			for (String stateKey : allStates.keySet())
 			{
