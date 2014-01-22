@@ -30,6 +30,7 @@ import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
 import it.polito.elite.dog.core.library.jaxb.Configparam;
+import it.polito.elite.dog.core.library.jaxb.Configstate;
 import it.polito.elite.dog.core.library.jaxb.ControlFunctionality;
 import it.polito.elite.dog.core.library.jaxb.Controllables;
 import it.polito.elite.dog.core.library.jaxb.Device;
@@ -855,7 +856,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	
 	/**
 	 * Prepare the JAXB Device to contain the proper information for external
-	 * applications. It removes all the network-related properties...
+	 * applications. It removes all the network-related properties and hides
+	 * some redundant arrays for the JSON serialization.
 	 * 
 	 * @param device
 	 *            the "full" JAXB Device to clean
@@ -898,6 +900,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				}
 				paramsToRemove.clear();
 			}
+			
+			// improve JSON rendering by hiding a redundant array
+			controlFunctionality.setCommandList(controlFunctionality.getCommands().getCommand());
 		}
 		
 		// get all the notification functionalities...
@@ -925,7 +930,15 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				}
 				paramsToRemove.clear();
 			}
+			
+			// improve JSON rendering by hiding a redundant array
+			notificationFunctionality.setNotificationList(notificationFunctionality.getNotifications()
+					.getNotification());
 		}
+		
+		// improve JSON rendering by hiding a redundant array for states
+		for (Configstate status : device.getState())
+			status.setStatevalueList(status.getStatevalues().getStatevalue());
 		
 	}
 	
