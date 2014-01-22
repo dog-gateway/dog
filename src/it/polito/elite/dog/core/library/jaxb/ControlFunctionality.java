@@ -24,19 +24,25 @@
 
 package it.polito.elite.dog.core.library.jaxb;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-
 /**
- * <p>Java class for controlFunctionality complex type.
+ * <p>
+ * Java class for controlFunctionality complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="controlFunctionality">
@@ -54,63 +60,91 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "controlFunctionality", propOrder = {
-    "commands"
-})
-public class ControlFunctionality {
-
-    @XmlElement(required = true)
-    protected Commands commands;
-    @XmlAttribute(name = "class", required = true)
-    @JsonProperty("class")
-    protected String clazz;
-
-    /**
-     * Gets the value of the commands property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Commands }
-     *     
-     */
-    public Commands getCommands() {
-        return commands;
-    }
-
-    /**
-     * Sets the value of the commands property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Commands }
-     *     
-     */
-    public void setCommands(Commands value) {
-        this.commands = value;
-    }
-
-    /**
-     * Gets the value of the clazz property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getClazz() {
-        return clazz;
-    }
-
-    /**
-     * Sets the value of the clazz property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setClazz(String value) {
-        this.clazz = value;
-    }
-
+@XmlType(name = "controlFunctionality", propOrder = { "commands" })
+public class ControlFunctionality
+{
+	
+	@XmlElement(required = true)
+	@JsonIgnore
+	protected Commands commands;
+	
+	// workaround for properly serialize a JSON message: it avoids a "redundant"
+	// array
+	@XmlTransient
+	@JsonProperty("commands")
+	protected List<Configcommand> commandList;
+	
+	@XmlAttribute(name = "class", required = true)
+	@JsonProperty("class")
+	protected String clazz;
+	
+	/**
+	 * Gets the value of the commands property.
+	 * 
+	 * @return possible object is {@link Commands }
+	 * 
+	 */
+	public Commands getCommands()
+	{
+		return commands;
+	}
+	
+	/**
+	 * Sets the value of the commands property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Commands }
+	 * 
+	 */
+	public void setCommands(Commands value)
+	{
+		this.commands = value;
+	}
+	
+	/**
+	 * Gets the value of the clazz property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getClazz()
+	{
+		return clazz;
+	}
+	
+	/**
+	 * Sets the value of the clazz property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setClazz(String value)
+	{
+		this.clazz = value;
+	}
+	
+	/**
+	 * Workaround for properly serialize a JSON message; it is not considered in
+	 * XML
+	 * 
+	 * @return the commandList
+	 */
+	public List<Configcommand> getCommandList()
+	{
+		return commandList;
+	}
+	
+	/**
+	 * Workaround for properly serialize a JSON message; it is not considered in
+	 * XML
+	 * 
+	 * @param commandList
+	 *            the commandList to set
+	 */
+	public void setCommandList(List<Configcommand> commandList)
+	{
+		this.commandList = commandList;
+	}
+	
 }

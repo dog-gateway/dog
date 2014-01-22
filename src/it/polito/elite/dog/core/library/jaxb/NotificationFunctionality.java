@@ -24,19 +24,25 @@
 
 package it.polito.elite.dog.core.library.jaxb;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-
 /**
- * <p>Java class for notificationFunctionality complex type.
+ * <p>
+ * Java class for notificationFunctionality complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="notificationFunctionality">
@@ -54,63 +60,91 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "notificationFunctionality", propOrder = {
-    "notifications"
-})
-public class NotificationFunctionality {
-
-    @XmlElement(required = true)
-    protected Notifications notifications;
-    @XmlAttribute(name = "class", required = true)
-    @JsonProperty("class")
-    protected String clazz;
-
-    /**
-     * Gets the value of the notifications property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Notifications }
-     *     
-     */
-    public Notifications getNotifications() {
-        return notifications;
-    }
-
-    /**
-     * Sets the value of the notifications property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Notifications }
-     *     
-     */
-    public void setNotifications(Notifications value) {
-        this.notifications = value;
-    }
-
-    /**
-     * Gets the value of the clazz property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getClazz() {
-        return clazz;
-    }
-
-    /**
-     * Sets the value of the clazz property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setClazz(String value) {
-        this.clazz = value;
-    }
-
+@XmlType(name = "notificationFunctionality", propOrder = { "notifications" })
+public class NotificationFunctionality
+{
+	
+	@XmlElement(required = true)
+	@JsonIgnore
+	protected Notifications notifications;
+	
+	// workaround for properly serialize a JSON message: it avoids a "redundant"
+	// array
+	@XmlTransient
+	@JsonProperty("notifications")
+	protected List<Confignotification> notificationList;
+	
+	@XmlAttribute(name = "class", required = true)
+	@JsonProperty("class")
+	protected String clazz;
+	
+	/**
+	 * Gets the value of the notifications property.
+	 * 
+	 * @return possible object is {@link Notifications }
+	 * 
+	 */
+	public Notifications getNotifications()
+	{
+		return notifications;
+	}
+	
+	/**
+	 * Sets the value of the notifications property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Notifications }
+	 * 
+	 */
+	public void setNotifications(Notifications value)
+	{
+		this.notifications = value;
+	}
+	
+	/**
+	 * Gets the value of the clazz property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getClazz()
+	{
+		return clazz;
+	}
+	
+	/**
+	 * Sets the value of the clazz property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setClazz(String value)
+	{
+		this.clazz = value;
+	}
+	
+	/**
+	 * Workaround for properly serialize a JSON message; it is not considered in
+	 * XML
+	 * 
+	 * @return the notificationList
+	 */
+	public List<Confignotification> getNotificationList()
+	{
+		return notificationList;
+	}
+	
+	/**
+	 * Workaround for properly serialize a JSON message; it is not considered in
+	 * XML
+	 * 
+	 * @param notificationList
+	 *            the notificationList to set
+	 */
+	public void setNotificationList(List<Confignotification> notificationList)
+	{
+		this.notificationList = notificationList;
+	}
+	
 }

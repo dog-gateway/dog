@@ -24,19 +24,25 @@
 
 package it.polito.elite.dog.core.library.jaxb;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-
 /**
- * <p>Java class for configstate complex type.
+ * <p>
+ * Java class for configstate complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="configstate">
@@ -54,63 +60,91 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "configstate", propOrder = {
-    "statevalues"
-})
-public class Configstate {
-
-    @XmlElement(required = true)
-    protected Statevalues statevalues;
-    @XmlAttribute(name = "class", required = true)
-    @JsonProperty("class")
-    protected String clazz;
-
-    /**
-     * Gets the value of the statevalues property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Statevalues }
-     *     
-     */
-    public Statevalues getStatevalues() {
-        return statevalues;
-    }
-
-    /**
-     * Sets the value of the statevalues property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Statevalues }
-     *     
-     */
-    public void setStatevalues(Statevalues value) {
-        this.statevalues = value;
-    }
-
-    /**
-     * Gets the value of the clazz property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getClazz() {
-        return clazz;
-    }
-
-    /**
-     * Sets the value of the clazz property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setClazz(String value) {
-        this.clazz = value;
-    }
-
+@XmlType(name = "configstate", propOrder = { "statevalues" })
+public class Configstate
+{
+	
+	@XmlElement(required = true)
+	@JsonIgnore
+	protected Statevalues statevalues;
+	
+	// workaround for properly serialize a JSON message: it avoids a "redundant"
+	// array
+	@XmlTransient
+	@JsonProperty("statevalues")
+	protected List<Statevalue> statevalueList;
+	
+	@XmlAttribute(name = "class", required = true)
+	@JsonProperty("class")
+	protected String clazz;
+	
+	/**
+	 * Gets the value of the statevalues property.
+	 * 
+	 * @return possible object is {@link Statevalues }
+	 * 
+	 */
+	public Statevalues getStatevalues()
+	{
+		return statevalues;
+	}
+	
+	/**
+	 * Sets the value of the statevalues property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Statevalues }
+	 * 
+	 */
+	public void setStatevalues(Statevalues value)
+	{
+		this.statevalues = value;
+	}
+	
+	/**
+	 * Gets the value of the clazz property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getClazz()
+	{
+		return clazz;
+	}
+	
+	/**
+	 * Sets the value of the clazz property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setClazz(String value)
+	{
+		this.clazz = value;
+	}
+	
+	/**
+	 * Workaround for properly serialize a JSON message; it is not considered in
+	 * XML
+	 * 
+	 * @return the statevalueList
+	 */
+	public List<Statevalue> getStatevalueList()
+	{
+		return statevalueList;
+	}
+	
+	/**
+	 * Workaround for properly serialize a JSON message; it is not considered in
+	 * XML
+	 * 
+	 * @param statevalueList
+	 *            the statevalueList to set
+	 */
+	public void setStatevalueList(List<Statevalue> statevalueList)
+	{
+		this.statevalueList = statevalueList;
+	}
+	
 }
