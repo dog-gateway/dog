@@ -699,7 +699,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// check if the device state is available, i.e., not
 		// null
 		if (allStates != null)
-		{	
+		{
 			// iterate over all states
 			for (String stateKey : allStates.keySet())
 			{
@@ -803,10 +803,10 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		
 		// --- Use Jackson to interpret the type of data passed as value ---
 		
-		// check if a post/put body is given and convert it into an array of
-		// parameters
+		// check if a post/put body is given, it is not an empty JSON object,
+		// and convert it into an array of parameters
 		// TODO: check if commands can have more than 1 parameter
-		if ((commandParameters != null) && (!commandParameters.isEmpty()))
+		if ((commandParameters != null) && (!commandParameters.isEmpty()) && (!commandParameters.equals("{}")))
 		{
 			// try to read the payload
 			for (int i = 0; i < this.payloads.size(); i++)
