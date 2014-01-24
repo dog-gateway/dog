@@ -3,18 +3,22 @@
 /* Controllers */
 
 angular.module('dogUI.controllers', [])
-  .controller('firstCtrl', ['$scope', function($scope) {
-	  /*$scope.singleModel = 1;*/
+  /* Navbar Controller: set as active the current view */
+  .controller('HeaderController', ['$scope', '$location', function($scope, $location) {
+    $scope.isActive = function (viewLocation) { 
+      return viewLocation === $location.path();
+	  }
   }])
-  .controller('MyCtrl2', [function() {
-
-  }])
-  .controller('DeviceListCtrl', ['$scope', 'Device', 'DeviceStatus', '$timeout', function($scope, Device, DeviceStatus, $timeout) {
+  /* Controller for handling devices-related information */
+  .controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', '$timeout', function($scope, Device, DeviceStatus, $timeout) {
+	  // init
 	  $scope.data = {};
 	  $scope.data.devices = {};
 	  
+	  // get the devices list from the Dog APIs, and elaborate it in a promise
 	  var devicesList = Device.get(function() {
         for(var num in devicesList.devices) {
+          // take only the needed information
           var currentDevice = new Device();
           currentDevice.id = devicesList.devices[num].id;
           currentDevice.isIn = devicesList.devices[num].isIn;
@@ -22,18 +26,19 @@ angular.module('dogUI.controllers', [])
           currentDevice.controlFunctionality = devicesList.devices[num].controlFunctionality;
           $scope.data.devices[devicesList.devices[num].id] = currentDevice;
       }
-      
 	});
     
+	// status poller: each 1 second, ask for devices status update
     var poll = function() {
-        $timeout(function() {
-            var deviceStatus = DeviceStatus.get(function(){
-              for(var num in deviceStatus.devicesStatus) {
-                $scope.data.devices[deviceStatus.devicesStatus[num].id].status = deviceStatus.devicesStatus[num].status;
-              }
-            });
-            poll();
-        }, 1000);
+      $timeout(function() {
+        var deviceStatus = DeviceStatus.get(function(){
+          for(var num in deviceStatus.devicesStatus) {
+        	// associate the right device status with the already known device information
+            $scope.data.devices[deviceStatus.devicesStatus[num].id].status = deviceStatus.devicesStatus[num].status;
+          }
+        });
+        poll();
+      }, 1000);
     };     
    poll();
   }]);

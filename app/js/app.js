@@ -1,6 +1,5 @@
 'use strict';
 
-
 // Declare app level module which depends on filters, and services
 angular.module('dogUI', [
   'ngRoute',
@@ -10,8 +9,10 @@ angular.module('dogUI', [
   'dogUI.directives',
   'dogUI.controllers'
 ]).
+/* Handle app routes */
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
-  $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});
-  /*$routeProvider.otherwise({redirectTo: '/view1'});*/
+  $routeProvider.when('/home', {templateUrl: 'partials/overview.html'});
+  $routeProvider.when('/devices', {templateUrl: 'partials/devices.html', controller: 'DeviceCtrl'});
+  $routeProvider.when('/components', {templateUrl: 'partials/components.html'});
+  $routeProvider.otherwise({redirectTo: '/home'});
 }]);

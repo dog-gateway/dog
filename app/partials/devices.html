@@ -1,0 +1,23 @@
+<div ng-controller="DeviceCtrl">
+    <p>Devices status</p>
+    <pre>{{data.devices['zwave-gateway'].status}}</pre>
+  	<ul>
+    <li ng-repeat="device in data.devices">
+      {{device.id}}
+      <p>{{device.description}}</p>
+      <p>{{device.isIn}}</p>
+      <p>Commands:</p>
+      <ul ng-repeat="controlFunctionality in device.controlFunctionality">
+        <li ng-repeat="command in controlFunctionality.commands | filter:'!get'">
+            {{command.param[0].value}}
+        </li>
+      </ul>
+      <p>States</p>
+      <ul ng-repeat="(state, values) in device.status">
+        <li ng-repeat="number in values">
+          {{state}} : {{number.value}}
+        </li>
+      </ul>
+    </li>
+  </ul>
+  </div>
