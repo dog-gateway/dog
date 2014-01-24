@@ -10,7 +10,7 @@ angular.module('dogUI.controllers', [])
 	  }
   }])
   /* Controller for handling devices-related information */
-  .controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', '$timeout', function($scope, Device, DeviceStatus, $timeout) {
+  .controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'DeviceCmd', '$timeout', function($scope, Device, DeviceStatus, DeviceCmd, $timeout) {
 	  // init
 	  $scope.data = {};
 	  $scope.data.devices = {};
@@ -23,6 +23,7 @@ angular.module('dogUI.controllers', [])
           currentDevice.id = devicesList.devices[num].id;
           currentDevice.isIn = devicesList.devices[num].isIn;
           currentDevice.description = devicesList.devices[num].description;
+          currentDevice.type = angular.lowercase(devicesList.devices[num].class);
           currentDevice.controlFunctionality = devicesList.devices[num].controlFunctionality;
           $scope.data.devices[devicesList.devices[num].id] = currentDevice;
       }
@@ -41,4 +42,12 @@ angular.module('dogUI.controllers', [])
       }, 1000);
     };     
    poll();
+   
+   // send command
+   $scope.sendCommand = function(deviceId, commandName) {
+	 // optional parameters should go as field of devCmd (e.g., devCmd.value=param)
+	 // TODO Add optional command params
+	 var devCmd = new DeviceCmd();
+	 devCmd.$update({id: deviceId, command: commandName});
+   }
   }]);

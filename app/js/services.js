@@ -21,6 +21,12 @@ services.factory('Device', ['$resource', function($resource){
     });
   }]);
 
+services.factory('DeviceCmd', ['$resource', function($resource){
+return $resource('/api/devices/:id/commands/:command', {id:"@id", command: "@command"}, {
+    update: {method:'PUT'}
+  });
+}]);
+
 services.factory('DeviceStatus', ['$resource', function($resource){
     return $resource('/api/devices/status', {}, {
       get: {method:'GET', headers: {'Accept':'application/json'}}

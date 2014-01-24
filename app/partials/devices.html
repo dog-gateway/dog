@@ -1,23 +1,35 @@
 <div ng-controller="DeviceCtrl">
-    <p>Devices status</p>
-    <pre>{{data.devices['zwave-gateway'].status}}</pre>
-  	<ul>
-    <li ng-repeat="device in data.devices">
-      {{device.id}}
-      <p>{{device.description}}</p>
-      <p>{{device.isIn}}</p>
-      <p>Commands:</p>
-      <ul ng-repeat="controlFunctionality in device.controlFunctionality">
-        <li ng-repeat="command in controlFunctionality.commands | filter:'!get'">
-            {{command.param[0].value}}
-        </li>
-      </ul>
-      <p>States</p>
-      <ul ng-repeat="(state, values) in device.status">
-        <li ng-repeat="number in values">
-          {{state}} : {{number.value}}
-        </li>
-      </ul>
-    </li>
-  </ul>
+  <div class="row">
+    <div class="col-md-4" ng-repeat="device in data.devices">
+      <div class="panel panel-info" >
+        <div class="panel-heading">
+          <span class="device-{{device.type}}"></span>{{device.id}}
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="thumbnail">
+                <img class="img-responsive" src="img/lamp.jpg">
+                <div class="caption">
+                  <ul class="list-unstyled" ng-repeat="(stateName, stateValues) in device.status">
+                    <li class="text-center" ng-repeat="stateValue in stateValues">
+                      <small>{{stateValue.value}}</small>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <small>{{device.description}}</small><br>
+              <small>{{device.isIn}}</small><br><br>
+              <div ng-repeat="controlFunctionality in device.controlFunctionality">
+                <button ng-repeat="command in controlFunctionality.commands | filter:'!get'" class="btn btn-primary btn-block" ng-click="sendCommand(device.id, command.param[0].value)">
+                  {{command.param[0].value}}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
