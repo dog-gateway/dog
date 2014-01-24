@@ -167,6 +167,14 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriver implements Light
 	{
 		return currentState;
 	}
+	
+	@Override
+	public Measure<?,?>  getLuminance()
+	{
+		return (Measure<?, ?>) currentState.getState(
+				LightIntensityState.class.getSimpleName())
+				.getCurrentStateValue()[0].getValue();
+	}
 
 	@Override
 	public void notifyNewLuminosityValue(Measure<?, ?> luminosityValue) 
