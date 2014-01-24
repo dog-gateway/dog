@@ -30,6 +30,7 @@ package it.polito.elite.dog.core.library.model.devicemodel;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.AbstractDevice;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
+import it.polito.elite.dog.core.library.model.devicecategory.LightSensor;
 import it.polito.elite.dog.core.library.model.devicecategory.TripleSensor;
 import it.polito.elite.dog.core.library.model.notification.*;
 import it.polito.elite.dog.core.library.model.state.*;
@@ -84,6 +85,14 @@ public class DogTripleSensor extends AbstractDevice implements TripleSensor
 	}
 
 
+	@Override
+	public Measure<?,?>  getLuminance()
+	{
+		if(this.driver!=null){
+		return ((LightSensor) this.driver).getLuminance();
+		}
+		 return null;
+	}
 
 	/*Generated Notifications*/
 

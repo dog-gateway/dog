@@ -44,10 +44,13 @@ public interface LightSensor extends Sensor
 	public void storeGroup(String groupID);
 
 
+	public Measure<?, ?> getLuminance();
+	
 	/*Generated Notifications*/
 
 	/*Notification: StateChangeNotification*/
 	public void notifyStateChanged(State newState);
 	/*Notification: LuminosityMeasurementNotification*/
 	public void notifyNewLuminosityValue(Measure<?,?>  luminosityValue);
+	
 }
