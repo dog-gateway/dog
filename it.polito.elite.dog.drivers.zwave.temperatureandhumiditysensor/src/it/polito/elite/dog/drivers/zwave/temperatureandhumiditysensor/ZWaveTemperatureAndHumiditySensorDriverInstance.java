@@ -24,7 +24,7 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.DataElemObject;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
-import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
+import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
@@ -52,7 +52,7 @@ import javax.measure.unit.UnitFormat;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriver implements
+public class ZWaveTemperatureAndHumiditySensorDriverInstance extends ZWaveDriverInstance implements
 		TemperatureAndHumiditySensor
 {
 	public static final String SENSORTYPE_TEMPERATURE = "Temperature";

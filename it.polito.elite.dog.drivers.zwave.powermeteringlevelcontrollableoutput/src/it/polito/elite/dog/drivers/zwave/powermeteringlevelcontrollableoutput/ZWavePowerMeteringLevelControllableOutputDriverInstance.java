@@ -39,7 +39,7 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.DataElemObject;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
-import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
+import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 
@@ -57,7 +57,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
-		ZWaveDriver implements PowerMeteringLevelControllableOutput,
+		ZWaveDriverInstance implements PowerMeteringLevelControllableOutput,
 		EnergyAndPowerMeteringLevelControllableOutput
 {
 	// the class logger

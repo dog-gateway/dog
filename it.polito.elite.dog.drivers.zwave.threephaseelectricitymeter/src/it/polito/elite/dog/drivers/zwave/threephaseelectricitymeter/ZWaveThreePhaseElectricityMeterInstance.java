@@ -41,7 +41,7 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.DataElemObject;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
-import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
+import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 
@@ -60,7 +60,7 @@ import javax.measure.unit.UnitFormat;
 
 import org.osgi.framework.BundleContext;
 
-public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriver
+public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 		implements ThreePhaseElectricityMeter
 {
 

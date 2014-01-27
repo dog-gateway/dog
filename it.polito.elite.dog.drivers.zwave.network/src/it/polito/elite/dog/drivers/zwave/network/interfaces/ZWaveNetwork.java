@@ -20,7 +20,7 @@ package it.polito.elite.dog.drivers.zwave.network.interfaces;
 import java.util.Map;
 
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
-import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
+import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 
 public interface ZWaveNetwork
@@ -99,10 +99,10 @@ public interface ZWaveNetwork
 	 *            milliseconds between two forced get on device sensor. 0 if it
 	 *            is not requested
 	 * @param driver
-	 *            the {@link ZWaveDriver} instance to add.
+	 *            the {@link ZWaveDriverInstance} instance to add.
 	 */
 	public void addDriver(ZWaveNodeInfo nodeInfo, int updateTimeMillis,
-			ZWaveDriver driver);
+			ZWaveDriverInstance driver);
 
 	/**
 	 * Removes a device-specific driver for the given register
@@ -125,7 +125,7 @@ public interface ZWaveNetwork
 	 * 
 	 * @param datapoint
 	 */
-	void removeDriver(ZWaveDriver driver);
+	void removeDriver(ZWaveDriverInstance driver);
 
 	/**
 	 * Get all raw device data for devices currently available on the network,

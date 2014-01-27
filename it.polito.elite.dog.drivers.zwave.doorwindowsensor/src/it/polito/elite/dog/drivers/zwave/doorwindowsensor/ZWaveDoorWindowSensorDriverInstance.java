@@ -22,7 +22,7 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
-import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
+import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
@@ -42,7 +42,7 @@ import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriver implements DoorSensor, WindowSensor
+public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance implements DoorSensor, WindowSensor
 {
 	// the class logger
 	private LogHelper logger;

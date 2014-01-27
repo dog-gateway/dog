@@ -36,7 +36,7 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.DataConst;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.DeviceData;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
-import it.polito.elite.dog.drivers.zwave.network.ZWaveDriver;
+import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 
@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveGatewayDriverInstance extends ZWaveDriver implements
+public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 		ZWaveGateway
 {
 	// the driver logger

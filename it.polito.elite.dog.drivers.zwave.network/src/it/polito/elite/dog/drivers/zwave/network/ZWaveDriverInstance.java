@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
 
-public abstract class ZWaveDriver implements StatefulDevice
+public abstract class ZWaveDriverInstance implements StatefulDevice
 {
 	// a reference to the network driver interface to allow network-level access
 	// for sub-classes
@@ -108,7 +108,7 @@ public abstract class ZWaveDriver implements StatefulDevice
 	 * @param device
 	 *            the device to which this driver is attached/associated //TODO
 	 */
-	public ZWaveDriver(ZWaveNetwork network, ControllableDevice device,
+	public ZWaveDriverInstance(ZWaveNetwork network, ControllableDevice device,
 			int deviceId, Set<Integer> instancesId, int gatewayNodeId,
 			int updateTimeMillis, BundleContext context)
 	{

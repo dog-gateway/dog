@@ -66,10 +66,10 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	private ZWaveModelTree modelTree;
 
 	// the register to driver map
-	private ConcurrentHashMap<ZWaveNodeInfo, ZWaveDriver> nodeInfo2Driver;
+	private ConcurrentHashMap<ZWaveNodeInfo, ZWaveDriverInstance> nodeInfo2Driver;
 
 	// the inverse map
-	private ConcurrentHashMap<ZWaveDriver, Set<ZWaveNodeInfo>> driver2NodeInfo;
+	private ConcurrentHashMap<ZWaveDriverInstance, Set<ZWaveNodeInfo>> driver2NodeInfo;
 
 	// the zwave poller
 	private ZWavePoller poller;
@@ -179,10 +179,10 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 		logger.log(LogService.LOG_DEBUG, "Activated: ZWave NetworkDriver...");
 
 		// create the register to driver map
-		nodeInfo2Driver = new ConcurrentHashMap<ZWaveNodeInfo, ZWaveDriver>();
+		nodeInfo2Driver = new ConcurrentHashMap<ZWaveNodeInfo, ZWaveDriverInstance>();
 
 		// create the driver to register map
-		driver2NodeInfo = new ConcurrentHashMap<ZWaveDriver, Set<ZWaveNodeInfo>>();
+		driver2NodeInfo = new ConcurrentHashMap<ZWaveDriverInstance, Set<ZWaveNodeInfo>>();
 	}
 
 	/**
@@ -236,7 +236,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 						// wrong
 						if (instanceNode != null)
 						{
-							ZWaveDriver driver = nodeInfo2Driver.get(nodeInfo);
+							ZWaveDriverInstance driver = nodeInfo2Driver.get(nodeInfo);
 							driver.newMessageFromHouse(deviceNode,
 									instanceNode, controllerNode, null);
 						}
@@ -343,7 +343,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	 */
 	@Override
 	public void addDriver(ZWaveNodeInfo nodeInfo, int updateTimeMillis,
-			ZWaveDriver driver)
+			ZWaveDriverInstance driver)
 	{
 		// get the register gateway address
 		int deviceNodeId = nodeInfo.getDeviceNodeId();
@@ -384,7 +384,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	public void removeDriver(ZWaveNodeInfo nodeInfo)
 	{
 		// removes a given register-driver association
-		ZWaveDriver drv = nodeInfo2Driver.remove(nodeInfo);
+		ZWaveDriverInstance drv = nodeInfo2Driver.remove(nodeInfo);
 
 		if (drv != null)
 		{
@@ -425,7 +425,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 	 * ZWaveDriver)
 	 */
 	@Override
-	public void removeDriver(ZWaveDriver driver)
+	public void removeDriver(ZWaveDriverInstance driver)
 	{
 		// removes a given driver-register association
 		Set<ZWaveNodeInfo> driverNodeInfo = driver2NodeInfo.remove(driver);
@@ -536,7 +536,7 @@ public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 			if (info.getDeviceNodeId() == nodeId)
 			{
 				// the driver currently connected to the device
-				ZWaveDriver driver = this.nodeInfo2Driver.get(info);
+				ZWaveDriverInstance driver = this.nodeInfo2Driver.get(info);
 
 				// get the device uri
 				deviceId = driver.getDevice().getDeviceId();
