@@ -1,7 +1,7 @@
 /*
  * Dog - Device Rest Endpoint
  * 
- * Copyright (c) 2013 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2013-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@ package it.polito.elite.dog.communication.rest.device.status;
 /**
  * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class AllDeviceStatesResponsePayload
 {
-	private DeviceStateResponsePayload[] devices;
+	private DeviceStateResponsePayload[] devicesStatus;
 
 	/**
 	 * 
@@ -38,16 +39,16 @@ public class AllDeviceStatesResponsePayload
 	/**
 	 * @return the devices
 	 */
-	public DeviceStateResponsePayload[] getDevices()
+	public DeviceStateResponsePayload[] getDevicesStatus()
 	{
-		return devices;
+		return devicesStatus;
 	}
 
 	/**
-	 * @param devices the devices to set
+	 * @param devicesStatus the devices status to set
 	 */
-	public void setDevices(DeviceStateResponsePayload[] devices)
+	public void setDevicesStatus(DeviceStateResponsePayload[] devicesStatus)
 	{
-		this.devices = devices;
+		this.devicesStatus = devicesStatus;
 	}
 }

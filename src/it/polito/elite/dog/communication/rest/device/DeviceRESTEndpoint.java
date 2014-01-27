@@ -30,6 +30,7 @@ import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
 import it.polito.elite.dog.core.library.jaxb.Configparam;
+import it.polito.elite.dog.core.library.jaxb.Configstate;
 import it.polito.elite.dog.core.library.jaxb.ControlFunctionality;
 import it.polito.elite.dog.core.library.jaxb.Controllables;
 import it.polito.elite.dog.core.library.jaxb.Device;
@@ -39,7 +40,6 @@ import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
-import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
@@ -616,7 +616,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				DeviceStateResponsePayload[] deviceStateResponsePayload = new DeviceStateResponsePayload[allDevices.length];
 				
 				// set the array as part of the response payload
-				responsePayload.setDevices(deviceStateResponsePayload);
+				responsePayload.setDevicesStatus(deviceStateResponsePayload);
 				
 				// iterate over all devices
 				for (int i = 0; i < allDevices.length; i++)
@@ -636,7 +636,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					}
 				}
 				// store the device
-				responsePayload.setDevices(deviceStateResponsePayload);
+				responsePayload.setDevicesStatus(deviceStateResponsePayload);
 				
 				// convert the response body to json
 				responseAsString = this.mapper.writeValueAsString(responsePayload);
@@ -736,32 +736,17 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// set the device id
 		deviceStateResponsePayload.setId(deviceDescriptor.getDeviceURI());
 		
-		// get the device description
-		String deviceDescription = deviceDescriptor.getDescription();
-		
-		// clean the description
-		deviceDescription = deviceDescription.trim();
-		deviceDescription = deviceDescription.replaceAll("\t", "");
-		deviceDescription = deviceDescription.replaceAll("\n", " ");
-		
-		// set the description
-		deviceStateResponsePayload.setDescription(deviceDescription);
-		
 		// set the activation status of the device
 		deviceStateResponsePayload
 				.setActive(Boolean.valueOf((String) deviceService.getProperty(DeviceCostants.ACTIVE)));
 		
 		// get the device status
-		DeviceStatus state = ((Controllable) device).getState();
+		Map<String, State> allStates = ((Controllable) device).getState().getStates();
 		
 		// check if the device state is available, i.e., not
 		// null
-		if (state != null)
+		if (allStates != null)
 		{
-			// get the states composing the overall device
-			// status
-			Map<String, State> allStates = state.getStates();
-			
 			// iterate over all states
 			for (String stateKey : allStates.keySet())
 			{
@@ -862,7 +847,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		
 		// set default value for the variable used to store the HTTP response by
-		// the right value: EXPECTATION_FAILED (If something go wrong we will
+		// the right value: EXPECTATION_FAILED (If something goes wrong we will
 		// say to user that the command was not executed successfully)
 		// it was the best response status available
 		Status response = Response.Status.EXPECTATION_FAILED;
@@ -872,10 +857,11 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		
 		// --- Use Jackson to interpret the type of data passed as value ---
 		
-		// check if a post/put body is given and convert it into an array of
+		// check if a post/put body is given, it is not an empty JSON object,
+		// and convert it into an array of
 		// parameters
 		// TODO: check if commands can have more than 1 parameter
-		if ((commandParameters != null) && (!commandParameters.isEmpty()))
+		if ((commandParameters != null) && (!commandParameters.isEmpty()) && (!commandParameters.equals("{}")))
 		{
 			// try to read the payload
 			for (int i = 0; i < this.payloads.size(); i++)
@@ -931,7 +917,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	
 	/**
 	 * Prepare the JAXB Device to contain the proper information for external
-	 * applications. It removes all the network-related properties...
+	 * applications. It removes all the network-related properties and hides
+	 * some redundant arrays for the JSON serialization.
 	 * 
 	 * @param device
 	 *            the "full" JAXB Device to clean
@@ -974,6 +961,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				}
 				paramsToRemove.clear();
 			}
+			
+			// improve JSON rendering by hiding a redundant array
+			controlFunctionality.setCommandList(controlFunctionality.getCommands().getCommand());
 		}
 		
 		// get all the notification functionalities...
@@ -1001,7 +991,15 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				}
 				paramsToRemove.clear();
 			}
+			
+			// improve JSON rendering by hiding a redundant array
+			notificationFunctionality.setNotificationList(notificationFunctionality.getNotifications()
+					.getNotification());
 		}
+		
+		// improve JSON rendering by hiding a redundant array for states
+		for (Configstate status : device.getState())
+			status.setStatevalueList(status.getStatevalues().getStatevalue());
 		
 	}
 	
