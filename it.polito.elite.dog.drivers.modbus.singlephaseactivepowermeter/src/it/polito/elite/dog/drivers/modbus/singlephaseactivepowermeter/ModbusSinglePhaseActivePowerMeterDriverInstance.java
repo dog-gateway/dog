@@ -25,7 +25,7 @@ import it.polito.elite.dog.core.library.model.state.SinglePhaseActivePowerMeasur
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
+import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
 import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
@@ -45,7 +45,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDriver implements
+public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDriverInstance implements
 		SinglePhaseActivePowerMeter
 {
 	// the class logger

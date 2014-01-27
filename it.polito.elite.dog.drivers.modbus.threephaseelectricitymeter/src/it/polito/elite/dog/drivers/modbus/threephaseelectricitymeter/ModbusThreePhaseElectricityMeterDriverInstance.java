@@ -49,7 +49,7 @@ import it.polito.elite.dog.core.library.model.statevalue.ReactivePowerStateValue
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.model.statevalue.VoltageStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
+import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
 import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
@@ -74,7 +74,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver implements ThreePhaseElectricityMeter
+public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriverInstance implements ThreePhaseElectricityMeter
 {
 	// the class logger
 	private LogHelper logger;

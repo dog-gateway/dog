@@ -19,7 +19,7 @@ package it.polito.elite.dog.drivers.modbus.network.interfaces;
 
 import java.util.Set;
 
-import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
+import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 
 
@@ -61,9 +61,9 @@ public interface ModbusNetwork
 	 * Adds a new device-specific driver for the given register
 	 * @param register
 	 *            the register unique identifier.
-	 * @param driver the {@link ModbusDriver} instance to add.
+	 * @param driver the {@link ModbusDriverInstance} instance to add.
 	 */
-	public void addDriver(ModbusRegisterInfo register, ModbusDriver driver);
+	public void addDriver(ModbusRegisterInfo register, ModbusDriverInstance driver);
 	
 	/**
 	 * Removes a device-specific driver for the given register
@@ -77,5 +77,5 @@ public interface ModbusNetwork
 	 * 
 	 * @param datapoint
 	 */
-	public void removeDriver(ModbusDriver driver);
+	public void removeDriver(ModbusDriverInstance driver);
 }

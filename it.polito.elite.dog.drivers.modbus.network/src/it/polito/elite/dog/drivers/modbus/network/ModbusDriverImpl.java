@@ -78,10 +78,10 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	public static String logId = "[ModbusDriverImpl]: ";
 	
 	// the register to driver map
-	private Map<ModbusRegisterInfo, ModbusDriver> register2Driver;
+	private Map<ModbusRegisterInfo, ModbusDriverInstance> register2Driver;
 	
 	// the inverse map
-	private Map<ModbusDriver, Set<ModbusRegisterInfo>> driver2Register;
+	private Map<ModbusDriverInstance, Set<ModbusRegisterInfo>> driver2Register;
 	
 	// the modbus server-to-register association for polling
 	private Map<InetAddress, Set<ModbusRegisterInfo>> gatewayAddress2Registers;
@@ -128,10 +128,10 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 		this.bundleContext = bundleContext;
 		
 		// create the register to driver map
-		this.register2Driver = new ConcurrentHashMap<ModbusRegisterInfo, ModbusDriver>();
+		this.register2Driver = new ConcurrentHashMap<ModbusRegisterInfo, ModbusDriverInstance>();
 		
 		// create the driver to register map
-		this.driver2Register = new ConcurrentHashMap<ModbusDriver, Set<ModbusRegisterInfo>>();
+		this.driver2Register = new ConcurrentHashMap<ModbusDriverInstance, Set<ModbusRegisterInfo>>();
 		
 		// create the gateway address to register map
 		this.gatewayAddress2Registers = new ConcurrentHashMap<InetAddress, Set<ModbusRegisterInfo>>();
@@ -347,7 +347,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	/**
 	 * @return the register2Driver
 	 */
-	public Map<ModbusRegisterInfo, ModbusDriver> getRegister2Driver()
+	public Map<ModbusRegisterInfo, ModbusDriverInstance> getRegister2Driver()
 	{
 		return register2Driver;
 	}
@@ -355,7 +355,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	/**
 	 * @return the driver2Register
 	 */
-	public Map<ModbusDriver, Set<ModbusRegisterInfo>> getDriver2Register()
+	public Map<ModbusDriverInstance, Set<ModbusRegisterInfo>> getDriver2Register()
 	{
 		return driver2Register;
 	}
@@ -461,7 +461,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 					+ register.getXlator().getValue());
 			
 			// dispatch the new message...
-			ModbusDriver driver = this.register2Driver.get(register);
+			ModbusDriverInstance driver = this.register2Driver.get(register);
 			driver.newMessageFromHouse(register, register.getXlator().getValue());
 		}
 		else
@@ -556,7 +556,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 									+ register.getXlator().getValue());
 							
 							// dispatch the new message...
-							ModbusDriver driver = this.register2Driver.get(register);
+							ModbusDriverInstance driver = this.register2Driver.get(register);
 							driver.newMessageFromHouse(register, register.getXlator().getValue());
 						}
 						catch (ModbusIOException e)
@@ -694,7 +694,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	 * it.polito.elite.dog.drivers.modbus.network.ModbusDriver)
 	 */
 	@Override
-	public void addDriver(ModbusRegisterInfo register, ModbusDriver driver)
+	public void addDriver(ModbusRegisterInfo register, ModbusDriverInstance driver)
 	{
 		// get the register gateway address
 		InetAddress gwAddress = register.getGatewayIPAddress();
@@ -760,7 +760,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	public void removeDriver(ModbusRegisterInfo register)
 	{
 		// removes a given register-driver association
-		ModbusDriver drv = this.register2Driver.remove(register);
+		ModbusDriverInstance drv = this.register2Driver.remove(register);
 		
 		if (drv != null)
 		{
@@ -788,7 +788,7 @@ public class ModbusDriverImpl implements ModbusNetwork, ManagedService
 	}
 	
 	@Override
-	public void removeDriver(ModbusDriver driver)
+	public void removeDriver(ModbusDriverInstance driver)
 	{
 		// removes a given driver-register association
 		Set<ModbusRegisterInfo> driverRegisters = this.driver2Register.remove(driver);

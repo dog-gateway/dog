@@ -26,7 +26,7 @@ import it.polito.elite.dog.core.library.model.state.LightIntensityState;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.LevelStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
+import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
 import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
@@ -47,7 +47,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  *
  */
-public class ModbusLightSensorDriverInstance extends ModbusDriver implements LightSensor
+public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implements LightSensor
 {
 	// the class logger
 	private LogHelper logger;

@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @since Jan 18, 2012
  */
-public abstract class ModbusDriver implements StatefulDevice
+public abstract class ModbusDriverInstance implements StatefulDevice
 {
 	// a reference to the network driver interface to allow network-level access
 	// for sub-classes
@@ -94,7 +94,7 @@ public abstract class ModbusDriver implements StatefulDevice
 	 * @param device
 	 *            the device to which this driver is attached/associated
 	 */
-	public ModbusDriver(ModbusNetwork network, ControllableDevice device, String gatewayAddress, String gatewayPort, String gatewayProtocol)
+	public ModbusDriverInstance(ModbusNetwork network, ControllableDevice device, String gatewayAddress, String gatewayPort, String gatewayProtocol)
 	{
 		// store a reference to the network driver
 		this.network = network;

@@ -29,7 +29,7 @@ import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
+import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
 
@@ -41,7 +41,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class ModbusOnOffDeviceDriverInstance extends ModbusDriver implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet
+public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet
 {
 	
 	// the class logger

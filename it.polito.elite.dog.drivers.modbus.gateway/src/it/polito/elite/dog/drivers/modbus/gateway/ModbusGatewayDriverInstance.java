@@ -22,7 +22,7 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.ModbusGateway;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.drivers.modbus.network.ModbusDriver;
+import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
 
@@ -34,7 +34,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  *
  */
-public class ModbusGatewayDriverInstance extends ModbusDriver implements ModbusGateway
+public class ModbusGatewayDriverInstance extends ModbusDriverInstance implements ModbusGateway
 {
 	// the driver logger
 	LogHelper logger;
