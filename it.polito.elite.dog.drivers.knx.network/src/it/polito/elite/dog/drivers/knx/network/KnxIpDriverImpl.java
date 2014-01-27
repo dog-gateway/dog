@@ -91,7 +91,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 	private Map<KnxIPDeviceInfo, DPT> knxDeviceInfo2DPT;
 	
 	// the map groupAddres/device-specific driver
-	private Map<KnxIPDeviceInfo, KnxIPDriver> knxDeviceInfo2Driver;
+	private Map<KnxIPDeviceInfo, KnxIPDriverInstance> knxDeviceInfo2Driver;
 	
 	// the KnxIp gateway to device map
 	private Map<InetSocketAddress, Set<KnxIPDeviceInfo>> gateway2Device;
@@ -137,7 +137,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 		this.knxDeviceInfo2DPT = new HashMap<KnxIPDeviceInfo, DPT>();
 		
 		// create the groupAddress to KnxIPDriver map
-		this.knxDeviceInfo2Driver = new HashMap<KnxIPDeviceInfo, KnxIPDriver>();
+		this.knxDeviceInfo2Driver = new HashMap<KnxIPDeviceInfo, KnxIPDriverInstance>();
 		
 		// initialize the gateway to device map
 		this.gateway2Device = new HashMap<InetSocketAddress, Set<KnxIPDeviceInfo>>();
@@ -305,7 +305,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 		// get the device datapoint, if available
 		DPT deviceDPT = this.knxDeviceInfo2DPT.get(deviceInfo);
 		// gete the device driver if available
-		KnxIPDriver deviceDriver = this.knxDeviceInfo2Driver.get(deviceInfo);
+		KnxIPDriverInstance deviceDriver = this.knxDeviceInfo2Driver.get(deviceInfo);
 		
 		// if both the device DPT and Driver are available, send the read
 		// command
@@ -343,7 +343,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 		// get the device datapoint, if available
 		DPT deviceDPT = this.knxDeviceInfo2DPT.get(deviceInfo);
 		// gete the device driver if available
-		KnxIPDriver deviceDriver = this.knxDeviceInfo2Driver.get(deviceInfo);
+		KnxIPDriverInstance deviceDriver = this.knxDeviceInfo2Driver.get(deviceInfo);
 		
 		// if both the device DPT and Driver are available, send the read
 		// command
@@ -376,7 +376,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 	}
 	
 	@Override
-	public void addDriver(KnxIPDeviceInfo device, int mainNumber, DPT deviceDPT, KnxIPDriver driver)
+	public void addDriver(KnxIPDeviceInfo device, int mainNumber, DPT deviceDPT, KnxIPDriverInstance driver)
 	{
 		// store the associations group address / DPT
 		this.knxDeviceInfo2DPT.put(device, deviceDPT);
@@ -409,7 +409,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 	}
 	
 	
-	public void removeDriver(KnxIPDriver driver)
+	public void removeDriver(KnxIPDriverInstance driver)
 	{
 		//create the set of device info to remove as consequence of driver removal
 		Set<KnxIPDeviceInfo> toRemove =  new HashSet<KnxIPDeviceInfo>();
@@ -595,7 +595,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 	 * @param deviceDriver
 	 *            the driver to which the read value shall be sent.
 	 */
-	private void read(Datapoint dpt, KnxIPDriver deviceDriver, InetSocketAddress gwAddress)
+	private void read(Datapoint dpt, KnxIPDriverInstance deviceDriver, InetSocketAddress gwAddress)
 	{
 		try
 		{
@@ -719,7 +719,7 @@ public class KnxIpDriverImpl implements KnxIPNetwork, ManagedService, ProcessLis
 										String value = translator.getValue();
 										
 										// try to find a driver to dispatch to
-										KnxIPDriver driver = knxDeviceInfo2Driver.get(deviceInfo);
+										KnxIPDriverInstance driver = knxDeviceInfo2Driver.get(deviceInfo);
 										
 										// if not null dispatch the message,
 										// otherwise log the

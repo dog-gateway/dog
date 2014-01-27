@@ -39,7 +39,7 @@ import java.util.Set;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public abstract class KnxIPDriver implements StatefulDevice
+public abstract class KnxIPDriverInstance implements StatefulDevice
 {
 	// a reference to the network driver interface to allow network-level access
 	// for sub-classes
@@ -103,7 +103,7 @@ public abstract class KnxIPDriver implements StatefulDevice
 	 * @param device
 	 *            the device to which this driver is attached/associated
 	 */
-	public KnxIPDriver(KnxIPNetwork network, ControllableDevice device, String gatewayAddress)
+	public KnxIPDriverInstance(KnxIPNetwork network, ControllableDevice device, String gatewayAddress)
 	{
 		// store a reference to the network driver
 		this.network = network;

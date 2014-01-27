@@ -17,7 +17,7 @@
  */
 package it.polito.elite.dog.drivers.knx.network.interfaces;
 
-import it.polito.elite.dog.drivers.knx.network.KnxIPDriver;
+import it.polito.elite.dog.drivers.knx.network.KnxIPDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import tuwien.auto.calimero.dptxlator.DPT;
 
@@ -52,9 +52,9 @@ public interface KnxIPNetwork
 	/**
 	 * Adds a new device-specific driver for the given device
 	 * @param device the KnxIPDeviceInfo group address of the device.
-	 * @param driver the {@link KnxIPDriver} instance to add.
+	 * @param driver the {@link KnxIPDriverInstance} instance to add.
 	 */
-	public void addDriver(KnxIPDeviceInfo device, int mainNumber, DPT deviceDPT, KnxIPDriver driver);
+	public void addDriver(KnxIPDeviceInfo device, int mainNumber, DPT deviceDPT, KnxIPDriverInstance driver);
 	
 	/**
 	 * Removes a device-specific driver for the given device
@@ -64,7 +64,7 @@ public interface KnxIPNetwork
 	
 	/**
 	 * Removes a device-specific driver 
-	 * @param driver driver the {@link KnxIPDriver} instance to remove.
+	 * @param driver driver the {@link KnxIPDriverInstance} instance to remove.
 	 */
-	public void removeDriver(KnxIPDriver driver);
+	public void removeDriver(KnxIPDriverInstance driver);
 }

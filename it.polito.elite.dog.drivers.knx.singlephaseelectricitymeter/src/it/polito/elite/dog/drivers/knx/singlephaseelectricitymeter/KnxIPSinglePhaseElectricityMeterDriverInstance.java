@@ -51,7 +51,7 @@ import it.polito.elite.dog.core.library.model.statevalue.PowerFactorStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ReactiveEnergyStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ReactivePowerStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.VoltageStateValue;
-import it.polito.elite.dog.drivers.knx.network.KnxIPDriver;
+import it.polito.elite.dog.drivers.knx.network.KnxIPDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
 
@@ -79,7 +79,7 @@ import tuwien.auto.calimero.dptxlator.DPTXlator4ByteInteger;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriver implements SinglePhaseElectricityMeter
+public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverInstance implements SinglePhaseElectricityMeter
 {
 	// the device state
 	private DeviceStatus innerState;

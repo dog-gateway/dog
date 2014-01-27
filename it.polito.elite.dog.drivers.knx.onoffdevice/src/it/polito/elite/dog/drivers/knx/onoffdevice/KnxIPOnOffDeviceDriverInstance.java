@@ -29,7 +29,7 @@ import it.polito.elite.dog.core.library.model.state.OnOffState;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
-import it.polito.elite.dog.drivers.knx.network.KnxIPDriver;
+import it.polito.elite.dog.drivers.knx.network.KnxIPDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
 
@@ -49,7 +49,7 @@ import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriver implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet
+public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet
 {
 	// the driver logger
 	LogHelper logger;

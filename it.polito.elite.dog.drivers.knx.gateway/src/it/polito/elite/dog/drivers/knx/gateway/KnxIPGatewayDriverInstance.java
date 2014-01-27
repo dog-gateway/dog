@@ -22,7 +22,7 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.KNXNetIPGateway;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.drivers.knx.network.KnxIPDriver;
+import it.polito.elite.dog.drivers.knx.network.KnxIPDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
 
@@ -34,7 +34,7 @@ import org.osgi.framework.BundleContext;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  *
  */
-public class KnxIPGatewayDriverInstance extends KnxIPDriver implements KNXNetIPGateway
+public class KnxIPGatewayDriverInstance extends KnxIPDriverInstance implements KNXNetIPGateway
 {
 	
 	// the driver logger

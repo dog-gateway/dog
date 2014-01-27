@@ -53,7 +53,7 @@ import it.polito.elite.dog.core.library.model.statevalue.ReactiveEnergyStateValu
 import it.polito.elite.dog.core.library.model.statevalue.ReactivePowerStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.model.statevalue.VoltageStateValue;
-import it.polito.elite.dog.drivers.knx.network.KnxIPDriver;
+import it.polito.elite.dog.drivers.knx.network.KnxIPDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
 
@@ -85,7 +85,7 @@ import tuwien.auto.calimero.dptxlator.DPTXlator4ByteInteger;
  *         must come from DogOnt2Dog
  * 
  */
-public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriver implements ThreePhaseElectricityMeter
+public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverInstance implements ThreePhaseElectricityMeter
 {
 	// the notification name to DPT map
 	private Map<String, DPT> notification2DPT;
