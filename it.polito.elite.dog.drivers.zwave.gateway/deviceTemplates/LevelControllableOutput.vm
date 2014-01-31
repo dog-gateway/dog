@@ -43,7 +43,7 @@
 			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
 				<dhc:notifications>
 					<dhc:notification
-						id="StateChangeNotification_ZL_7421_EU_In_Wall_Switch" class="StateChangeNotification">
+						id="StateChangeNotification_$name" class="StateChangeNotification">
 						<dhc:param value="1" name="nParams" />
 						<dhc:param value="stateChanged" name="notificationName" />
 						<dhc:param type="State" value="newState" name="notificationParamName" />
