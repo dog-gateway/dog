@@ -477,6 +477,12 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 							}
 						}
 					}
+
+					//Releases all the services object referenced at the beginning of the method
+					for (ServiceReference<?> singleServiceReference : deviceService)
+					{
+						this.context.ungetService(singleServiceReference);
+					}
 				}
 			}
 			catch (Exception e)
@@ -567,6 +573,12 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 							}
 						}
 					}
+
+					//Releases all the services object referenced at the beginning of the method
+					for (ServiceReference<?> singleServiceReference : deviceService)
+					{
+						this.context.ungetService(singleServiceReference);
+					}
 				}
 			}
 			catch (Exception e)
@@ -640,6 +652,12 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				
 				// convert the response body to json
 				responseAsString = this.mapper.writeValueAsString(responsePayload);
+
+				//Releases all the services object referenced at the beginning of the method
+				for (ServiceReference<?> singleServiceReference : allDevices)
+				{
+					this.context.ungetService(singleServiceReference);
+				}
 			}
 			
 		}
@@ -698,6 +716,12 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				
 				// convert the response body to json
 				responseAsString = this.mapper.writeValueAsString(deviceStateResponsePayload);
+
+				//Releases all the services object referenced at the beginning of the method
+				for (ServiceReference<?> singleServiceReference : deviceService)
+				{
+					this.context.ungetService(singleServiceReference);
+				}
 			}
 		}
 		catch (Exception e)
