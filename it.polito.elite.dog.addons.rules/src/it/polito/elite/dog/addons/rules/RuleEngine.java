@@ -25,6 +25,7 @@ import it.polito.elite.dog.addons.rules.util.ThreadedRuleBundleInitializer;
 import it.polito.elite.dog.addons.rules.util.TimeConversion;
 //import it.polito.elite.dog.addons.rules.util.TimedNotificationsPreProcessor;
 import it.polito.elite.dog.addons.rules.util.Xml2DrlTranslator;
+import it.polito.elite.dog.core.library.model.AbstractDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.notification.Notification;
@@ -826,7 +827,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	{
 		Object returningState = new Object();
 		// Get the status variable with path "deviceURI/status"
-		StatusVariable deviceStatusVariable = monitorAdmin.getStatusVariable(deviceURI + "/status");
+		StatusVariable deviceStatusVariable = monitorAdmin.getStatusVariable(AbstractDevice.toMonitorableId(deviceURI) + "/status");
 		DeviceStatus currentDeviceStatus;
 		try
 		{
