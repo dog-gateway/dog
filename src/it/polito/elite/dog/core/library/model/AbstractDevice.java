@@ -24,6 +24,9 @@ import it.polito.elite.dog.core.library.util.EventFactory;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Map;
@@ -56,8 +59,8 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public abstract class AbstractDevice extends ControllableDevice implements ServiceTrackerCustomizer<Object, Object>,
-		Monitorable
+public abstract class AbstractDevice extends ControllableDevice implements
+		ServiceTrackerCustomizer<Object, Object>, Monitorable
 {
 	// Reference to the driver. Null when any driver is attached
 	protected Object driver;
@@ -65,12 +68,12 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 	protected BundleContext context;
 	// Reference to the MonitorListener
 	protected MonitorListener monitorListener;
-	
+
 	// / Reference to a ServiceTracker listening for the EventAdmin service
 	protected ServiceTracker<?, ?> trackerEventAdmin;
 	// Reference to a ServiceTracker listening for the MonitorListener service
 	protected ServiceTracker<?, ?> trackerMonitorListener;
-	
+
 	// Monitorable service registration in the OSGi framework
 	protected ServiceRegistration<?> serviceRegMonitorable;
 	// Service registration for interacting with the device (after the
@@ -79,17 +82,17 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 	// Service registration in the OSGi framework (for the DeviceManager
 	// matching, only) */
 	volatile private ServiceRegistration<?> serviceRegDevice;
-	
+
 	// OSGi logger
 	LogHelper logger;
-	
+
 	Timer delayedAttachment = new Timer();
-	
+
 	volatile boolean changedProperties = true;
-	
+
 	// this field allows to avoid duplicated timestamps for the same device
 	private Integer timestampOffset = 0;
-	
+
 	/**
 	 * Class constructor
 	 * 
@@ -102,14 +105,16 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		this.context = context;
 		this.logger = new LogHelper(context);
 		// create and open a ServiceTracker for the EventAdmin service
-		this.trackerEventAdmin = new ServiceTracker<Object, Object>(context, EventAdmin.class.getName(), null);
+		this.trackerEventAdmin = new ServiceTracker<Object, Object>(context,
+				EventAdmin.class.getName(), null);
 		this.trackerEventAdmin.open();
 		// create and open a ServiceTracker for the MonitorLister service
-		this.trackerMonitorListener = new ServiceTracker<Object, Object>(context, MonitorListener.class.getName(), this);
+		this.trackerMonitorListener = new ServiceTracker<Object, Object>(
+				context, MonitorListener.class.getName(), this);
 		this.trackerMonitorListener.open();
-		
+
 	}
-	
+
 	/**
 	 * Alternative class constructor. It calls the standard constructor and set
 	 * the device properties
@@ -119,19 +124,20 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 	 * @param dogDeviceDescriptor
 	 *            the device properties to set
 	 */
-	public AbstractDevice(BundleContext context, DeviceDescriptor dogDeviceDescriptor)
+	public AbstractDevice(BundleContext context,
+			DeviceDescriptor dogDeviceDescriptor)
 	{
 		this(context);
 		this.setDeviceProperties(dogDeviceDescriptor);
 	}
-	
+
 	@Override
 	public Object addingService(ServiceReference<Object> reference)
 	{
 		// get the object that implements one of the interfaces the bundle is
 		// listening for
 		Object serviceInstance = this.context.getService(reference);
-		
+
 		// check its type
 		if (serviceInstance instanceof MonitorListener)
 		{
@@ -140,16 +146,18 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		}
 		return serviceInstance;
 	}
-	
+
 	@Override
-	public void modifiedService(ServiceReference<Object> reference, Object service)
+	public void modifiedService(ServiceReference<Object> reference,
+			Object service)
 	{
 		// intentionally left empty
-		
+
 	}
-	
+
 	@Override
-	public void removedService(ServiceReference<Object> reference, Object service)
+	public void removedService(ServiceReference<Object> reference,
+			Object service)
 	{
 		// check if the removed service is equals to the current referenced
 		// object
@@ -158,13 +166,13 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 			this.monitorListener = null;
 		}
 	}
-	
+
 	@Override
 	public void setDriver(Object obj)
 	{
 		this.driver = obj;
 		this.updateProperties();
-		
+
 		// Search the command device interface
 		for (Class<?> currentInterface : this.getClass().getInterfaces())
 		{
@@ -174,69 +182,76 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 				// Register the device service with the command device interface
 				// (and no properties in order to avoid the DeviceManager
 				// intervention)
-				this.serviceRegCommand = this.context.registerService(currentInterface.getName(), this, null);
+				this.serviceRegCommand = this.context.registerService(
+						currentInterface.getName(), this, null);
 			}
 		}
-		
+
 		// Create the property hashtable
 		Hashtable<String, String> properties = new Hashtable<String, String>();
 		// Add the pid property to the Monitorable service
-		properties.put("service.pid", this.deviceId);
+		properties.put("service.pid", AbstractDevice.toMonitorableId(this.deviceId));
 		// Register a Monitorable service (MonitorAdmin bundle)
-		this.serviceRegMonitorable = context.registerService(Monitorable.class.getName(), this, properties);
-		
+		this.serviceRegMonitorable = context.registerService(
+				Monitorable.class.getName(), this, properties);
+
 	}
-	
+
 	public void updateProperties()
 	{
 		if (this.serviceRegDevice == null)
 		{
-			
-			delayedAttachment.schedule(new TimerTask() {
-				
+
+			delayedAttachment.schedule(new TimerTask()
+			{
+
 				@Override
 				public void run()
 				{
-					
+
 					updateProperties();
-					
+
 				}
 			}, 1000);
-			
+
 		}
 		else
 		{
-			
+
 			delayedAttachment.cancel();
 			this.deviceProp.put(DeviceCostants.ACTIVE, "true");
-			
+
 			this.serviceRegDevice.setProperties(this.deviceProp);
-			if (!this.serviceRegDevice.getReference().getProperty(DeviceCostants.ACTIVE).equals("true"))
+			if (!this.serviceRegDevice.getReference()
+					.getProperty(DeviceCostants.ACTIVE).equals("true"))
 			{
 				updateProperties();
 			}
-			this.logger.log(LogService.LOG_INFO, "ACTIVATED DRIVER " + this.driver + " for device " + this.deviceId
-					+ " \n");
+			this.logger.log(LogService.LOG_INFO, "ACTIVATED DRIVER "
+					+ this.driver + " for device " + this.deviceId + " \n");
 		}
 	}
-	
+
 	protected void registerDevice(String deviceClass)
 	{
-		
+
 		try
 		{
 			// register the device
-			this.serviceRegDevice = this.context.registerService(Device.class.getName(), this, this.deviceProp);
-			this.logger.log(LogService.LOG_INFO, "REGISTERED DEVICE " + this.serviceRegDevice);
-			
+			this.serviceRegDevice = this.context.registerService(
+					Device.class.getName(), this, this.deviceProp);
+			this.logger.log(LogService.LOG_INFO, "REGISTERED DEVICE "
+					+ this.serviceRegDevice);
+
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_ERROR, "DEVICE REGISTRATION EXCEPTION ", e);
+			this.logger.log(LogService.LOG_ERROR,
+					"DEVICE REGISTRATION EXCEPTION ", e);
 		}
-		
+
 	}
-	
+
 	/**
 	 * Detach the driver to the device
 	 * 
@@ -249,55 +264,57 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 	{
 		if (this.driver.equals(driverRemoved))
 		{
-			this.logger.log(LogService.LOG_INFO, "DEACTIVATED DRIVER for " + this.deviceId);
-			
+			this.logger.log(LogService.LOG_INFO, "DEACTIVATED DRIVER for "
+					+ this.deviceId);
+
 			// unregister the command device service
 			if (this.serviceRegCommand != null)
 			{
 				this.serviceRegCommand.unregister();
 			}
-			
+
 			// unregister the Monitorable service
 			if (this.serviceRegMonitorable != null)
 			{
 				this.serviceRegMonitorable.unregister();
 			}
-			
+
 			this.driver = null;
-			
+
 			this.deviceProp.put(DeviceCostants.ACTIVE, "false");
 			if (this.serviceRegDevice != null)
 			{
 				this.serviceRegDevice.setProperties(this.deviceProp);
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	public void removeDevice()
 	{
-		this.logger.log(LogService.LOG_INFO, "UNREGISTERING device " + this.deviceId);
-		
+		this.logger.log(LogService.LOG_INFO, "UNREGISTERING device "
+				+ this.deviceId);
+
 		// unregister the command device service
 		if (this.serviceRegCommand != null)
 		{
 			this.serviceRegCommand.unregister();
 		}
-		
+
 		// unregister the Monitorable service
 		if (this.serviceRegMonitorable != null)
 		{
 			this.serviceRegMonitorable.unregister();
 		}
-		
+
 		// unregister the device service (DeviceManager)
 		if (this.serviceRegDevice != null)
 		{
 			this.serviceRegDevice.unregister();
 		}
 	}
-	
+
 	/**
 	 * Get all the states (DeviceStatus) of the device. It call the getStates
 	 * method on the driver
@@ -305,7 +322,7 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 	 * @return map containing the name of the state and the State objects
 	 */
 	public abstract Object getState();
-	
+
 	/**
 	 * Get all the states of the device. It call the getStates method on the
 	 * driver
@@ -319,11 +336,11 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		{
 			StatefulDevice dogDriver = (StatefulDevice) this.driver;
 			state = dogDriver.getState();
-			
+
 		}
 		return state;
 	}
-	
+
 	/* Notification: StateChangeNotification */
 	public void notifyStateChanged(State newState)
 	{
@@ -331,9 +348,9 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		DeviceStatus deviceStatus = ((DeviceStatus) this.getState());
 		// Notify the MonitorAdmin about the new DeviceStatus
 		notifyMonitorAdmin(deviceStatus);
-		
+
 	}
-	
+
 	/**
 	 * Notify to the event admin a just happened event (since Dog2.5 not
 	 * StateChangeNotification)
@@ -353,10 +370,11 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		// --add device uri (probably only useful for StateChangeNotifications)
 		// (since 2012-05-08)
 		eventProp.put(DeviceCostants.DEVICEURI, this.deviceId);
-		
+
 		// --add event name (apparently, it is useless) (since 2012-05-08)
-		eventProp.put(org.osgi.service.event.EventConstants.EVENT_TOPIC, eventTopic);
-		
+		eventProp.put(org.osgi.service.event.EventConstants.EVENT_TOPIC,
+				eventTopic);
+
 		// /----- Avoid duplicated timestamps ------------------
 		long currentTimeStamp = 0;
 		synchronized (this.timestampOffset)
@@ -370,15 +388,16 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		}
 		GregorianCalendar calendar = new GregorianCalendar();
 		calendar.setTimeInMillis(currentTimeStamp);
-		eventProp.put(org.osgi.service.event.EventConstants.TIMESTAMP, calendar);
-		
+		eventProp
+				.put(org.osgi.service.event.EventConstants.TIMESTAMP, calendar);
+
 		if (ea != null)
 		{
 			ea.postEvent(new Event(eventTopic, eventProp));
 		}
-		
+
 	}
-	
+
 	/**
 	 * Method for sending an event to the OSGi Event Admin
 	 * 
@@ -390,15 +409,16 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		// Retrieve a reference of the EventAdmin service
 		EventAdmin ea = (EventAdmin) this.trackerEventAdmin.getService();
 		// Create the event through the DogEventFactory
-		Event notificationEvent = EventFactory.createEvent(notification, this.getClass().getSimpleName());
-		
+		Event notificationEvent = EventFactory.createEvent(notification, this
+				.getClass().getSimpleName());
+
 		if (ea != null)
 		{
 			// Send the event to the EventAdmin
 			ea.postEvent(notificationEvent);
 		}
 	}
-	
+
 	/**
 	 * Method for sending a notification to the OSGi Monitor Admin when the
 	 * DeviceStatus changes
@@ -413,25 +433,30 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		// TODO Check why this exception is generated, sometimes...
 		try
 		{
-			deviceStatusSerialization = DeviceStatus.serializeToString(deviceStatus);
+			deviceStatusSerialization = DeviceStatus
+					.serializeToString(deviceStatus);
 			// For each DeviceStatus is generated a StatusVariable object
 			// notified through the MonitorListener service with updated method
-			this.monitorListener.updated(this.deviceId, new StatusVariable("status", StatusVariable.CM_SI,
-					deviceStatusSerialization));
+			this.monitorListener.updated(AbstractDevice.toMonitorableId(this.deviceId),
+					new StatusVariable("status", StatusVariable.CM_SI,
+							deviceStatusSerialization));
 		}
 		catch (Exception e)
 		{
-			logger.log(LogService.LOG_ERROR, "DeviceStatus notification error for device " + deviceId + ": " + e);
+			logger.log(LogService.LOG_ERROR,
+					"DeviceStatus notification error for device " + deviceId
+							+ ": " + e);
 		}
 	}
-	
+
 	@Override
 	public void noDriverFound()
 	{
-		this.logger.log(LogService.LOG_INFO, this.deviceId + " any drivers found!");
-		
+		this.logger.log(LogService.LOG_INFO, this.deviceId
+				+ " any drivers found!");
+
 	}
-	
+
 	@Override
 	public String[] getStatusVariableNames()
 	{
@@ -439,9 +464,10 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 		statusVariableName[0] = "status";
 		return statusVariableName;
 	}
-	
+
 	@Override
-	public StatusVariable getStatusVariable(String id) throws IllegalArgumentException
+	public StatusVariable getStatusVariable(String id)
+			throws IllegalArgumentException
 	{
 		// Check that the id arguments is "status"
 		if (id.equals("status"))
@@ -452,39 +478,70 @@ public abstract class AbstractDevice extends ControllableDevice implements Servi
 			String deviceStatusSerialization = "";
 			try
 			{
-				deviceStatusSerialization = DeviceStatus.serializeToString(deviceStatus);
+				deviceStatusSerialization = DeviceStatus
+						.serializeToString(deviceStatus);
 			}
 			catch (IOException e)
 			{
-				logger.log(LogService.LOG_ERROR, this.deviceId + " serialization error!");
+				logger.log(LogService.LOG_ERROR, this.deviceId
+						+ " serialization error!");
 			}
 			// For each DeviceStatus is generated and returned a StatusVariable
 			// object
-			return new StatusVariable("status", StatusVariable.CM_SI, deviceStatusSerialization);
+			return new StatusVariable("status", StatusVariable.CM_SI,
+					deviceStatusSerialization);
 		}
 		else
-			throw new IllegalArgumentException("Invalid Status Variable name " + id);
+			throw new IllegalArgumentException("Invalid Status Variable name "
+					+ id);
 	}
-	
+
 	@Override
 	public boolean notifiesOnChange(String id) throws IllegalArgumentException
 	{
 		return true;
 	}
-	
+
 	@Override
-	public boolean resetStatusVariable(String id) throws IllegalArgumentException
+	public boolean resetStatusVariable(String id)
+			throws IllegalArgumentException
 	{
 		return false;
 	}
-	
+
 	@Override
 	public String getDescription(String id) throws IllegalArgumentException
 	{
 		if ("status".equals(id))
 			return this.getDeviceDescriptor().getDescription();
 		else
-			throw new IllegalArgumentException("Invalid Status Variable name " + id);
+			throw new IllegalArgumentException("Invalid Status Variable name "
+					+ id);
 	}
-	
+
+	/**
+	 * Gets a monitorable unique and with a maximum length of 32 bytes
+	 * 
+	 * @param deviceId
+	 * @return
+	 */
+	public static String toMonitorableId(String deviceId)
+	{
+		String id = null;
+		byte[] hash = null;
+
+		try
+		{
+			hash = MessageDigest.getInstance("MD5").digest(deviceId.getBytes());
+			BigInteger bi = new BigInteger(1, hash);
+
+			id = String.format("%0" + (hash.length << 1) + "x", bi);
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+
+		}
+
+		return id;
+	}
 }
