@@ -20,7 +20,6 @@ package it.polito.elite.dog.drivers.zwave.device;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
-import it.polito.elite.dog.core.library.model.devicecategory.LightSensor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.gateway.ZWaveGatewayDriver;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
