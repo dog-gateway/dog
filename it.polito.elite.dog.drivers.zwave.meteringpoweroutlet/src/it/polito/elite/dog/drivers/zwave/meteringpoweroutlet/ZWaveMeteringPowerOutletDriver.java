@@ -17,279 +17,44 @@
  */
 package it.polito.elite.dog.drivers.zwave.meteringpoweroutlet;
 
-import it.polito.elite.dog.drivers.zwave.gateway.ZWaveGatewayDriver;
-import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
-import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
-import it.polito.elite.dog.core.library.model.devicecategory.MeteringPowerOutlet;
+import it.polito.elite.dog.drivers.zwave.device.ZWaveDeviceDriver;
+import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
+import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 
-import java.util.Dictionary;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Set;
-import java.util.Vector;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
-import org.osgi.service.device.Driver;
-import org.osgi.service.device.Device;
 
-public class ZWaveMeteringPowerOutletDriver implements Driver, ManagedService
+public class ZWaveMeteringPowerOutletDriver extends ZWaveDeviceDriver
 {
-	// The OSGi framework context
-	protected BundleContext context;
-	
-	// System logger
-	LogHelper logger;
-	
-	// the log identifier, unique for the class
-	public static String LOG_ID = "[ZWaveMeteringPowerDriver]: ";
-	
-	// String identifier for driver id
-	public static final String DRIVER_ID = "ZWave_ZWaveMeteringPower_driver";
-	
-	// a reference to the network driver
-	private AtomicReference<ZWaveNetwork> network;
-	
-	// a reference to the gateway driver
-	private AtomicReference<ZWaveGatewayDriver> gateway;
-	
-	// milliseconds between two update of the device status, from configuration
-	// file
-	protected int updateTimeMillis;
-	
-	// the list of driver instances currently connected to a device
-	private Vector<ZWaveMeteringPowerOutletInstance> connectedDrivers;
-	
-	// the registration object needed to handle the life span of this bundle in
-	// the OSGi framework (it is a ServiceRegistration object for use by the
-	// bundle registering the service to update the service's properties or to
-	// unregister the service).
-	private ServiceRegistration<?> regDriver;
-	
-	// the filter query for listening to framework events relative to the
-	// to the ZWave gateway driver
-	String filterQuery = String.format("(%s=%s)", Constants.OBJECTCLASS, ZWaveGatewayDriver.class.getName());
-	
-	// what are the on/off device categories that can match with this driver?
-	private Set<String> meteringPowerCategories;
-	
 	public ZWaveMeteringPowerOutletDriver()
 	{
-		this.gateway = new AtomicReference<ZWaveGatewayDriver>();
-		this.network = new AtomicReference<ZWaveNetwork>();
+		super();
 	}
-	
-	/**
-	 * Handle the bundle activation
-	 */
-	public void activate(BundleContext bundleContext)
-	{
-		// init the logger
-		logger = new LogHelper(bundleContext);
-		
-		// store the context
-		context = bundleContext;
-		
-		// initialize the connected drivers list
-		connectedDrivers = new Vector<ZWaveMeteringPowerOutletInstance>();
-		
-		// initialize the set of implemented device categories
-		meteringPowerCategories = new HashSet<String>();
-		
-		// fill supported categories of device
-		properFillDeviceCategories();
-	}
-	
-	public void deactivate()
-	{
-		// remove the service from the OSGi framework
-		this.unRegister();
-	}
-	
-	public void addingService(ZWaveGatewayDriver gatewayDriver)
-	{
-		gateway.set(gatewayDriver);
-		
-		// TODO: remove!!!
-		network.set(gateway.get().getNetwork());
-		
-		// this.registerDriver();
-		
-	}
-	
-	public void removedService(ZWaveGatewayDriver gatewayDriver)
-	{
-		if (gateway.compareAndSet(gatewayDriver, null))
-			// unregisters this driver from the OSGi framework
-			unRegister();
-	}
-	
-	@SuppressWarnings("rawtypes")
+
 	@Override
-	public synchronized int match(ServiceReference reference) throws Exception
+	public ZWaveDriverInstance createZWaveDriverInstance(
+			ZWaveNetwork zWaveNetwork, ControllableDevice device, int nodeId,
+			HashSet<Integer> instancesId, int gatewayNodeId,
+			int updateTimeMillis, BundleContext context)
 	{
-		int matchValue = Device.MATCH_NONE;
-		
-		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
-		{
-			// get the given device category
-			String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
-			
-			try
-			{
-				// get the device class
-				if (Controllable.class.isAssignableFrom(ZWaveMeteringPowerOutletDriver.class.getClassLoader()
-						.loadClass(deviceCategory)))
-				{
-					// get the given device manufacturer
-					String manifacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
-					
-					// get the gateway to which the device is connected
-					String gateway = (String) reference.getProperty(DeviceCostants.GATEWAY);
-					
-					// compute the matching score between the given device and
-					// this driver
-					if (deviceCategory != null)
-					{
-						if (manifacturer != null && (gateway != null) && (manifacturer.equals(ZWaveInfo.MANUFACTURER))
-								&& (meteringPowerCategories.contains(deviceCategory))
-								&& (this.gateway.get().isGatewayAvailable(gateway)))
-						{
-							matchValue = MeteringPowerOutlet.MATCH_MANUFACTURER + MeteringPowerOutlet.MATCH_TYPE;
-						}
-						
-					}
-					
-				}
-			}
-			catch (ClassNotFoundException e)
-			{
-				// skip --> no match
-			}
-		}
-		
-		return matchValue;
+		return new ZWaveMeteringPowerOutletInstance(zWaveNetwork, device, nodeId, instancesId, gatewayNodeId, updateTimeMillis, context);
 	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+
 	@Override
-	public synchronized String attach(ServiceReference reference) throws Exception
+	public void properFillDeviceCategories()
 	{
-		// get the referenced device
-		ControllableDevice device = ((ControllableDevice) context.getService(reference));
-		
-		// get the gateway to which the device is connected
-		String gateway = (String) device.getDeviceDescriptor().getGateway();
-		
-		// get the corresponding end point set
-		Set<String> nodeIdSet = device.getDeviceDescriptor().getSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
-		
-		// get the corresponding end point set
-		Set<String> instanceIdSet = device.getDeviceDescriptor().getSimpleConfigurationParams()
-				.get(ZWaveInfo.INSTANCE_ID);
-		
-		// get the nodeId
-		String sNodeID = nodeIdSet.iterator().next();
-		
-		// get the list of instances available
-		HashSet<Integer> instancesId = new HashSet<Integer>();
-		for (String sInstanceId : instanceIdSet)
-			instancesId.add(Integer.parseInt(sInstanceId));
-		
-		// create a new driver instance
-		ZWaveMeteringPowerOutletInstance driverInstance = new ZWaveMeteringPowerOutletInstance(network.get(), device,
-				Integer.parseInt(sNodeID), instancesId, this.gateway.get().getSpecificGateway(gateway).getNodeInfo()
-						.getDeviceNodeId(), updateTimeMillis, context);
-		
-		// connect this driver instance with the device
-		device.setDriver(driverInstance);
-		
-		// store a reference to the connected driver
-		synchronized (connectedDrivers)
 		{
-			connectedDrivers.add(driverInstance);
-		}
-		return null;
-	}
-	
-	/**
-	 * Registers this driver in the OSGi framework, making its services
-	 * available to all the other bundles living in the same or in connected
-	 * frameworks.
-	 */
-	private void registerDriver()
-	{
-		if ((gateway.get() != null) && (network.get() != null) && (this.context != null) && (this.regDriver == null))
-		{
-			// create a new property object describing this driver
-			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-			// add the id of this driver to the properties
-			propDriver.put(DeviceCostants.DRIVER_ID, DRIVER_ID);
-			// register this driver in the OSGi framework
-			regDriver = context.registerService(Driver.class.getName(), this, propDriver);
-		}
-	}
-	
-	/**
-	 * Handle the bundle de-activation
-	 */
-	protected void unRegister()
-	{
-		// TODO DETACH allocated Drivers
-		if (regDriver != null)
-		{
-			regDriver.unregister();
-			regDriver = null;
-		}
-	}
-	
-	/**
-	 * Fill a set with all the device categories whose devices can match with
-	 * this driver. Automatically retrieve the device categories list by reading
-	 * the implemented interfaces of its DeviceDriverInstance class bundle.
-	 */
-	private void properFillDeviceCategories()
-	{
-		for (Class<?> devCat : ZWaveMeteringPowerOutletInstance.class.getInterfaces())
-		{
-			meteringPowerCategories.add(devCat.getName());
-		}
-	}
-	
-	@Override
-	public void updated(Dictionary<String, ?> properties) throws ConfigurationException
-	{
-		if (properties != null)
-		{
-			// try to get the baseline polling time
-			String updateTimeAsString = (String) properties.get(ZWaveInfo.PROPERTY_UPDATETIME);
-			
-			// trim leading and trailing spaces
-			updateTimeAsString = updateTimeAsString.trim();
-			
-			// check not null
-			if (updateTimeAsString != null)
+			for (Class<?> devCat : ZWaveMeteringPowerOutletInstance.class
+					.getInterfaces())
 			{
-				// parse the string
-				updateTimeMillis = Integer.valueOf(updateTimeAsString);
+				this.deviceCategories.add(devCat.getName());
 			}
-			else
-			{
-				throw new ConfigurationException(ZWaveInfo.PROPERTY_UPDATETIME, ZWaveInfo.PROPERTY_UPDATETIME
-						+ " not defined in configuraton file for " + ZWaveMeteringPowerOutletDriver.class.getName());
-			}
-			
-			// register driver
-			registerDriver();
 		}
+		
 	}
+	
+	
+	
 }

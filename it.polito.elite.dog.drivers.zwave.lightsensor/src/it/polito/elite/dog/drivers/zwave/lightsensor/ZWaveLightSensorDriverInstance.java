@@ -187,7 +187,7 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implemen
 				new LightIntensityState(pValue));
 
 		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveLightSensorDriver.LOG_ID + "Device " + device.getDeviceId()
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
 				+ " light intensity " + luminosityValue.toString());
 
 		// notify the new measure

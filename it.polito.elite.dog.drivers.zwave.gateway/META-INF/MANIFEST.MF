@@ -24,6 +24,7 @@ Import-Package: it.polito.elite.dog.core.devicefactory.api;version="1.0.0",
  org.osgi.service.cm,
  org.osgi.service.device;version="1.1.0",
  org.osgi.service.log
-Export-Package: it.polito.elite.dog.drivers.zwave.gateway
+Export-Package: it.polito.elite.dog.drivers.zwave.device,
+ it.polito.elite.dog.drivers.zwave.gateway
 Bundle-ClassPath: deviceTemplates/,
  .

@@ -57,8 +57,8 @@ import javax.measure.unit.UnitFormat;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance implements
-		MeteringPowerOutlet
+public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
+		implements MeteringPowerOutlet
 {
 	// the class logger
 	private LogHelper logger;
@@ -150,8 +150,8 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance implem
 	public void notifyStateChanged(State newState)
 	{
 		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveMeteringPowerOutletDriver.LOG_ID
-				+ "Device " + device.getDeviceId() + " is now "
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " is now "
 				+ ((OnOffState) newState).getCurrentStateValue()[0].getValue());
 		((ElectricalSystem) device).notifyStateChanged(newState);
 
@@ -260,7 +260,8 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance implem
 			if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
 			{
 				newState = new OnOffState(new OnStateValue());
-			} else
+			}
+			else
 			{
 				newState = new OnOffState(new OffStateValue());
 			}
@@ -335,11 +336,8 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance implem
 				new SinglePhaseActiveEnergyState(pValue));
 
 		// debug
-		logger.log(
-				LogService.LOG_DEBUG,
-				ZWaveMeteringPowerOutletDriver.LOG_ID + "Device "
-						+ device.getDeviceId() + " active energy "
-						+ value.toString());
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " active energy " + value.toString());
 
 		// notify the new measure
 		((EnergyMeteringPowerOutlet) device).notifyNewActiveEnergyValue(value);
@@ -357,9 +355,8 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance implem
 				new SinglePhaseActivePowerMeasurementState(pValue));
 
 		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveMeteringPowerOutletDriver.LOG_ID
-				+ "Device " + device.getDeviceId() + " active power "
-				+ powerValue.toString());
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " active power " + powerValue.toString());
 
 		// notify the new measure
 		((PowerMeteringPowerOutlet) device)
