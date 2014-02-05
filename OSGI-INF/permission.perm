@@ -8,7 +8,7 @@
 # EventAdmin permissions
 (org.osgi.framework.ServicePermission "org.osgi.service.event.EventAdmin" "GET")
 (org.osgi.framework.PackagePermission "org.osgi.service.event" "IMPORT")
-(org.osgi.service.event.TopicPermission "org/osgi/service/monitor" "PUBLISH")
+(org.osgi.service.event.TopicPermission "org/osgi/service/monitor/MonitorEvent" "PUBLISH")
 # MonitorAdmin permissions
 (org.osgi.framework.ServicePermission "org.osgi.service.monitor.Monitorable" "GET")
 (org.osgi.framework.ServicePermission "org.osgi.service.monitor.MonitorAdmin" "REGISTER")

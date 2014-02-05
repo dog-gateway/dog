@@ -1,5 +1,4 @@
 Manifest-Version: 1.0
-Bundle-Activator: it.polito.elite.dog.core.monitoradmin.Activator
 Import-Package: org.osgi.framework;version="1.6.0",
  org.osgi.service.event;version="1.3.0",
  org.osgi.service.log;version="1.3.0",
@@ -12,4 +11,5 @@ Bundle-ManifestVersion: 2
 Bundle-SymbolicName: it.polito.elite.dog.core.monitoradmin;singleton:=true
 Bundle-ClassPath: .
 Export-Package: org.osgi.service.monitor;version="1.0.0"
+Service-Component: OSGI-INF/component.xml
 
