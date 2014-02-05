@@ -150,9 +150,6 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 	public void notifyStateChanged(State newState)
 	{
 		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " is now "
-				+ ((OnOffState) newState).getCurrentStateValue()[0].getValue());
 		((ElectricalSystem) device).notifyStateChanged(newState);
 
 	}
@@ -193,7 +190,7 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 				{
 					double activeEnergy = Double.valueOf(energyEntry
 							.getDataElemValue("val").toString());
-					notifyNewActiveEnergyValue(DecimalMeasure
+					this.notifyNewActiveEnergyValue(DecimalMeasure
 							.valueOf(activeEnergy
 									+ " "
 									+ SI.KILO(SI.WATT.times(NonSI.HOUR))
@@ -206,21 +203,11 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 				{
 					double activePower = Double.valueOf(powerEntry
 							.getDataElemValue("val").toString());
-					notifyNewActivePowerValue(DecimalMeasure
+					this.notifyNewActivePowerValue(DecimalMeasure
 							.valueOf(activePower + " " + SI.WATT.toString()));
 				}
 			}
-			/*
-			 * else { // increment counter nFailedUpdate++;
-			 * 
-			 * // log a message after 5 failed update if (nFailedUpdate >= 5) {
-			 * logger.log(LogService.LOG_WARNING,
-			 * ZWaveMeteringPowerOutletDriver.LOG_ID + "Device " +
-			 * device.getDeviceId() +
-			 * " doesn't respond after 5 update requests");
-			 * 
-			 * nFailedUpdate = 0; } }
-			 */
+
 
 			// always update on-off state
 			int nLevel = 0;
@@ -230,9 +217,11 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 				nLevel = ccEntryOnOff.getLevelAsInt();
 
 			if (nLevel > 0)
-				changeCurrentState(OnOffState.ON);
+				this.changeCurrentState(OnOffState.ON);
 			else
-				changeCurrentState(OnOffState.OFF);
+				this.changeCurrentState(OnOffState.OFF);
+			
+			this.notifyStateChanged(null);
 		}
 	}
 
@@ -268,7 +257,6 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 			// ... then set the new state for the device and throw a state
 			// changed notification
 			currentState.setState(newState.getStateName(), newState);
-			notifyStateChanged(newState);
 		}
 	}
 

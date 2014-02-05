@@ -17,6 +17,20 @@
  */
 package it.polito.elite.dog.drivers.zwave.onoffdevice;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
+import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
+import it.polito.elite.dog.core.library.model.devicecategory.LampHolder;
+import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
+import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
+import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
+import it.polito.elite.dog.core.library.model.state.OnOffState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
@@ -25,40 +39,21 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
-import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
-import it.polito.elite.dog.core.library.model.devicecategory.LampHolder;
-import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
-import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
-import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
-import it.polito.elite.dog.core.library.model.state.OnOffState;
-import it.polito.elite.dog.core.library.model.state.State;
-import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
 
 public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet, LampHolder, OnOffOutput
 {
-	// the class logger
-	private LogHelper logger;
-
 	public ZWaveOnOffDeviceDriverInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
 			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
 	{
 		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
 
-		// create a logger
-		logger = new LogHelper(context);
+		new LogHelper(context);
 
 		// initialize states
 		this.initializeStates();
@@ -86,8 +81,6 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 	public void notifyStateChanged(State newState)
 	{
 		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveOnOffDeviceDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " is now " + ((OnOffState) newState).getCurrentStateValue()[0].getValue());
 		((ElectricalSystem) device).notifyStateChanged(newState);
 
 	}
@@ -116,21 +109,9 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 				changeCurrentState(OnOffState.ON);
 			else
 				changeCurrentState(OnOffState.OFF);
+			
+			notifyStateChanged(null);
 		}
-		/*else
-		{
-			// increment counter
-			nFailedUpdate++;
-
-			//log a message after 5 failed update
-			if(nFailedUpdate >= 5)
-			{
-				logger.log(LogService.LOG_WARNING, ZWaveOnOffDeviceDriver.LOG_ID + "Device " + device.getDeviceId()
-						+ " doesn't respond after 5 update requests");
-
-				nFailedUpdate = 0;
-			}
-		}*/
 	}
 
 	/**
@@ -163,7 +144,6 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 			}
 			// ... then set the new state for the device and throw a state
 			currentState.setState(newState.getStateName(), newState);
-            notifyStateChanged(newState);
 		}
 	}
 

@@ -33,6 +33,7 @@ public class ZWaveLightSensorDriver extends ZWaveDeviceDriver
 	public ZWaveLightSensorDriver()
 	{
 		super();
+		this.driverInstanceClass = ZWaveLightSensorDriverInstance.class;
 	}
 
 	@Override
@@ -42,18 +43,5 @@ public class ZWaveLightSensorDriver extends ZWaveDeviceDriver
 			int updateTimeMillis, BundleContext context)
 	{
 		return new ZWaveLightSensorDriverInstance(zWaveNetwork,device,nodeId,instancesId,gatewayNodeId,updateTimeMillis,context);
-	}
-	
-	@Override
-	public void properFillDeviceCategories()
-	{
-		{
-			for (Class<?> devCat : ZWaveLightSensorDriverInstance.class
-					.getInterfaces())
-			{
-				this.deviceCategories.add(devCat.getName());
-			}
-		}
-		
 	}
 }

@@ -28,6 +28,7 @@ import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.LightSensor;
 import it.polito.elite.dog.core.library.model.state.LightIntensityState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -86,7 +87,7 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implemen
 	@Override
 	public void notifyStateChanged(State newState)
 	{
-		//probably not used...
+		((ElectricalSystem) device).notifyStateChanged(newState);
 	}
 
 	@Override
@@ -113,22 +114,11 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implemen
 			double measure = ccInst.getVal();
 
 			//call the notify method 
-			notifyNewLuminosityValue(DecimalMeasure.valueOf(measure, SI.LUX));
+			this.notifyNewLuminosityValue(DecimalMeasure.valueOf(measure, SI.LUX));
+			
+			//update the state
+			this.notifyStateChanged(null);
 		}
-		/*else
-		{
-			// increment counter
-			nFailedUpdate++;
-
-			//log a message after 5 failed update
-			if(nFailedUpdate >= 5)
-			{
-				logger.log(LogService.LOG_WARNING, ZWaveLightSensorDriver.LOG_ID + "Device " + device.getDeviceId()
-						+ " doesn't respond after 5 update requests");
-
-				nFailedUpdate = 0;
-			}
-		}*/
 	}
 
 	@Override

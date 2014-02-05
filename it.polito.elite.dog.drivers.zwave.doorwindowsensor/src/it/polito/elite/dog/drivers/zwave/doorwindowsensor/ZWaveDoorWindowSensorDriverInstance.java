@@ -29,6 +29,7 @@ import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.DoorSensor;
+import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.WindowSensor;
 import it.polito.elite.dog.core.library.model.state.OpenCloseState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -42,15 +43,18 @@ import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance implements DoorSensor, WindowSensor
+public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance
+		implements DoorSensor, WindowSensor
 {
 	// the class logger
 	private LogHelper logger;
 
-	public ZWaveDoorWindowSensorDriverInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
-			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
+	public ZWaveDoorWindowSensorDriverInstance(ZWaveNetwork network,
+			ControllableDevice device, int deviceId, Set<Integer> instancesId,
+			int gatewayNodeId, int updateTimeMillis, BundleContext context)
 	{
-		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
+		super(network, device, deviceId, instancesId, gatewayNodeId,
+				updateTimeMillis, context);
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -65,10 +69,12 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance imp
 	private void initializeStates()
 	{
 		// initialize the state
-		this.currentState.setState(OpenCloseState.class.getSimpleName(), new OpenCloseState(new CloseStateValue()));
+		this.currentState.setState(OpenCloseState.class.getSimpleName(),
+				new OpenCloseState(new CloseStateValue()));
 
 		// get the initial state of the device
-		Runnable worker = new Runnable() {
+		Runnable worker = new Runnable()
+		{
 			public void run()
 			{
 				network.read(nodeInfo, true);
@@ -83,18 +89,19 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance imp
 	@Override
 	public void notifyStateChanged(State newState)
 	{
-		//probably not used...
+		((ElectricalSystem) device).notifyStateChanged(newState);
 	}
 
 	@Override
-	public void newMessageFromHouse(Device deviceNode, Instance instanceNode, 
+	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
 		this.deviceNode = deviceNode;
 
 		// Read the value associated with the right CommandClass.
 		boolean bState = false;
-		CommandClasses ccEntry = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_BINARY);
+		CommandClasses ccEntry = instanceNode
+				.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_BINARY);
 
 		if (ccEntry != null)
 			bState = ccEntry.getLevelAsBoolean();
@@ -103,6 +110,9 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance imp
 			changeCurrentState(OpenCloseState.OPEN);
 		else
 			changeCurrentState(OpenCloseState.CLOSE);
+		
+		//notify state changed
+		this.notifyStateChanged(null);
 	}
 
 	/**
@@ -115,10 +125,12 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance imp
 	private void changeCurrentState(String openCloseValue)
 	{
 		String currentStateValue = "";
-		State state = currentState.getState(OpenCloseState.class.getSimpleName());
+		State state = currentState.getState(OpenCloseState.class
+				.getSimpleName());
 
 		if (state != null)
-			currentStateValue = (String) state.getCurrentStateValue()[0].getValue();
+			currentStateValue = (String) state.getCurrentStateValue()[0]
+					.getValue();
 
 		// if the current states it is different from the new state
 		if (!currentStateValue.equalsIgnoreCase(openCloseValue))
@@ -157,45 +169,57 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance imp
 	}
 
 	@Override
-	public void notifyOpen() 
+	public void notifyOpen()
 	{
 		// update the state
 		OpenCloseState openState = new OpenCloseState(new OpenStateValue());
 		currentState.setState(OpenCloseState.class.getSimpleName(), openState);
 
-		logger.log(LogService.LOG_DEBUG, ZWaveDoorWindowSensorDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " is now " + ((OpenCloseState) openState).getCurrentStateValue()[0].getValue());
+		logger.log(
+				LogService.LOG_DEBUG,
+				"Device "
+						+ device.getDeviceId()
+						+ " is now "
+						+ ((OpenCloseState) openState).getCurrentStateValue()[0]
+								.getValue());
 
 		((DoorSensor) device).notifyOpen();
 	}
 
 	@Override
-	public void notifyClose() 
+	public void notifyClose()
 	{
 		// update the state
 		OpenCloseState closeState = new OpenCloseState(new CloseStateValue());
 		currentState.setState(OpenCloseState.class.getSimpleName(), closeState);
 
-		logger.log(LogService.LOG_DEBUG, ZWaveDoorWindowSensorDriver.LOG_ID + "Device " + device.getDeviceId()
-				+ " is now " + ((OpenCloseState) closeState).getCurrentStateValue()[0].getValue());
+		logger.log(
+				LogService.LOG_DEBUG,
+				"Device "
+						+ device.getDeviceId()
+						+ " is now "
+						+ ((OpenCloseState) closeState).getCurrentStateValue()[0]
+								.getValue());
 
 		((DoorSensor) device).notifyClose();
 	}
 
 	@Override
-	protected ZWaveNodeInfo createNodeInfo(int deviceId, Set<Integer> instancesId, boolean isController) 
+	protected ZWaveNodeInfo createNodeInfo(int deviceId,
+			Set<Integer> instancesId, boolean isController)
 	{
-		HashMap<Integer,Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
+		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
 
-		//binary switch has its own command class 
+		// binary switch has its own command class
 		HashSet<Integer> ccSet = new HashSet<Integer>();
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_SENSOR_BINARY);
 
-		for(Integer instanceId : instancesId)
+		for (Integer instanceId : instancesId)
 		{
 			instanceCommand.put(instanceId, ccSet);
 		}
-		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand, isController);
+		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand,
+				isController);
 		return nodeInfo;
 	}
 }

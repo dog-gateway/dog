@@ -47,7 +47,7 @@ public abstract class ZWaveDeviceDriver implements Driver, ManagedService
 	protected BundleContext context;
 
 	// System logger
-	LogHelper logger;
+	protected LogHelper logger;
 
 	// a reference to the network driver
 	private AtomicReference<ZWaveNetwork> network;
@@ -76,6 +76,10 @@ public abstract class ZWaveDeviceDriver implements Driver, ManagedService
 	// what are the on/off device categories that can match with this driver?
 	protected Set<String> deviceCategories;
 
+	// the driver instance class from which extracting the supported device
+	// categories
+	protected Class<?> driverInstanceClass;
+
 	public ZWaveDeviceDriver()
 	{
 		// intialize atomic references
@@ -99,9 +103,9 @@ public abstract class ZWaveDeviceDriver implements Driver, ManagedService
 
 		// store the context
 		this.context = bundleContext;
-		
+
 		// fill the device categories
-		this.properFillDeviceCategories();
+		this.properFillDeviceCategories(this.driverInstanceClass);
 
 	}
 
@@ -186,7 +190,7 @@ public abstract class ZWaveDeviceDriver implements Driver, ManagedService
 
 		// get the list of instances available
 		HashSet<Integer> instancesId = new HashSet<Integer>();
-		
+
 		for (String sInstanceId : instanceIdSet)
 			instancesId.add(Integer.parseInt(sInstanceId));
 
@@ -212,7 +216,6 @@ public abstract class ZWaveDeviceDriver implements Driver, ManagedService
 			ZWaveNetwork zWaveNetwork, ControllableDevice device, int nodeId,
 			HashSet<Integer> instancesId, int gatewayNodeId,
 			int updateTimeMillis, BundleContext context);
-	
 
 	/**
 	 * Registers this driver in the OSGi framework, making its services
@@ -252,8 +255,17 @@ public abstract class ZWaveDeviceDriver implements Driver, ManagedService
 	 * this driver. Automatically retrieve the device categories list by reading
 	 * the implemented interfaces of its DeviceDriverInstance class bundle.
 	 */
-	public abstract void properFillDeviceCategories();
-	
+	public void properFillDeviceCategories(Class<?> cls)
+	{
+		if (cls != null)
+		{
+			for (Class<?> devCat : cls.getInterfaces())
+			{
+				this.deviceCategories.add(devCat.getName());
+			}
+		}
+
+	}
 
 	@Override
 	public void updated(Dictionary<String, ?> properties)

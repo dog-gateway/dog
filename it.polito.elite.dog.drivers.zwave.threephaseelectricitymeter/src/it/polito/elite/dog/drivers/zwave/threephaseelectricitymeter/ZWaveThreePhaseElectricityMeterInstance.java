@@ -371,6 +371,8 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 					}
 				}
 			}
+			
+			this.notifyStateChanged(null);
 		}
 	}
 

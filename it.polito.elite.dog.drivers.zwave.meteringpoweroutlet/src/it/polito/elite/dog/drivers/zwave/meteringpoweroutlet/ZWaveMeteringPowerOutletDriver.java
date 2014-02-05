@@ -31,6 +31,7 @@ public class ZWaveMeteringPowerOutletDriver extends ZWaveDeviceDriver
 	public ZWaveMeteringPowerOutletDriver()
 	{
 		super();
+		this.driverInstanceClass = ZWaveMeteringPowerOutletInstance.class;
 	}
 
 	@Override
@@ -40,21 +41,5 @@ public class ZWaveMeteringPowerOutletDriver extends ZWaveDeviceDriver
 			int updateTimeMillis, BundleContext context)
 	{
 		return new ZWaveMeteringPowerOutletInstance(zWaveNetwork, device, nodeId, instancesId, gatewayNodeId, updateTimeMillis, context);
-	}
-
-	@Override
-	public void properFillDeviceCategories()
-	{
-		{
-			for (Class<?> devCat : ZWaveMeteringPowerOutletInstance.class
-					.getInterfaces())
-			{
-				this.deviceCategories.add(devCat.getName());
-			}
-		}
-		
-	}
-	
-	
-	
+	}	
 }

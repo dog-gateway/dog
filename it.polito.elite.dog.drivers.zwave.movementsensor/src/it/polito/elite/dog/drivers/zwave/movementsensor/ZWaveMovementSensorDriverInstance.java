@@ -28,6 +28,7 @@ import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.MovementSensor;
 import it.polito.elite.dog.core.library.model.state.MovementState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -82,7 +83,7 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 	@Override
 	public void notifyStateChanged(State newState)
 	{
-		//probably not used...
+		((ElectricalSystem) device).notifyStateChanged(newState);
 	}
 
 	@Override
@@ -99,9 +100,11 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 			bState = ccEntry.getLevelAsBoolean();
 
 		if (bState)
-			changeCurrentState(MovementState.ISMOVING);
+			this.changeCurrentState(MovementState.ISMOVING);
 		else
-			changeCurrentState(MovementState.NOTMOVING);
+			this.changeCurrentState(MovementState.NOTMOVING);
+		
+		this.notifyStateChanged(null);
 	}
 
 	/**
@@ -178,7 +181,7 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 		MovementState movState = new MovementState(new NotMovingStateValue());
 		currentState.setState(MovementState.class.getSimpleName(), movState);
 
-		logger.log(LogService.LOG_DEBUG, ZWaveMovementSensorDriver.LOG_ID + "Device " + device.getDeviceId()
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
 				+ " value is now " + ((MovementState) movState).getCurrentStateValue()[0].getValue());
 
 		((MovementSensor) device).notifyCeasedMovement();
@@ -192,7 +195,7 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 		MovementState movState = new MovementState(new MovingStateValue());
 		currentState.setState(MovementState.class.getSimpleName(), movState);
 
-		logger.log(LogService.LOG_DEBUG, ZWaveMovementSensorDriver.LOG_ID + "Device " + device.getDeviceId()
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
 				+ " value is now " + ((MovementState) movState).getCurrentStateValue()[0].getValue());
 
 		((MovementSensor) device).notifyDetectedMovement();

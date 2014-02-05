@@ -45,8 +45,8 @@ import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance implements
-		DimmerLamp, LevelControllableOutput
+public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
+		implements DimmerLamp, LevelControllableOutput
 {
 	// the class logger
 	private LogHelper logger;
@@ -56,11 +56,12 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance impleme
 
 	public ZWaveDimmerDeviceDriverInstance(ZWaveNetwork network,
 			ControllableDevice device, int deviceId, Set<Integer> instancesId,
-			int gatewayNodeId, int updateTimeMillis, int stepPercentage, BundleContext context)
+			int gatewayNodeId, int updateTimeMillis, int stepPercentage,
+			BundleContext context)
 	{
 		super(network, device, deviceId, instancesId, gatewayNodeId,
 				updateTimeMillis, context);
-		
+
 		this.stepPercentage = stepPercentage;
 
 		// create a logger
@@ -92,10 +93,6 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance impleme
 	@Override
 	public void notifyStateChanged(State newState)
 	{
-		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveDimmerDeviceDriver.LOG_ID
-				+ "Device " + device.getDeviceId() + " is now "
-				+ ((OnOffState) newState).getCurrentStateValue()[0].getValue());
 		((ElectricalSystem) device).notifyStateChanged(newState);
 
 	}
@@ -126,18 +123,11 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance impleme
 					changeCurrentState(OnOffState.ON, nLevel);
 				else
 					changeCurrentState(OnOffState.OFF, nLevel);
+				
+				//notify state changed
+				this.notifyStateChanged(null);
 			}
 		}
-		/*
-		 * else { // increment counter nFailedUpdate++;
-		 * 
-		 * //log a message after 5 failed update if(nFailedUpdate >= 5) {
-		 * logger.log(LogService.LOG_WARNING, ZWaveDimmerDeviceDriver.LOG_ID +
-		 * "Device " + device.getDeviceId() +
-		 * " doesn't respond after 5 update requests");
-		 * 
-		 * nFailedUpdate = 0; } }
-		 */
 	}
 
 	/**
@@ -169,8 +159,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance impleme
 
 				logger.log(
 						LogService.LOG_DEBUG,
-						ZWaveDimmerDeviceDriver.LOG_ID
-								+ "Device "
+						"Device "
 								+ device.getDeviceId()
 								+ " is now "
 								+ ((OnOffState) onState).getCurrentStateValue()[0]
@@ -185,8 +174,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance impleme
 
 				logger.log(
 						LogService.LOG_DEBUG,
-						ZWaveDimmerDeviceDriver.LOG_ID
-								+ "Device "
+						"Device "
 								+ device.getDeviceId()
 								+ " is now "
 								+ ((OnOffState) offState)
@@ -203,8 +191,8 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance impleme
 				pValue));
 
 		// debug
-		logger.log(LogService.LOG_DEBUG, ZWaveDimmerDeviceDriver.LOG_ID
-				+ "Device " + device.getDeviceId() + " dimmer at " + nLevel);
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " dimmer at " + nLevel);
 
 	}
 
