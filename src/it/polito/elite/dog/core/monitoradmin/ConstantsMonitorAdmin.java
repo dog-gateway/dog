@@ -28,7 +28,7 @@ public interface ConstantsMonitorAdmin {
     /**
      * <code>MonitorAdmin</code> events topic
      */
-    public final static String TOPIC = "org/osgi/service/monitor";
+    public final static String TOPIC = "org/osgi/service/monitor/MonitorEvent"; //"org/osgi/service/monitor";
     /**
      * <code>Monitorable</code> ID
      */
