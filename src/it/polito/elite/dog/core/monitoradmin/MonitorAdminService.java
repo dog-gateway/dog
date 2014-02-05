@@ -38,11 +38,11 @@ import java.util.logging.Logger;
  * @author dmytro.pishchukhin
  * @see org.osgi.framework.BundleActivator
  */
-public class Activator implements BundleActivator, OsgiVisitor, LogVisitor {
+public class MonitorAdminService implements OsgiVisitor, LogVisitor {
     /**
      * Default logger
      */
-    private static final Logger LOG = Logger.getLogger(Activator.class.getName());
+    private static final Logger LOG = Logger.getLogger(MonitorAdminService.class.getName());
 
     /**
      * <code>MonitorAdmin</code> <code>ServiceFactory</code> instance
@@ -76,7 +76,7 @@ public class Activator implements BundleActivator, OsgiVisitor, LogVisitor {
     private ServiceTracker<?, ?> logServiceTracker;
 
 
-    public void start(BundleContext bundleContext) throws Exception {
+    public void activate(BundleContext bundleContext) throws Exception {
         bc = bundleContext;
 
         // init LogService tracker
@@ -89,18 +89,20 @@ public class Activator implements BundleActivator, OsgiVisitor, LogVisitor {
 
         // init commons
         common = new MonitorAdminCommon(this, this);
+        
         // init factory
         monitorAdminFactory = new MonitorAdminFactory(this, common);
 
         // register MonitorAdmin ServiceFactory
         monitorAdminRegistration = bundleContext.registerService(MonitorAdmin.class.getName(), monitorAdminFactory, null);
+        
         // register MonitorListener
         monitorListenerRegistration = bundleContext.registerService(MonitorListener.class.getName(), common, null);
 
         info("MonitorAdmin started", null);
     }
 
-    public void stop(BundleContext bundleContext) throws Exception {
+    public void deactivate(BundleContext bundleContext) throws Exception {
         // unregister MonitorAdmin service
         if (monitorAdminRegistration != null) {
             monitorAdminRegistration.unregister();
