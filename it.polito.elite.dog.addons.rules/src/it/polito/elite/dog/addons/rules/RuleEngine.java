@@ -311,7 +311,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		Hashtable<String, Object> p = new Hashtable<String, Object>();
 		// Add this bundle as a listener of monitor, TimedTriggerNotification
 		// and DogOntNotification events
-		p.put(EventConstants.EVENT_TOPIC, new String[] { "org/osgi/service/monitor",
+		p.put(EventConstants.EVENT_TOPIC, new String[] { "org/osgi/service/monitor/MonitorEvent",
 				TimedTriggerNotification.notificationTopic, "it/polito/elite/domotics/model/notification/*" });
 		this.srEventHandler = this.context.registerService(EventHandler.class.getName(), this, p);
 		this.srDogRulesService = this.context.registerService(RuleEngineApi.class.getName(), this, null);
@@ -718,7 +718,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 					// Received a generic MonitorAdmin event (No MonitoringJob,
 					// so
 					// mon.listener.id property is null)
-					if (eventTopic != null && eventTopic.equals("org/osgi/service/monitor")
+					if (eventTopic != null && eventTopic.equals("org/osgi/service/monitor/MonitorEvent")
 							&& event.getProperty("mon.listener.id") == null)
 					{
 						DeviceStatus currentDeviceStatus = null;
