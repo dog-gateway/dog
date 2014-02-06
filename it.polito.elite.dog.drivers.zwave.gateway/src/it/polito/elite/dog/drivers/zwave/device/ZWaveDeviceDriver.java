@@ -174,39 +174,45 @@ public abstract class ZWaveDeviceDriver implements Driver, ManagedService
 		ControllableDevice device = ((ControllableDevice) context
 				.getService(reference));
 
-		// get the gateway to which the device is connected
-		String gateway = (String) device.getDeviceDescriptor().getGateway();
-
-		// get the corresponding end point set
-		Set<String> nodeIdSet = device.getDeviceDescriptor()
-				.getSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
-
-		// get the corresponding end point set
-		Set<String> instanceIdSet = device.getDeviceDescriptor()
-				.getSimpleConfigurationParams().get(ZWaveInfo.INSTANCE_ID);
-
-		// get the nodeId
-		String sNodeID = nodeIdSet.iterator().next();
-
-		// get the list of instances available
-		HashSet<Integer> instancesId = new HashSet<Integer>();
-
-		for (String sInstanceId : instanceIdSet)
-			instancesId.add(Integer.parseInt(sInstanceId));
-
-		// create a new driver instance
-		ZWaveDriverInstance driverInstance = this.createZWaveDriverInstance(
-				network.get(), device, Integer.parseInt(sNodeID), instancesId,
-				this.gateway.get().getSpecificGateway(gateway).getNodeInfo()
-						.getDeviceNodeId(), updateTimeMillis, context);
-
-		// connect this driver instance with the device
-		device.setDriver(driverInstance);
-
-		// store a reference to the connected driver
-		synchronized (this.managedInstances)
+		// check if not already attached
+		if (!this.managedInstances.containsKey(device.getDeviceId()))
 		{
-			this.managedInstances.put(device.getDeviceId(), driverInstance);
+			// get the gateway to which the device is connected
+			String gateway = (String) device.getDeviceDescriptor().getGateway();
+
+			// get the corresponding end point set
+			Set<String> nodeIdSet = device.getDeviceDescriptor()
+					.getSimpleConfigurationParams().get(ZWaveInfo.NODE_ID);
+
+			// get the corresponding end point set
+			Set<String> instanceIdSet = device.getDeviceDescriptor()
+					.getSimpleConfigurationParams().get(ZWaveInfo.INSTANCE_ID);
+
+			// get the nodeId
+			String sNodeID = nodeIdSet.iterator().next();
+
+			// get the list of instances available
+			HashSet<Integer> instancesId = new HashSet<Integer>();
+
+			for (String sInstanceId : instanceIdSet)
+				instancesId.add(Integer.parseInt(sInstanceId));
+
+			// create a new driver instance
+			ZWaveDriverInstance driverInstance = this
+					.createZWaveDriverInstance(network.get(), device,
+							Integer.parseInt(sNodeID), instancesId,
+							this.gateway.get().getSpecificGateway(gateway)
+									.getNodeInfo().getDeviceNodeId(),
+							updateTimeMillis, context);
+
+			// connect this driver instance with the device
+			device.setDriver(driverInstance);
+
+			// store a reference to the connected driver
+			synchronized (this.managedInstances)
+			{
+				this.managedInstances.put(device.getDeviceId(), driverInstance);
+			}
 		}
 
 		return null;
