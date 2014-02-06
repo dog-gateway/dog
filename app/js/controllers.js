@@ -27,6 +27,14 @@ angular.module('dogUI.controllers', [])
           currentDevice.controlFunctionality = devicesList.devices[num].controlFunctionality;
           $scope.data.devices[devicesList.devices[num].id] = currentDevice;
       }
+        
+        //set the initial status... a promise inside a promise...
+        var deviceStatus = DeviceStatus.get(function(){
+            for(var num in deviceStatus.devicesStatus) {
+          	// associate the right device status with the already known device information
+              $scope.data.devices[deviceStatus.devicesStatus[num].id].status = deviceStatus.devicesStatus[num].status;
+            }
+          });
 	});
     
 	// status poller: each 1 second, ask for devices status update
