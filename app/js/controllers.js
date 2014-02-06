@@ -4,7 +4,7 @@
 
 angular.module('dogUI.controllers', [])
   /* Navbar Controller: set as active the current view */
-  .controller('HeaderController', ['$scope', '$location', function($scope, $location) {
+  .controller('NavController', ['$scope', '$location', function($scope, $location) {
     $scope.isActive = function (viewLocation) { 
       return viewLocation === $location.path();
 	  }

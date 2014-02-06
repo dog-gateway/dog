@@ -5,6 +5,7 @@
   <title>Whelp - Dog Admin UI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
+  <link rel="stylesheet" href="css/font-awesome/font-awesome.min.css"/>
   <link rel="stylesheet" href="css/devices.css"/>
   <link rel="stylesheet" href="css/app.css"/>
   
@@ -16,31 +17,58 @@
 </head>
 
 <body>
-  <div class="container">
+  
   <!-- Header Navbar -->
-  <div class="navbar navbar-default" role="navigation">
+  <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="index.html">Whelp</a>
         </div>
-        <div class="navbar-collapse collapse" ng-class="!navCollapsed && 'in'" ng-controller="HeaderController">
+        <div class="navbar-collapse collapse" ng-class="!navCollapsed && 'in'" ng-controller="NavController">
           <ul class="nav navbar-nav">
-            <li ng-class="{ active: isActive('/home') }"><a href="#/home">Home</a></li>
-            <li ng-class="{ active: isActive('/devices') }"><a href="#/devices">Devices</a></li>
-            <li ng-class="{ active: isActive('/components') }"><a href="#/components">Components</a></li>
+            <li ng-class="{ active: isActive('/home') }">
+              <a href="#/home"><span class="glyphicon glyphicon-dashboard"></span> Overview</a>
+            </li>
+            <li ng-class="{ active: isActive('/devices') }">
+              <a href="#/devices"><i class="fa fa-lightbulb-o fa-lg"></i> Devices</a>
+            </li>
+            <li ng-class="{ active: isActive('/components') }">
+              <a href="#/components"><span class="glyphicon glyphicon-th-list"></span> Components</a>
+            </li>
           </ul>
         </div><!--/.nav-collapse -->
-      </div>
-
-  <!-- Partial view -->
-  <div ng-view></div>
+      </div><!-- /container-fluid -->
+    </div>
   
-  </div> <!-- /container -->
-
+    <!-- Side Navbar -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar" ng-controller="NavController">
+          <ul class="nav nav-sidebar">
+            <li ng-class="{ active: isActive('/home') }">
+              <a href="#/home"><span class="glyphicon glyphicon-dashboard"></span> Overview</a>
+              </li>
+            <li ng-class="{ active: isActive('/devices') }">
+              <a href="#/devices"><i class="fa fa-lightbulb-o fa-lg"></i> Devices</a>
+              </li>
+            <li ng-class="{ active: isActive('/components') }">
+              <a href="#/components"><span class="glyphicon glyphicon-th-list"></span> Components</a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <!-- Partial view -->
+            <div ng-view></div>
+        </div>
+      </div>
+    </div>
+  
   <script src="lib/angular/angular.js"></script>
   <script src="lib/angular/angular-route.js"></script>
   <script src="lib/angular/angular-resource.js"></script>
