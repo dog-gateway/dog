@@ -31,8 +31,27 @@ angular.module('dogUI.controllers', [])
       //set the initial status... a promise inside a promise...
       var deviceStatus = DeviceStatus.get(function(){
         for(var num in deviceStatus.devicesStatus) {
+          var status = {};
+          // remove 'State' and 'MeasurementState' from the status or rename 'OnOffState'
+          angular.forEach(deviceStatus.devicesStatus[num].status, function(value, key)
+          {
+        	 if(key == "OnOffState")
+             {
+        	    key = "Status";
+             }
+        	 else
+        	 {
+        		var end = key.indexOf("Measurement");
+             	if(end==-1)
+             	   end = key.indexOf("State");
+             	 
+             	key = key.slice(0, end);
+        	 }
+        	 
+         	 status[key]=value;
+          });          
           // associate the right device status with the already known device information
-          $scope.data.devices[deviceStatus.devicesStatus[num].id].status = deviceStatus.devicesStatus[num].status;
+          $scope.data.devices[deviceStatus.devicesStatus[num].id].status = status;
         }
       });
 	});
@@ -42,8 +61,27 @@ angular.module('dogUI.controllers', [])
       $timeout(function() {
         var deviceStatus = DeviceStatus.get(function(){
           for(var num in deviceStatus.devicesStatus) {
+        	 var status = {};
+             // remove 'State' and 'MeasurementState' from the status or rename 'OnOffState'
+             angular.forEach(deviceStatus.devicesStatus[num].status, function(value, key)
+             {
+                if(key == "OnOffState")
+                {
+            	   key = "Status";
+                }
+            	else
+            	{
+            	   var end = key.indexOf("Measurement");
+                   if(end==-1)
+                      end = key.indexOf("State");
+                 	 
+                   key = key.slice(0, end);
+            	}
+            	 
+             	status[key]=value;
+             });
         	// associate the right device status with the already known device information
-            $scope.data.devices[deviceStatus.devicesStatus[num].id].status = deviceStatus.devicesStatus[num].status;
+            $scope.data.devices[deviceStatus.devicesStatus[num].id].status = status;
           }
         });
         poll();
