@@ -250,7 +250,22 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					e);
 		}
 		
-		return devicesJSON;
+		// if there are not Devices in the list we have to
+		// send an HTTP response 404 Not found
+		List<Controllables> controllablesList = dhc.getControllables();
+		boolean nonEmptyList = false;
+		for (Controllables singleControllables : controllablesList)
+		{
+			if (!singleControllables.getDevice().isEmpty())
+				nonEmptyList = true;
+		}
+		if (devicesJSON.isEmpty() || nonEmptyList != true)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return devicesJSON;
 	}
 	
 	/*
@@ -270,7 +285,22 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// create the XML for replying the request
 		devicesXML = this.generateXML(dhc);
 		
-		return devicesXML;
+		// if there are not Devices in the list we have to
+		// send an HTTP response 404 Not found
+		List<Controllables> controllablesList = dhc.getControllables();
+		boolean nonEmptyList = false;
+		for (Controllables singleControllables : controllablesList)
+		{
+			if (!singleControllables.getDevice().isEmpty())
+				nonEmptyList = true;
+		}
+		if (devicesXML.isEmpty() || nonEmptyList != true)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return devicesXML;
 	}
 	
 	/**
@@ -337,7 +367,22 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			}
 		}
 		
-		return deviceJSON;
+		// if there are not Devices in the list we have to
+		// send an HTTP response 404 Not found
+		List<Controllables> controllablesList = dhc.getControllables();
+		boolean nonEmptyList = false;
+		for (Controllables singleControllables : controllablesList)
+		{
+			if (!singleControllables.getDevice().isEmpty())
+				nonEmptyList = true;
+		}
+		if (deviceJSON.isEmpty() || nonEmptyList != true)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return deviceJSON;
 	}
 	
 	/*
@@ -357,7 +402,22 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// create the XML for replying the request
 		deviceXML = this.generateXML(dhc);
 		
-		return deviceXML;
+		// if there are not Devices in the list we have to
+		// send an HTTP response 404 Not found
+		List<Controllables> controllablesList = dhc.getControllables();
+		boolean nonEmptyList = false;
+		for (Controllables singleControllables : controllablesList)
+		{
+			if (!singleControllables.getDevice().isEmpty())
+				nonEmptyList = true;
+		}
+		if (deviceXML.isEmpty() || nonEmptyList != true)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return deviceXML;
 	}
 	
 	/**
@@ -477,8 +537,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 							}
 						}
 					}
-
-					//Releases all the services object referenced at the beginning of the method
+					
+					// Releases all the services object referenced at the
+					// beginning of the method
 					for (ServiceReference<?> singleServiceReference : deviceService)
 					{
 						this.context.ungetService(singleServiceReference);
@@ -573,8 +634,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 							}
 						}
 					}
-
-					//Releases all the services object referenced at the beginning of the method
+					
+					// Releases all the services object referenced at the
+					// beginning of the method
 					for (ServiceReference<?> singleServiceReference : deviceService)
 					{
 						this.context.ungetService(singleServiceReference);
@@ -610,6 +672,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// the response
 		String responseAsString = "";
+		boolean listIsEmpty = true;
 		
 		// get all the installed device services
 		try
@@ -645,6 +708,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						
 						// get the response payload for the current device
 						deviceStateResponsePayload[i] = this.getControllableStatus(currentDevice, allDevices[i]);
+						//if we are here it means that the list will not be empty
+						listIsEmpty = false;
 					}
 				}
 				// store the device
@@ -652,8 +717,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				
 				// convert the response body to json
 				responseAsString = this.mapper.writeValueAsString(responsePayload);
-
-				//Releases all the services object referenced at the beginning of the method
+				
+				// Releases all the services object referenced at the beginning
+				// of the method
 				for (ServiceReference<?> singleServiceReference : allDevices)
 				{
 					this.context.ungetService(singleServiceReference);
@@ -666,7 +732,16 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			this.logger.log(LogService.LOG_ERROR, "Error while composing the response", e);
 		}
 		
-		return responseAsString;
+		// if the responseAsString variable is empty we have to send an HTTP
+		// response
+		// 404 Not found
+		if (responseAsString.isEmpty() || listIsEmpty == true)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return responseAsString;
 	}
 	
 	/*
@@ -680,6 +755,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// the response
 		String responseAsString = "";
+		boolean listIsEmpty = true;
 		
 		// create filter for getting the desired device
 		String deviceFilter = String.format("(&(%s=*)(%s=%s))", Constants.DEVICE_CATEGORY, DeviceCostants.DEVICEURI,
@@ -710,14 +786,17 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						
 						// get the response payload
 						deviceStateResponsePayload = this.getControllableStatus(currentDevice, deviceService[0]);
+						//if we are here it means that the list will not be empty
+						listIsEmpty = false;
 					}
 					
 				}
 				
 				// convert the response body to json
 				responseAsString = this.mapper.writeValueAsString(deviceStateResponsePayload);
-
-				//Releases all the services object referenced at the beginning of the method
+				
+				// Releases all the services object referenced at the beginning
+				// of the method
 				for (ServiceReference<?> singleServiceReference : deviceService)
 				{
 					this.context.ungetService(singleServiceReference);
@@ -730,7 +809,16 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					.log(LogService.LOG_ERROR, "Error while composing the response for the status of " + deviceId, e);
 		}
 		
-		return responseAsString;
+		// if the responseAsString variable is empty we have to send an HTTP
+		// response
+		// 404 Not found
+		if (responseAsString.isEmpty() || listIsEmpty == true)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return responseAsString;
 	}
 	
 	/**
