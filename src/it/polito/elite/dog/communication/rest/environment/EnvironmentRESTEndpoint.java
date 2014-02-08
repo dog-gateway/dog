@@ -176,7 +176,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			this.logger.log(LogService.LOG_ERROR,
 					"Error in creating the JSON representing the entire building environment", e);
 		}
-
+		
 		// if there are not Buildings in the list we have to
 		// send an HTTP response 404 Not found
 		List<BuildingEnvironment> buildingEnvironmentList = dhc.getBuildingEnvironment();
@@ -212,7 +212,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		
 		// create the XML for replying the request
 		environmentXML = this.generateXML(dhc);
-
+		
 		// if there are not Buildings in the list we have to
 		// send an HTTP response 404 Not found
 		List<BuildingEnvironment> buildingEnvironmentList = dhc.getBuildingEnvironment();
@@ -245,7 +245,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		
 		// get the JAXB object containing all the information about flats
 		Building building = this.getFlatsFromModel();
-
+		
 		// if building is null we have to send an HTTP response
 		// 404 Not found
 		if (building == null)
@@ -263,7 +263,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		{
 			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON representing all the flats", e);
 		}
-
+		
 		// if the flatsJSON variable is empty we have to send an HTTP response
 		// 404 Not found
 		if (flatsJSON.isEmpty() || building.getFlat().isEmpty())
@@ -350,7 +350,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			this.logger
 					.log(LogService.LOG_ERROR, "Error in creating the JSON representing the flat named " + flatId, e);
 		}
-
+		
 		// if the flatJSON variable is empty we have to send an HTTP response
 		// 404 Not found
 		if (flatJSON.isEmpty() || flat.getRoom().isEmpty())
@@ -445,7 +445,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			// launch the exception responsible for sending the HTTP response
 			throw new WebApplicationException(Response.Status.NOT_FOUND);
 		}
-					
+		
 		// remove everything but the room list from the retrieved flat
 		flat.setClazz(null);
 		flat.setDescription(null);
@@ -462,7 +462,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			this.logger.log(LogService.LOG_ERROR,
 					"Error in creating the JSON representing the rooms present in the flat named " + flatId, e);
 		}
-
+		
 		// if the roomsJSON variable is empty we have to send an HTTP response
 		// 404 Not found
 		if (roomsJSON.isEmpty() || flat.getRoom().isEmpty())
@@ -530,7 +530,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		// get the JAXB object containing all the information about the desired
 		// room
 		Room room = this.getRoomFromModel(flatId, roomId);
-
+		
 		// if the room variable is null we have to send an HTTP response
 		// 404 Not found
 		if (room == null)
@@ -548,7 +548,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			this.logger
 					.log(LogService.LOG_ERROR, "Error in creating the JSON representing the room named " + roomId, e);
 		}
-
+		
 		// if the roomsJSON variable is empty we have to send an HTTP response
 		// 404 Not found
 		if (roomsJSON.isEmpty())
