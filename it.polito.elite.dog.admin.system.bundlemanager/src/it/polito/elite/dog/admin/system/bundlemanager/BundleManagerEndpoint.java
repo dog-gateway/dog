@@ -1,7 +1,7 @@
 /*
  * Dog - Admin
  * 
- * Copyright (c) 2013 Dario Bonino
+ * Copyright (c) 2013-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,48 +17,55 @@
  */
 package it.polito.elite.dog.admin.system.bundlemanager;
 
-import java.util.Arrays;
-
-import it.polito.elite.dog.admin.system.bundlemanager.api.BundleManagerInterface;
+import it.polito.elite.dog.admin.system.bundlemanager.api.BundleManager;
+import it.polito.elite.dog.admin.system.bundlemanager.model.BundleStateResponse;
+import it.polito.elite.dog.admin.system.bundlemanager.model.BundleStatsResponse;
 import it.polito.elite.dog.admin.system.bundlemanager.util.BundleNameComparator;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.ws.rs.Path;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 @Path("/admin/system/bundlemanager/")
-public class BundleManager implements BundleManagerInterface
+public class BundleManagerEndpoint implements BundleManager
 {
 	// the service logger
 	private LogHelper logger;
 	
-	// the number of columns
-	public static final int nColumns = 2;
-	
-	// the full-row span
-	public static final int spanPerRow = 12;
-	
-	// the bundle context reference to extract information on the entire Dog
-	// status
+	// the bundle context reference to extract information on the bundle list
 	private BundleContext context;
 	
+	// the instance-level mapper
+	private ObjectMapper mapper;
+	
 	/**
-		 * 
-		 */
-	public BundleManager()
+	 * Default constructor
+	 */
+	public BundleManagerEndpoint()
 	{
-		// TODO Auto-generated constructor stub
+		// initialize the instance-wide object mapper
+		this.mapper = new ObjectMapper();
+		// set the mapper pretty printing
+		this.mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+		// avoid empty arrays and null values
+		this.mapper.configure(SerializationConfig.Feature.WRITE_EMPTY_JSON_ARRAYS, false);
+		this.mapper.setSerializationInclusion(Inclusion.NON_NULL);
 	}
 	
 	/**
@@ -94,87 +101,64 @@ public class BundleManager implements BundleManagerInterface
 		this.logger = null;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * it.polito.elite.dog.admin.system.bundlemanager.BundleManagerInterface
-	 * #getBundles()
-	 */
 	@Override
-	@GET
-	@Path("/bundles")
-	@Produces(MediaType.TEXT_HTML)
 	public String getBundles()
 	{
+		// init
+		List<BundleStateResponse> bundleList = new ArrayList<BundleStateResponse>();
+		String bundles = "";
+		
 		// get all the installed bundles
 		Bundle allBundles[] = this.context.getBundles();
 		Arrays.sort(allBundles, new BundleNameComparator());
 		
-		// the output buffer
-		StringBuffer htmlOut = new StringBuffer();
-		
-		// append the unordered list header
-		
-		// generate a list of bundles
+		// generate a list of bundles to be returned as JSON array
 		for (int i = 0; i < allBundles.length; i++)
 		{
-			// column handling
-			if (i == 0)
-			{
-				htmlOut.append("<div class=\"span" + (BundleManager.spanPerRow / nColumns)
-						+ "\">\n<div class=\"well\">\n<ul class=\"unstyled\">\n");
-			}
-			else if (i == allBundles.length / nColumns)
-			{
-				htmlOut.append("</ul>\n</div>\n</div>");
-				htmlOut.append("<div class=\"span" + (BundleManager.spanPerRow / nColumns)
-						+ "\">\n<div class=\"well\">\n<ul class=\"unstyled\">\n");
-			}
-			
-			// handle the current bundle rendering
-			htmlOut.append("<li>" + allBundles[i].getSymbolicName() + " (" + allBundles[i].getVersion() + ") ");
-			
-			// render the bundle state
+			BundleStateResponse currentBundle = new BundleStateResponse();
+			currentBundle.setName(allBundles[i].getSymbolicName() + " (" + allBundles[i].getVersion() + ")");
 			switch (allBundles[i].getState())
 			{
 				case Bundle.ACTIVE:
 				{
-					htmlOut.append("<span class=\"label label-success pull-right\">Active</span>");
+					currentBundle.setState("Active");
 					break;
 				}
 				case Bundle.INSTALLED:
 				{
-					htmlOut.append("<span class=\"label label-info pull-right\">Installed</span>");
+					currentBundle.setState("Installed");
 					break;
 				}
 				case Bundle.RESOLVED:
 				{
-					htmlOut.append("<span class=\"label label-warning pull-right\">Resolved</span>");
+					currentBundle.setState("Resolved");
 					break;
 				}
 			}
-			
-			htmlOut.append("</li>\n");
+			bundleList.add(currentBundle);
 		}
 		
-		htmlOut.append("</ul>\n</div>\n</div>");
+		try
+		{
+			bundles = this.mapper.writeValueAsString(bundleList);
+		}
+		catch (Exception e)
+		{
+			this.logger.log(LogService.LOG_WARNING, "Error in creating the JSON object for the bundle list");
+		}
 		
-		return htmlOut.toString();
-		
+		return bundles;
 	}
 	
 	@Override
-	@GET
-	@Path("/bundles/statistics")
-	@Produces(MediaType.TEXT_HTML)
 	public String getOverallStatistics()
 	{
+		// init
+		BundleStatsResponse statistics = new BundleStatsResponse();
+		String bundleStats = "";
+		
 		// get all the installed bundles
 		Bundle allBundles[] = this.context.getBundles();
-		
-		// the output buffer
-		StringBuffer htmlOut = new StringBuffer();
 		
 		// prepare counters
 		int nActive = 0;
@@ -184,7 +168,7 @@ public class BundleManager implements BundleManagerInterface
 		// generate a list of bundles
 		for (int i = 0; i < allBundles.length; i++)
 		{
-			// render the bundle state
+			// get the bundle state
 			switch (allBundles[i].getState())
 			{
 				case Bundle.ACTIVE:
@@ -205,22 +189,26 @@ public class BundleManager implements BundleManagerInterface
 			}
 		}
 		
-		// render statistics
-		
 		// compute the active ratio
-		double activeRatio = (double)nActive / (double)(nActive+nResolved+nInstalled);
+		double activeRatio = (double) nActive / (double) (nActive + nResolved + nInstalled);
 		
-		// compute the label color
-		String color = "";
-		if (activeRatio < 0.5)
-			color = "label-important";
-		else if (activeRatio == 1)
-			color = "label-success";
-		else
-			color = "label-warning";
+		// fill the response object
+		statistics.setActive(nActive);
+		statistics.setInstalled(nInstalled);
+		statistics.setResolved(nResolved);
+		statistics.setActiveRatio(activeRatio);
 		
-		htmlOut.append("<span class=\"label pull-right " + color + "\">" + nActive + " Active / " + nInstalled +" Installed / "+nResolved+" Resolved </span>");
+		try
+		{
+			bundleStats = this.mapper.writeValueAsString(statistics);
+		}
+		catch (Exception e)
+		{
+			this.logger.log(LogService.LOG_WARNING, "Error in creating the JSON object for the bundle statistics");
+		}
 		
-		return htmlOut.toString();
+		return bundleStats;
+		
+		
 	}
 }
