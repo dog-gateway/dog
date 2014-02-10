@@ -2,7 +2,7 @@
 <html lang="en" ng-app="dogUI">
 <head>
   <meta charset="utf-8">
-  <title>Whelp - Dog Admin UI</title>
+  <title>Vet - monitor your Dog's health</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
   <link rel="stylesheet" href="css/font-awesome/font-awesome.min.css"/>
@@ -28,7 +28,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="index.html">Whelp</a>
+          <a class="navbar-brand" href="index.html"><span class="fa fa-stethoscope"></span> Vet</a>
         </div>
         <div class="navbar-collapse collapse" ng-class="!navCollapsed && 'in'" ng-controller="NavController">
           <ul class="nav navbar-nav">
@@ -36,7 +36,7 @@
               <a href="#/home"><span class="glyphicon glyphicon-dashboard"></span> Overview</a>
             </li>
             <li ng-class="{ active: isActive('/devices') }">
-              <a href="#/devices"><i class="fa fa-lightbulb-o fa-lg"></i> Devices</a>
+              <a href="#/devices"><span class="fa fa-lightbulb-o fa-lg"></span> Devices</a>
             </li>
             <li ng-class="{ active: isActive('/components') }">
               <a href="#/components"><span class="glyphicon glyphicon-th-list"></span> Components</a>
@@ -55,7 +55,7 @@
               <a href="#/home"><span class="glyphicon glyphicon-dashboard"></span> Overview</a>
               </li>
             <li ng-class="{ active: isActive('/devices') }">
-              <a href="#/devices"><i class="fa fa-lightbulb-o fa-lg"></i> Devices</a>
+              <a href="#/devices"><span class="fa fa-lightbulb-o fa-lg"></span> Devices</a>
               </li>
             <li ng-class="{ active: isActive('/components') }">
               <a href="#/components"><span class="glyphicon glyphicon-th-list"></span> Components</a>

@@ -1,6 +1,6 @@
 <div ng-controller="DeviceCtrl">
   <div class="row">
-    <div class="col-md-4" ng-repeat="device in data.devices">
+    <div class="col-sm-6 col-md-4" ng-repeat="device in data.devices">
       <div class="panel panel-info" >
         <div class="panel-heading">
           <span class="device-{{device.type}}"></span>{{device.id}}
@@ -10,10 +10,10 @@
             <div class="col-md-12">
               <small>{{device.description}}</small><br>
               <small>{{device.isIn}}</small><br><br>
-              <ul class="list-unstyled" ng-repeat="(stateName, stateValues) in device.status">
-                <li class="text-center" ng-repeat="stateValue in stateValues">
-                {{stateName}}
-                  <small>{{stateValue.value}}</small>
+              <ul class="list-group">
+                <li class="list-group-item" ng-repeat="(stateName, stateValues) in device.status">
+                  {{stateName}}
+                  <span class="badge" ng-repeat="stateValue in stateValues">{{stateValue.value}}</span>
                 </li>
               </ul>
               <div ng-repeat="controlFunctionality in device.controlFunctionality">

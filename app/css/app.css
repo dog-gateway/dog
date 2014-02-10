@@ -52,11 +52,13 @@ body {
 }
 .nav-sidebar > .active > a {
   background-color: #285e8e;
+  border-bottom: 1px solid #428bca;
 }
-.nav-sidebar > li > a:hover {
+.nav-sidebar > li > a:hover,
+.nav-sidebar > li > a:focus {
   background-color: #285e8e;
+  border-bottom: 1px solid #428bca;
 }
-
 
 /*
  * Main content
@@ -70,4 +72,11 @@ body {
     padding-left: 40px;
     padding-right: 40px;
   }
+
+/*
+ * Devices
+ */
+.list-group-item {
+	overflow: auto;
+}
 }
