@@ -72,11 +72,23 @@ body {
     padding-left: 40px;
     padding-right: 40px;
   }
+}
 
 /*
  * Devices
  */
 .list-group-item {
-	overflow: auto;
+  overflow: auto;
 }
+
+/*
+ * Bundles
+ */
+.bundle {
+  word-wrap: break-word;
+}
+
+.list-group-item > .row {
+  margin-left: 0px;
+  margin-right: 0px;
 }

@@ -1,1 +1,28 @@
-<p>Welcome to Whelp</p>
+<div ng-controller="FrameworkCtrl">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title"><span class="glyphicon glyphicon-cog"></span> System Status</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-12 col-md-12">
+              <p>System memory: <span class="label label-primary pull-right">{{data.memory.total.value}}</span></p>
+              <p>Current memory usage:
+                <span ng-if="data.memory.used.ratio>0.66" class="label label-danger pull-right">{{data.memory.used.value}}</span>
+                <span ng-if="data.memory.used.ratio>0.33 && data.memory.used.ratio<=0.66" class="label label-warning pull-right">{{data.memory.used.value}}</span>
+                <span ng-if="data.memory.used.ratio<=0.33" class="label label-success pull-right">{{data.memory.used.value}}</span>
+              </p>
+              <p>Free memory:
+                <span ng-if="data.memory.free.ratio>0.66" class="label label-success pull-right">{{data.memory.free.value}}</span>
+                <span ng-if="data.memory.free.ratio>0.33 && data.memory.free.ratio<=0.66" class="label label-warning pull-right">{{data.memory.free.value}}</span>
+                <span ng-if="data.memory.free.ratio<=0.33" class="label label-danger pull-right">{{data.memory.free.value}}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

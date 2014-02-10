@@ -96,4 +96,61 @@ angular.module('dogUI.controllers', [])
 	 var devCmd = new DeviceCmd();
 	 devCmd.$update({id: deviceId, command: commandName});
    }
-  }]);
+  }])
+   /* Controller for handling bundle-related information */
+  .controller('BundleCtrl', ['$scope', 'Bundle', '$timeout', function($scope, Bundle, $timeout) {
+	//init
+	$scope.data = {};
+	$scope.data.bundles = {};
+	
+	// get the bundle list from the Dog APIs
+	var bundleList = Bundle.query(function(){
+	  var len = bundleList.length;
+	  $scope.data.bundles['second'] = bundleList.splice(len/2, len);
+	  $scope.data.bundles['first'] = bundleList;
+	});
+	
+	// poller: each 1 second, ask for bundle list update
+    var poll = function() {
+      $timeout(function() {
+    	// get the bundle list from the Dog APIs
+        var bundleList = Bundle.query(function(){
+    	  var len = bundleList.length;
+    	  $scope.data.bundles['second'] = bundleList.splice(len/2, len);
+    	  $scope.data.bundles['first'] = bundleList;
+    	});
+        poll();
+      }, 1000);
+    };     
+   poll();
+  }])
+    /* Controller for handling framework-related information */
+  .controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMemory', 'UsedMemory', '$timeout', function($scope, RuntimeMemory, FreeMemory, UsedMemory, $timeout) {
+    //init
+	$scope.data = {};
+    $scope.data.memory = {};
+    $scope.data.memory.total = {};
+    $scope.data.memory.free = {};
+    $scope.data.memory.used = {};
+    
+    // get the total memory from the Dog APIs
+    $scope.data.memory.total = RuntimeMemory.get();
+    // get the free memory from the Dog APIs
+    $scope.data.memory.free = FreeMemory.get();
+    // get the used memory from the Dog APIs
+    $scope.data.memory.used = UsedMemory.get();
+    
+    // poller: each 1 second, ask for bundle list update
+    var poll = function() {
+      $timeout(function() {
+    	// get the total memory from the Dog APIs
+    	$scope.data.memory.total = RuntimeMemory.get();
+    	// get the free memory from the Dog APIs
+    	$scope.data.memory.free = FreeMemory.get();
+    	// get the used memory from the Dog APIs
+    	$scope.data.memory.used = UsedMemory.get();
+        poll();
+      }, 1000);
+    };     
+   poll();
+}]);

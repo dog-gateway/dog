@@ -32,3 +32,27 @@ services.factory('DeviceStatus', ['$resource', function($resource){
       get: {method:'GET', headers: {'Accept':'application/json'}}
     });
   }]);
+
+services.factory('Bundle', ['$resource', function($resource){
+    return $resource('/admin/system/bundlemanager/bundles', {}, {
+      query: {method:'GET', headers: {'Accept':'application/json'}, isArray:true }
+    });
+  }]);
+
+services.factory('RuntimeMemory', ['$resource', function($resource){
+    return $resource('/admin/framework/memory/runtime', {}, {
+      get: {method:'GET', headers: {'Accept':'application/json'} }
+    });
+  }]);
+
+services.factory('FreeMemory', ['$resource', function($resource){
+    return $resource('/admin/framework/memory/free', {}, {
+      get: {method:'GET', headers: {'Accept':'application/json'} }
+    });
+  }]);
+
+services.factory('UsedMemory', ['$resource', function($resource){
+    return $resource('/admin/framework/memory/used', {}, {
+      get: {method:'GET', headers: {'Accept':'application/json'} }
+    });
+  }]);
