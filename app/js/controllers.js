@@ -2,15 +2,17 @@
 
 /* Controllers */
 
-angular.module('dogUI.controllers', [])
-  /* Navbar Controller: set as active the current view */
-  .controller('NavController', ['$scope', '$location', function($scope, $location) {
+var dogUIController = angular.module('dogUI.controllers', []);
+
+/* Navbar Controller: set as active the current view */
+dogUIController.controller('NavController', ['$scope', '$location', function($scope, $location) {
     $scope.isActive = function (viewLocation) { 
       return viewLocation === $location.path();
 	  }
-  }])
-  /* Controller for handling devices-related information */
-  .controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'DeviceCmd', '$timeout', function($scope, Device, DeviceStatus, DeviceCmd, $timeout) {
+  }]);
+
+/* Controller for handling devices-related information */
+dogUIController.controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'DeviceCmd', '$timeout', function($scope, Device, DeviceStatus, DeviceCmd, $timeout) {
 	  // init
 	  $scope.data = {};
 	  $scope.data.devices = {};
@@ -61,10 +63,11 @@ angular.module('dogUI.controllers', [])
       $timeout(function() {
         var deviceStatus = DeviceStatus.get(function(){
           for(var num in deviceStatus.devicesStatus) {
-        	 var status = {};
-             // remove 'State' and 'MeasurementState' from the status or rename 'OnOffState'
-             angular.forEach(deviceStatus.devicesStatus[num].status, function(value, key)
-             {
+            if($scope.data.devices[deviceStatus.devicesStatus[num].id]) {
+        	  var status = {};
+              // remove 'State' and 'MeasurementState' from the status or rename 'OnOffState'
+              angular.forEach(deviceStatus.devicesStatus[num].status, function(value, key)
+              {
                 if(key == "OnOffState")
                 {
             	   key = "Status";
@@ -76,12 +79,12 @@ angular.module('dogUI.controllers', [])
                       end = key.indexOf("State");
                  	 
                    key = key.slice(0, end);
-            	}
-            	 
+            	} 
              	status[key]=value;
-             });
-        	// associate the right device status with the already known device information
-            $scope.data.devices[deviceStatus.devicesStatus[num].id].status = status;
+              });
+        	  // associate the right device status with the already known device information
+              $scope.data.devices[deviceStatus.devicesStatus[num].id].status = status;
+            }
           }
         });
         poll();
@@ -96,18 +99,22 @@ angular.module('dogUI.controllers', [])
 	 var devCmd = new DeviceCmd();
 	 devCmd.$update({id: deviceId, command: commandName});
    }
-  }])
-   /* Controller for handling bundle-related information */
-  .controller('BundleCtrl', ['$scope', 'Bundle', '$timeout', function($scope, Bundle, $timeout) {
+  }]);
+
+/* Controller for handling bundle-related information */
+dogUIController.controller('BundleCtrl', ['$scope', 'Bundle', '$timeout', function($scope, Bundle, $timeout) {
 	//init
 	$scope.data = {};
 	$scope.data.bundles = {};
+	$scope.data.available = {};
+	$scope.data.available.bundles = null;
 	
 	// get the bundle list from the Dog APIs
 	var bundleList = Bundle.query(function(){
 	  var len = bundleList.length;
 	  $scope.data.bundles['second'] = bundleList.splice(len/2, len);
 	  $scope.data.bundles['first'] = bundleList;
+	  $scope.data.available.bundles = true;
 	});
 	
 	// poller: each 1 second, ask for bundle list update
@@ -118,14 +125,16 @@ angular.module('dogUI.controllers', [])
     	  var len = bundleList.length;
     	  $scope.data.bundles['second'] = bundleList.splice(len/2, len);
     	  $scope.data.bundles['first'] = bundleList;
+    	  $scope.data.available.bundles = true;
     	});
         poll();
       }, 1000);
     };     
    poll();
-  }])
-    /* Controller for handling framework-related information */
-  .controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMemory', 'UsedMemory', '$timeout', function($scope, RuntimeMemory, FreeMemory, UsedMemory, $timeout) {
+  }]);
+
+/* Controller for handling framework-related information */
+dogUIController.controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMemory', 'UsedMemory', '$timeout', function($scope, RuntimeMemory, FreeMemory, UsedMemory, $timeout) {
     //init
 	$scope.data = {};
     $scope.data.memory = {};

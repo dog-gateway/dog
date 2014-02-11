@@ -1,4 +1,7 @@
 <div ng-controller="BundleCtrl">
+  <div ng-show="!data.available.bundles">
+    Loading bundle list...
+  </div>
   <div class="row">
     <div class="col-md-6" ng-repeat="list in data.bundles">
       <ul class="list-group">
