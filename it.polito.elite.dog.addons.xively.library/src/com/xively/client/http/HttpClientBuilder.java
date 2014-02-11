@@ -7,7 +7,6 @@ import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.params.CoreConnectionPNames;
 
 import com.xively.client.AppConfig;
 
@@ -19,7 +18,6 @@ import com.xively.client.AppConfig;
  * 
  * @author s0pau
  */
-@SuppressWarnings("deprecation")
 public class HttpClientBuilder
 {
 	private static final int DEFAULT_CONNECTION_TIMEOUT_IN_MS = 3000;
