@@ -32,7 +32,7 @@
 					</dhc:command>
 					<dhc:command id="StepUpCommand_$name"
 						name="OnCommand_$name" class="StepUpCommand">
-						<dhc:param value="stepDown" name="realCommandName" />
+						<dhc:param value="stepUp" name="realCommandName" />
 					</dhc:command>
 					<dhc:command id="StepDownCommand_$name"
 						name="OnCommand_$name" class="StepDownCommand">
@@ -101,7 +101,9 @@
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="LevelState">
-				<dhc:statevalue name="level" class="LevelStateValue" />
+				<dhc:statevalues>
+					<dhc:statevalue name="level" class="LevelStateValue" />
+				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="SinglePhaseEnergyMeasurementState">
 				<dhc:statevalues>
