@@ -1,7 +1,7 @@
 /*
  * Dog - Admin
  * 
- * Copyright (c) 2013 Dario Bonino
+ * Copyright (c) 2013-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package it.polito.elite.dog.admin.system.bundlemanager.api;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+package it.polito.elite.dog.admin.system.bundlemanager.model;
 
 /**
+ * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
- *
+ * 
  */
-@Path("/admin/system/bundlemanager/")
-public interface BundleManagerInterface
+public class BundleStateResponse
 {
-	@GET
-	@Path("/bundles")
-	@Produces(MediaType.TEXT_HTML)
-	public String getBundles();
+	private String name;
+	private String state;
 	
-	@GET
-	@Path("/bundles/statistics")
-	@Produces(MediaType.TEXT_HTML)
-	public String getOverallStatistics();
+	public BundleStateResponse()
+	{
+		// intentionally left empty
+	}
+	
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	public void setName(String bundleName)
+	{
+		this.name = bundleName;
+	}
+	
+	public String getState()
+	{
+		return this.state;
+	}
+	
+	public void setState(String bundleState)
+	{
+		this.state = bundleState;
+	}
+	
 }

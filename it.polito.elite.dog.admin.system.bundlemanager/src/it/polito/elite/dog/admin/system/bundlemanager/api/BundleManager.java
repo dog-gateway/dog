@@ -1,7 +1,7 @@
 /*
  * Dog - Admin
  * 
- * Copyright (c) 2013 Dario Bonino
+ * Copyright (c) 2013-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,38 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package it.polito.elite.dog.admin.system.devicemonitor.api;
+package it.polito.elite.dog.admin.system.bundlemanager.api;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- * The interrace defining the API for the device monitor bundle which allows to
- * get information about installed, active and idle devices.
- * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-@Path("/admin/system/devicemonitor/")
-public interface DeviceMonitorInterface
+@Path("/admin/system/bundlemanager/")
+public interface BundleManager
 {
 	@GET
-	@Path("/devices")
-	@Produces(MediaType.TEXT_HTML)
-	public String getInstalledDevices();
+	@Path("/bundles")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getBundles();
 	
 	@GET
-	@Path("/devices/statistics")
-	@Produces(MediaType.TEXT_HTML)
+	@Path("/bundles/statistics")
+	@Produces(MediaType.APPLICATION_JSON)
 	public String getOverallStatistics();
-	
-	@GET
-	@Path("/devices/{device-id}/state")
-	@Produces(MediaType.TEXT_HTML)
-	public String getDeviceState(@PathParam("device-id") String deviceId);
-	
 }
