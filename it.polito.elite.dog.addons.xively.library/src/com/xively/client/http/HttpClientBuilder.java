@@ -93,8 +93,8 @@ public class HttpClientBuilder
 				retryHandler = new DefaultHttpRequestRetryHandler(0, false);
 			}
 
-			httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
-			httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, socketTimeout);
+			//httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
+			//httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, socketTimeout);
 		}
 		return httpClient;
 	}

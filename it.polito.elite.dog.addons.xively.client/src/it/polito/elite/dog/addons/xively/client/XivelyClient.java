@@ -327,12 +327,14 @@ public class XivelyClient implements ManagedService, EventHandler
 				this.baseURI = uri;
 
 			// get the base feed, if needed
-			this.defaultEventFeed = Integer.valueOf((String) properties
-					.get(XivelyClient.XIVELY_DEFAULT_EVENT_FEED));
+			Object eventFeed = properties
+					.get(XivelyClient.XIVELY_DEFAULT_EVENT_FEED);
+			this.defaultEventFeed = (eventFeed instanceof String)?Integer.valueOf((String) eventFeed):(Integer)eventFeed;
 
 			// get the base feed, if needed
-			this.defaultAlertFeed = Integer.valueOf((String) properties
-					.get(XivelyClient.XIVELY_DEFAULT_ALERT_FEED));
+			Object alertFeed = (String) properties
+					.get(XivelyClient.XIVELY_DEFAULT_ALERT_FEED);
+			this.defaultAlertFeed = (alertFeed instanceof String)?Integer.valueOf((String) alertFeed):(Integer)alertFeed;
 
 			try
 			{
@@ -448,9 +450,9 @@ public class XivelyClient implements ManagedService, EventHandler
 								.getProperties();
 
 						properties.put(XivelyClient.XIVELY_DEFAULT_ALERT_FEED,
-								feedId);
+								feedId.toString());
 						properties.put(XivelyClient.XIVELY_DEFAULT_EVENT_FEED,
-								feedId);
+								feedId.toString());
 						properties.put(XivelyClient.XIVELY_KEY, apiKey);
 
 						configuration.update(properties);
