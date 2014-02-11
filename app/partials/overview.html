@@ -8,6 +8,7 @@
         <div class="panel-body">
           <div class="row">
             <div class="col-sm-12 col-md-12">
+              <p>Dog status: <span class="label label-success pull-right">Running</span></p>
               <p>System memory: <span class="label label-primary pull-right">{{data.memory.total.value}}</span></p>
               <p>Current memory usage:
                 <span ng-if="data.memory.used.ratio>0.66" class="label label-danger pull-right">{{data.memory.used.value}}</span>
@@ -18,6 +19,11 @@
                 <span ng-if="data.memory.free.ratio>0.66" class="label label-success pull-right">{{data.memory.free.value}}</span>
                 <span ng-if="data.memory.free.ratio>0.33 && data.memory.free.ratio<=0.66" class="label label-warning pull-right">{{data.memory.free.value}}</span>
                 <span ng-if="data.memory.free.ratio<=0.33" class="label label-danger pull-right">{{data.memory.free.value}}</span>
+              </p>
+              <p>Bundles:
+                <span ng-if="data.bundles.stats.activeRatio==1" class="label label-success pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>
+                <span ng-if="data.bundles.stats.activeRatio>=0.5 && data.bundles.stats.activeRatio<1" class="label label-warning pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>
+                <span ng-if="data.bundles.stats.activeRatio<0.5" class="label label-danger pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>
               </p>
             </div>
           </div>

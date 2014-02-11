@@ -134,13 +134,15 @@ dogUIController.controller('BundleCtrl', ['$scope', 'Bundle', '$timeout', functi
   }]);
 
 /* Controller for handling framework-related information */
-dogUIController.controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMemory', 'UsedMemory', '$timeout', function($scope, RuntimeMemory, FreeMemory, UsedMemory, $timeout) {
+dogUIController.controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMemory', 'UsedMemory', 'BundleStats', '$timeout', function($scope, RuntimeMemory, FreeMemory, UsedMemory, BundleStats, $timeout) {
     //init
 	$scope.data = {};
     $scope.data.memory = {};
     $scope.data.memory.total = {};
     $scope.data.memory.free = {};
     $scope.data.memory.used = {};
+    $scope.data.bundles = {};
+    $scope.data.bundles.stats = {};
     
     // get the total memory from the Dog APIs
     $scope.data.memory.total = RuntimeMemory.get();
@@ -148,6 +150,8 @@ dogUIController.controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMem
     $scope.data.memory.free = FreeMemory.get();
     // get the used memory from the Dog APIs
     $scope.data.memory.used = UsedMemory.get();
+    
+    $scope.data.bundles.stats = BundleStats.get();
     
     // poller: each 1 second, ask for bundle list update
     var poll = function() {
@@ -158,6 +162,8 @@ dogUIController.controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMem
     	$scope.data.memory.free = FreeMemory.get();
     	// get the used memory from the Dog APIs
     	$scope.data.memory.used = UsedMemory.get();
+    	
+    	$scope.data.bundles.stats = BundleStats.get();
         poll();
       }, 1000);
     };     

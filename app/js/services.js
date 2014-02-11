@@ -37,7 +37,13 @@ services.factory('Bundle', ['$resource', function($resource){
     return $resource('/admin/system/bundlemanager/bundles', {}, {
       query: {method:'GET', headers: {'Accept':'application/json'}, isArray:true }
     });
-  }]);
+}]);
+
+services.factory('BundleStats', ['$resource', function($resource){
+	return $resource('/admin/system/bundlemanager/bundles/statistics', {}, {
+		get: {method:'GET', headers: {'Accept':'application/json'}}
+	});
+}]);
 
 services.factory('RuntimeMemory', ['$resource', function($resource){
     return $resource('/admin/framework/memory/runtime', {}, {
