@@ -144,7 +144,7 @@ public class BundleManagerEndpoint implements BundleManager
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_WARNING, "Error in creating the JSON object for the bundle list");
+			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON object for the bundle list", e);
 		}
 		
 		return bundles;
@@ -204,7 +204,7 @@ public class BundleManagerEndpoint implements BundleManager
 		}
 		catch (Exception e)
 		{
-			this.logger.log(LogService.LOG_WARNING, "Error in creating the JSON object for the bundle statistics");
+			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON object for the bundle statistics", e);
 		}
 		
 		return bundleStats;

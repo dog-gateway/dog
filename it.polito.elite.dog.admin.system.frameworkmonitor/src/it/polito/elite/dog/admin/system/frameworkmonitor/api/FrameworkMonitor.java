@@ -45,4 +45,9 @@ public interface FrameworkMonitor
 	@Path("/memory/used")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUsedMemory();
+	
+	@GET
+	@Path("/devices/statistics")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getDeviceStats();
 }
