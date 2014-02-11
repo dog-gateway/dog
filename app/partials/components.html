@@ -1,0 +1,27 @@
+<div ng-controller="BundleCtrl">
+  <div ng-show="!data.available.bundles">
+    Loading bundle list...
+  </div>
+  <div class="row" ng-controller="FrameworkCtrl">
+    <div class="col-sm-12 col-md-12">
+      <span ng-if="data.bundles.stats.activeRatio==1" class="label label-success pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>
+      <span ng-if="data.bundles.stats.activeRatio>=0.5 && data.bundles.stats.activeRatio<1" class="label label-warning pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>
+      <span ng-if="data.bundles.stats.activeRatio<0.5" class="label label-danger pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>
+    </div>
+  </div>
+  <br/>
+  <div class="row">
+    <div class="col-sm-6 col-md-6" ng-repeat="list in data.bundles">
+      <ul class="list-group">
+        <li class="list-group-item" ng-repeat="bundle in list" ng-switch="bundle.state">
+          <div class="row">
+            <p class="col-xs-9 col-md-9 bundle">{{bundle.name}}</p>
+            <span ng-switch-when="Active" class="col-xs-3 col-md-3 label label-success">{{bundle.state}}</span>
+            <span ng-switch-when="Resolved" class="col-xs-3 col-md-3 label label-default">{{bundle.state}}</span>
+            <span ng-switch-when="Installed" class="col-xs-3 col-md-3 label label-danger">{{bundle.state}}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

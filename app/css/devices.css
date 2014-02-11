@@ -1,0 +1,337 @@
+[class^="device-"],
+[class*=" device-"] {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  /*margin-top: 1px;*/
+  margin-right: .3em;
+  line-height: 14px;
+  vertical-align: middle;
+  background-image: url("../img/devices-small/device.png");
+  background-repeat: no-repeat;
+}
+
+.device-modbusgateway,
+.device-knxnetipgateway,
+.device-elitegateway,
+.device-bticinogateway,
+.device-echelonlilon100gateway,
+.device-homegateway,
+.device-konnexgateway,
+.device-texasinstrumentsgateway,
+.device-zwavegateway
+{
+	background-image: url("../img/devices-small/gateway.png");	
+}
+
+.device-mainspoweroutlet,
+.device-onoffoutput,
+.device-meteringpoweroutlet,
+.device-energymeteringpoweroutlet,
+.device-powermeteringpoweroutlet
+{
+	background-image: url("../img/devices-small/plug.png");
+}
+
+.device-washingmachine,
+.device-appliances,
+.device-dishwasher
+{
+	background-image: url("../img/devices-small/washing-machine.png");
+}
+
+.device-activepowermeter,
+.device-apparentpowermeter,
+.device-currentmeter,
+.device-electricitymeter,
+.device-energymeter,
+.device-energyandpowermeter,
+.device-multitariffenergymeter,
+.device-multitariffsinglephaseenergymeter,
+.device-multitariffthreephaseenergymeter,
+.device-reactivepowermeter,
+.device-singlephaseactivepowermeter,
+.device-singlephaseapparentpowermeter,
+.device-singlephasecurrentmeter,
+.device-singlephaseelectricitymeter,
+.device-singlephaseenergymeter,
+.device-singlephasereactivepowermeter
+.device-singlephasevoltagemeter,
+.device-singletariffenergymeter,
+.device-threephaseactivepowermeter,
+.device-threephaseapparentpowermeter,
+.device-threephasecurrentmeter,
+.device-threephaseelectricitymeter,
+.device-threephaseenergymeter,
+.device-threephasereactivepowermeter,
+.device-threephasevoltagemeter
+{
+	background-image: url("../img/devices-small/electricity-meter.png");
+	width: 31px;
+}
+
+.device-microwaveoven
+{
+	background-image: url("../img/devices-small/microwave.png");
+}
+
+.device-cooker,
+.device-electricalcooker,
+.device-gascooker,
+.device-hotplate,
+.device-electricaloven
+{
+	background-image: url("../img/devices-small/cooker.png");
+}
+
+.device-fridge,
+.device-deepfreezer
+{
+	background-image: url("../img/devices-small/fridge.png");
+}
+
+.device-singletemperaturesensor,
+.device-temperatureandhumiditysensor,
+.device-temperaturesensor
+{
+	background-image: url("../img/devices-small/temperature.png");
+}
+
+.device-accesscontrolsystem
+{
+	background-image: url("../img/devices-small/access-control.png");
+}
+
+.device-acoustic
+{
+	background-image: url("../img/devices-small/speaker.png");
+}
+
+.device-actuator,
+.device-awningactuator
+{
+	background-image: url("../img/devices-small/actuator.png");
+}
+
+.device-airconditioningsystem
+{
+	background-image: url("../img/devices-small/cold.png");
+}
+
+.device-alarmclock
+{
+	background-image: url("../img/devices-small/alarm-clock.png");
+}
+
+.device-answeringmachine,
+.device-communication,
+.device-fax,
+.device-interphone
+{
+	background-image: url("../img/devices-small/phone.png");
+	
+}
+
+.device-antiintrusionsystem
+{
+	background-image: url("../img/devices-small/anti-intrusion.png");
+}
+
+.device-boiler,
+.device-hottube
+{
+	background-image: url("../img/devices-small/hot-tube.png");
+}
+
+.device-browngoods
+{
+	background-image: url("../img/devices-small/radio.png");
+}
+
+.device-button
+{
+	background-image: url("../img/devices-small/tap.png");
+}
+
+.device-buzzer
+{
+	background-image: url("../img/devices-small/bell.png");
+}
+
+.device-clock,
+.device-ez430chronos
+{
+	background-image: url("../img/devices-small/clock.png");	
+}
+
+.device-co2sensor
+{
+	background-image: url("../img/devices-small/co2sensor.png");	
+}
+
+.device-coffeemaker
+{
+	background-image: url("../img/devices-small/coffee-maker.png");	
+}
+
+.device-colordimmablelight
+{
+	background-image: url("../img/devices-small/color-dimmable-lamp.png");
+}
+
+.device-colordimmableswitch
+{
+	background-image: url("../img/devices-small/color-dimmable-switch.png");
+}
+
+.device-computer
+{
+	background-image: url("../img/devices-small/notebook.png");
+}
+
+.device-control,
+.device-controllable,
+.device-switch
+{
+	background-image: url("../img/devices-small/switch.png");
+}
+
+.device-dimmablelight,
+.device-dimmerlamp
+{
+	background-image: url("../img/devices-small/dimmable-lamp.png");
+}
+
+.device-dimmerswitch,
+.device-levelcontrolswitch
+{
+	background-image: url("../img/devices-small/dimmable-switch.png");
+}
+
+.device-dooractuator,
+.device-doorsensor
+{
+	background-image: url("../img/devices-small/door.png");
+}
+
+.device-dvd
+{
+	background-image: url("../img/devices-small/dvd.png");
+}
+
+.device-electricalsystem
+{
+	background-image: url("../img/devices-small/electrical.png");
+}
+
+.device-entertainment,
+.device-hifi
+{
+	background-image: url("../img/devices-small/entertainment.png");
+}
+
+.device-fan
+{
+	background-image: url("../img/devices-small/fan.png");
+}
+
+.device-firesystem
+{
+	background-image: url("../img/devices-small/fire.png");
+}
+
+.device-flashinglamp
+{
+	background-image: url("../img/devices-small/flashing-lamp.png");
+}
+
+.device-floodsensor,
+.device-floodsystem
+{
+	background-image: url("../img/devices-small/sink.png");
+}
+
+.device-flowsensor,
+.device-gasmeter
+{
+	background-image: url("../img/devices-small/pressure.png");
+}
+
+.device-frequencymeter
+{
+	background-image: url("../img/devices-small/frequency-meter.png");
+}
+
+.device-gasheater,
+.device-gasoilheater
+.device-gassystem,
+.device-heater,
+.device-heatingsystem
+{
+	background-image: url("../img/devices-small/heater.png");
+}
+
+.device-gassensor
+{
+	background-image: url("../img/devices-small/smoking.png");
+}
+
+.device-gateactuator
+{
+	background-image: url("../img/devices-small/gate-actuator.png");
+}
+
+.device-heatingandcoolingunit,
+.device-hvacsystem
+{
+	background-image: url("../img/devices-small/heating-and-cooling.png");
+}
+
+.device-heatingenergymeter
+{
+	background-image: url("../img/devices-small/heating-meter.png");
+}
+
+.device-houseplants
+{
+	background-image: url("../img/devices-small/home.png");
+}
+
+.device-humiditysensor
+{
+	background-image: url("../img/devices-small/humidity-sensor.png");
+}
+
+.device-infraredsensor,
+.device-movementsensor
+{
+	background-image: url("../img/devices-small/infrared-sensor.png");
+}
+
+.device-knob
+{
+	background-image: url("../img/devices-small/knob.png");
+}
+
+.device-lamp,
+.device-lampholder,
+.device-lighting,
+.device-simplelamp
+{
+	background-image: url("../img/devices-small/lamp.png");
+}
+
+.device-levelcontrollableoutput
+{
+	background-image: url("../img/devices-small/level-out.png");
+}
+
+.device-lightsensor
+{
+	background-image: url("../img/devices-small/light-sensor.png");
+}
+
+.device-meter
+{
+	background-image: url("../img/devices-small/speed.png");
+}
