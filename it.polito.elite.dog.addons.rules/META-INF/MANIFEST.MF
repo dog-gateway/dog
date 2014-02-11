@@ -32,3 +32,4 @@ Bundle-ClassPath: lib/drools/drools-core-5.4.0.Final.jar,
 Service-Component: OSGI-INF/component.xml
 Export-Package: it.polito.elite.dog.addons.rules.api;version="1.0.0",
  it.polito.elite.dog.addons.rules.schemalibrary;version="1.0.0"
+Bundle-ActivationPolicy: lazy
