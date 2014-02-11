@@ -62,3 +62,9 @@ services.factory('UsedMemory', ['$resource', function($resource){
       get: {method:'GET', headers: {'Accept':'application/json'} }
     });
   }]);
+
+services.factory('DeviceStats', ['$resource', function($resource){
+    return $resource('/admin/framework/devices/statistics', {}, {
+      get: {method:'GET', headers: {'Accept':'application/json'} }
+    });
+  }]);

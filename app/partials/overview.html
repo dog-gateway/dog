@@ -1,6 +1,6 @@
 <div ng-controller="FrameworkCtrl">
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-sm-12 col-md-12">
       <div class="panel panel-info">
         <div class="panel-heading">
           <h3 class="panel-title"><span class="glyphicon glyphicon-cog"></span> System Status</h3>
@@ -19,6 +19,11 @@
                 <span ng-if="data.memory.free.ratio>0.66" class="label label-success pull-right">{{data.memory.free.value}}</span>
                 <span ng-if="data.memory.free.ratio>0.33 && data.memory.free.ratio<=0.66" class="label label-warning pull-right">{{data.memory.free.value}}</span>
                 <span ng-if="data.memory.free.ratio<=0.33" class="label label-danger pull-right">{{data.memory.free.value}}</span>
+              </p>
+              <p>Devices:
+                <span ng-if="data.devices.stats.activeRatio>0.66" class="label label-success pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
+                <span ng-if="data.devices.stats.activeRatio<=0.33 && data.devices.stats.activeRatio<=0.66" class="label label-warning pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
+                <span ng-if="data.devices.stats.activeRatio<0.33" class="label label-danger pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
               </p>
               <p>Bundles:
                 <span ng-if="data.bundles.stats.activeRatio==1" class="label label-success pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>

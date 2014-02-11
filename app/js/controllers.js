@@ -91,7 +91,6 @@ dogUIController.controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'D
       }, 1000);
     };     
    poll();
-   
    // send command
    $scope.sendCommand = function(deviceId, commandName) {
 	 // optional parameters should go as field of devCmd (e.g., devCmd.value=param)
@@ -134,7 +133,7 @@ dogUIController.controller('BundleCtrl', ['$scope', 'Bundle', '$timeout', functi
   }]);
 
 /* Controller for handling framework-related information */
-dogUIController.controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMemory', 'UsedMemory', 'BundleStats', '$timeout', function($scope, RuntimeMemory, FreeMemory, UsedMemory, BundleStats, $timeout) {
+dogUIController.controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMemory', 'UsedMemory', 'BundleStats', 'DeviceStats', '$timeout', function($scope, RuntimeMemory, FreeMemory, UsedMemory, BundleStats, DeviceStats, $timeout) {
     //init
 	$scope.data = {};
     $scope.data.memory = {};
@@ -143,27 +142,53 @@ dogUIController.controller('FrameworkCtrl', ['$scope', 'RuntimeMemory', 'FreeMem
     $scope.data.memory.used = {};
     $scope.data.bundles = {};
     $scope.data.bundles.stats = {};
+    $scope.data.devices = {};
+    $scope.data.devices.stats = {};
     
+    // a promise is needed to avoid the flickering during the value updates
     // get the total memory from the Dog APIs
-    $scope.data.memory.total = RuntimeMemory.get();
+    var totalMemory = RuntimeMemory.get(function() {
+    	$scope.data.memory.total = totalMemory;
+    });
     // get the free memory from the Dog APIs
-    $scope.data.memory.free = FreeMemory.get();
+    var freeMemory = FreeMemory.get(function() {
+    	$scope.data.memory.free = freeMemory;
+    });
     // get the used memory from the Dog APIs
-    $scope.data.memory.used = UsedMemory.get();
+    var usedMemory = UsedMemory.get(function() {
+    	$scope.data.memory.used = usedMemory;
+    });
+    // get the bundles statistics
+    var bundleStats = BundleStats.get(function(){
+    	$scope.data.bundles.stats = bundleStats;
+    });
+    // get the devices statistics
+    var devStats = DeviceStats.get(function(){
+    	$scope.data.devices.stats = devStats;
+    });
     
-    $scope.data.bundles.stats = BundleStats.get();
-    
-    // poller: each 1 second, ask for bundle list update
+    // poller: each 1 second, ask for updates
     var poll = function() {
       $timeout(function() {
-    	// get the total memory from the Dog APIs
-    	$scope.data.memory.total = RuntimeMemory.get();
+        var totalMemory = RuntimeMemory.get(function() {
+    	  $scope.data.memory.total = totalMemory;
+    	});
     	// get the free memory from the Dog APIs
-    	$scope.data.memory.free = FreeMemory.get();
+    	var freeMemory = FreeMemory.get(function() {
+    	  $scope.data.memory.free = freeMemory;
+    	});
     	// get the used memory from the Dog APIs
-    	$scope.data.memory.used = UsedMemory.get();
-    	
-    	$scope.data.bundles.stats = BundleStats.get();
+    	var usedMemory = UsedMemory.get(function() {
+    	  $scope.data.memory.used = usedMemory;
+    	});
+    	// get the bundles statistics
+    	var bundleStats = BundleStats.get(function(){
+    	  $scope.data.bundles.stats = bundleStats;
+    	});
+    	// get the devices statistics
+    	var devStats = DeviceStats.get(function(){
+    	  $scope.data.devices.stats = devStats;
+    	});
         poll();
       }, 1000);
     };     
