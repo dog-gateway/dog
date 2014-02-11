@@ -15,7 +15,7 @@
       <ul class="list-group">
         <li class="list-group-item" ng-repeat="bundle in list" ng-switch="bundle.state">
           <div class="row">
-            <p class="col-xs-9 col-md-9 bundle">{{bundle.name}}</p>
+            <p class="col-xs-9 col-md-9 text-wrap">{{bundle.name}}</p>
             <span ng-switch-when="Active" class="col-xs-3 col-md-3 label label-success">{{bundle.state}}</span>
             <span ng-switch-when="Resolved" class="col-xs-3 col-md-3 label label-default">{{bundle.state}}</span>
             <span ng-switch-when="Installed" class="col-xs-3 col-md-3 label label-danger">{{bundle.state}}</span>

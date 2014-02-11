@@ -2,13 +2,13 @@
   <div class="row" ng-controller="FrameworkCtrl">
     <div class="col-sm-12 col-md-12">
       <span ng-if="data.devices.stats.activeRatio>0.66" class="label label-success pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
-      <span ng-if="data.devices.stats.activeRatio<=0.33 && data.devices.stats.activeRatio<=0.66" class="label label-warning pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
+      <span ng-if="data.devices.stats.activeRatio>=0.33 && data.devices.stats.activeRatio<=0.66" class="label label-warning pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
       <span ng-if="data.devices.stats.activeRatio<0.33" class="label label-danger pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
     </div>
   </div>
   <br/>
   <div class="row">
-    <div class="col-sm-6 col-md-4" ng-repeat="device in data.devices">
+    <div class="col-sm-6 col-md-4 text-wrap" ng-repeat="device in data.devices">
       <div class="panel panel-info" >
         <div class="panel-heading">
           <span class="device-{{device.type}}"></span>{{device.id}}
@@ -24,14 +24,19 @@
                   <span class="badge" ng-repeat="stateValue in stateValues">{{stateValue.value}}</span>
                 </li>
               </ul>
-              <div ng-repeat="controlFunctionality in device.controlFunctionality">
-                <button ng-repeat="command in controlFunctionality.commands | filter:'!get'" class="btn btn-primary btn-block" ng-click="sendCommand(device.id, command.param[0].value)">
-                  {{command.param[0].value}}</button>
+            </div>
+            <div class="col-sm-12 col-md-12 text-center commands">
+              <div class="btn-toolbar" ng-repeat="controlFunctionality in device.controlFunctionality">
+                <div class="btn-group btn-group-justified" >
+                  <a type="button" class="btn btn-primary text-wrap" ng-repeat="command in controlFunctionality.commands | filter:'!get' | filter:'!set'" ng-click="sendCommand(device.id, command.param[0].value)">
+                    {{command.param[0].value}}</a>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="clearfix"></div>
     </div>
   </div>
 </div>

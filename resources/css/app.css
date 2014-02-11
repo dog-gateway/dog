@@ -74,6 +74,11 @@ body {
   }
 }
 
+.text-wrap {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
 /*
  * Devices
  */
@@ -81,13 +86,13 @@ body {
   overflow: auto;
 }
 
+.commands > .btn-toolbar+.btn-toolbar {
+	margin-top: 10px;
+}
+
 /*
  * Bundles
  */
-.bundle {
-  word-wrap: break-word;
-}
-
 .list-group-item > .row {
   margin-left: 0px;
   margin-right: 0px;
