@@ -2,8 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: it.polito.elite.dog.core.housemodel.semantic
 Bundle-SymbolicName: it.polito.elite.dog.core.housemodel.semantic
-Bundle-Version: 0.9.0.pre
-Bundle-Activator: it.polito.elite.dog.core.housemodel.semantic.SemanticHouseModelActivator
+Bundle-Version: 0.9.9.pre
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.hp.hpl.jena.ontology,
  com.hp.hpl.jena.ontology.impl,
@@ -28,3 +27,4 @@ Bundle-ClassPath: .,
  lib/jaxb-impl-2.1.5.jar,
  lib/cmdutils.jar
 Export-Package: it.polito.elite.dog.core.housemodel.api;version="1.1.0"
+Service-Component: OSGI-INF/component.xml

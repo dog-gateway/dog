@@ -1,24 +1,20 @@
-/*                               
-    _/_/_/                          _/_/                _/      
-   _/    _/    _/_/      _/_/_/  _/    _/  _/_/_/    _/_/_/_/   
-  _/    _/  _/    _/  _/    _/  _/    _/  _/    _/    _/        
- _/    _/  _/    _/  _/    _/  _/    _/  _/    _/    _/         
-_/_/_/      _/_/      _/_/_/    _/_/    _/    _/      _/_/      
-                         _/                                     
-                    _/_/                                DogOnt + Dog -> Semantic House Model
-
-WEBSITE: http://elite.polito.it/dog-tools-80
-
-Copyright (c) [2009] 
-[Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
-You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
-on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-See the License for the specific language governing permissions and limitations under the License. 
-
+/*
+ * Dog - Core
+ * 
+ * Copyright (c) 2009-2014 Dario Bonino and Luigi De Russis
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
-
 package it.polito.elite.dog.core.housemodel.semantic.loader;
 
 import it.polito.elite.dog.core.housemodel.semantic.SemanticHouseModel;
@@ -46,7 +42,8 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
  * A Thread class for loading the ontology-based model, automatically deals with
  * all the imported ontologies...
  * 
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class ThreadedModelLoader extends Thread
@@ -101,7 +98,7 @@ public class ThreadedModelLoader extends Thread
 		this.sHouseModel = sHouseModel;
 		
 		// init the logger
-		this.logger = new LogHelper(this.sHouseModel.getContext());
+		this.logger = this.sHouseModel.getLogger();
 		
 		// the global manager to manage redirection of ontology imports
 		this.manager = OntDocumentManager.getInstance();

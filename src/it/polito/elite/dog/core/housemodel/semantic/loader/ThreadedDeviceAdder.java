@@ -1,24 +1,20 @@
-/*                               
-    _/_/_/                          _/_/                _/      
-   _/    _/    _/_/      _/_/_/  _/    _/  _/_/_/    _/_/_/_/   
-  _/    _/  _/    _/  _/    _/  _/    _/  _/    _/    _/        
- _/    _/  _/    _/  _/    _/  _/    _/  _/    _/    _/         
-_/_/_/      _/_/      _/_/_/    _/_/    _/    _/      _/_/      
-                         _/                                     
-                    _/_/                                DogOnt + Dog -> Semantic House Model
-
-WEBSITE: http://elite.polito.it/dog-tools-80
-
-Copyright (c) [2009] 
-[Dario Bonino (dario.bonino@polito.it), Politecnico di Torino] 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
-You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
-on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-See the License for the specific language governing permissions and limitations under the License. 
-
+/*
+ * Dog - Core
+ * 
+ * Copyright (c) 2009-2014 Dario Bonino and Luigi De Russis
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
-
 package it.polito.elite.dog.core.housemodel.semantic.loader;
 
 import java.util.Set;
@@ -39,7 +35,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
 
 /**
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class ThreadedDeviceAdder extends Thread
@@ -89,8 +87,8 @@ public class ThreadedDeviceAdder extends Thread
 		this.isIn = this.theHome.getProperty(prefix + "isIn");
 		this.notificationFunctionality = this.theHome.getOntClass(prefix + "NotificationFunctionality");
 		
-		// init the logger
-		this.logger = new LogHelper(this.sHouseModel.getContext());
+		// get the logger
+		this.logger = this.sHouseModel.getLogger();
 	}
 	
 	public void run()
@@ -224,9 +222,6 @@ public class ThreadedDeviceAdder extends Thread
 			// re-enable automatic change detection
 			// first disable reasoned model change detection
 			((PelletInfGraph) this.theHome.getGraph()).setAutoDetectChanges(true);
-			
-			// trigger an AddedNewDeviceNotification from the house model bundle
-			this.sHouseModel.notifyAddedNewDeviced(deviceDesc);
 			
 		}
 		
