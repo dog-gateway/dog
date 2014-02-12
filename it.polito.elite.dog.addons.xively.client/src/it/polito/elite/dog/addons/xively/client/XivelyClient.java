@@ -117,6 +117,9 @@ public class XivelyClient implements ManagedService, EventHandler
 	// the temporary cache of events
 	private Hashtable<String, Set<Datapoint>> waitingEventList;
 
+	// the existing channels
+	private HashSet<String> existingChannels;
+
 	// ---------------- ALERTS -------------------------------
 
 	// the default alert feed
@@ -136,6 +139,7 @@ public class XivelyClient implements ManagedService, EventHandler
 		// create the waiting list
 		this.waitingEventList = new Hashtable<String, Set<Datapoint>>();
 		this.waitingAlertList = new Hashtable<String, Set<Datapoint>>();
+		this.existingChannels = new HashSet<String>();
 	}
 
 	/**
@@ -329,12 +333,14 @@ public class XivelyClient implements ManagedService, EventHandler
 			// get the base feed, if needed
 			Object eventFeed = properties
 					.get(XivelyClient.XIVELY_DEFAULT_EVENT_FEED);
-			this.defaultEventFeed = (eventFeed instanceof String)?Integer.valueOf((String) eventFeed):(Integer)eventFeed;
+			this.defaultEventFeed = (eventFeed instanceof String) ? Integer
+					.valueOf((String) eventFeed) : (Integer) eventFeed;
 
 			// get the base feed, if needed
 			Object alertFeed = (String) properties
 					.get(XivelyClient.XIVELY_DEFAULT_ALERT_FEED);
-			this.defaultAlertFeed = (alertFeed instanceof String)?Integer.valueOf((String) alertFeed):(Integer)alertFeed;
+			this.defaultAlertFeed = (alertFeed instanceof String) ? Integer
+					.valueOf((String) alertFeed) : (Integer) alertFeed;
 
 			try
 			{
@@ -396,9 +402,9 @@ public class XivelyClient implements ManagedService, EventHandler
 			{
 				// activate the device
 				this.activateXivelyDevice();
-				
-				//if the key is ok
-				if(this.key!=null)
+
+				// if the key is ok
+				if (this.key != null)
 					appConfig.setApiKey(this.key);
 			}
 			else
@@ -530,35 +536,42 @@ public class XivelyClient implements ManagedService, EventHandler
 			if (datapointSet.size() >= this.waitingListSize)
 			{
 				// check if the channel exists
-				try
+				if (!this.existingChannels.contains(innerEvent.getStreamName()))
 				{
-					this.logger.log(LogService.LOG_DEBUG, "ApiKey"+AppConfig.getInstance().getApiKey());
-					XivelyService.instance().datastream(eventFeed)
-							.get(innerEvent.getStreamName());
-				}
-				catch (HttpException e)
-				{
-					int codeFamily = e.getStatusCode() / 100;
-					if (codeFamily == 4)
+					try
 					{
-						// prepare the new data stream
-						Datastream ds = new Datastream();
+						this.logger.log(LogService.LOG_DEBUG, "ApiKey"
+								+ AppConfig.getInstance().getApiKey());
+						XivelyService.instance().datastream(eventFeed)
+								.get(innerEvent.getStreamName());
 
-						// set the data stream id
-						ds.setId(innerEvent.getStreamName());
+						// update the existing channel
+						this.existingChannels.add(innerEvent.getStreamName());
+					}
+					catch (HttpException e)
+					{
+						int codeFamily = e.getStatusCode() / 100;
+						if (codeFamily == 4)
+						{
+							// prepare the new data stream
+							Datastream ds = new Datastream();
 
-						// set the data stream unit
-						Unit unit = new Unit();
-						unit.setSymbol(innerEvent.getUnitOfMeasure());
-						unit.setLabel(innerEvent.getUnitOfMeasure());
-						ds.setUnit(unit);
+							// set the data stream id
+							ds.setId(innerEvent.getStreamName());
 
-						Feed feed = new Feed();
-						feed.setId(eventFeed);
-						feed.setDatastreams(Collections.singleton(ds));
+							// set the data stream unit
+							Unit unit = new Unit();
+							unit.setSymbol(innerEvent.getUnitOfMeasure());
+							unit.setLabel(innerEvent.getUnitOfMeasure());
+							ds.setUnit(unit);
 
-						// create the data stream
-						XivelyService.instance().feed().update(feed);
+							Feed feed = new Feed();
+							feed.setId(eventFeed);
+							feed.setDatastreams(Collections.singleton(ds));
+
+							// create the data stream
+							XivelyService.instance().feed().update(feed);
+						}
 					}
 				}
 
