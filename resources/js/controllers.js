@@ -54,6 +54,8 @@ dogUIController.controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'D
           });          
           // associate the right device status with the already known device information
           $scope.data.devices[deviceStatus.devicesStatus[num].id].status = status;
+          // associate the active/idle information to the proper device
+          $scope.data.devices[deviceStatus.devicesStatus[num].id].active = deviceStatus.devicesStatus[num].active;
         }
       });
 	});
@@ -84,6 +86,8 @@ dogUIController.controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'D
               });
         	  // associate the right device status with the already known device information
               $scope.data.devices[deviceStatus.devicesStatus[num].id].status = status;
+              // associate the active/idle information to the proper device
+              $scope.data.devices[deviceStatus.devicesStatus[num].id].active = deviceStatus.devicesStatus[num].active;
             }
           }
         });

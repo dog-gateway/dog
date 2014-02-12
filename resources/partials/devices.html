@@ -9,8 +9,8 @@
   <br/>
   <div class="row">
     <div ng-repeat="device in data.devices">
-    <div class="col-sm-6 col-md-4 text-wrap" >
-      <div class="panel panel-info" >
+    <div class="col-sm-6 col-md-4 text-wrap">
+      <div class="panel" ng-class="(device.active) ? 'panel-info' : 'panel-danger'">
         <div class="panel-heading">
           <span class="device-{{device.type}}"></span>{{device.id}}
         </div>
