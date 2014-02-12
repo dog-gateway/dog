@@ -1,6 +1,7 @@
 package it.polito.elite.dog.addons.xively.client.queue;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.xively.client.model.Datapoint;
 
@@ -10,25 +11,22 @@ public class DatapointInfo
 	private int feedId;
 
 	private String datastreamId;
-	
-	private Datapoint last;
 
 	// the JSON data to be sent
-	private Set<Datapoint> datapoints;
+	private TreeSet<Datapoint> datapoints;
 
-	public DatapointInfo(int feed, String datastreamId, Set<Datapoint> data, Datapoint last)
+	public DatapointInfo(int feed, String datastreamId, Set<Datapoint> data)
 	{
 		// store the web resource
 		this.feedId = feed;
 
 		// store the datastream id
 		this.datastreamId = datastreamId;
-		
-		//store the last value
-		this.last = last;		
+	
 		
 		// store the JSON data
-		this.datapoints = data;
+		this.datapoints = new TreeSet<Datapoint>();
+		this.datapoints.addAll(data);
 	}
 
 	public int getFeed()
@@ -58,18 +56,13 @@ public class DatapointInfo
 
 	public void setDatapoints(Set<Datapoint> jsonData)
 	{
-		this.datapoints = jsonData;
+		this.datapoints.clear();
+		this.datapoints.addAll(jsonData);
 	}
 
 	public Datapoint getLast()
 	{
-		return last;
+		return this.datapoints.last();
 	}
-
-	public void setLast(Datapoint last)
-	{
-		this.last = last;
-	}
-	
 	
 }

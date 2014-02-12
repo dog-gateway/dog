@@ -564,7 +564,7 @@ public class XivelyClient implements ManagedService, EventHandler
 
 				// enqueue the data to be sent via rest
 				DatapointInfo data = new DatapointInfo(new Integer(eventFeed),
-						innerEvent.getStreamName(), datapointSet, dp);
+						innerEvent.getStreamName(), datapointSet);
 				queue.addDatapoints(data);
 
 				// remove the data from the waiting list

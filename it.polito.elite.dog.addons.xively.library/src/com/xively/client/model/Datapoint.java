@@ -2,6 +2,10 @@
 // This is part of Xively4J library, it is under the BSD 3-Clause license.
 package com.xively.client.model;
 
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -17,7 +21,7 @@ import com.xively.client.utils.ObjectUtil;
  * 
  */
 @JsonRootName(value = "datapoints")
-public class Datapoint implements DomainObject
+public class Datapoint implements DomainObject, Comparable<Datapoint>
 {
 	/**
 	 * id of the datapoint
@@ -106,4 +110,26 @@ public class Datapoint implements DomainObject
 		retval += (at == null ? 0 : at.hashCode() * 37);
 		return retval;
 	}
+
+	@Override
+	public int compareTo(Datapoint o)
+	{
+		//
+		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		try
+		{
+			Date localAt = sd.parse(this.at);
+			Date toCompareDate = sd.parse(o.at);
+			return localAt.compareTo(toCompareDate);
+		}
+		catch (ParseException e)
+		{
+			// TODO Auto-generated catch block
+			// do nothing
+		}
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	
 }
