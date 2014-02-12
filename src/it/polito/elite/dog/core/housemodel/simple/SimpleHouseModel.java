@@ -139,7 +139,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		this.srEnvironmentModel = null;
 	}
 	
-	/***
+	/**
 	 * Unregister its services from OSGi framework
 	 */
 	public void unRegister()
