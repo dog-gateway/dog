@@ -101,7 +101,7 @@ public class ThreadedDeviceAdder extends Thread
 		// here the new device shall be added, so first we need to understand to
 		// which class the device belongs
 		// therefore we need to first get the device category
-		String devCategory = this.deviceDesc.getDevCategory();
+		String devCategory = this.deviceDesc.getDeviceCategory();
 		
 		// change it into a short form containing only the device class name,
 		// since we do not know if its provided as either a full URI, as a
@@ -121,7 +121,7 @@ public class ThreadedDeviceAdder extends Thread
 			// first we create an instance for this device class
 			String deviceIndName = this.sHouseModel.getEntryPoint() + "#" + // this.qWrapper.toShortForm(devCategory)+
 					// "_"+
-					this.deviceDesc.getDevURI();
+					this.deviceDesc.getDeviceURI();
 			
 			this.thePlainHome.enterCriticalSection(Lock.WRITE);
 			Individual deviceInd = this.thePlainHome.createIndividual(deviceIndName, deviceClass);
@@ -191,7 +191,7 @@ public class ThreadedDeviceAdder extends Thread
 			
 			/*************************** The network technology *********************************/
 			// get the device technology
-			String tech = this.deviceDesc.getDevTechnology();
+			String tech = this.deviceDesc.getTechnology();
 			
 			// if it si not null, compose the component name
 			if ((tech != null) && (!tech.isEmpty()))
@@ -252,7 +252,7 @@ public class ThreadedDeviceAdder extends Thread
 		OntClass functionalityClass = this.theHome.getOntClass(functionalityURI);
 		if (functionalityClass != null)
 		{
-			String functionalityName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDevURI() + "_"
+			String functionalityName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDeviceURI() + "_"
 					+ this.qWrapper.toShortForm(functionalityURI);
 			
 			// create the functionality individual
@@ -290,7 +290,7 @@ public class ThreadedDeviceAdder extends Thread
 			if (cmdRes != null)
 			{
 				// if the notification class exists, create the individual
-				indName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDevURI() + "_"
+				indName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDeviceURI() + "_"
 						+ this.qWrapper.toShortForm(currentNotification);
 				
 				this.thePlainHome.enterCriticalSection(Lock.WRITE);
@@ -322,7 +322,7 @@ public class ThreadedDeviceAdder extends Thread
 			if (cmdRes != null)
 			{
 				// if the command class exists, create the individual
-				indName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDevURI() + "_"
+				indName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDeviceURI() + "_"
 						+ this.qWrapper.toShortForm(currentCommand);
 				
 				this.thePlainHome.enterCriticalSection(Lock.WRITE);
@@ -353,7 +353,7 @@ public class ThreadedDeviceAdder extends Thread
 		OntClass stateClass = this.theHome.getOntClass(stateURI);
 		if (stateClass != null)
 		{
-			String stateName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDevURI() + "_"
+			String stateName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDeviceURI() + "_"
 					+ this.qWrapper.toShortForm(stateURI);
 			
 			// create the state individual
@@ -386,7 +386,7 @@ public class ThreadedDeviceAdder extends Thread
 			if (stateValueRes != null)
 			{
 				// if the command class exists, create the individual
-				indName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDevURI() + "_"
+				indName = this.sHouseModel.getEntryPoint() + "#" + this.deviceDesc.getDeviceURI() + "_"
 						+ this.qWrapper.toShortForm(stateValueClass);
 				
 				this.thePlainHome.enterCriticalSection(Lock.WRITE);

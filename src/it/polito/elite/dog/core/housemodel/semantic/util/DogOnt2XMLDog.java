@@ -301,7 +301,7 @@ public class DogOnt2XMLDog
 		{
 			// create a building object
 			Building building = factory.createBuilding();
-			building.setName(cBuilding);
+			building.setId(cBuilding);
 			
 			// store the element reference in the reference map in order to
 			// possibly link other
@@ -322,7 +322,7 @@ public class DogOnt2XMLDog
 	private void getBuildingInstanceInformation(ObjectFactory factory, Building building)
 	{
 		// compose the uri of the building
-		String buildingUri = this.modelToLoadNS + "#" + building.getName();
+		String buildingUri = this.modelToLoadNS + "#" + building.getId();
 		
 		Set<String> buildingContents = this.qWrapper.getContainedInstanceUri(buildingUri);
 		for (String buildingContent : buildingContents)
@@ -334,7 +334,7 @@ public class DogOnt2XMLDog
 			{
 				Garden garden = factory.createGarden();
 				
-				garden.setName(instanceName);
+				garden.setId(instanceName);
 				
 				// store the element reference in the reference map in order to
 				// possibly link other
@@ -349,7 +349,7 @@ public class DogOnt2XMLDog
 			{
 				// create the garage object
 				Garage garage = factory.createGarage();
-				garage.setName(instanceName);
+				garage.setId(instanceName);
 				
 				// store the element reference in the reference map in order to
 				// possibly link other
@@ -363,7 +363,7 @@ public class DogOnt2XMLDog
 			else if (buildingContentType.contains("Flat"))
 			{
 				Flat flat = factory.createFlat();
-				flat.setName(instanceName);
+				flat.setId(instanceName);
 				flat.setClazz("Flat");
 				// store the element reference in the reference map in order to
 				// possibly link other
@@ -380,7 +380,7 @@ public class DogOnt2XMLDog
 			else if (buildingContentType.contains("Storey"))
 			{
 				Storey storey = factory.createStorey();
-				storey.setName(instanceName);
+				storey.setId(instanceName);
 				storey.setClazz("Storey");
 				
 				// store the element reference in the reference map in order to
@@ -402,7 +402,7 @@ public class DogOnt2XMLDog
 	
 	private void getStoreyInformation(ObjectFactory factory, Storey storey)
 	{
-		String storeyUri = this.modelToLoadNS + "#" + storey.getName();
+		String storeyUri = this.modelToLoadNS + "#" + storey.getId();
 		// first, get the svg footpring attribute
 		
 		Map<String, Set<String>> datatypes = this.qWrapper.getDatatypePropertyValuesOf(storeyUri, "Storey");
@@ -440,7 +440,7 @@ public class DogOnt2XMLDog
 			{
 				// create the room object
 				Room room = factory.createRoom();
-				room.setName(contentInstanceName);
+				room.setId(contentInstanceName);
 				
 				// store the element reference in the reference map in order to
 				// possibly link other
@@ -456,7 +456,7 @@ public class DogOnt2XMLDog
 			else if (contentType.contains("Flat"))
 			{
 				Flat flat = factory.createFlat();
-				flat.setName(contentInstanceName);
+				flat.setId(contentInstanceName);
 				
 				// store the element reference in the reference map in order to
 				// possibly link other
@@ -476,7 +476,7 @@ public class DogOnt2XMLDog
 	
 	private void getFlatInformation(ObjectFactory factory, Flat flat)
 	{
-		String flatUri = this.modelToLoadNS + "#" + flat.getName();
+		String flatUri = this.modelToLoadNS + "#" + flat.getId();
 		// first, get the svg footpring attribute
 		
 		Map<String, Set<String>> datatypes = this.qWrapper.getDatatypePropertyValuesOf(flatUri, "Flat");
@@ -500,7 +500,7 @@ public class DogOnt2XMLDog
 			String roomInstanceName = this.qWrapper.toShortForm(roomInstance);
 			// create the room object
 			Room room = factory.createRoom();
-			room.setName(roomInstanceName);
+			room.setId(roomInstanceName);
 			
 			// store the element reference in the reference map in order to
 			// possibly link other
@@ -518,7 +518,7 @@ public class DogOnt2XMLDog
 	private void getRoomInformation(ObjectFactory factory, Room room)
 	{
 		// first set the room class
-		String roomURI = this.modelToLoadNS + "#" + room.getName();
+		String roomURI = this.modelToLoadNS + "#" + room.getId();
 		String clazz = this.qWrapper.getType(roomURI, null);
 		room.setClazz(clazz);
 		
@@ -528,7 +528,7 @@ public class DogOnt2XMLDog
 		{
 			// create the ceiling object
 			Ceiling ceiling = factory.createCeiling();
-			ceiling.setName(ceilingName);
+			ceiling.setId(ceilingName);
 			
 			// store the element reference in the reference map in order to
 			// possibly link other
@@ -548,7 +548,7 @@ public class DogOnt2XMLDog
 		{
 			// create the floor object
 			Floor floor = factory.createFloor();
-			floor.setName(floorName);
+			floor.setId(floorName);
 			
 			// store the element reference in the reference map in order to
 			// possibly link other
@@ -583,7 +583,7 @@ public class DogOnt2XMLDog
 				}
 				else
 				{
-					wall.setName(wallName);
+					wall.setId(wallName);
 					// store the element reference in the reference map in order
 					// to possibly link other
 					// elements to this element
@@ -611,7 +611,7 @@ public class DogOnt2XMLDog
 	private void getWallInformation(ObjectFactory factory, Wall wall)
 	{
 		// regenerate the wall URI
-		String wallURI = this.modelToLoadNS + "#" + wall.getName();
+		String wallURI = this.modelToLoadNS + "#" + wall.getId();
 		
 		// get all the wallOpenings inside the wall
 		Set<String> wallOpnInstances = this.qWrapper.getAllWallOpeningsIn(wallURI);
@@ -637,7 +637,7 @@ public class DogOnt2XMLDog
 				else
 				{
 					// set the opening name
-					opening.setName(wallOpnInst);
+					opening.setId(wallOpnInst);
 					
 					// store the element reference in the reference map in order
 					// to possibly link other
@@ -687,7 +687,7 @@ public class DogOnt2XMLDog
 			{
 				// creates the device
 				device = factory.createDevice();
-				device.setName(devName);
+				device.setId(devName);
 				
 				// store the element reference in the reference map in order to
 				// possibly link other
@@ -707,6 +707,11 @@ public class DogOnt2XMLDog
 			String networkType = this.qWrapper.getType(cControllableInst, this.namespaces.get("dogOnt")
 					+ "#BuildingThing");
 			
+			if(networkType==null)
+			{
+				networkType = this.qWrapper.getType(cControllableInst, null);
+			}
+			
 			if ((networkType != null) && (!networkType.isEmpty()))
 			{
 				// extracts the domotic system by "handling" names with string
@@ -721,6 +726,7 @@ public class DogOnt2XMLDog
 				device.setDomoticSystem(networkType.substring(0, cIndex).toUpperCase());
 				
 			}
+				
 			// get all other device infos
 			this.getDeviceInformation(factory, device);
 			
@@ -733,7 +739,7 @@ public class DogOnt2XMLDog
 	
 	private void getDeviceInformation(ObjectFactory factory, Device device)
 	{
-		String deviceURI = this.modelToLoadNS + "#" + device.getName();
+		String deviceURI = this.modelToLoadNS + "#" + device.getId();
 		
 		// get the device location
 		Set<String> isInLocations = this.qWrapper.getIsIn(deviceURI);
@@ -746,7 +752,7 @@ public class DogOnt2XMLDog
 				
 				if (locationObj != null)
 					// add the location
-					device.setIsIn(((Room) locationObj).getName());
+					device.setIsIn(((Room) locationObj).getId());
 			}
 		}
 		
@@ -764,11 +770,11 @@ public class DogOnt2XMLDog
 			Object meterObj = this.ids2JaxbObjects.get(meter);
 			
 			if (meterObj != null)
-				device.setHasMeter(((Device) meterObj).getName());
+				device.setHasMeter(((Device) meterObj).getId());
 			else
 			{
 				Device cntrlDevice = factory.createDevice();
-				cntrlDevice.setName(meter);
+				cntrlDevice.setId(meter);
 				// store the element reference in the reference map in order
 				// to possibly link other
 				// elements to this element
@@ -786,11 +792,11 @@ public class DogOnt2XMLDog
 				Object meteredDeviceObj = this.ids2JaxbObjects.get(meteredDevice);
 				
 				if (meteredDeviceObj != null)
-					device.getMeterOf().add((((Device) meteredDeviceObj).getName()));
+					device.getMeterOf().add((((Device) meteredDeviceObj).getId()));
 				else
 				{
 					Device cntrlDevice = factory.createDevice();
-					cntrlDevice.setName(meteredDevice);
+					cntrlDevice.setId(meteredDevice);
 					// store the element reference in the reference map in order
 					// to possibly link other
 					// elements to this element
@@ -807,11 +813,11 @@ public class DogOnt2XMLDog
 			Object sensorObj = this.ids2JaxbObjects.get(sensor);
 			
 			if (sensorObj != null)
-				device.setSensorOf(((Device) sensorObj).getName());
+				device.setSensorOf(((Device) sensorObj).getId());
 			else
 			{
 				Device cntrlDevice = factory.createDevice();
-				cntrlDevice.setName(sensor);
+				cntrlDevice.setId(sensor);
 				// store the element reference in the reference map in order
 				// to possibly link other
 				// elements to this element
@@ -827,11 +833,11 @@ public class DogOnt2XMLDog
 			Object plugObj = this.ids2JaxbObjects.get(plug);
 			
 			if (plugObj != null)
-				device.setPluggedIn(((Device) plugObj).getName());
+				device.setPluggedIn(((Device) plugObj).getId());
 			else
 			{
 				Device cntrlDevice = factory.createDevice();
-				cntrlDevice.setName(plug);
+				cntrlDevice.setId(plug);
 				// store the element reference in the reference map in order
 				// to possibly link other
 				// elements to this element
@@ -845,7 +851,7 @@ public class DogOnt2XMLDog
 		if ((desc != null) && (!desc.isEmpty()))
 			device.setDescription(desc);
 		else
-			device.setDescription("A " + device.getClazz() + " instance named " + device.getName());
+			device.setDescription("A " + device.getClazz() + " instance named " + device.getId());
 		
 		// get the device parameters
 		Map<String, Set<String>> parameters = this.qWrapper.getInstanceLevelDeviceNetworkParameters(deviceURI);
@@ -875,7 +881,7 @@ public class DogOnt2XMLDog
 			Object actObj = this.ids2JaxbObjects.get(actuatedObject);
 			
 			if (actObj != null)
-				device.setActuatorOf(((WallOpening) actObj).getName());
+				device.setActuatorOf(((WallOpening) actObj).getId());
 			
 		}
 		
@@ -888,11 +894,11 @@ public class DogOnt2XMLDog
 				Object cntrlObj = this.ids2JaxbObjects.get(controlledObject);
 				
 				if (cntrlObj != null)
-					device.getControls().add((((Device) cntrlObj).getName()));
+					device.getControls().add((((Device) cntrlObj).getId()));
 				else
 				{
 					Device cntrlDevice = factory.createDevice();
-					cntrlDevice.setName(controlledObject);
+					cntrlDevice.setId(controlledObject);
 					// store the element reference in the reference map in order
 					// to possibly link other
 					// elements to this element
@@ -916,7 +922,7 @@ public class DogOnt2XMLDog
 	 */
 	private void getSpecificStateInformation(ObjectFactory factory, Device device)
 	{
-		String deviceURI = this.modelToLoadNS + "#" + device.getName();
+		String deviceURI = this.modelToLoadNS + "#" + device.getId();
 		Set<String> states = this.qWrapper.getDeviceInstanceLevelStates(deviceURI);
 		if (states != null)
 		{
@@ -950,7 +956,7 @@ public class DogOnt2XMLDog
 	
 	private void getSpecificCommandInformation(ObjectFactory factory, Device device)
 	{
-		String deviceURI = this.modelToLoadNS + "#" + device.getName();
+		String deviceURI = this.modelToLoadNS + "#" + device.getId();
 		
 		Map<String, Set<String>> functionalities = this.qWrapper
 				.getDeviceInstanceSpecificFunctionalitiesCommands(deviceURI);
@@ -980,13 +986,13 @@ public class DogOnt2XMLDog
 					// are already linked by a
 					// generatesCommand relation but that
 					// still need to be included in the jaxb model
-					Set<Configcommand> cOrphans = this.candidateOrphans.get(device.getName());
+					Set<Configcommand> cOrphans = this.candidateOrphans.get(device.getId());
 					if (cOrphans != null)
 					{
 						if (cOrphans.contains(cmd))
 							cOrphans.remove(cmd);
 						if (cOrphans.isEmpty())
-							this.candidateOrphans.remove(device.getName());
+							this.candidateOrphans.remove(device.getId());
 					}
 				}
 				else
@@ -1039,7 +1045,7 @@ public class DogOnt2XMLDog
 	
 	private void getSpecificNotificationInformation(ObjectFactory factory, Device device)
 	{
-		String deviceURI = this.modelToLoadNS + "#" + device.getName();
+		String deviceURI = this.modelToLoadNS + "#" + device.getId();
 		Map<String, Set<String>> functionalitiesNotifications = this.qWrapper
 				.getDeviceInstanceSpecificFunctionalitiesNotifications(deviceURI);
 		// for each notification functionality
@@ -1054,8 +1060,8 @@ public class DogOnt2XMLDog
 			for (String notificationInstanceURI : notifications)
 			{
 				Confignotification notification = factory.createConfignotification();
-				notification.setName(this.qWrapper.toShortForm(notificationInstanceURI));
-				this.ids2JaxbObjects.put(notification.getName(), notification);
+				notification.setId(this.qWrapper.toShortForm(notificationInstanceURI));
+				this.ids2JaxbObjects.put(notification.getId(), notification);
 				
 				// get the notification type
 				notification.setClazz(this.qWrapper.getType(notificationInstanceURI, null));

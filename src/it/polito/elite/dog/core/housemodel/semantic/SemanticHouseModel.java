@@ -31,14 +31,14 @@ import it.polito.elite.dog.core.housemodel.semantic.query.SPARQLQueryWrapper;
 import it.polito.elite.dog.core.housemodel.semantic.util.DogOnt2XMLDog;
 import it.polito.elite.dog.core.housemodel.semantic.util.OntologyDescriptorSet;
 import it.polito.elite.dog.core.housemodel.api.ModelUpdate;
+import it.polito.elite.dog.core.library.jaxb.Controllables;
+import it.polito.elite.dog.core.library.jaxb.Device;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
-import it.polito.elite.dog.core.library.model.notification.core.AddedNewDeviceNotification;
-import it.polito.elite.dog.core.library.model.notification.core.RemovedDeviceNotification;
-import it.polito.elite.dog.core.library.model.notification.core.UpdatedModelNotification;
-import it.polito.elite.dog.core.library.util.ElementDescription;
-import it.polito.elite.dog.core.library.util.EventFactory;
+//import it.polito.elite.dog.core.library.model.notification.core.AddedNewDeviceNotification;
+//import it.polito.elite.dog.core.library.model.notification.core.RemovedDeviceNotification;
+//import it.polito.elite.dog.core.library.model.notification.core.UpdatedModelNotification;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.BufferedReader;
@@ -49,6 +49,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -57,7 +58,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
@@ -88,8 +88,8 @@ import com.hp.hpl.jena.ontology.OntModel;
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  * 
  */
-public class SemanticHouseModel implements HouseModel, DogModelProviderInterface, ModelUpdate,
-		ManagedService, ServiceTrackerCustomizer<Object, Object>
+public class SemanticHouseModel implements HouseModel, DogModelProviderInterface, ModelUpdate, ManagedService,
+		ServiceTrackerCustomizer<Object, Object>
 {
 	// the bundle intelligence level
 	public static final String OWNINTELLIGENCE = "DOGONT";
@@ -135,8 +135,7 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 	// ServiceTracker for the EventAdmin service
 	private ServiceTracker<?, ?> trackerEventAdmin;
 	
-	// to export xml configuration to external all (REST); useless, right now
-	@SuppressWarnings("unused")
+	// to export xml configuration to external all (REST)
 	private DogHomeConfiguration xmlConfiguration;
 	
 	/**
@@ -276,7 +275,7 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 		this.registrationPropertiesHC.put(DeviceCostants.ACTIVE, false);
 		
 		// register the house configuration provider
-		this.serReg = this.context.registerService(HouseModel.class.getName(), this, this.registrationPropertiesHC);
+		//this.serReg = this.context.registerService(HouseModel.class.getName(), this, this.registrationPropertiesHC);
 		
 		// register the model provider
 		this.registrationPropertiesMP = new Hashtable<String, Object>();
@@ -312,8 +311,10 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 		this.registrationPropertiesMP.put(DeviceCostants.ACTIVE, true);
 		this.registrationPropertiesMUP.put(DeviceCostants.ACTIVE, true);
 		
+		this.serReg = this.context.registerService(HouseModel.class.getName(), this, this.registrationPropertiesHC);
+		
 		// register driver service
-		this.serReg.setProperties(this.registrationPropertiesHC);
+		//this.serReg.setProperties(this.registrationPropertiesHC);
 		this.serRegModelProvider.setProperties(this.registrationPropertiesMP);
 		this.serRegModelUpdaterProvider.setProperties(this.registrationPropertiesMUP);
 		
@@ -432,7 +433,8 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 				try
 				{
 					logger.log(LogService.LOG_DEBUG, "[SemanticHouseModel]: computing JAXBXML configuration...");
-					DogOnt2XMLDog toXMLTranslator = new DogOnt2XMLDog(ontoDescSet);
+					//DogOnt2XMLDog toXMLTranslator = new DogOnt2XMLDog(ontoDescSet);
+					DogOnt2XMLDog toXMLTranslator = new DogOnt2XMLDog(dogontModel, namespaces,entryPoint);
 					xmlConfiguration = toXMLTranslator.getJAXBXMLDog();
 					logger.log(LogService.LOG_DEBUG, "[SemanticHouseModel]: generated JAXBXML configuration.");
 				}
@@ -441,14 +443,12 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 					logger.log(LogService.LOG_ERROR,
 							"[SemanticHouseModel]: Error while translating the ontology to JAXBXML" + e);
 				}
-			}
-		};
+			
 		
 		// register the service if not already active...
-		if ((this.serReg != null) && (!(Boolean) this.registrationPropertiesHC.get(DeviceCostants.ACTIVE))
-				&& (this.serRegModelProvider != null)
-				&& (!(Boolean) this.registrationPropertiesMP.get(DeviceCostants.ACTIVE)))
-			this.activateDriver();
+		activateDriver();
+			}
+		};
 		
 		// start the thread worker
 		Thread threadXMLConfigWorker = new Thread(XMLConfigWorker);
@@ -525,17 +525,6 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 	 * obtained through the {@link DogDeviceDescription} object (by calling the
 	 * {@link asDogDeviceConfigurationP()) method. Conditions might be given
 	 * restricting the set of devices for which configurations must be provided
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
 	 * back. They are given as an {@link Hashtable} of maximum 2 {@link HashSet}
 	 * <{@link String}>. This sets are respectively referenced by the keys:
 	 * {@link DogDeviceConstants.DEVICEURI} and
@@ -559,9 +548,6 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 	{
 		// prepare the device description object
 		Vector<DeviceDescriptor> configs = new Vector<DeviceDescriptor>();
-		DeviceDescriptor devDesc;
-		ElementDescription notificationDescription;
-		ElementDescription commandDescription;
 		
 		// the device list
 		Set<String> devList = new HashSet<String>();
@@ -601,186 +587,15 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 			devList.addAll(this.qWrapper.getAllControllableInstances());
 		}
 		
-		// ok here there should be a non empty list of devices from which
-		// getting
-		// the low level information needed to answer the get config request
-		Map<String, String> basicData;
-		String location;
-		Set<String> propDevices = null;
-		Set<String> propCmds = null;
-		Set<String> propNotifs = null;
-		String gateway = null;
-		
-		for (String devURI : devList)
+		if (this.xmlConfiguration != null)
 		{
-			// get basic device data
-			basicData = this.qWrapper.getControllableInstanceBasicData(devURI);
-			
-			// the basic device descriptor
-			devDesc = new DeviceDescriptor(basicData.get(DeviceCostants.DEVICEURI),
-					basicData.get(DeviceCostants.TYPE), basicData.get(DeviceCostants.DEVICE_DESCRIPTION),
-					basicData.get(DeviceCostants.MANUFACTURER));
-			
-			// the location
-			location = this.qWrapper.getEntityLocationInRoom(devURI);
-			
-			// the gateway
-			gateway = this.qWrapper.getHasGateway(devURI);
-			
-			// check not null
-			if ((gateway != null) && (!gateway.isEmpty()))
-				devDesc.setGateway(gateway);
-			
-			// actuatorOf
-			devDesc.setActuatorOf(this.qWrapper.getActuatorOf(devURI));
-			
-			// sensorOf
-			devDesc.setSensorOf(this.qWrapper.getSensorOf(devURI));
-			
-			// controlled objects
-			Set<String> controlledObjects = this.qWrapper.getControlledObjects(devURI);
-			if ((controlledObjects != null) && (!controlledObjects.isEmpty()))
-				devDesc.setControlledObjects(controlledObjects);
-			
-			// hasMeter
-			devDesc.setHasMeter(this.qWrapper.getHasMeter(devURI));
-			
-			// meter of
-			Set<String> meteredObjects = this.qWrapper.getMeterOf(devURI);
-			if ((meteredObjects != null) && (!meteredObjects.isEmpty()))
-				devDesc.setMeterOf(meteredObjects);
-			
-			// plugged in
-			devDesc.setPluggedIn(this.qWrapper.getPluggedIn(devURI));
-			
-			// add the location
-			devDesc.setDevLocation(location);
-			
-			// check manufacturer null
-			if (devDesc.getDevTechnology() == null)
+			for (Device dev : this.xmlConfiguration.getControllables().get(0).getDevice())
 			{
-				// shall set the manufacturer to e-lite, no specific parameter
-				// needed here...
-				devDesc.setDevTechnology("ELITE");
+				//if (devList.contains(dev.getId()))
+				//{
+					configs.add(new DeviceDescriptor(dev));
+				//}
 			}
-			else
-			{
-				
-				if (propDevices == null)
-					propDevices = this.qWrapper.getDatatypePropertiesOf("dogOnt:DomoticNetworkComponent");
-				
-				// get all the network-specific parameters for this device
-				// instance
-				Map<String, Set<String>> netData = this.qWrapper.getInstanceProperties(devURI, propDevices);
-				
-				// store the data in the descriptor
-				if ((netData != null) && (!netData.isEmpty()))
-				{
-					devDesc.setDevSimpleConfigurationParams(netData);
-				}
-				
-				// get all the network commands
-				Set<String> cmds = this.qWrapper.getDeviceInstanceNetworkSpecificCommands(devURI);
-				
-				// check null
-				if ((cmds != null) && (!cmds.isEmpty()))
-				{
-					// for each command get the network specific parameters
-					for (String cmd : cmds)
-					{
-						if (propCmds == null)
-							propCmds = this.qWrapper.getDatatypePropertiesOf("dogOnt:NetworkSpecificCommand");
-						
-						// get the command-specific network data...
-						netData = this.qWrapper.getInstanceProperties(cmd, propCmds);
-						
-						// if net data is not null or empty...add it to the
-						// command description and
-						// then to the device descriptor
-						if ((netData != null) && (!netData.isEmpty()))
-						{
-							// create the command description object
-							String cmdType = this.qWrapper.getType(cmd, this.getNamespaces().get("dogOnt")
-									+ "#NetworkSpecificCommand");
-							
-							commandDescription = new ElementDescription(cmd, cmdType);
-							
-							// get all the network parameters...
-							Map<String, Set<String>> cmdParams = this.qWrapper.getInstanceProperties(cmd, propCmds);
-							
-							// add the params... shall never be more than
-							// one..however also the multiple case is supported
-							// here
-							Set<String> values;
-							for (String paramName : cmdParams.keySet())
-							{
-								values = cmdParams.get(paramName);
-								if ((values != null) && (values.size() == 1))
-									commandDescription.addElementParam(paramName, values.iterator().next());
-								else
-									commandDescription.addElementParam(paramName, values.toString());
-							}
-							
-							// add the command description
-							devDesc.addDevCommandSpecificParam(commandDescription);
-						}
-					}
-				}
-				
-				// get all the network notifications
-				Set<String> notifications = this.qWrapper.getDeviceInstanceNetworkSpecificNotifications(devURI);
-				
-				// check null
-				if ((notifications != null) && (!notifications.isEmpty()))
-				{
-					// for each command get the network specific parameters
-					for (String notification : notifications)
-					{
-						if (propNotifs == null)
-							propNotifs = this.qWrapper.getDatatypePropertiesOf("dogOnt:Notification");
-						
-						// get the command-specific network data...
-						netData = this.qWrapper.getInstanceProperties(notification, propNotifs);
-						
-						// if net data is not null or empty...add it to the
-						// command description and
-						// then to the device descriptor
-						if ((netData != null) && (!netData.isEmpty()))
-						{
-							// create the command description object
-							String notificationType = this.qWrapper.getType(notification,
-									this.getNamespaces().get("dogOnt") + "#NetworkSpecificNotification");
-							
-							notificationDescription = new ElementDescription(notification, notificationType);
-							
-							// get all the network parameters...
-							Map<String, Set<String>> notificationParams = this.qWrapper
-									.getInstanceLevelNotificationNetworkParameters(notification); // getInstanceProperties(notification,
-																									// propNotifs);
-							notificationParams.putAll(this.qWrapper
-									.getInstanceLevelNotificationParameters(notification));
-							// add the params... shall never be more than
-							// one..however also the multiple case is supported
-							// here
-							Set<String> values;
-							for (String paramName : notificationParams.keySet())
-							{
-								values = notificationParams.get(paramName);
-								if ((values != null) && (values.size() == 1))
-									notificationDescription.addElementParam(paramName, values.iterator().next());
-								else
-									notificationDescription.addElementParam(paramName, values.toString());
-							}
-							
-							// add the command description
-							devDesc.addDevNotificationSpecificParam(notificationDescription);
-						}
-					}
-				}
-			}
-			
-			// add the device description as a property concatenation
-			configs.add(devDesc);// .asDogDeviceConfigurationP());
 		}
 		
 		return configs;
@@ -908,7 +723,7 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 	private void addNewDeviceImpl(DeviceDescriptor deviceDescriptor)
 	{
 		// log the addition request
-		this.logger.log(LogService.LOG_INFO, "Received request to add: " + deviceDescriptor.getDevURI());
+		this.logger.log(LogService.LOG_INFO, "Received request to add: " + deviceDescriptor.getDeviceURI());
 		
 		// create and launch the device addition thread
 		ThreadedDeviceAdder devAdder = new ThreadedDeviceAdder(deviceDescriptor, this.dogontModel,
@@ -949,11 +764,11 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 		if (ea != null)
 		{
 			// Create the notification
-			UpdatedModelNotification notification = new UpdatedModelNotification();
+			//UpdatedModelNotification notification = new UpdatedModelNotification();
 			// Create the event
-			Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
+			//Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
 			// Send the event to the EventAdmin
-			ea.postEvent(event);
+			//ea.postEvent(event);
 		}
 		
 	}
@@ -967,11 +782,11 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 		if (ea != null)
 		{
 			// Create the notification
-			AddedNewDeviceNotification notification = new AddedNewDeviceNotification(desc);
+			//AddedNewDeviceNotification notification = new AddedNewDeviceNotification(desc);
 			// Create the event
-			Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
+			//Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
 			// Send the event to the EventAdmin
-			ea.postEvent(event);
+			//ea.postEvent(event);
 		}
 		
 		// send also a generic update notification
@@ -988,11 +803,11 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 		if (ea != null)
 		{
 			// Create the notification
-			RemovedDeviceNotification notification = new RemovedDeviceNotification(desc);
+			//RemovedDeviceNotification notification = new RemovedDeviceNotification(desc);
 			// Create the event
-			Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
+			//Event event = EventFactory.createEvent(notification, this.getClass().getSimpleName());
 			// Send the event to the EventAdmin
-			ea.postEvent(event);
+			//ea.postEvent(event);
 		}
 		
 		// send also a generic update notification
@@ -1005,11 +820,61 @@ public class SemanticHouseModel implements HouseModel, DogModelProviderInterface
 	{
 		return this.getDeviceConfig(null);
 	}
-
+	
 	@Override
-	public String getSVGPlan()
+	public void updateConfiguration(Vector<DeviceDescriptor> updatedDescriptors)
 	{
-		return this.homeSVGFootprint;
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void updateConfiguration(DeviceDescriptor updatedDescriptor)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void addToConfiguration(Vector<DeviceDescriptor> newDescriptors)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void addToConfiguration(DeviceDescriptor newDescriptor)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void removeFromConfiguration(Set<String> deviceURIs)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void removeFromConfiguration(String deviceURI)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public DogHomeConfiguration getJAXBConfiguration()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public List<Controllables> getJAXBDevices()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

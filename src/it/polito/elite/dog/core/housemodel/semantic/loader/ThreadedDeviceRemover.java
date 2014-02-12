@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 import it.polito.elite.dog.core.housemodel.semantic.SemanticHouseModel;
 import it.polito.elite.dog.core.housemodel.semantic.query.SPARQLQueryWrapper;
-import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import org.mindswap.pellet.jena.PelletInfGraph;
@@ -228,7 +227,7 @@ public class ThreadedDeviceRemover extends Thread
 			((PelletInfGraph) this.theHome.getGraph()).setAutoDetectChanges(true);
 			
 			// send notification
-			this.sHouseModel.notifyRemovedDevice(new DeviceDescriptor(this.deviceToRemove));
+			//this.sHouseModel.notifyRemovedDevice(new DeviceDescriptor(this.deviceToRemove));
 			
 		}
 		else
