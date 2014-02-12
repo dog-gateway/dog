@@ -25,7 +25,6 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogEntry;
@@ -47,9 +46,6 @@ public class ConsoleLog implements LogListener, ManagedService
 {
 	// the registered LogReaderService
 	private AtomicReference<LogReaderService> registeredLogReader;
-	
-	// the service registration handle
-	private ServiceRegistration<?> serviceRegManagedService;
 	
 	// log types
 	public static String[] logTypes = new String[] { "ERROR", "WARNING", "DEBUG", "INFO" };
@@ -89,16 +85,12 @@ public class ConsoleLog implements LogListener, ManagedService
 	 * Deactivate this component (before its unbind)
 	 */
 	public void deactivate()
-	{
-		// unregister the services
-		this.unRegister();
-		
+	{	
 		// clear everything
 		this.loggerWriterTable.clear();
 		
 		// set everything to null
 		this.loggerWriterTable = null;
-		this.serviceRegManagedService = null;
 	}
 	
 	/**
@@ -113,18 +105,6 @@ public class ConsoleLog implements LogListener, ManagedService
 		this.loggerWriterTable.put(LogService.LOG_DEBUG, vectWriter);
 		this.loggerWriterTable.put(LogService.LOG_ERROR, vectWriter);
 		this.loggerWriterTable.put(LogService.LOG_WARNING, vectWriter);
-		
-	}
-	
-	/**
-	 * Unregister all the services...
-	 */
-	public void unRegister()
-	{
-		if (this.serviceRegManagedService != null)
-		{
-			this.serviceRegManagedService.unregister();
-		}
 		
 	}
 	
