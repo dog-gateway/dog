@@ -40,6 +40,7 @@ import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
@@ -694,7 +695,12 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				.setActive(Boolean.valueOf((String) deviceService.getProperty(DeviceCostants.ACTIVE)));
 		
 		// get the device status
-		Map<String, State> allStates = ((Controllable) device).getState().getStates();
+		Map<String, State> allStates = null;
+		DeviceStatus state = ((Controllable) device).getState();
+		if (state != null)
+		{
+			allStates = state.getStates();
+		}
 		
 		// check if the device state is available, i.e., not
 		// null
