@@ -427,30 +427,38 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 			conditions = condition.get(DeviceCostants.DEVICE_CATEGORY);
 			
 			// if not null, must extract the set of classes descending from the
-			// given
-			// device categories
+			// given device categories
 			if (conditions != null)
 			{
 				Set<String> devices = this.qWrapper.getCategoryFilteredControllableInstances(conditions);
 				
-				// load all to the device list
-				devList.addAll(devices);
+				// load all to the device list and convert it in short form
+				for(String devURI : devices)
+				{
+					devList.add(this.qWrapper.toShortForm(devURI));
+				}
 			}
 		}
 		else
 		{
 			// get all controllables...
-			devList.addAll(this.qWrapper.getAllControllableInstances());
+			Set<String> devices = this.qWrapper.getAllControllableInstances();
+			
+			// convert it in short form
+			for(String devURI : devices)
+			{
+				devList.add(this.qWrapper.toShortForm(devURI));
+			}
 		}
 		
 		if (this.xmlConfiguration != null)
-		{
+		{	
 			for (Device dev : this.xmlConfiguration.getControllables().get(0).getDevice())
 			{
-				// if (devList.contains(dev.getId()))
-				// {
-				configs.add(new DeviceDescriptor(dev));
-				// }
+				if (devList.contains(dev.getId()))
+				{
+					configs.add(new DeviceDescriptor(dev));
+				}
 			}
 		}
 		
