@@ -16,6 +16,8 @@ dogUIController.controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'D
 	  // init
 	  $scope.data = {};
 	  $scope.data.devices = {};
+	  $scope.data.available = {};
+	  $scope.data.available.devices = null;
 	  
 	  // get the devices list from the Dog APIs, and elaborate it in a promise
 	  var devicesList = Device.get(function() {
@@ -28,6 +30,7 @@ dogUIController.controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'D
           currentDevice.type = angular.lowercase(devicesList.devices[num].class);
           currentDevice.controlFunctionality = devicesList.devices[num].controlFunctionality;
           $scope.data.devices[devicesList.devices[num].id] = currentDevice;
+          $scope.data.available.devices = true;
       }
         
       //set the initial status... a promise inside a promise...
