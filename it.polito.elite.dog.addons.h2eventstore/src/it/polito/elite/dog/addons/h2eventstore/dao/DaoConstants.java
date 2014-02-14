@@ -15,9 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package it.polito.elite.dog.addons.h2eventstore;
+package it.polito.elite.dog.addons.h2eventstore.dao;
 
-public class Constants {
-	final static String MAPPING_FILE = "dao.h2.source.mapping";
-	final static String DB_LOCATION = "DATABASE";
+public class DaoConstants {
+
+	final static String SCHEMA = "CREATE TABLE EVENT(NAME VARCHAR(100), VALUE DECIMAL, UNIT VARCHAR(5), TIMESTAMP TIMESTAMP);";
+
+	final static String INSERT = "INSERT INTO EVENT (NAME, VALUE, UNIT, TIMESTAMP) VALUES (?, ?, ?, ?);";
 }

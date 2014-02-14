@@ -1,20 +1,20 @@
 /*
+ * Dog - Addons
  * 
- * Copyright (c) [2013] [Claudio Degioanni claudiodegio@gmail.com]
+ * Copyright (c) 2013-2014 Claudio Degioanni, Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *              http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License
  */
-
 package it.polito.elite.dog.addons.h2eventstore.dao;
 
 import java.math.BigDecimal;
@@ -34,7 +34,7 @@ import org.osgi.service.log.LogService;
 
 public class MeasureDaoImp implements MeasureDao
 {	
-	// System logger
+	// OSGi logger
 	private LogHelper logger;
 	
 	// database connection
@@ -47,16 +47,16 @@ public class MeasureDaoImp implements MeasureDao
 		this.logger = new LogHelper(context);
 		
 		// open database connection
-		connection = DriverManager.getConnection(url, user, password);
+		this.connection = DriverManager.getConnection(url, user, password);
 		
 		// check table exist
 		final ResultSet tableSet = connection.getMetaData().getTables(connection.getCatalog(), null, "EVENT", null);
 		
 		if (!tableSet.next())
 		{
-			// missing event table create it
-			connection.prepareStatement(Contants.SCHEMA).executeUpdate();
-			logger.log(LogService.LOG_INFO, " schema creation success");
+			// missing event table: create it
+			this.connection.prepareStatement(DaoConstants.SCHEMA).executeUpdate();
+			this.logger.log(LogService.LOG_INFO, "Schema creation has been successful!");
 		}
 		
 		tableSet.close();
@@ -65,10 +65,10 @@ public class MeasureDaoImp implements MeasureDao
 	@Override
 	public void insert(String name, Measure<?, ?> value, Date timestamp) throws SQLException
 	{
-		logger.log(LogService.LOG_INFO, "insert event name: " + name + " value: " + value + " timestamp: "
+		this.logger.log(LogService.LOG_INFO, "insert event name: " + name + " value: " + value + " timestamp: "
 				+ timestamp);
 		
-		final PreparedStatement stm = connection.prepareStatement(Contants.INSERT);
+		final PreparedStatement stm = connection.prepareStatement(DaoConstants.INSERT);
 		
 		stm.setString(1, name);
 		stm.setBigDecimal(2, (BigDecimal) value.getValue());

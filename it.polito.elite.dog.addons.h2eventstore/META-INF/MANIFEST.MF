@@ -11,13 +11,10 @@ Import-Package: it.polito.elite.dog.core.library.model.notification,
  javax.measure.quantity,
  javax.measure.unit,
  org.osgi.framework;version="1.3.0",
- org.osgi.service.cm;version="1.4.0",
- org.osgi.service.component.annotations;version="1.2.0",
+ org.osgi.service.cm;version="[1.5.0,1.6.0)",
  org.osgi.service.event;version="1.3.0",
- org.osgi.service.log;version="1.3.0",
- org.osgi.util.tracker;version="1.3.1"
-Bundle-ActivationPolicy: lazy
+ org.osgi.service.log;version="1.3.0"
 Service-Component: OSGI-INF/*.xml
 Bundle-ClassPath: .,
- lib/h2-1.3.172.jar,
- lib/spchains-addon.jar
+ lib/spchains-addon.jar,
+ lib/h2-1.3.175.jar
