@@ -23,6 +23,6 @@ Import-Package: it.polito.elite.dog.core.library.model.notification,
  javax.measure.quantity,
  javax.measure.unit,
  org.osgi.framework,
- org.osgi.service.cm;version="1.3.0",
+ org.osgi.service.cm;version="1.5.0",
  org.osgi.service.event;version="1.3.0",
  org.osgi.service.log;version="1.3.0"
