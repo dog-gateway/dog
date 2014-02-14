@@ -17,7 +17,7 @@ var services = angular.module('dogUI.services', ['ngResource']);
 
 services.factory('Device', ['$resource', function($resource){
     return $resource('/api/devices', {}, {
-      get: {method:'GET', headers: {'Accept':'application/json'}}
+      get: {method:'GET', headers: {'Accept':'application/json'}, cache:true}
     });
   }]);
 
@@ -35,7 +35,7 @@ services.factory('DeviceStatus', ['$resource', function($resource){
 
 services.factory('Bundle', ['$resource', function($resource){
     return $resource('/admin/system/bundlemanager/bundles', {}, {
-      query: {method:'GET', headers: {'Accept':'application/json'}, isArray:true }
+      query: {method:'GET', headers: {'Accept':'application/json'}, isArray:true, cache:true }
     });
 }]);
 
