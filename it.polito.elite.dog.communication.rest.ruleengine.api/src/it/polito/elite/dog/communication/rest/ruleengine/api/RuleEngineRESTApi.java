@@ -32,7 +32,7 @@ import javax.ws.rs.core.MediaType;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  *
  */
-@Path("/api/rules/")
+@Path("/api/v1/rules/")
 public interface RuleEngineRESTApi
 {
 	@GET
