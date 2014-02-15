@@ -85,10 +85,8 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	private String svgPlan;
 	// the XML configuration
 	private DogHomeConfiguration xmlConfiguration;
-	// the JAXB representation of the environment
-	private List<BuildingEnvironment> buildingEnvironment;
 	// the JAXB representation of the devices without network-related info
-	private List<Controllables> externalConfiguration;
+	private List<Controllables> simpleDevicesConfiguration;
 	// the logger
 	private LogHelper logger;
 	// the JAXB context
@@ -237,10 +235,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			
 			// create the JAXB object representing the device list without their
 			// network-related properties
-			this.createExternalConfig();
-			
-			// create the JAXB building environment for further requests
-			this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
+			this.createSimpleDevicesRepresentation();
 		}
 		
 		long t2 = System.currentTimeMillis();
@@ -255,12 +250,12 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	 * Create the devices representation suitable for external usage (e.g., the
 	 * REST API), without network related informations.
 	 */
-	private synchronized void createExternalConfig()
+	private synchronized void createSimpleDevicesRepresentation()
 	{
 		// get the full device representation
-		this.externalConfiguration = this.xmlConfiguration.clone().getControllables();
+		this.simpleDevicesConfiguration = this.xmlConfiguration.clone().getControllables();
 		
-		for (Device dev : this.externalConfiguration.get(0).getDevice())
+		for (Device dev : this.simpleDevicesConfiguration.get(0).getDevice())
 		{
 			this.cleanJaxbDevice(dev);
 		}
@@ -418,7 +413,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		}
 		
 		// recreate the devices list for external usage
-		this.createExternalConfig();
+		this.createSimpleDevicesRepresentation();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -431,7 +426,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		this.updateDevice(updatedDescriptor);
 		
 		// recreate the devices list for external usage
-		this.createExternalConfig();
+		this.createSimpleDevicesRepresentation();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -447,7 +442,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		}
 		
 		// recreate the devices list for external usage
-		this.createExternalConfig();
+		this.createSimpleDevicesRepresentation();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -460,7 +455,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		this.addDevice(newDescriptor);
 		
 		// recreate the devices list for external usage
-		this.createExternalConfig();
+		this.createSimpleDevicesRepresentation();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -475,7 +470,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		}
 		
 		// recreate the devices list for external usage
-		this.createExternalConfig();
+		this.createSimpleDevicesRepresentation();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -488,7 +483,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		this.removeDevice(deviceURI);
 		
 		// recreate the devices list for external usage
-		this.createExternalConfig();
+		this.createSimpleDevicesRepresentation();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -717,7 +712,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	@Override
 	public List<Controllables> getDevices()
 	{
-		return this.externalConfiguration;
+		return this.xmlConfiguration.getControllables();
 	}
 	
 	@Override
@@ -736,9 +731,15 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	}
 	
 	@Override
+	public List<Controllables> getSimpleDevices()
+	{
+		return this.simpleDevicesConfiguration;
+	}
+	
+	@Override
 	public List<BuildingEnvironment> getBuildingEnvironment()
 	{
-		return this.buildingEnvironment;
+		return this.xmlConfiguration.getBuildingEnvironment();
 	}
 	
 	@Override
@@ -767,7 +768,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			
 			if ((added) && (removed))
 			{
-				this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 				this.saveConfiguration();
 			}
 		}
@@ -784,7 +784,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			
 			if ((added) && (removed))
 			{
-				this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 				this.saveConfiguration();
 			}
 		}
@@ -801,7 +800,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			
 			if ((added) && (removed))
 			{
-				this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 				this.saveConfiguration();
 			}
 		}
@@ -818,7 +816,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			
 			if ((added) && (removed))
 			{
-				this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 				this.saveConfiguration();
 			}
 		}
@@ -835,7 +832,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				
 				if (added)
 				{
-					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
 				}
 			}
@@ -896,7 +892,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				
 				if (added)
 				{
-					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
 				}
 			}
@@ -929,7 +924,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				
 				if (added)
 				{
-					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
 				}
 			}
@@ -962,7 +956,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				
 				if (added)
 				{
-					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
 				}
 			}
@@ -1004,7 +997,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				
 				if (removed)
 				{
-					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
 				}
 			}
@@ -1107,7 +1099,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				
 				if (removed)
 				{
-					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
 				}
 			}
@@ -1166,7 +1157,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				
 				if (removed)
 				{
-					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
 				}
 			}

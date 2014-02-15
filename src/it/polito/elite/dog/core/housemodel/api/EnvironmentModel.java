@@ -47,7 +47,7 @@ public interface EnvironmentModel
 	 * representation needs to be modified.
 	 * </p>
 	 * 
-	 * @return a dedicated copy of {@link List} of {@link BuildingEnvironment},
+	 * @return a {@link List} of {@link BuildingEnvironment},
 	 *         i.e., all the building-related environments (flats, rooms, etc.)
 	 */
 	public List<BuildingEnvironment> getBuildingEnvironment();

@@ -112,16 +112,19 @@ public interface HouseModel
 	/**
 	 * <p>
 	 * Get the JAXB representation of the devices present in the environment,
-	 * without their network-related properties.
+	 * with all their properties.
 	 * </p>
+	 * 
 	 * <p>
-	 * This method returns a shallow copy of the JAXB devices present in Dog
-	 * and, for this reason, MUST NOT be used when the JAXB devices
-	 * representation needs to be modified.
+	 * This method is equivalent to {@link getJAXBDevices()} but returns a
+	 * shallow copy of the JAXB devices present in Dog and, for this reason, it
+	 * is faster.<br/>
+	 * This method MUST NOT be used when the JAXB devices representation needs
+	 * to be modified.
 	 * </p>
 	 * 
 	 * @return a {@link List} of {@link Controllables}, i.e., all the configured
-	 *         devices without the network-related properties.
+	 *         devices with their properties.
 	 */
 	public List<Controllables> getDevices();
 	
@@ -132,8 +135,8 @@ public interface HouseModel
 	 * </p>
 	 * 
 	 * <p>
-	 * This method returns a deep copy of the JAXB devices present in the
-	 * environment and, for this reason, it is slow.<br/>
+	 * This method is equivalent to {@link getDevices()} but returns a deep copy
+	 * of the JAXB devices present in Dog and, for this reason, it is slower.<br/>
 	 * This method MUST be used when the JAXB devices representation needs to be
 	 * modified.
 	 * </p>
@@ -142,4 +145,21 @@ public interface HouseModel
 	 *         all the configured devices with their properties.
 	 */
 	public List<Controllables> getJAXBDevices();
+	
+	/**
+	 * <p>
+	 * Get the JAXB representation of the devices present in the environment,
+	 * without their network-related properties, suitable for end-user
+	 * visualizations.
+	 * </p>
+	 * <p>
+	 * This method returns a shallow copy of the JAXB devices present in Dog
+	 * and, for this reason, MUST NOT be used when the JAXB devices
+	 * representation needs to be modified.
+	 * </p>
+	 * 
+	 * @return a {@link List} of {@link Controllables}, i.e., all the configured
+	 *         devices without the network-related properties.
+	 */
+	public List<Controllables> getSimpleDevices();
 }
