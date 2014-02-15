@@ -50,7 +50,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-@Path("/api/environment/")
+@Path("/api/v1/environment/")
 public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 {
 	// the service logger
