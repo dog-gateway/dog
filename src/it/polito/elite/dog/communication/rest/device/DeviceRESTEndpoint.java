@@ -283,7 +283,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		if (this.houseModel.get() != null)
 		{
 			// get all the devices from the HouseModel
-			Controllables controllables = this.houseModel.get().getDevices().get(0);
+			Controllables controllables = this.houseModel.get().getSimpleDevices().get(0);
 			
 			dhc.getControllables().add(controllables);
 		}
@@ -369,7 +369,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			Controllables controllables = factory.createControllables();
 			
 			// get the desired device from the HouseModel service
-			for (Device device : this.houseModel.get().getDevices().get(0).getDevice())
+			for (Device device : this.houseModel.get().getSimpleDevices().get(0).getDevice())
 			{
 				if (device.getId().equalsIgnoreCase(deviceId))
 				{	
