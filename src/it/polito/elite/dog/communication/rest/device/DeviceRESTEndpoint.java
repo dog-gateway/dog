@@ -19,23 +19,17 @@ package it.polito.elite.dog.communication.rest.device;
 
 import it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi;
 import it.polito.elite.dog.communication.rest.device.command.ClimateSchedulePayload;
+import it.polito.elite.dog.communication.rest.device.command.CommandPayload;
 import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedulePayload;
 import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
 import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
-import it.polito.elite.dog.communication.rest.device.command.CommandPayload;
 import it.polito.elite.dog.communication.rest.device.status.AllDeviceStatesResponsePayload;
 import it.polito.elite.dog.communication.rest.device.status.DeviceStateResponsePayload;
 import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
-import it.polito.elite.dog.core.library.jaxb.Configcommand;
-import it.polito.elite.dog.core.library.jaxb.Confignotification;
-import it.polito.elite.dog.core.library.jaxb.Configparam;
-import it.polito.elite.dog.core.library.jaxb.Configstate;
-import it.polito.elite.dog.core.library.jaxb.ControlFunctionality;
 import it.polito.elite.dog.core.library.jaxb.Controllables;
 import it.polito.elite.dog.core.library.jaxb.Device;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
-import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
@@ -50,7 +44,6 @@ import it.polito.elite.dog.core.library.util.LogHelper;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicReference;
@@ -290,15 +283,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		if (this.houseModel.get() != null)
 		{
 			// get all the devices from the HouseModel
-			Controllables controllables = this.houseModel.get().getJAXBDevices().get(0);
-			
-			for (Device device : controllables.getDevice())
-			{
-				// create the JAXB representation to be sent to external
-				// applications: it removes all the network-specific
-				// parameters
-				this.cleanJaxbDevice(device);
-			}
+			Controllables controllables = this.houseModel.get().getDevices().get(0);
 			
 			dhc.getControllables().add(controllables);
 		}
@@ -384,15 +369,10 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			Controllables controllables = factory.createControllables();
 			
 			// get the desired device from the HouseModel service
-			for (Device device : this.houseModel.get().getJAXBDevices().get(0).getDevice())
+			for (Device device : this.houseModel.get().getDevices().get(0).getDevice())
 			{
 				if (device.getId().equalsIgnoreCase(deviceId))
-				{
-					// create the JAXB representation to be sent to external
-					// applications: it removes all the network-specific
-					// parameters
-					this.cleanJaxbDevice(device);
-					
+				{	
 					// add the device to its container
 					controllables.getDevice().add(device);
 				}
@@ -844,93 +824,6 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		
 	}
 	
-	/**
-	 * Prepare the JAXB Device to contain the proper information for external
-	 * applications. It removes all the network-related properties and hides
-	 * some redundant arrays for the JSON serialization.
-	 * 
-	 * @param device
-	 *            the "full" JAXB Device to clean
-	 */
-	private void cleanJaxbDevice(Device device)
-	{
-		// store the parameters to be removed from the current device
-		Vector<Configparam> paramsToRemove = new Vector<Configparam>();
-		
-		// remove all the "first-level" params, since they are network-related
-		device.getParam().clear();
-		
-		// clean the description field
-		String description = device.getDescription().trim();
-		description = description.replaceAll("\t", "");
-		description = description.replaceAll("\n", " ");
-		device.setDescription(description);
-		
-		// get all the control functionalites...
-		List<ControlFunctionality> controlFunctionalities = device.getControlFunctionality();
-		for (ControlFunctionality controlFunctionality : controlFunctionalities)
-		{
-			// get all the commands
-			for (Configcommand command : controlFunctionality.getCommands().getCommand())
-			{
-				for (Configparam param : command.getParam())
-				{
-					// get all the command parameters to remove
-					// (network-related), i.e., preserve only the
-					// "realCommandName" prop
-					if (!param.getName().equalsIgnoreCase("realCommandName"))
-					{
-						paramsToRemove.add(param);
-					}
-				}
-				// effectively remove the parameters
-				for (Configparam param : paramsToRemove)
-				{
-					command.getParam().remove(param);
-				}
-				paramsToRemove.clear();
-			}
-			
-			// improve JSON rendering by hiding a redundant array
-			controlFunctionality.setCommandList(controlFunctionality.getCommands().getCommand());
-		}
-		
-		// get all the notification functionalities...
-		List<NotificationFunctionality> notificationsFunctionalities = device.getNotificationFunctionality();
-		for (NotificationFunctionality notificationFunctionality : notificationsFunctionalities)
-		{
-			// get all the notifications...
-			for (Confignotification notification : notificationFunctionality.getNotifications().getNotification())
-			{
-				for (Configparam param : notification.getParam())
-				{
-					// get all the notification parameters to remove
-					// (network-related), i.e., preserve only the
-					// "notificationName" and "notificationParamName" props
-					if ((!param.getName().equalsIgnoreCase("notificationName"))
-							&& (!param.getName().equalsIgnoreCase("notificationParamName")))
-					{
-						paramsToRemove.add(param);
-					}
-				}
-				// effectively remove the parameters
-				for (Configparam param : paramsToRemove)
-				{
-					notification.getParam().remove(param);
-				}
-				paramsToRemove.clear();
-			}
-			
-			// improve JSON rendering by hiding a redundant array
-			notificationFunctionality.setNotificationList(notificationFunctionality.getNotifications()
-					.getNotification());
-		}
-		
-		// improve JSON rendering by hiding a redundant array for states
-		for (Configstate status : device.getState())
-			status.setStatevalueList(status.getStatevalues().getStatevalue());
-		
-	}
 	
 	/**
 	 * Generate the XML to be sent
