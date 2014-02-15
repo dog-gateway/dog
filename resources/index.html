@@ -55,10 +55,10 @@
               <a href="#/home"><span class="glyphicon glyphicon-dashboard"></span> Overview</a>
               </li>
             <li ng-class="{ active: isActive('/devices') }">
-              <a href="#/devices"><span class="fa fa-lightbulb-o fa-lg"></span> Devices <span class="badge pull-right" ng-controller="FrameworkCtrl">{{data.devices.stats.active}}</span></a>
+              <a href="#/devices"><span class="fa fa-lightbulb-o fa-lg"></span> Devices <span class="badge pull-right" ng-controller="FrameworkCtrl" ng-cloak>{{data.devices.stats.active}}</span></a>
               </li>
             <li ng-class="{ active: isActive('/components') }">
-              <a href="#/components"><span class="glyphicon glyphicon-th-list"></span> Components <span class="badge pull-right" ng-controller="FrameworkCtrl">{{data.bundles.stats.active}}</span></a>
+              <a href="#/components"><span class="glyphicon glyphicon-th-list"></span> Components <span class="badge pull-right" ng-controller="FrameworkCtrl" ng-cloak>{{data.bundles.stats.active}}</span></a>
             </li>
           </ul>
         </div>
