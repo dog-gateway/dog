@@ -78,7 +78,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-@Path("/api/devices/")
+@Path("/api/v1/devices/")
 public class DeviceRESTEndpoint implements DeviceRESTApi
 {
 	// the service logger
