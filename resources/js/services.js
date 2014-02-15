@@ -16,19 +16,19 @@ Default ngResources are defined as
 var services = angular.module('dogUI.services', ['ngResource']);
 
 services.factory('Device', ['$resource', function($resource){
-    return $resource('/api/devices', {}, {
+    return $resource('/api/v1/devices', {}, {
       get: {method:'GET', headers: {'Accept':'application/json'}, cache:true}
     });
   }]);
 
 services.factory('DeviceCmd', ['$resource', function($resource){
-return $resource('/api/devices/:id/commands/:command', {id:"@id", command: "@command"}, {
+return $resource('/api/v1/devices/:id/commands/:command', {id:"@id", command: "@command"}, {
     update: {method:'PUT'}
   });
 }]);
 
 services.factory('DeviceStatus', ['$resource', function($resource){
-    return $resource('/api/devices/status', {}, {
+    return $resource('/api/v1/devices/status', {}, {
       get: {method:'GET', headers: {'Accept':'application/json'}}
     });
   }]);
