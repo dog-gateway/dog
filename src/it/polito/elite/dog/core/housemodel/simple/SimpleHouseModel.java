@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  * 
- * Copyright (c) 2010-2013 Dario Bonino, Luigi De Russis and Emiliano Castellina
+ * Copyright (c) 2010-2014 Dario Bonino, Luigi De Russis and Emiliano Castellina
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,16 @@ import it.polito.elite.dog.core.housemodel.api.EnvironmentModel;
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.library.jaxb.Building;
 import it.polito.elite.dog.core.library.jaxb.BuildingEnvironment;
+import it.polito.elite.dog.core.library.jaxb.Configcommand;
+import it.polito.elite.dog.core.library.jaxb.Confignotification;
+import it.polito.elite.dog.core.library.jaxb.Configparam;
+import it.polito.elite.dog.core.library.jaxb.Configstate;
+import it.polito.elite.dog.core.library.jaxb.ControlFunctionality;
 import it.polito.elite.dog.core.library.jaxb.Controllables;
 import it.polito.elite.dog.core.library.jaxb.Device;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.jaxb.Flat;
+import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.jaxb.Room;
 import it.polito.elite.dog.core.library.jaxb.Storey;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
@@ -49,10 +55,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.namespace.QName;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -81,6 +85,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	private String svgPlan;
 	// the XML configuration
 	private DogHomeConfiguration xmlConfiguration;
+	// the JAXB representation of the environment
+	private List<BuildingEnvironment> buildingEnvironment;
+	// the JAXB representation of the devices without network-related info
+	private List<Controllables> externalConfiguration;
 	// the logger
 	private LogHelper logger;
 	// the JAXB context
@@ -180,7 +188,8 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	}
 	
 	/**
-	 * Load and parse the XML configuration of the current environment.
+	 * Load and parse the XML configuration of the current environment. It also
+	 * fill all the data structures that depends from the XML configuration.
 	 * 
 	 * @param xmlFilename
 	 *            the XML file storing the configuration
@@ -192,6 +201,8 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	 */
 	private boolean loadXmlConfiguration(String xmlFilename, String type)
 	{
+		long t1 = System.currentTimeMillis();
+		
 		try
 		{
 			this.jaxbContext = JAXBContext.newInstance(DogHomeConfiguration.class.getPackage().getName());
@@ -201,13 +212,11 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			{
 				// store the configuration path
 				this.configurationPath = xmlFilename;
-			
+				
 				// check absolute vs relative
-				File xmlFile = new File(
-						this.configurationPath);
+				File xmlFile = new File(this.configurationPath);
 				if (!xmlFile.isAbsolute())
-					this.configurationPath = System.getProperty("configFolder")
-							+ "/" + this.configurationPath;		
+					this.configurationPath = System.getProperty("configFolder") + "/" + this.configurationPath;
 				
 				// unmarshall
 				this.xmlConfiguration = (DogHomeConfiguration) ((JAXBElement<DogHomeConfiguration>) unmarshaller
@@ -220,16 +229,128 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			this.logger.log(LogService.LOG_ERROR, "JAXB Error", e);
 		}
 		
-		long t1 = System.currentTimeMillis();
-		
-		// create a DeviceDescriptor-based representation of current XML
-		// configuration
-		this.createDeviceDescriptors();
+		if (this.xmlConfiguration != null)
+		{
+			// create a DeviceDescriptor-based representation of current XML
+			// configuration
+			this.createDeviceDescriptors();
+			
+			// create the JAXB object representing the device list without their
+			// network-related properties
+			this.createExternalConfig();
+			
+			// create the JAXB building environment for further requests
+			this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
+		}
 		
 		long t2 = System.currentTimeMillis();
-		this.logger.log(LogService.LOG_INFO, String.format("Parsing time: JAXB %.2f s\n", (float) (t2 - t1) / 1000f));
+		this.logger.log(LogService.LOG_INFO,
+				String.format("Parsing and init time: %.2f s\n", (float) (t2 - t1) / 1000f));
 		
 		return this.deviceList.size() > 0;
+		
+	}
+	
+	/**
+	 * Create the devices representation suitable for external usage (e.g., the
+	 * REST API), without network related informations.
+	 */
+	private synchronized void createExternalConfig()
+	{
+		// get the full device representation
+		this.externalConfiguration = this.xmlConfiguration.clone().getControllables();
+		
+		for (Device dev : this.externalConfiguration.get(0).getDevice())
+		{
+			this.cleanJaxbDevice(dev);
+		}
+	}
+	
+	/**
+	 * Prepare the JAXB Device to contain the proper information for external
+	 * applications. It removes all the network-related properties and hides
+	 * some redundant arrays for the JSON serialization.
+	 * 
+	 * @param device
+	 *            the "full" JAXB Device to clean
+	 */
+	private synchronized void cleanJaxbDevice(Device device)
+	{
+		// store the parameters to be removed from the current device
+		Vector<Configparam> paramsToRemove = new Vector<Configparam>();
+		
+		// remove all the "first-level" params, since they are network-related
+		device.getParam().clear();
+		
+		// clean the description field
+		String description = device.getDescription().trim();
+		description = description.replaceAll("\t", "");
+		description = description.replaceAll("\n", " ");
+		device.setDescription(description);
+		
+		// get all the control functionalites...
+		List<ControlFunctionality> controlFunctionalities = device.getControlFunctionality();
+		for (ControlFunctionality controlFunctionality : controlFunctionalities)
+		{
+			// get all the commands
+			for (Configcommand command : controlFunctionality.getCommands().getCommand())
+			{
+				for (Configparam param : command.getParam())
+				{
+					// get all the command parameters to remove
+					// (network-related), i.e., preserve only the
+					// "realCommandName" prop
+					if (!param.getName().equalsIgnoreCase("realCommandName"))
+					{
+						paramsToRemove.add(param);
+					}
+				}
+				// effectively remove the parameters
+				for (Configparam param : paramsToRemove)
+				{
+					command.getParam().remove(param);
+				}
+				paramsToRemove.clear();
+			}
+			
+			// improve non-XML rendering by creating a redundant array
+			controlFunctionality.setCommandList(controlFunctionality.getCommands().getCommand());
+		}
+		
+		// get all the notification functionalities...
+		List<NotificationFunctionality> notificationsFunctionalities = device.getNotificationFunctionality();
+		for (NotificationFunctionality notificationFunctionality : notificationsFunctionalities)
+		{
+			// get all the notifications...
+			for (Confignotification notification : notificationFunctionality.getNotifications().getNotification())
+			{
+				for (Configparam param : notification.getParam())
+				{
+					// get all the notification parameters to remove
+					// (network-related), i.e., preserve only the
+					// "notificationName" and "notificationParamName" props
+					if ((!param.getName().equalsIgnoreCase("notificationName"))
+							&& (!param.getName().equalsIgnoreCase("notificationParamName")))
+					{
+						paramsToRemove.add(param);
+					}
+				}
+				// effectively remove the parameters
+				for (Configparam param : paramsToRemove)
+				{
+					notification.getParam().remove(param);
+				}
+				paramsToRemove.clear();
+			}
+			
+			// improve non-XML rendering by creating a redundant array
+			notificationFunctionality.setNotificationList(notificationFunctionality.getNotifications()
+					.getNotification());
+		}
+		
+		// improve non-XML rendering by creating a redundant array for states
+		for (Configstate status : device.getState())
+			status.setStatevalueList(status.getStatevalues().getStatevalue());
 		
 	}
 	
@@ -239,29 +360,27 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	 */
 	private void createDeviceDescriptors()
 	{
-		if (this.xmlConfiguration != null)
+		
+		for (Device dev : this.xmlConfiguration.getControllables().get(0).getDevice())
 		{
-			for (Device dev : this.xmlConfiguration.getControllables().get(0).getDevice())
-			{
-				DeviceDescriptor currentDescriptor = new DeviceDescriptor(dev);
-				
-				// add the Device Descriptor to the device list
-				this.deviceList.put(currentDescriptor.getDeviceURI(), currentDescriptor);
-				
-				// add the element to the map that stores information grouped by
-				// Device Category
-				HashSet<String> devicesForDevCategory = this.deviceCategoriesUriList.get(currentDescriptor
-						.getDeviceCategory());
-				// category does not exist yet...
-				if (devicesForDevCategory == null)
-				{
-					devicesForDevCategory = new HashSet<String>();
-					this.deviceCategoriesUriList.put(currentDescriptor.getDeviceCategory(), devicesForDevCategory);
-				}
-				devicesForDevCategory.add(currentDescriptor.getDeviceURI());
-			}
+			DeviceDescriptor currentDescriptor = new DeviceDescriptor(dev);
 			
+			// add the Device Descriptor to the device list
+			this.deviceList.put(currentDescriptor.getDeviceURI(), currentDescriptor);
+			
+			// add the element to the map that stores information grouped by
+			// Device Category
+			HashSet<String> devicesForDevCategory = this.deviceCategoriesUriList.get(currentDescriptor
+					.getDeviceCategory());
+			// category does not exist yet...
+			if (devicesForDevCategory == null)
+			{
+				devicesForDevCategory = new HashSet<String>();
+				this.deviceCategoriesUriList.put(currentDescriptor.getDeviceCategory(), devicesForDevCategory);
+			}
+			devicesForDevCategory.add(currentDescriptor.getDeviceURI());
 		}
+		
 		// final log
 		this.logger.log(LogService.LOG_INFO,
 				String.format("SimpleHouseModel contains %d device descriptions.", this.deviceList.size()));
@@ -298,6 +417,9 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			this.updateDevice(descriptor);
 		}
 		
+		// recreate the devices list for external usage
+		this.createExternalConfig();
+		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
 	}
@@ -307,6 +429,9 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	{
 		// update the device present in the configuration
 		this.updateDevice(updatedDescriptor);
+		
+		// recreate the devices list for external usage
+		this.createExternalConfig();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -321,6 +446,9 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			this.addDevice(descriptor);
 		}
 		
+		// recreate the devices list for external usage
+		this.createExternalConfig();
+		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
 	}
@@ -330,6 +458,9 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	{
 		// insert the device in the configuration
 		this.addDevice(newDescriptor);
+		
+		// recreate the devices list for external usage
+		this.createExternalConfig();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -343,6 +474,9 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			this.removeDevice(device);
 		}
 		
+		// recreate the devices list for external usage
+		this.createExternalConfig();
+		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
 	}
@@ -352,6 +486,9 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	{
 		// remove the given device from the configuration
 		this.removeDevice(deviceURI);
+		
+		// recreate the devices list for external usage
+		this.createExternalConfig();
 		
 		// write a new XML configuration file on disk
 		this.saveConfiguration();
@@ -364,7 +501,7 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	 * @param updatedDescriptor
 	 *            the {@link DeviceDescriptor} representing the device to update
 	 */
-	private void updateDevice(DeviceDescriptor updatedDescriptor)
+	private synchronized void updateDevice(DeviceDescriptor updatedDescriptor)
 	{
 		// remove the device from the current configuration
 		this.removeDevice(updatedDescriptor.getDeviceURI());
@@ -578,59 +715,40 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 	}
 	
 	@Override
+	public List<Controllables> getDevices()
+	{
+		return this.externalConfiguration;
+	}
+	
+	@Override
 	public List<Controllables> getJAXBDevices()
 	{
 		List<Controllables> devices = new ArrayList<Controllables>();
 		
 		if ((this.xmlConfiguration != null) && (!this.xmlConfiguration.getControllables().isEmpty()))
 		{
-			try
-			{
-				// deep copy
-				// TODO Implement as clone() for better performance (look for a
-				// plugin on the Internet... it exists!)
-				JAXBElement<DogHomeConfiguration> contentObj = new JAXBElement<DogHomeConfiguration>(new QName(
-						DogHomeConfiguration.class.getSimpleName()), DogHomeConfiguration.class, this.xmlConfiguration);
-				JAXBSource source = new JAXBSource(this.jaxbContext, contentObj);
-				// marshall the JAXBSource to obtain a deep copy
-				devices.addAll((jaxbContext.createUnmarshaller().unmarshal(source, DogHomeConfiguration.class)
-						.getValue()).getControllables());
-			}
-			catch (JAXBException e)
-			{
-				this.logger.log(LogService.LOG_ERROR, "Exception in cloning the XML configuration", e);
-			}
+			devices = this.xmlConfiguration.clone().getControllables();
 		}
 		
 		// return all the devices with their properties, in their JAXB
 		// representation
 		return devices;
-		
 	}
 	
 	@Override
-	public List<BuildingEnvironment> getJAXBBuildingEnvironment()
+	public List<BuildingEnvironment> getBuildingEnvironment()
+	{
+		return this.buildingEnvironment;
+	}
+	
+	@Override
+	public List<BuildingEnvironment> getJAXBEnvironment()
 	{
 		List<BuildingEnvironment> building = new ArrayList<BuildingEnvironment>();
 		
 		if ((this.xmlConfiguration != null) && (!this.xmlConfiguration.getBuildingEnvironment().isEmpty()))
 		{
-			try
-			{
-				// deep copy
-				// TODO Implement as clone() for better performance (look for a
-				// plugin on the Internet... it exists!)
-				JAXBElement<DogHomeConfiguration> contentObj = new JAXBElement<DogHomeConfiguration>(new QName(
-						DogHomeConfiguration.class.getSimpleName()), DogHomeConfiguration.class, this.xmlConfiguration);
-				JAXBSource source = new JAXBSource(this.jaxbContext, contentObj);
-				// marshall the JAXBSource to obtain a deep copy
-				building.addAll((jaxbContext.createUnmarshaller().unmarshal(source, DogHomeConfiguration.class)
-						.getValue()).getBuildingEnvironment());
-			}
-			catch (JAXBException e)
-			{
-				this.logger.log(LogService.LOG_ERROR, "Exception in cloning the XML configuration", e);
-			}
+			building = this.xmlConfiguration.clone().getBuildingEnvironment();
 		}
 		
 		// return the building structures (flats, rooms, etc.) in their JAXB
@@ -648,7 +766,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			boolean added = this.addRoom(roomToUpdate, containerURI);
 			
 			if ((added) && (removed))
+			{
+				this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 				this.saveConfiguration();
+			}
 		}
 	}
 	
@@ -662,7 +783,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			boolean added = this.addFlat(flatToUpdate);
 			
 			if ((added) && (removed))
+			{
+				this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 				this.saveConfiguration();
+			}
 		}
 	}
 	
@@ -676,7 +800,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			boolean added = this.addFlat(flatToUpdate, storeyURI);
 			
 			if ((added) && (removed))
+			{
+				this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 				this.saveConfiguration();
+			}
 		}
 	}
 	
@@ -690,7 +817,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			boolean added = this.addStorey(storeyToUpdate);
 			
 			if ((added) && (removed))
+			{
+				this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 				this.saveConfiguration();
+			}
 		}
 	}
 	
@@ -704,7 +834,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				boolean added = this.addRoom(roomToAdd, containerURI);
 				
 				if (added)
+				{
+					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
+				}
 			}
 		}
 	}
@@ -762,7 +895,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				boolean added = this.addFlat(flatToAdd);
 				
 				if (added)
+				{
+					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
+				}
 			}
 		}
 	}
@@ -792,7 +928,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				boolean added = this.addStorey(storeyToAdd);
 				
 				if (added)
+				{
+					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
+				}
 			}
 		}
 	}
@@ -822,7 +961,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				boolean added = this.addFlat(flatToAdd, storeyURI);
 				
 				if (added)
+				{
+					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
+				}
 			}
 		}
 	}
@@ -861,7 +1003,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				boolean removed = this.removeRoom(roomURI, containerURI);
 				
 				if (removed)
+				{
+					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
+				}
 			}
 		}
 	}
@@ -961,7 +1106,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				boolean removed = this.removeFlat(flatURI);
 				
 				if (removed)
+				{
+					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
+				}
 			}
 		}
 	}
@@ -1017,7 +1165,10 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				boolean removed = this.removeStorey(storeyURI);
 				
 				if (removed)
+				{
+					this.buildingEnvironment = this.xmlConfiguration.clone().getBuildingEnvironment();
 					this.saveConfiguration();
+				}
 			}
 		}
 		
@@ -1092,4 +1243,5 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		
 		return buffer.toString();
 	}
+	
 }

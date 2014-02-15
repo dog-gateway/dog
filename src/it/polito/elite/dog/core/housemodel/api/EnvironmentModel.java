@@ -35,13 +35,40 @@ import java.util.List;
 public interface EnvironmentModel
 {
 	/**
-	 * Get a copy of the JAXB representation of the building environment (flats,
-	 * rooms, etc.)
+	 * <p>
+	 * Get the JAXB representation of the building environment (flats, rooms,
+	 * etc.)
+	 * <p>
+	 * <p>
+	 * This method is equivalent to {@link getJAXBEnvironment()} but returns a
+	 * shallow copy of the JAXB building environment present in Dog and, for
+	 * this reason, it is faster.<br/>
+	 * This method MUST NOT be used when the JAXB building environment
+	 * representation needs to be modified.
+	 * </p>
 	 * 
-	 * @return a {@link List} of {@link BuildingEnvironment}, i.e., all the
-	 *         building-related environments (flats, rooms, etc.)
+	 * @return a dedicated copy of {@link List} of {@link BuildingEnvironment},
+	 *         i.e., all the building-related environments (flats, rooms, etc.)
 	 */
-	public List<BuildingEnvironment> getJAXBBuildingEnvironment();
+	public List<BuildingEnvironment> getBuildingEnvironment();
+	
+	/**
+	 * <p>
+	 * Get a deep copy of the JAXB representation of the building environment
+	 * (flats, rooms, etc.)
+	 * <p>
+	 * <p>
+	 * This method is equivalent to {@link getBuildingEnvironment()} but returns
+	 * a deep copy of the JAXB building environment present in Dog and, for this
+	 * reason, it is slower.<br/>
+	 * This method MUST be used when the JAXB building environment
+	 * representation needs to be modified.
+	 * </p>
+	 * 
+	 * @return a dedicated copy of {@link List} of {@link BuildingEnvironment},
+	 *         i.e., all the building-related environments (flats, rooms, etc.)
+	 */
+	public List<BuildingEnvironment> getJAXBEnvironment();
 	
 	/**
 	 * Get the SVG house plan.
