@@ -146,8 +146,8 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	 */
 	public RuleEngine()
 	{
-		// intentionally left empty
-		// System.err.println("Created an instance of RuleEngine");
+		// initialize atomic references
+		this.monitorAdmin = new AtomicReference<MonitorAdmin>();
 	}
 	
 	public void activate(BundleContext context)
