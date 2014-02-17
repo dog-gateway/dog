@@ -32,6 +32,7 @@ dogUIController.controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'D
           $scope.data.devices[devicesList.devices[num].id] = currentDevice;
           // assume all devices active
           $scope.data.devices[devicesList.devices[num].id].active = true;
+          $scope.data.available.devices = true;
       }
         
       //set the initial status... a promise inside a promise...
@@ -39,7 +40,6 @@ dogUIController.controller('DeviceCtrl', ['$scope', 'Device', 'DeviceStatus', 'D
         for(var num in deviceStatus.devicesStatus) {
           // associate the active/idle information to the proper device
           $scope.data.devices[deviceStatus.devicesStatus[num].id].active = deviceStatus.devicesStatus[num].active;
-          $scope.data.available.devices = true;
           
           var status = {};
           // remove 'State' and 'MeasurementState' from the status or rename 'OnOffState'
