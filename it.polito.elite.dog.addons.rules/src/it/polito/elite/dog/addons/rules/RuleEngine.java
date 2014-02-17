@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.unit.Unit;
@@ -104,7 +105,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	public static final String logId = "[RuleEngine]: ";
 	
 	/** Reference to the MonitorAdmin */
-	private MonitorAdmin monitorAdmin;
+	private AtomicReference<MonitorAdmin> monitorAdmin;
 	
 	/** Reference to the registration of the DogRulesService */
 	private ServiceRegistration<?> srDogRulesService;
@@ -827,7 +828,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	{
 		Object returningState = new Object();
 		// Get the status variable with path "deviceURI/status"
-		StatusVariable deviceStatusVariable = monitorAdmin.getStatusVariable(AbstractDevice.toMonitorableId(deviceURI) + "/status");
+		StatusVariable deviceStatusVariable = monitorAdmin.get().getStatusVariable(AbstractDevice.toMonitorableId(deviceURI) + "/status");
 		DeviceStatus currentDeviceStatus;
 		try
 		{
@@ -952,7 +953,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	public void addedMonitorAdmin(MonitorAdmin monitorAdmin)
 	{
 		// assign the new reference to the local object
-		this.monitorAdmin = monitorAdmin;
+		this.monitorAdmin.set(monitorAdmin);
 		
 		// check whether the bundle could register provided services
 		this.checkAndRegisterServices();
@@ -965,8 +966,9 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	 */
 	public void removedMonitorAdmin(MonitorAdmin monitorAdmin)
 	{
-		// unregister
-		this.unregisterServices();
+		if(this.monitorAdmin.compareAndSet(monitorAdmin, null))
+			// unregister
+			this.unregisterServices();
 		
 		// TODO remove/clean inner data structures
 	}
