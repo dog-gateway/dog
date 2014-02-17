@@ -993,7 +993,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 	 */
 	private void checkAndRegisterServices()
 	{
-		if (this.monitorAdmin != null /* && this.scheduler != null */&& this.context != null)
+		if (this.monitorAdmin.get() != null /* && this.scheduler != null */&& this.context != null)
 		{ // all the needed services are up and running?
 		
 			// if the needed services have been matched and the rule base has
