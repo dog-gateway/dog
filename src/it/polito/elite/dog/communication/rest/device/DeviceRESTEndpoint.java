@@ -57,8 +57,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.DataBindingException;
-import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -100,6 +101,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	// the instance-level mapper
 	private ObjectMapper mapper;
 	
+	// the JAXB context
+	private JAXBContext jaxbContext;
+	
 	/**
 	 * Constructor
 	 */
@@ -110,6 +114,16 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		
 		// init the device factory atomic reference
 		this.deviceFactory = new AtomicReference<DeviceFactory>();
+		
+		// init JAXB Context
+		try
+		{
+			this.jaxbContext = JAXBContext.newInstance(DogHomeConfiguration.class.getPackage().getName());
+		}
+		catch (JAXBException e)
+		{
+			this.logger.log(LogService.LOG_ERROR, "JAXB Init Error", e);
+		}
 		
 		// init the set of allowed payloads
 		this.payloads = new Vector<Class<? extends CommandPayload<?>>>();
@@ -372,7 +386,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			for (Device device : this.houseModel.get().getSimpleDevices().get(0).getDevice())
 			{
 				if (device.getId().equalsIgnoreCase(deviceId))
-				{	
+				{
 					// add the device to its container
 					controllables.getDevice().add(device);
 				}
@@ -824,7 +838,6 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		
 	}
 	
-	
 	/**
 	 * Generate the XML to be sent
 	 * 
@@ -836,19 +849,25 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		String devicesXML = "";
 		
-		try
+		if (this.jaxbContext != null)
 		{
-			StringWriter output = new StringWriter();
-			
-			// marshall the DogHomeConfiguration...
-			JAXB.marshal(dhc, output);
-			
-			devicesXML = output.getBuffer().toString();
-		}
-		catch (DataBindingException e)
-		{
-			// the exception can be throw by the JAXB.marshal method...
-			this.logger.log(LogService.LOG_ERROR, "Exception in JAXB Marshalling...", e);
+			try
+			{
+				StringWriter output = new StringWriter();
+				
+				// marshall the DogHomeConfiguration...
+				Marshaller marshaller = jaxbContext.createMarshaller();
+				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+				
+				marshaller.marshal(dhc, output);
+				
+				devicesXML = output.getBuffer().toString();
+			}
+			catch (JAXBException e)
+			{
+				// the exception can be throw by the JAXB.marshal method...
+				this.logger.log(LogService.LOG_ERROR, "Exception in JAXB Marshalling...", e);
+			}
 		}
 		
 		return devicesXML;
