@@ -608,7 +608,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	 */
 	private String generateXML(DogHomeConfiguration dhc)
 	{
-		String devicesXML = "";
+		String environmentXML = "";
 		
 		if (this.jaxbContext != null)
 		{
@@ -622,7 +622,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 				
 				marshaller.marshal(dhc, output);
 				
-				devicesXML = output.getBuffer().toString();
+				environmentXML = output.getBuffer().toString();
 			}
 			catch (JAXBException e)
 			{
@@ -631,7 +631,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			}
 		}
 		
-		return devicesXML;
+		return environmentXML;
 	}
 	
 }
