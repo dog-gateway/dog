@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: it.polito.elite.dog.drivers.bticino.network
+Bundle-SymbolicName: it.polito.elite.dog.drivers.bticino.network;singleton:=true
+Bundle-Version: 0.9.0.pre
+Bundle-Activator: it.polito.elite.dog.drivers.bticino.network.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: it.polito.elite.dog.core.library.util,
+ org.osgi.framework;version="1.3.0",
+ org.osgi.service.cm;version="1.5.0",
+ org.osgi.service.log;version="1.3.0"
+Export-Package: com.bticino.core,
+ it.polito.elite.dog.drivers.bticino.interfaces
+Bundle-ClassPath: .,
+ lib/gestPassword.jar
