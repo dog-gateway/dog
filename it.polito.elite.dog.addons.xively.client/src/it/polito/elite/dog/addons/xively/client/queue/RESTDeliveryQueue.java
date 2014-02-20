@@ -1,13 +1,19 @@
 /*
- * Dog 2.0 - Addons
+ * Dog - Addons
  * 
- * Copyright [2012]
- * [Dario Bonino (dario.bonino@polito.it), Politecnico di Torino]
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and limitations under the License. 
+ * Copyright (c) 2012-2014 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.addons.xively.client.queue;
 
@@ -26,7 +32,8 @@ import com.xively.client.XivelyService;
 import com.xively.client.model.Datastream;
 
 /**
- * @author bonino
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
 public class RESTDeliveryQueue extends Thread
@@ -268,17 +275,18 @@ public class RESTDeliveryQueue extends Thread
 			// send the data
 			if (this.mediaType.toString().equals(MediaType.APPLICATION_XML))
 			{
-				//cheng the app config
+				// cheng the app config
 				AppConfig appConfig = AppConfig.getInstance();
 				
 				appConfig.setResponseMediaType(AcceptedMediaType.xml);
 			}
 			
 			// debug
-			this.logger.log(LogService.LOG_DEBUG, RESTDeliveryQueue.logId + "Sending to feed "+data.getFeed()+", datatstream"+data.getDatastreamId()+" data: "
-					+ data.toString());
+			this.logger.log(LogService.LOG_DEBUG, RESTDeliveryQueue.logId + "Sending to feed " + data.getFeed()
+					+ ", datatstream" + data.getDatastreamId() + " data: " + data.toString());
 			
-			// create the data stream object representing the datastream to updated
+			// create the data stream object representing the datastream to
+			// updated
 			Datastream ds = new Datastream();
 			
 			// set the id to match the datastream to update on xively
@@ -287,12 +295,12 @@ public class RESTDeliveryQueue extends Thread
 			// set the datapoints to insert
 			ds.setDatapoints(data.getDatapoints());
 			
-			//set the latest value
+			// set the latest value
 			ds.setValue(data.getLast().getValue());
 			
-			//update on xively
+			// update on xively
 			XivelyService.instance().datastream(data.getFeed()).update(ds);
-
+			
 		}
 		catch (Exception e)
 		{
