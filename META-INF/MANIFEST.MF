@@ -4,7 +4,9 @@ Bundle-Name: StreamLibrary
 Bundle-SymbolicName: it.polito.elite.dog.core.library.stream
 Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: it.polito.elite.stream.processing.events;version="1.0.0";uses:="javax.measure",
+Export-Package: it.polito.elite.dog.core.library.stream.source.mapping,
+ it.polito.elite.dog.core.library.stream.source.mapping.xml,
+ it.polito.elite.stream.processing.events;version="1.0.0";uses:="javax.measure",
  it.polito.elite.stream.processing.events.queue;version="1.0.0"
 Import-Package: it.polito.elite.dog.core.library.util;version="1.0.0",
  javax.measure;version="4.3.1",
