@@ -1,0 +1,19 @@
+I. Included Third-Party Software
+	
+KnowHowLab (http://knowhowlab.org) donated
+the original source code of this bundle
+in 2012-10-01 to the OPS4J project.
+Last sources can be found at
+https://github.com/ops4j/org.ops4j.pax.monitoradmin
+Licensed under the Apache License 2.0 
+	
+II. Used Third-Party Software
+	
+This product uses software developed at
+The OSGi Alliance (http://www.osgi.org/).
+Copyright (c) OSGi Alliance (2000, 2012).
+Licensed under the Apache License 2.0. 
+	
+III. License Summary
+
+- Apache License 2.0
