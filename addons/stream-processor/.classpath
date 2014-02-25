@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/timing/commons-logging.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timing/quartz-all-1.6.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spchains-addon.jar"/>
+	<classpathentry kind="lib" path="lib/spchains-core.jar" sourcepath="/home/bonino/Development/WorkSpaces/Dog2.0/StreamProcessingBlocks"/>
+	<classpathentry exported="true" kind="lib" path="lib/antlr-runtime-3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cglib-nodep-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/esper-4.9.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/timing/commons-collections-3.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
