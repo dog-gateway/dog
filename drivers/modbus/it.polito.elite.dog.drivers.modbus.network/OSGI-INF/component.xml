@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="ModbusNetworkDriver">
+   <implementation class="it.polito.elite.dog.drivers.modbus.network.ModbusDriverImpl"/>
+   <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
+   </service>
+   <property name="service.pid" type="String" value="ModbusNetworkDriver"/>
+</scr:component>
