@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+	<dhc:controllables>
+		<dhc:device domoticSystem="ZWave" id="$name"
+			class="PowerMeteringLevelControllableOutput" gateway="$gateway">
+			<dhc:description>$description</dhc:description>
+	<dhc:isIn>$location</dhc:isIn>
+	<dhc:param value="$nodeId" name="NodeID" type="network"/>
+	#foreach( $instanceId in $instanceIds )
+	<dhc:param value="$instanceId" name="InstanceID" type="network"/>
+	#end
+			<!-- <dhc:hasMeter>$meter</dhc:hasMeter> -->
+			<dhc:controlFunctionality class="OnOffFunctionality">
+				<dhc:commands>
+					<dhc:command id="OffCommand_$name"
+						name="OffCommand_$name" class="OffCommand">
+						<dhc:param value="off" name="realCommandName" />
+					</dhc:command>
+					<dhc:command id="OnCommand_$name"
+						name="OnCommand_$name" class="OnCommand">
+						<dhc:param value="on" name="realCommandName" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:controlFunctionality class="LevelControlFunctionality">
+				<dhc:commands>
+					<dhc:command id="SetCommand_$name"
+						name="OffCommand_$name" class="SetCommand">
+						<dhc:param value="set" name="realCommandName" />
+						<dhc:param value="1" name="nParams" />
+						<dhc:param value="value" name="commandParamName" type="Object" />
+					</dhc:command>
+					<dhc:command id="StepUpCommand_$name"
+						name="OnCommand_$name" class="StepUpCommand">
+						<dhc:param value="stepDown" name="realCommandName" />
+					</dhc:command>
+					<dhc:command id="StepDownCommand_$name"
+						name="OnCommand_$name" class="StepDownCommand">
+						<dhc:param value="stepDown" name="realCommandName" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:controlFunctionality
+				class="SinglePhaseActiveEnergyMeasurementFunctionality">
+				<dhc:commands>
+					<dhc:command class="Get1PhaseActiveEnergyCommand" name="Get1PhaseActiveEnergyCommand_$name"
+						id="Get1PhaseActiveEnergyCommand_$name">
+						<dhc:param value="getActiveEnergyValue" name="realCommandName" />
+						<dhc:param name="returnType" value="Measure" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification
+						id="StateChangeNotification_$name" class="StateChangeNotification">
+						<dhc:param value="1" name="nParams" />
+						<dhc:param value="stateChanged" name="notificationName" />
+						<dhc:param type="State" value="newState" name="notificationParamName" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality
+				class="SinglePhaseActivePowerMeasurementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="SinglePhaseActivePowerMeasurementNotification"
+						name="SinglePhaseActivePowerMeasurementNotification_$name">
+						<dhc:param name="nParams" value="2" />
+						<dhc:param name="notificationName" value="newActivePowerValue" />
+						<dhc:param name="unitOfMeasure" value="W" />
+						<dhc:param name="notificationParamName" value="value"
+							type="Measure" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:state class="OnOffState">
+				<dhc:statevalues>
+					<dhc:statevalue name="off" class="OffStateValue" />
+					<dhc:statevalue name="on" class="OnStateValue" />
+				</dhc:statevalues>
+			</dhc:state>
+			<dhc:state class="LevelState">
+				<dhc:statevalue name="level" class="LevelStateValue" />
+			</dhc:state>
+			<dhc:state class="SinglePhaseActivePowerMeasurementState">
+				<dhc:statevalues>
+					<dhc:statevalue class="SinglePhaseActivePowerStateValue"
+						name="" />
+				</dhc:statevalues>
+			</dhc:state>
+		</dhc:device>
+	</dhc:controllables>
+</dhc:dogHomeConfiguration>

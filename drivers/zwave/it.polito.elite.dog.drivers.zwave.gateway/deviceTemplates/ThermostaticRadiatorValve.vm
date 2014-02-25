@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+	<dhc:controllables>
+		<dhc:device class="ThermostaticRadiatorValve" id="$name"
+			domoticSystem="ZWave" gateway="$gateway">
+			<dhc:description>$description</dhc:description>
+			<dhc:isIn>$location</dhc:isIn>
+			<dhc:param value="$nodeId" name="NodeID" type="network" />
+			#foreach( $instanceId in $instanceIds )
+			<dhc:param value="$instanceId" name="InstanceID" type="network" />
+			#end
+			<dhc:controlFunctionality class="ClimateScheduleFunctionality">
+				<dhc:commands>
+					<dhc:command class="SetClimateScheduleCommand"
+						name="SetClimateScheduleCommand_$name" id="SetClimateScheduleCommand_$name">
+						<dhc:param name="realCommandName" value="setDaySchedule" />
+						<dhc:param name="nParams" value="2" />
+						<dhc:param name="commandParamName" value="switchPoints"
+							type="Object[]" />
+						<dhc:param name="commandParamName" value="weekDay" type="Integer" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:controlFunctionality class="ClimateScheduleQueryFunctionality">
+				<dhc:commands>
+					<dhc:command class="GetClimateScheduleCommand"
+						name="GetClimateScheduleCommand_$name" id="GetClimateScheduleCommand_$name">
+						<dhc:param name="realCommandName" value="getDaySchedule" />
+						<dhc:param name="nParams" value="1" />
+						<dhc:param name="commandParamName" value="weekDay" type="Integer" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:controlFunctionality class="ThermostatControlFunctionality">
+				<dhc:commands>
+					<dhc:command class="CoolCommand"
+						name="CoolCommand_$name" id="CoolCommand_$name">
+						<dhc:param name="realCommandName" value="cool" />
+					</dhc:command>
+					<dhc:command class="HeatCommand"
+						name="HeatCommand_$name" id="HeatCommand_$name">
+						<dhc:param name="realCommandName" value="heat" />
+					</dhc:command>
+					<dhc:command class="StopHeatingCoolingCommand"
+						name="StopHeatingCoolingCommand_$name" id="StopHeatingCoolingCommand_$name">
+						<dhc:param name="realCommandName" value="stopHeatingOrCooling" />
+					</dhc:command>
+					<dhc:command class="SetDesiredTemperatureCommand"
+						name="SetDesiredTemperatureCommand_$name"
+						id="SetDesiredTemperatureCommand_$name">
+						<dhc:param name="realCommandName" value="setTemperatureAt" />
+						<dhc:param name="nParams" value="1" />
+						<dhc:param name="commandParamName" value="temperature"
+							type="Measure" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:controlFunctionality class="ThermostatQueryFunctionality">
+				<dhc:commands>
+					<dhc:command class="GetCommand"
+						name="GetCommand_$name" id="GetCommand_$name">
+						<dhc:param name="realCommandName" value="getState" />
+						<dhc:param name="nParams" value="1" />
+						<dhc:param name="returnType" value="DeviceStatus" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="StateChangeNotification"
+						id="StateChangeNotification_$name">
+						<dhc:param name="nParams" value="1" />
+						<dhc:param name="notificationName" value="stateChanged" />
+						<dhc:param name="notificationParamName" value="newState"
+							type="State" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:state class="ClimateScheduleState">
+				<dhc:statevalues>
+					<dhc:statevalue class="ClimateScheduleStateValue"
+						name="" />
+					<dhc:statevalue class="ClimateScheduleStateValue"
+						name="" />
+					<dhc:statevalue class="ClimateScheduleStateValue"
+						name="" />
+					<dhc:statevalue class="ClimateScheduleStateValue"
+						name="" />
+					<dhc:statevalue class="ClimateScheduleStateValue"
+						name="" />
+					<dhc:statevalue class="ClimateScheduleStateValue"
+						name="" />
+					<dhc:statevalue class="ClimateScheduleStateValue"
+						name="" />
+				</dhc:statevalues>
+			</dhc:state>
+			<dhc:state class="TemperatureState">
+				<dhc:statevalues>
+					<dhc:statevalue class="TemperatureStateValue" name="" />
+				</dhc:statevalues>
+			</dhc:state>
+		</dhc:device>
+	</dhc:controllables>
+</dhc:dogHomeConfiguration>

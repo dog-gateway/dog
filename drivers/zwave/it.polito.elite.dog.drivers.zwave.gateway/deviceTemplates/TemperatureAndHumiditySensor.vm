@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+	<dhc:controllables>
+		<dhc:device class="TemperatureAndHumiditySensor" id="$name"
+			domoticSystem="ZWave" gateway="$gateway">
+			<dhc:description>$description</dhc:description>
+			<dhc:isIn>$location</dhc:isIn>
+			<dhc:param value="$nodeId" name="NodeID" type="network" />
+			#foreach( $instanceId in $instanceIds )
+			<dhc:param value="$instanceId" name="InstanceID" type="network" />
+			#end
+			<dhc:controlFunctionality class="TemperatureMeasurementFunctionality">
+				<dhc:commands>
+					<dhc:command class="GetTemperatureCommand"
+						name="GetTemperatureCommand_$name" id="GetTemperatureCommand_$name">
+						<dhc:param name="realCommandName" value="getTemperature" />
+						<dhc:param name="returnType" value="Measure" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:controlFunctionality class="HumidityMeasurementFunctionality">
+				<dhc:commands>
+					<dhc:command class="GetRelativeHumidityCommand"
+						name="GetRelativeHumidityCommand_$name"
+						id="GetRelativeHumidityCommand_$name">
+						<dhc:param name="realCommandName" value="getRelativeHumidity" />
+						<dhc:param name="returnType" value="Measure" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="StateChangeNotification"
+						id="StateChangeNotification_$name">
+						<dhc:param name="notificationName" value="stateChanged" />
+						<dhc:param name="notificationParamName" value="newState"
+							type="State" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality
+				class="TemperatureMeasurementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="TemperatureMeasurementNotification"
+						id="TemperatureMeasurementNotification_$name">
+						<dhc:param name="nParams" value="2" />
+						<dhc:param name="notificationName" value="newTemperatureValue" />
+						<dhc:param name="unitOfMeasure" value="C" />
+						<dhc:param name="notificationParamName" value="temperatureValue"
+							type="Measure" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality
+				class="HumidityMeasurementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="HumidityMeasurementNotification"
+						id="HumidityMeasurementNotification_$name">
+						<dhc:param name="nParams" value="2" />
+						<dhc:param name="notificationName" value="changedRelativeHumidity" />
+						<dhc:param name="unitOfMeasure" value="%" />
+						<dhc:param name="notificationParamName" value="relativeHumidity"
+							type="Measure" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:state class="TemperatureState">
+				<dhc:statevalues>
+					<dhc:statevalue class="TemperatureStateValue" name="" />
+				</dhc:statevalues>
+			</dhc:state>
+			<dhc:state class="HumidityMeasurementState">
+				<dhc:statevalues>
+					<dhc:statevalue class="HumidityStateValue" name="" />
+				</dhc:statevalues>
+			</dhc:state>
+		</dhc:device>
+	</dhc:controllables>
+</dhc:dogHomeConfiguration>

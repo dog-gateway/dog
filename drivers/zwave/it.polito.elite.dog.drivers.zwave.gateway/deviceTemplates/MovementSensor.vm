@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+	<dhc:controllables>
+		<dhc:device class="MovementSensor" id="$name"
+			domoticSystem="ZWave" gateway="$gateway">
+			<dhc:description>$description</dhc:description>
+			<dhc:isIn>$location</dhc:isIn>
+			<dhc:param value="$nodeId" name="NodeID" type="network" />
+			#foreach( $instanceId in $instanceIds )
+			<dhc:param value="$instanceId" name="InstanceID" type="network" />
+			#end
+			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="StateChangeNotification"
+						id="StateChangeNotification_$name">
+						<dhc:param name="nParams" value="1" />
+						<dhc:param name="notificationName" value="stateChanged" />
+						<dhc:param name="notificationParamName" value="newState"
+							type="State" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality class="MovementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="MovementCeasedNotification"
+						id="MovementCeasedNotification_$name">
+						<dhc:param name="nParams" value="0" />
+						<dhc:param name="notificationName" value="ceasedMovement" />
+					</dhc:notification>
+					<dhc:notification class="MovementDetectedNotification"
+						id="MovementDetectedNotification_$name">
+						<dhc:param name="nParams" value="0" />
+						<dhc:param name="notificationName" value="detectedMovement" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:state class="MovementState">
+				<dhc:statevalues>
+					<dhc:statevalue class="MovingStateValue" name="isMoving" />
+					<dhc:statevalue class="NotMovingStateValue" name="notMoving" />
+				</dhc:statevalues>
+			</dhc:state>
+		</dhc:device>
+	</dhc:controllables>
+</dhc:dogHomeConfiguration>

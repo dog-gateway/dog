@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+	<dhc:controllables>
+		<dhc:device class="ZWaveGateway" id="$name"
+			domoticSystem="ZWave">
+			<dhc:description>$description</dhc:description>
+			<dhc:isIn>$location</dhc:isIn>
+			<dhc:param name="NodeID" value="$nodeId" type="network" />
+			<dhc:controlFunctionality class="AssociateFunctionality">
+				<dhc:commands>
+					<dhc:command id="AssociateCommand_$name" name="AssociateCommand_$name"
+						class="AssociateCommand">
+						<dhc:param value="associate" name="realCommandName" />
+					</dhc:command>
+					<dhc:command id="DisassociateCommand_$name" name="DisassociateCommand_$name"
+						class="DisassociateCommand">
+						<dhc:param value="disassociate" name="realCommandName" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+		</dhc:device>
+	</dhc:controllables>
+</dhc:dogHomeConfiguration>
