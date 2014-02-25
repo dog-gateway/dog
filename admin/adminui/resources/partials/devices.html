@@ -1,0 +1,48 @@
+<div ng-controller="DeviceCtrl">
+  <div ng-show="!data.available.devices">
+    Loading device list...
+  </div>
+  <div class="row" ng-controller="FrameworkCtrl">
+    <div class="col-sm-12 col-md-12">
+      <span ng-if="data.devices.stats.activeRatio>0.66" class="label label-success pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
+      <span ng-if="data.devices.stats.activeRatio>=0.33 && data.devices.stats.activeRatio<=0.66" class="label label-warning pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
+      <span ng-if="data.devices.stats.activeRatio<0.33" class="label label-danger pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
+    </div>
+  </div>
+  <br/>
+  <div class="row">
+    <div ng-repeat="device in data.devices">
+    <div class="col-sm-6 col-md-4 text-wrap">
+      <div class="panel" ng-class="(device.active) ? 'panel-info' : 'panel-danger'">
+        <div class="panel-heading">
+          <span class="device-{{device.type}}"></span>{{device.id}}
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-12 col-md-12">
+              <small>{{device.description}}</small><br>
+              <small>{{device.isIn}}</small><br><br>
+              <ul class="list-group">
+                <li class="list-group-item" ng-repeat="(stateName, stateValues) in device.status">
+                  {{stateName}}
+                  <span class="badge" ng-repeat="stateValue in stateValues">{{stateValue.value}}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-sm-12 col-md-12 text-center commands">
+              <div class="btn-toolbar" ng-repeat="controlFunctionality in device.controlFunctionality">
+                <div class="btn-group btn-group-justified" >
+                  <a type="button" class="btn btn-primary text-wrap" ng-class="(!device.active) ? 'disabled' : ''" ng-repeat="command in controlFunctionality.commands | filter:'!get' | filter:'!set'" ng-click="sendCommand(device.id, command.param[0].value)">
+                    {{command.param[0].value}}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div ng-if="($index+1)%3==0" class="clearfix visible-md"></div>
+      <div ng-if="($index+1)%2==0" class="clearfix visible-sm"></div>
+    </div>
+  </div>
+</div>
