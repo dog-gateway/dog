@@ -1,7 +1,7 @@
 /*
  * Dog - Environment REST Endpoint
  * 
- * Copyright (c) 2013 Luigi De Russis
+ * Copyright (c) 2013-2014 Luigi De Russis and Teodoro Montanaro
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-@Path("/api/environment/")
+@Path("/api/v1/environment/")
 public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 {
 	// the service logger
@@ -637,7 +637,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		if (this.environmentModel.get() != null)
 		{
 			// get all the building environment from the HouseModel
-			BuildingEnvironment buildingEnv = this.environmentModel.get().getJAXBBuildingEnvironment().get(0);
+			BuildingEnvironment buildingEnv = this.environmentModel.get().getBuildingEnvironment().get(0);
 			
 			dhc.getBuildingEnvironment().add(buildingEnv);
 		}
@@ -660,7 +660,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		if (this.environmentModel.get() != null)
 		{
 			// get all the flats for the first building
-			List<Flat> flats = this.environmentModel.get().getJAXBBuildingEnvironment().get(0).getBuilding().get(0)
+			List<Flat> flats = this.environmentModel.get().getBuildingEnvironment().get(0).getBuilding().get(0)
 					.getFlat();
 			
 			// build the flats container
@@ -686,7 +686,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		if (this.environmentModel.get() != null)
 		{
 			// get all the flats for the first building
-			List<Flat> flats = this.environmentModel.get().getJAXBBuildingEnvironment().get(0).getBuilding().get(0)
+			List<Flat> flats = this.environmentModel.get().getJAXBEnvironment().get(0).getBuilding().get(0)
 					.getFlat();
 			
 			// look for the desired flat
@@ -721,7 +721,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		if (this.environmentModel.get() != null)
 		{
 			// get all the flats for the first building
-			List<Flat> flats = this.environmentModel.get().getJAXBBuildingEnvironment().get(0).getBuilding().get(0)
+			List<Flat> flats = this.environmentModel.get().getBuildingEnvironment().get(0).getBuilding().get(0)
 					.getFlat();
 			
 			// look for the desired room in the given flat
