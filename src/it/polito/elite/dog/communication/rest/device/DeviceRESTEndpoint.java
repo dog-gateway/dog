@@ -1,7 +1,7 @@
 /*
  * Dog - Device Rest Endpoint
  * 
- * Copyright (c) 2013 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2013-2014 Dario Bonino, Luigi De Russis and Teodoro Montanaro
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-@Path("/api/devices/")
+@Path("/api/v1/devices/")
 public class DeviceRESTEndpoint implements DeviceRESTApi
 {
 	// the service logger
