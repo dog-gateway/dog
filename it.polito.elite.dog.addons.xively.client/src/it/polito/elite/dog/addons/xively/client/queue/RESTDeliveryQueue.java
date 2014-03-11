@@ -49,7 +49,7 @@ public class RESTDeliveryQueue extends Thread
 	private double severeLevel = 1.5;
 	
 	// the dispatching thread timing in milliseconds
-	private int emptyQueueTime = 20;
+	private int emptyQueueTime = 5;
 	private int fullQueueTime = 0;
 	
 	// the maximum queue size
