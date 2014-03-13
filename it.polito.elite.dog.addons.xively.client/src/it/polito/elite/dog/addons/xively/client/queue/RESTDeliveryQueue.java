@@ -48,6 +48,9 @@ public class RESTDeliveryQueue extends Thread
 	private double warningLevel = 0.5;
 	private double severeLevel = 1.5;
 	
+	// the tuning step
+	private double tuningStep = 2.0; //quadratic progression
+	
 	// the dispatching thread timing in milliseconds
 	private int emptyQueueTime = 5;
 	private int fullQueueTime = 0;
@@ -265,6 +268,22 @@ public class RESTDeliveryQueue extends Thread
 		this.mediaType = mediaType;
 	}
 	
+	/**
+	 * @return the tuningStep
+	 */
+	public double getTuningStep()
+	{
+		return tuningStep;
+	}
+
+	/**
+	 * @param tuningStep the tuningStep to set
+	 */
+	public void setTuningStep(double tuningStep)
+	{
+		this.tuningStep = tuningStep;
+	}
+	
 	// --------------------------- PRIVATE METHODS
 	// ------------------------------------------------------
 	
@@ -313,7 +332,7 @@ public class RESTDeliveryQueue extends Thread
 	private void selfTune()
 	{
 		// setup self tuning
-		if ((this.selfTune) && (this.maxSize > 0) && (this.dispatchQueue.size() > this.warningLevel * this.maxSize))
+		if ((this.selfTune) && (this.maxSize > 0) && (this.dispatchQueue.size() > (int)(this.warningLevel * (double)this.maxSize)))
 		{
 			// log
 			this.logger.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId
@@ -326,28 +345,29 @@ public class RESTDeliveryQueue extends Thread
 			
 			// the ideal ratio would be the one for which there is one JSON
 			// object per sensor in the dispatch queue. If the maximum
-			// ration is < 1 then
+			// ratio is < 1 then
 			// the space needed for holding sensor data is not sufficient
 			// and there might be a queue saturation problem (or event drop
 			// in case of queues with limited size)
-			int idealRatio = 1;
+			int safeRatio =(int) (((maxRatio*this.warningLevel) > 0) ? maxRatio*this.warningLevel : 1);
+			int actualRatio = 1;
 			
 			if (maxRatio > 1)
 			{
-				idealRatio = (int) Math.ceil(sizeRatio);
+				actualRatio = (int) Math.ceil(sizeRatio);
 			}
 			else if (maxRatio > 0)
 			{
-				idealRatio = (int) Math.ceil((1.0d / maxRatio));
+				actualRatio = (int) Math.ceil((1.0d / maxRatio));
 			}
 			
 			// tune the JSON data size
-			if (this.outlet.getWaitingListSize() < idealRatio)
+			if (actualRatio >= safeRatio)
 			{
 				// log
 				this.logger.log(LogService.LOG_INFO, RESTDeliveryQueue.logId
-						+ "Auto-tuning the JSON object size, original size: " + this.outlet.getWaitingListSize()
-						+ " new size:" + idealRatio);
+						+ "Auto-tuning the datapoints object size, original size: " + this.outlet.getWaitingListSize()
+						+ " new size:" + this.outlet.getWaitingListSize()*this.tuningStep);
 				
 				synchronized (outlet)
 				{
@@ -359,7 +379,7 @@ public class RESTDeliveryQueue extends Thread
 					// maximum allowed JSON data size, this of course may still
 					// cause
 					// data drop if the needed size exceeds the maximum possible
-					this.outlet.setWaitingListSize(Math.min(idealRatio, this.outlet.getMaxListSize()));
+					this.outlet.setWaitingListSize((int)Math.min(this.outlet.getWaitingListSize()*this.tuningStep, this.outlet.getMaxListSize()));
 				}
 			}
 			else
@@ -367,13 +387,14 @@ public class RESTDeliveryQueue extends Thread
 				// check if there is any old-ratio that can be set
 				// this allows keeping the "desired" size of the JSON data while
 				// successfully handling overload situations
-				if (idealRatio < this.oldWaitingListSize)
+				if (actualRatio < safeRatio)
 				{
 					synchronized (outlet)
 					{
 						if (this.oldWaitingListSize > 0)
 						{
-							this.outlet.setWaitingListSize(this.oldWaitingListSize);
+							//one step back, should enable to settle around a good threshold value
+							this.outlet.setWaitingListSize((int)Math.max(this.oldWaitingListSize,this.outlet.getWaitingListSize()/tuningStep));
 							this.oldWaitingListSize = 0;
 						}
 					}
@@ -401,14 +422,12 @@ public class RESTDeliveryQueue extends Thread
 			{
 				// log
 				this.logger.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId
-						+ "This delivery queue is full, events are being discarded...");
-				// drop elements exceeding the maximum size (the queue works as
-				// a
-				// circular fifo buffer)
-				// ideally this should execute only one cycle
+						+ "This delivery queue is full, events are being discarded up to half of the queue size...");
+				// drop elements until the queue returns down to the warning level (the queue works as
+				// a circular fifo buffer ideally this should execute only one cycle)
 				synchronized (this.dispatchQueue)
 				{
-					for (int i = 0; i < (this.dispatchQueue.size() - this.maxSize + 1); i++)
+					for (int i = 0; i < (this.dispatchQueue.size() - (int)((double)this.maxSize*this.warningLevel) + 1); i++)
 						// drop oldest elements
 						this.dispatchQueue.poll();
 				}
