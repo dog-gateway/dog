@@ -40,78 +40,82 @@ public class RESTDeliveryQueue extends Thread
 {
 	// the log id
 	public static final String logId = "[RESTDeliveryQueue]: ";
-	
+
 	// the queue for handling event notifications
 	private ConcurrentLinkedQueue<DatapointInfo> dispatchQueue;
-	
+
 	// the warning level for the queue occupation (between 0 and 1)
 	private double warningLevel = 0.5;
 	private double severeLevel = 1.5;
-	
+
+	// the tuning step
+	private double tuningStep = 2.0; // quadratic progression
+
 	// the dispatching thread timing in milliseconds
-	private int emptyQueueTime = 20;
+	private int emptyQueueTime = 5;
 	private int fullQueueTime = 0;
-	
+
 	// the maximum queue size
 	private int maxSize = 0;
-	
+
 	// the self-tuning flag
 	private boolean selfTune = false;
-	
+
 	// the self tune list size memory
 	private int oldWaitingListSize = 0;
-	
+
 	// a flag for starting/stopping the event dispatch thread
 	private boolean canDispatch;
-	
+
 	// the logger to use
 	protected LogHelper logger;
-	
+
 	// the COSM key if needed
-	private String cosmKey;
-	
+	private String xivelyKey;
+
 	// the COSMOutlet
-	private XivelyClient outlet;
-	
+	private XivelyClient xivelyClient;
+
 	// the media type
 	private MediaType mediaType;
-	
+
 	/**
 	 * 
 	 */
-	public RESTDeliveryQueue(LogHelper logger, XivelyClient outlet, MediaType format)
+	public RESTDeliveryQueue(LogHelper logger, XivelyClient outlet,
+			MediaType format)
 	{
 		// store the logger
 		this.logger = logger;
-		
+
 		// the dispatch flag
 		this.canDispatch = false;
-		
+
 		// the dispatch queue
 		this.dispatchQueue = new ConcurrentLinkedQueue<DatapointInfo>();
-		
+
 		// the optional cosm key
-		this.cosmKey = outlet.getKey();
-		
+		this.xivelyKey = outlet.getKey();
+
 		// the media type
 		this.mediaType = format;
-		
+
 		// store the outlet for self-tuning
-		this.outlet = outlet;
+		this.xivelyClient = outlet;
 	}
-	
+
 	public RESTDeliveryQueue(LogHelper logger)
 	{
 		// store the logger
 		this.logger = logger;
-		
+
 		// the dispatch flag
 		this.canDispatch = false;
-		
+
 		// the dispatch queue
 		this.dispatchQueue = new ConcurrentLinkedQueue<DatapointInfo>();
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -128,7 +132,7 @@ public class RESTDeliveryQueue extends Thread
 				this.processData(data);
 				sleepTime = this.fullQueueTime;
 			}
-			
+
 			try
 			{
 				if (sleepTime == 0)
@@ -138,7 +142,8 @@ public class RESTDeliveryQueue extends Thread
 			}
 			catch (InterruptedException e)
 			{
-				this.logger.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId + "Interrupted:\n" + e);
+				this.logger.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId
+						+ "Interrupted:\n" + e);
 			}
 		}
 		// if it comes here, then the dispatching thread is being stopped and
@@ -150,7 +155,7 @@ public class RESTDeliveryQueue extends Thread
 			this.processData(remainingData);
 		}
 	}
-	
+
 	/**
 	 * Stops the queue
 	 */
@@ -158,19 +163,19 @@ public class RESTDeliveryQueue extends Thread
 	{
 		this.canDispatch = false;
 	}
-	
+
 	/**
 	 * Starts the queue
 	 */
-	
+
 	public void startQueue()
 	{
 		if (!this.canDispatch)
 			this.canDispatch = true;
-		
+
 		this.start();
 	}
-	
+
 	/**
 	 * Inserts one event in the queue (FIFO behavior)
 	 * 
@@ -180,74 +185,74 @@ public class RESTDeliveryQueue extends Thread
 	{
 		// self-Limit if needed
 		this.selfLimit();
-		
+
 		// self-tunes only id enabled
 		this.selfTune();
-		
+
 		// add the JSON data to the queue
 		this.dispatchQueue.add(data);
 	}
-	
+
 	public int getEmptyQueueTime()
 	{
 		return emptyQueueTime;
 	}
-	
+
 	public void setEmptyQueueTime(int emptyQueueTime)
 	{
 		this.emptyQueueTime = emptyQueueTime;
 	}
-	
+
 	public int getFullQueueTime()
 	{
 		return fullQueueTime;
 	}
-	
+
 	public void setFullQueueTime(int fullQueueTime)
 	{
 		this.fullQueueTime = fullQueueTime;
 	}
-	
+
 	public int getMaxSize()
 	{
 		return maxSize;
 	}
-	
+
 	public void setMaxSize(int maxSize)
 	{
 		this.maxSize = maxSize;
 	}
-	
+
 	public boolean isSelfTune()
 	{
 		return selfTune;
 	}
-	
+
 	public void setSelfTune(boolean selfTune)
 	{
 		this.selfTune = selfTune;
 	}
-	
+
 	public String getCosmKey()
 	{
-		return cosmKey;
+		return xivelyKey;
 	}
-	
+
 	public void setCosmKey(String cosmKey)
 	{
-		this.cosmKey = cosmKey;
+		this.xivelyKey = cosmKey;
 	}
-	
+
 	public XivelyClient getOutlet()
 	{
-		return outlet;
+		return xivelyClient;
 	}
-	
+
 	public void setOutlet(XivelyClient outlet)
 	{
-		this.outlet = outlet;
+		this.xivelyClient = outlet;
 	}
-	
+
 	/**
 	 * @return the mediaType
 	 */
@@ -255,7 +260,7 @@ public class RESTDeliveryQueue extends Thread
 	{
 		return mediaType;
 	}
-	
+
 	/**
 	 * @param mediaType
 	 *            the mediaType to set
@@ -264,10 +269,27 @@ public class RESTDeliveryQueue extends Thread
 	{
 		this.mediaType = mediaType;
 	}
-	
+
+	/**
+	 * @return the tuningStep
+	 */
+	public double getTuningStep()
+	{
+		return tuningStep;
+	}
+
+	/**
+	 * @param tuningStep
+	 *            the tuningStep to set
+	 */
+	public void setTuningStep(double tuningStep)
+	{
+		this.tuningStep = tuningStep;
+	}
+
 	// --------------------------- PRIVATE METHODS
 	// ------------------------------------------------------
-	
+
 	private void processData(DatapointInfo data)
 	{
 		try
@@ -277,89 +299,109 @@ public class RESTDeliveryQueue extends Thread
 			{
 				// cheng the app config
 				AppConfig appConfig = AppConfig.getInstance();
-				
+
 				appConfig.setResponseMediaType(AcceptedMediaType.xml);
 			}
-			
+
 			// debug
-			this.logger.log(LogService.LOG_DEBUG, RESTDeliveryQueue.logId + "Sending to feed " + data.getFeed()
-					+ ", datatstream" + data.getDatastreamId() + " data: " + data.toString());
-			
+			this.logger.log(LogService.LOG_DEBUG, RESTDeliveryQueue.logId
+					+ "Sending to feed " + data.getFeed() + ", datatstream"
+					+ data.getDatastreamId() + " data: " + data.toString());
+
 			// create the data stream object representing the datastream to
 			// updated
 			Datastream ds = new Datastream();
-			
+
 			// set the id to match the datastream to update on xively
 			ds.setId(data.getDatastreamId());
-			
+
 			// set the datapoints to insert
 			ds.setDatapoints(data.getDatapoints());
-			
+
 			// set the latest value
 			ds.setValue(data.getLast().getValue());
-			
+
 			// update on xively
 			XivelyService.instance().datastream(data.getFeed()).update(ds);
-			
+
 		}
 		catch (Exception e)
 		{
 			// catch any exception
-			this.logger
-					.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId + "Error while sending cosm request..." + e);
+			this.logger.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId
+					+ "Error while sending xively request..." + e);
 		}
 	}
-	
+
 	private void selfTune()
 	{
 		// setup self tuning
-		if ((this.selfTune) && (this.maxSize > 0) && (this.dispatchQueue.size() > this.warningLevel * this.maxSize))
+		if ((this.selfTune)
+				&& (this.maxSize > 0)
+				&& (this.dispatchQueue.size() > (int) (this.warningLevel * (double) this.maxSize)))
 		{
 			// log
 			this.logger.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId
 					+ "Reached warning level, starting self-tuning...");
-			
+
 			// compute the "ideal" json data size
 			double sizeRatio = (double) this.dispatchQueue.size()
-					/ (double) this.outlet.getNEventsAlertsInWaitingList();
-			double maxRatio = (double) this.maxSize / (double) this.outlet.getNEventsAlertsInWaitingList();
-			
+					/ (double) this.xivelyClient
+							.getNEventsAlertsInWaitingList();
+			double maxRatio = (double) this.maxSize
+					/ (double) this.xivelyClient
+							.getNEventsAlertsInWaitingList();
+
 			// the ideal ratio would be the one for which there is one JSON
 			// object per sensor in the dispatch queue. If the maximum
-			// ration is < 1 then
+			// ratio is < 1 then
 			// the space needed for holding sensor data is not sufficient
 			// and there might be a queue saturation problem (or event drop
 			// in case of queues with limited size)
-			int idealRatio = 1;
-			
+			int safeRatio = (int) (((maxRatio * this.warningLevel) > 0) ? maxRatio
+					* this.warningLevel
+					: 1);
+			int actualRatio = 1;
+
 			if (maxRatio > 1)
 			{
-				idealRatio = (int) Math.ceil(sizeRatio);
+				actualRatio = (int) Math.ceil(sizeRatio);
 			}
 			else if (maxRatio > 0)
 			{
-				idealRatio = (int) Math.ceil((1.0d / maxRatio));
+				actualRatio = (int) Math.ceil((1.0d / maxRatio));
 			}
-			
+
 			// tune the JSON data size
-			if (this.outlet.getWaitingListSize() < idealRatio)
+			if (actualRatio >= safeRatio)
 			{
 				// log
-				this.logger.log(LogService.LOG_INFO, RESTDeliveryQueue.logId
-						+ "Auto-tuning the JSON object size, original size: " + this.outlet.getWaitingListSize()
-						+ " new size:" + idealRatio);
-				
-				synchronized (outlet)
+				this.logger
+						.log(LogService.LOG_WARNING,
+								RESTDeliveryQueue.logId
+										+ "Auto-tuning the datapoints object size, original size: "
+										+ this.xivelyClient
+												.getWaitingListSize()
+										+ " new size:"
+										+ this.xivelyClient
+												.getWaitingListSize()
+										* this.tuningStep);
+
+				synchronized (xivelyClient)
 				{
 					// store the old-ratio (avoid storing intermediate values)
 					if (this.oldWaitingListSize == 0)
-						this.oldWaitingListSize = this.outlet.getWaitingListSize();
-					
+						this.oldWaitingListSize = this.xivelyClient
+								.getWaitingListSize();
+
 					// update the waiting list size, with saturation on the
 					// maximum allowed JSON data size, this of course may still
 					// cause
 					// data drop if the needed size exceeds the maximum possible
-					this.outlet.setWaitingListSize(Math.min(idealRatio, this.outlet.getMaxListSize()));
+					this.xivelyClient.setWaitingListSize((int) Math.min(
+							this.xivelyClient.getWaitingListSize()
+									* this.tuningStep,
+							this.xivelyClient.getMaxListSize()));
 				}
 			}
 			else
@@ -367,21 +409,29 @@ public class RESTDeliveryQueue extends Thread
 				// check if there is any old-ratio that can be set
 				// this allows keeping the "desired" size of the JSON data while
 				// successfully handling overload situations
-				if (idealRatio < this.oldWaitingListSize)
+				if (actualRatio < safeRatio * this.warningLevel)
 				{
-					synchronized (outlet)
+					synchronized (xivelyClient)
 					{
 						if (this.oldWaitingListSize > 0)
 						{
-							this.outlet.setWaitingListSize(this.oldWaitingListSize);
-							this.oldWaitingListSize = 0;
+							// one step back, should enable to settle around a
+							// good threshold value
+							this.xivelyClient.setWaitingListSize((int) Math
+									.max(this.oldWaitingListSize,
+											this.xivelyClient
+													.getWaitingListSize()
+													/ tuningStep));
+
+							if (this.xivelyClient.getWaitingListSize() == this.oldWaitingListSize)
+								this.oldWaitingListSize = 0;
 						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	private void selfLimit()
 	{
 		// check for maximum size, if maxSize=0 the queue is un-limited
@@ -391,29 +441,34 @@ public class RESTDeliveryQueue extends Thread
 			if (this.dispatchQueue.size() > this.severeLevel * this.maxSize)
 			{
 				// log
-				this.logger.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId
-						+ "This delivery queue is over 50% overloaded, ALL events are being discarded...");
-				
+				this.logger
+						.log(LogService.LOG_WARNING,
+								RESTDeliveryQueue.logId
+										+ "This delivery queue is over 50% overloaded, ALL events are being discarded...");
+
 				// discard all events
 				this.dispatchQueue.clear();
 			}
 			else
 			{
 				// log
-				this.logger.log(LogService.LOG_WARNING, RESTDeliveryQueue.logId
-						+ "This delivery queue is full, events are being discarded...");
-				// drop elements exceeding the maximum size (the queue works as
-				// a
-				// circular fifo buffer)
-				// ideally this should execute only one cycle
+				this.logger
+						.log(LogService.LOG_WARNING,
+								RESTDeliveryQueue.logId
+										+ "This delivery queue is full, events are being discarded up to half of the queue size...");
+				// drop elements until the queue returns down to the warning
+				// level (the queue works as
+				// a circular fifo buffer ideally this should execute only one
+				// cycle)
 				synchronized (this.dispatchQueue)
 				{
-					for (int i = 0; i < (this.dispatchQueue.size() - this.maxSize + 1); i++)
+					for (int i = 0; i < (this.dispatchQueue.size()
+							- (int) ((double) this.maxSize * this.warningLevel) + 1); i++)
 						// drop oldest elements
 						this.dispatchQueue.poll();
 				}
 			}
 		}
 	}
-	
+
 }

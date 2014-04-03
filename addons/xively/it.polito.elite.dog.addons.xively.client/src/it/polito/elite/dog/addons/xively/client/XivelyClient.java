@@ -69,6 +69,7 @@ public class XivelyClient implements ManagedService, EventHandler
 	public static final String XIVELY_WAITING_LIST_SIZE = "xively.waitingList.size";
 	public static final String XIVELY_DELIVERY_QUEUE_SIZE = "xively.deliveryQueue.size";
 	public static final String XIVELY_DELIVERY_QUEUE_SELFTUNE = "xively.deliveryQueue.selfTune";
+	public static final String XIVELY_DELIVERY_QUEUE_TUNING_STEP = "xively.deliveryQueue.tuningStep";
 	private static final String XIVELY_MEDIA_TYPE = "xively.mediaType";
 	private static final String XIVELY_BASE_URI = "xively.baseURI";
 	private static final String XIVELY_SERIAL = "xively.serial";
@@ -109,6 +110,9 @@ public class XivelyClient implements ManagedService, EventHandler
 
 	// the delivery queue size
 	private int deliveryQueueSize = 0;
+	
+	// the tuning step
+	private double tuningStep = 2.0;
 
 	// the queue self-tuning flag
 	private boolean selfTune = false;
@@ -355,6 +359,10 @@ public class XivelyClient implements ManagedService, EventHandler
 				this.deliveryQueueSize = Integer.valueOf((String) properties
 						.get(XivelyClient.XIVELY_DELIVERY_QUEUE_SIZE));
 
+				// get the tuning step, if any
+				this.tuningStep = Double.valueOf((String) properties
+						.get(XivelyClient.XIVELY_DELIVERY_QUEUE_TUNING_STEP));
+				
 				// get the self-tune flag
 				this.selfTune = Boolean.valueOf((String) properties
 						.get(XivelyClient.XIVELY_DELIVERY_QUEUE_SELFTUNE));
@@ -380,9 +388,11 @@ public class XivelyClient implements ManagedService, EventHandler
 			// setup the queues
 			this.alertQueue.setSelfTune(this.selfTune);
 			this.alertQueue.setMaxSize(this.deliveryQueueSize);
+			this.alertQueue.setTuningStep(this.tuningStep);
 
 			this.eventQueue.setSelfTune(this.selfTune);
 			this.eventQueue.setMaxSize(this.deliveryQueueSize);
+			this.eventQueue.setTuningStep(this.tuningStep);
 
 			// start the queues
 			this.alertQueue.startQueue();
