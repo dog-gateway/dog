@@ -47,8 +47,6 @@ import org.osgi.service.log.LogService;
 
 public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implements LightSensor
 {
-	public static final String SENSORTYPE_LIGHT = "Light";
-
 	// the class logger
 	private LogHelper logger;
 

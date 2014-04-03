@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="it.polito.elite.dog.drivers.zwave.quadsensor">
+   <implementation class="it.polito.elite.dog.drivers.zwave.quadsensor.ZWaveQuadSensorDriver"/>
+   <reference bind="addingService" cardinality="1..1" interface="it.polito.elite.dog.drivers.zwave.gateway.ZWaveGatewayDriver" name="ZWaveGatewayDriver" policy="dynamic" unbind="removedService"/>
+   <property name="service.pid" type="String" value="it.polito.elite.dog.drivers.zwave.quadsensor"/>
+   <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
+   </service>
+</scr:component>
