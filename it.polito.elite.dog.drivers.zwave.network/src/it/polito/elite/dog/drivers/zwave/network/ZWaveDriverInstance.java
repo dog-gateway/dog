@@ -17,17 +17,17 @@
  */
 package it.polito.elite.dog.drivers.zwave.network;
 
-import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
-import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
-import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
-import it.polito.elite.dog.drivers.zwave.network.info.CmdNotificationInfo;
-import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
-import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
-import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.dog.core.library.util.ElementDescription;
+import it.polito.elite.dog.core.library.model.CNParameters;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.StatefulDevice;
+import it.polito.elite.dog.core.library.util.ElementDescription;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
+import it.polito.elite.dog.drivers.zwave.network.info.ZWaveInfo;
+import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
+import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -70,10 +70,10 @@ public abstract class ZWaveDriverInstance implements StatefulDevice
 	// protected Set<ModbusRegisterInfo> managedRegisters;
 
 	// the datapoint to notifications map
-	protected Map<ZWaveNodeInfo, Set<CmdNotificationInfo>> register2Notification;
+	protected Map<ZWaveNodeInfo, Set<CNParameters>> register2Notification;
 
 	// the command2datapoint map
-	protected Map<CmdNotificationInfo, ZWaveNodeInfo> command2Register;
+	protected Map<CNParameters, ZWaveNodeInfo> command2Register;
 
 	// milliseconds between two forced update of the device status.
 	// Every T, network driver will perform a GET on the device. This will
@@ -132,10 +132,10 @@ public abstract class ZWaveDriverInstance implements StatefulDevice
 		nodeInfo = createNodeInfo(deviceId, instancesId, isController());
 
 		// create the map needed to associate datapoints to notifications
-		register2Notification = new ConcurrentHashMap<ZWaveNodeInfo, Set<CmdNotificationInfo>>();
+		register2Notification = new ConcurrentHashMap<ZWaveNodeInfo, Set<CNParameters>>();
 
 		// create the map to associate commands and datapoints
-		command2Register = new ConcurrentHashMap<CmdNotificationInfo, ZWaveNodeInfo>();
+		command2Register = new ConcurrentHashMap<CNParameters, ZWaveNodeInfo>();
 
 		//
 		// // create the set for storing the managed datapoints
@@ -201,7 +201,7 @@ public abstract class ZWaveDriverInstance implements StatefulDevice
 			 * scaleFactor = params.get(ZWaveInfo.SCALE_FACTOR);
 			 */
 
-			CmdNotificationInfo cmdInfo = new CmdNotificationInfo(
+			CNParameters cmdInfo = new CNParameters(
 					realCommandName, parameter.getElementParams());
 			// add the command to data point entry
 			command2Register.put(cmdInfo, nodeInfo);
@@ -237,17 +237,17 @@ public abstract class ZWaveDriverInstance implements StatefulDevice
 			// fill the data point to notification map, if the data point
 			// has
 			// never been registered create a new entry in the map.
-			Set<CmdNotificationInfo> notificationNames = register2Notification
+			Set<CNParameters> notificationNames = register2Notification
 					.get(nodeInfo);
 
 			if (notificationNames == null)
 			{
-				notificationNames = new HashSet<CmdNotificationInfo>();
+				notificationNames = new HashSet<CNParameters>();
 				register2Notification.put(nodeInfo, notificationNames);
 			}
 			// add the notification name to the set associated to the dp
 			// datapoint
-			CmdNotificationInfo nInfo = new CmdNotificationInfo(
+			CNParameters nInfo = new CNParameters(
 					notificationName, parameter.getElementParams());
 			notificationNames.add(nInfo);
 		}
