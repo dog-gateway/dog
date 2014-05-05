@@ -17,6 +17,7 @@
  */
 package it.polito.elite.dog.drivers.modbus.singlephaseactivepowermeter;
 
+import it.polito.elite.dog.core.library.model.CNParameters;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.SinglePhaseActivePowerMeter;
@@ -26,7 +27,6 @@ import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
-import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
 
@@ -145,10 +145,10 @@ public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDrive
 		if (value != null)
 		{
 			// gets the corresponding notification set...
-			Set<CmdNotificationInfo> notificationInfos = this.register2Notification.get(register);
+			Set<CNParameters> notificationInfos = this.register2Notification.get(register);
 			
 			// handle the notifications
-			for (CmdNotificationInfo notificationInfo : notificationInfos)
+			for (CNParameters notificationInfo : notificationInfos)
 			{
 				// black magic here...
 				String notificationName = notificationInfo.getName();
@@ -223,9 +223,9 @@ public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDrive
 		// configuration
 		for (ModbusRegisterInfo register : this.register2Notification.keySet())
 		{
-			Set<CmdNotificationInfo> notificationInfos = this.register2Notification.get(register);
+			Set<CNParameters> notificationInfos = this.register2Notification.get(register);
 			
-			for (CmdNotificationInfo notificationInfo : notificationInfos)
+			for (CNParameters notificationInfo : notificationInfos)
 			{
 				
 				if (notificationInfo.getName().equalsIgnoreCase(

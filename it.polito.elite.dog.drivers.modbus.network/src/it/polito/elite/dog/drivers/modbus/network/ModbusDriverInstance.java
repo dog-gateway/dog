@@ -17,11 +17,11 @@
  */
 package it.polito.elite.dog.drivers.modbus.network;
 
+import it.polito.elite.dog.core.library.model.CNParameters;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.StatefulDevice;
 import it.polito.elite.dog.core.library.util.ElementDescription;
-import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
@@ -66,10 +66,10 @@ public abstract class ModbusDriverInstance implements StatefulDevice
 	protected Set<ModbusRegisterInfo> managedRegisters;
 	
 	// the datapoint to notifications map
-	protected Map<ModbusRegisterInfo, Set<CmdNotificationInfo>> register2Notification;
+	protected Map<ModbusRegisterInfo, Set<CNParameters>> register2Notification;
 	
 	// the command2datapoint map
-	protected Map<CmdNotificationInfo, ModbusRegisterInfo> command2Register;
+	protected Map<CNParameters, ModbusRegisterInfo> command2Register;
 	
 	/**
 	 * Notifies a device-specific driver of a new register value coming from the
@@ -112,10 +112,10 @@ public abstract class ModbusDriverInstance implements StatefulDevice
 		this.gwProtocol = (gatewayProtocol!=null)? gatewayProtocol : ModbusProtocolVariant.TCP.toString();
 		
 		// create the map needed to associate datapoints to notifications
-		this.register2Notification = new ConcurrentHashMap<ModbusRegisterInfo, Set<CmdNotificationInfo>>();
+		this.register2Notification = new ConcurrentHashMap<ModbusRegisterInfo, Set<CNParameters>>();
 		
 		// create the map to associate commands and datapoints
-		this.command2Register = new ConcurrentHashMap<CmdNotificationInfo, ModbusRegisterInfo>();
+		this.command2Register = new ConcurrentHashMap<CNParameters, ModbusRegisterInfo>();
 		
 		// create the set for storing the managed datapoints
 		this.managedRegisters = new HashSet<ModbusRegisterInfo>();
@@ -225,7 +225,7 @@ public abstract class ModbusDriverInstance implements StatefulDevice
 				xlator.setUnitOfMeasure(unitOfMeasure);
 				xlator.setScaleFactor(Double.valueOf(scaleFactor.trim()));
 				
-				CmdNotificationInfo cmdInfo = new CmdNotificationInfo(realCommandName, parameter.getElementParams());
+				CNParameters cmdInfo = new CNParameters(realCommandName, parameter.getElementParams());
 				// add the command to data point entry
 				this.command2Register.put(cmdInfo, register);
 				
@@ -296,16 +296,16 @@ public abstract class ModbusDriverInstance implements StatefulDevice
 				// fill the data point to notification map, if the data point
 				// has
 				// never been registered create a new entry in the map.
-				Set<CmdNotificationInfo> notificationNames = this.register2Notification.get(register);
+				Set<CNParameters> notificationNames = this.register2Notification.get(register);
 				
 				if (notificationNames == null)
 				{
-					notificationNames = new HashSet<CmdNotificationInfo>();
+					notificationNames = new HashSet<CNParameters>();
 					this.register2Notification.put(register, notificationNames);
 				}
 				// add the notification name to the set associated to the dp
 				// datapoint
-				CmdNotificationInfo nInfo = new CmdNotificationInfo(notificationName, parameter.getElementParams());
+				CNParameters nInfo = new CNParameters(notificationName, parameter.getElementParams());
 				notificationNames.add(nInfo);
 				
 				// add the datapoint to the set of managed datapoints

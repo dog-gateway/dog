@@ -17,6 +17,7 @@
  */
 package it.polito.elite.dog.drivers.modbus.humiditysensor;
 
+import it.polito.elite.dog.core.library.model.CNParameters;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.HumiditySensor;
@@ -26,7 +27,6 @@ import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.HumidityStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
-import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
 
@@ -141,11 +141,11 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriverInstance imp
 	public void newMessageFromHouse(ModbusRegisterInfo register, String value) {
 		if (value != null) {
 			// gets the corresponding notification set...
-			Set<CmdNotificationInfo> notificationInfos = this.register2Notification
+			Set<CNParameters> notificationInfos = this.register2Notification
 					.get(register);
 
 			// handle the notifications
-			for (CmdNotificationInfo notificationInfo : notificationInfos) {
+			for (CNParameters notificationInfo : notificationInfos) {
 				// black magic here...
 				String notificationName = notificationInfo.getName();
 
@@ -220,10 +220,10 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriverInstance imp
 		// search the energy unit of measures declared in the device
 		// configuration
 		for (ModbusRegisterInfo register : this.register2Notification.keySet()) {
-			Set<CmdNotificationInfo> notificationInfos = this.register2Notification
+			Set<CNParameters> notificationInfos = this.register2Notification
 					.get(register);
 
-			for (CmdNotificationInfo notificationInfo : notificationInfos) {
+			for (CNParameters notificationInfo : notificationInfos) {
 
 				if (notificationInfo.getName().equalsIgnoreCase(
 						HumidityMeasurementNotification.notificationName)) {
