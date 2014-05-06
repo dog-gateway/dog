@@ -18,6 +18,7 @@
 package it.polito.elite.dog.communication.rest.environment.api;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -161,4 +162,26 @@ public interface EnvironmentRESTApi
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void updateRoomInFlat(@PathParam("flat-id") String flatId, @PathParam("room-id") String roomId,
 			String updatedRoom);
+	
+	/**
+	 * Remove the room identified by room-id and present in the given flat.
+	 * 
+	 * @param roomId
+	 *            the unique identifier of an existing room
+	 * @param flatId
+	 *            the unique identifier of an existing flat
+	 */
+	@DELETE
+	@Path("/flats/{flat-id}/rooms/{room-id}")
+	public void removeRoomFromFlat(@PathParam("room-id") String roomId, @PathParam("flat-id") String flatId);
+	
+	/**
+	 * Remove the flat identified by the given flat-id.
+	 * 
+	 * @param flatId
+	 *            the unique identifier of an existing flat
+	 */
+	@DELETE
+	@Path("/flats/{flat-id}")
+	public void removeFlat(@PathParam("flat-id") String flatId);
 }
