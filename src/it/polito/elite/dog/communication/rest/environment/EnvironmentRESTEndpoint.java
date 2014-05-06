@@ -541,7 +541,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		if (this.environmentModel.get() != null)
 		{
 			// get all the flats for the first building
-			List<Flat> flats = this.environmentModel.get().getBuildingEnvironment().get(0).getBuilding().get(0)
+			List<Flat> flats = this.environmentModel.get().getJAXBEnvironment().get(0).getBuilding().get(0)
 					.getFlat();
 			
 			// look for the desired flat
