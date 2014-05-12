@@ -34,5 +34,6 @@ Export-Package: com.hp.hpl.jena.ontology;version="2.6.3",
  com.hp.hpl.jena.rdf.model;version="2.6.3",
  com.hp.hpl.jena.shared;version="2.6.3",
  com.hp.hpl.jena.util.iterator;version="2.6.3",
+ com.hp.hpl.jena.vocabulary;version="2.6.3",
  it.polito.elite.dog.core.library.semantic.util;version="1.0.0",
  org.mindswap.pellet.jena
