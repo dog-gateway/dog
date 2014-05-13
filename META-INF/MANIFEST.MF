@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SemanticLibrary
 Bundle-SymbolicName: it.polito.elite.dog.core.library.semantic
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/jena/arq-2.8.4.jar,
  lib/jena/icu4j-3.4.4.jar,
@@ -35,5 +35,5 @@ Export-Package: com.hp.hpl.jena.ontology;version="2.6.3",
  com.hp.hpl.jena.shared;version="2.6.3",
  com.hp.hpl.jena.util.iterator;version="2.6.3",
  com.hp.hpl.jena.vocabulary;version="2.6.3",
- it.polito.elite.dog.core.library.semantic.util;version="1.0.0",
+ it.polito.elite.dog.core.library.semantic.util;version="1.1.0",
  org.mindswap.pellet.jena
