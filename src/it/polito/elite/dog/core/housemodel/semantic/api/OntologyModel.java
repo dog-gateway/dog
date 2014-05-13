@@ -19,7 +19,7 @@ package it.polito.elite.dog.core.housemodel.semantic.api;
 
 import java.util.Set;
 
-import it.polito.elite.dog.core.housemodel.semantic.util.OntologyDescriptorSet;
+import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
 
 import com.hp.hpl.jena.ontology.OntModel;
 

@@ -45,6 +45,7 @@ import it.polito.elite.dog.core.library.jaxb.Statevalues;
 import it.polito.elite.dog.core.library.jaxb.Storey;
 import it.polito.elite.dog.core.library.jaxb.Wall;
 import it.polito.elite.dog.core.library.jaxb.WallOpening;
+import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
 import it.polito.elite.utilities.cmd.Options;
 
 import java.io.BufferedReader;

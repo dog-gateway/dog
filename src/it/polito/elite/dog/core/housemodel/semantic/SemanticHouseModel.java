@@ -26,12 +26,18 @@ import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedModelLoader.L
 import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedModelLoader.ModelTypes;
 import it.polito.elite.dog.core.housemodel.semantic.query.SPARQLQueryWrapper;
 import it.polito.elite.dog.core.housemodel.semantic.util.DogOnt2XMLDog;
-import it.polito.elite.dog.core.housemodel.semantic.util.OntologyDescriptorSet;
+import it.polito.elite.dog.core.library.jaxb.Configcommand;
+import it.polito.elite.dog.core.library.jaxb.Confignotification;
+import it.polito.elite.dog.core.library.jaxb.Configparam;
+import it.polito.elite.dog.core.library.jaxb.Configstate;
+import it.polito.elite.dog.core.library.jaxb.ControlFunctionality;
 import it.polito.elite.dog.core.library.jaxb.Controllables;
 import it.polito.elite.dog.core.library.jaxb.Device;
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
+import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
+import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.BufferedReader;
@@ -47,12 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.util.JAXBSource;
-import javax.xml.namespace.QName;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -115,8 +115,8 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	// the XML configuration (for external communication and for describing a
 	// device)
 	private DogHomeConfiguration xmlConfiguration;
-	// the JAXB context
-	private JAXBContext jaxbContext;
+	// the JAXB representation of the devices without network-related info
+	private List<Controllables> simpleDevicesConfiguration;
 	
 	/**
 	 * Default (empty) constructor
@@ -316,8 +316,10 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 					DogOnt2XMLDog toXMLTranslator = new DogOnt2XMLDog(reasonedOntModel, namespaces, entryPoint);
 					// get the JAXB configuration
 					xmlConfiguration = toXMLTranslator.getJAXBXMLDog();
-					// store the JAXB context for further usage
-					jaxbContext = toXMLTranslator.getJAXBContext();
+					
+					// create the JAXB object representing the device list without their
+					// network-related properties
+					createSimpleDevicesRepresentation();
 					
 					// finish!
 					logger.log(LogService.LOG_DEBUG, "Generated JAXB configuration.");
@@ -362,6 +364,109 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		this.getNamespaces().putAll(namespaces);
 	}
 	
+	/**
+	 * Create the devices representation suitable for external usage (e.g., the
+	 * REST API), without network related informations.
+	 */
+	private synchronized void createSimpleDevicesRepresentation()
+	{
+		// get the full device representation
+		this.simpleDevicesConfiguration = this.xmlConfiguration.clone().getControllables();
+		
+		for (Device dev : this.simpleDevicesConfiguration.get(0).getDevice())
+		{
+			this.cleanJaxbDevice(dev);
+		}
+	}
+	
+	/**
+	 * Prepare the JAXB Device to contain the proper information for external
+	 * applications. It removes all the network-related properties and hides
+	 * some redundant arrays for the JSON serialization.
+	 * 
+	 * @param device
+	 *            the "full" JAXB Device to clean
+	 */
+	private synchronized void cleanJaxbDevice(Device device)
+	{
+		// store the parameters to be removed from the current device
+		Vector<Configparam> paramsToRemove = new Vector<Configparam>();
+		
+		// remove all the "first-level" params, since they are network-related
+		device.getParam().clear();
+		
+		// clean the description field
+		String description = device.getDescription().trim();
+		description = description.replaceAll("\t", "");
+		description = description.replaceAll("\n", " ");
+		device.setDescription(description);
+		
+		// get all the control functionalites...
+		List<ControlFunctionality> controlFunctionalities = device.getControlFunctionality();
+		for (ControlFunctionality controlFunctionality : controlFunctionalities)
+		{
+			// get all the commands
+			for (Configcommand command : controlFunctionality.getCommands().getCommand())
+			{
+				for (Configparam param : command.getParam())
+				{
+					// get all the command parameters to remove
+					// (network-related), i.e., preserve only the
+					// "realCommandName" prop
+					if (!param.getName().equalsIgnoreCase("realCommandName"))
+					{
+						paramsToRemove.add(param);
+					}
+				}
+				// effectively remove the parameters
+				for (Configparam param : paramsToRemove)
+				{
+					command.getParam().remove(param);
+				}
+				paramsToRemove.clear();
+			}
+			
+			// improve non-XML rendering by creating a redundant array
+			controlFunctionality.setCommandList(controlFunctionality.getCommands().getCommand());
+		}
+		
+		// get all the notification functionalities...
+		List<NotificationFunctionality> notificationsFunctionalities = device.getNotificationFunctionality();
+		for (NotificationFunctionality notificationFunctionality : notificationsFunctionalities)
+		{
+			// get all the notifications...
+			for (Confignotification notification : notificationFunctionality.getNotifications().getNotification())
+			{
+				for (Configparam param : notification.getParam())
+				{
+					// get all the notification parameters to remove
+					// (network-related), i.e., preserve only the
+					// "notificationName" and "notificationParamName" props
+					if ((!param.getName().equalsIgnoreCase("notificationName"))
+							&& (!param.getName().equalsIgnoreCase("notificationParamName")))
+					{
+						paramsToRemove.add(param);
+					}
+				}
+				// effectively remove the parameters
+				for (Configparam param : paramsToRemove)
+				{
+					notification.getParam().remove(param);
+				}
+				paramsToRemove.clear();
+			}
+			
+			// improve non-XML rendering by creating a redundant array
+			notificationFunctionality.setNotificationList(notificationFunctionality.getNotifications()
+					.getNotification());
+		}
+		
+		// improve non-XML rendering by creating a redundant array for states
+		for (Configstate status : device.getState())
+			status.setStatevalueList(status.getStatevalues().getStatevalue());
+		
+	}
+	
 	/*********************************************************************************
 	 * 
 	 * HouseModel service - implemented methods
@@ -380,6 +485,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	 * obtained through the {@link DogDeviceDescription} object (by calling the
 	 * {@link asDogDeviceConfigurationP()) method. Conditions might be given
 	 * restricting the set of devices for which configurations must be provided
+	 * 
 	 * 
 	 * back. They are given as an {@link Hashtable} of maximum 2 {@link HashSet}
 	 * <{@link String}>. This sets are respectively referenced by the keys:
@@ -433,7 +539,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 				Set<String> devices = this.qWrapper.getCategoryFilteredControllableInstances(conditions);
 				
 				// load all to the device list and convert it in short form
-				for(String devURI : devices)
+				for (String devURI : devices)
 				{
 					devList.add(this.qWrapper.toShortForm(devURI));
 				}
@@ -445,14 +551,14 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 			Set<String> devices = this.qWrapper.getAllControllableInstances();
 			
 			// convert it in short form
-			for(String devURI : devices)
+			for (String devURI : devices)
 			{
 				devList.add(this.qWrapper.toShortForm(devURI));
 			}
 		}
 		
 		if (this.xmlConfiguration != null)
-		{	
+		{
 			for (Device dev : this.xmlConfiguration.getControllables().get(0).getDevice())
 			{
 				if (devList.contains(dev.getId()))
@@ -553,27 +659,24 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		
 		if ((this.xmlConfiguration != null) && (!this.xmlConfiguration.getControllables().isEmpty()))
 		{
-			try
-			{
-				// deep copy
-				// TODO Implement as clone() for better performance (look for a
-				// plugin on the Internet... it exists!)
-				JAXBElement<DogHomeConfiguration> contentObj = new JAXBElement<DogHomeConfiguration>(new QName(
-						DogHomeConfiguration.class.getSimpleName()), DogHomeConfiguration.class, this.xmlConfiguration);
-				JAXBSource source = new JAXBSource(this.jaxbContext, contentObj);
-				// marshall the JAXBSource to obtain a deep copy
-				devices.addAll((jaxbContext.createUnmarshaller().unmarshal(source, DogHomeConfiguration.class)
-						.getValue()).getControllables());
-			}
-			catch (JAXBException e)
-			{
-				this.logger.log(LogService.LOG_ERROR, "Exception in cloning the XML configuration", e);
-			}
+			devices = this.xmlConfiguration.clone().getControllables();
 		}
 		
 		// return all the devices with their properties, in their JAXB
 		// representation
 		return devices;
+	}
+	
+	@Override
+	public List<Controllables> getDevices()
+	{
+		return this.xmlConfiguration.getControllables();
+	}
+	
+	@Override
+	public List<Controllables> getSimpleDevices()
+	{
+		return this.simpleDevicesConfiguration;
 	}
 	
 	/*********************************************************************************

@@ -17,8 +17,8 @@
  */
 package it.polito.elite.dog.core.housemodel.semantic.loader;
 
-import it.polito.elite.dog.core.housemodel.semantic.util.OntologyDescriptor;
-import it.polito.elite.dog.core.housemodel.semantic.util.OntologyDescriptorSet;
+import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptor;
+import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
 
 import java.io.File;
 import java.io.FileInputStream;

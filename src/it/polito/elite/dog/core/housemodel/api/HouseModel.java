@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  * 
- * Copyright (c) 2013 Luigi De Russis
+ * Copyright (c) 2013-2014 Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,18 +101,65 @@ public interface HouseModel
 	
 	/**
 	 * Get the JAXB representation of the environment: a list of devices, with
-	 * their properties, and a list of rooms/places.
+	 * their properties, and a list of rooms/places. <br/>
+	 * This method returns a shallow copy of the JAXB configuration, not
+	 * suitable for modifications.
 	 * 
 	 * @return {@link DogHomeConfiguration}
 	 */
 	public DogHomeConfiguration getJAXBConfiguration();
 	
 	/**
-	 * Get a copy of the JAXB representation of the devices configured in the
-	 * environment, with their properties
+	 * <p>
+	 * Get the JAXB representation of the devices present in the environment,
+	 * with all their properties.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method is equivalent to {@link getJAXBDevices()} but returns a
+	 * shallow copy of the JAXB devices present in Dog and, for this reason, it
+	 * is faster.<br/>
+	 * This method MUST NOT be used when the JAXB devices representation needs
+	 * to be modified.
+	 * </p>
 	 * 
 	 * @return a {@link List} of {@link Controllables}, i.e., all the configured
-	 *         devices
+	 *         devices with their properties.
+	 */
+	public List<Controllables> getDevices();
+	
+	/**
+	 * <p>
+	 * Get a deep copy of the JAXB object representing the devices present in
+	 * the environment, with all their properties.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method is equivalent to {@link getDevices()} but returns a deep copy
+	 * of the JAXB devices present in Dog and, for this reason, it is slower.<br/>
+	 * This method MUST be used when the JAXB devices representation needs to be
+	 * modified.
+	 * </p>
+	 * 
+	 * @return a dedicated copy of {@link List} of {@link Controllables}, i.e.,
+	 *         all the configured devices with their properties.
 	 */
 	public List<Controllables> getJAXBDevices();
+	
+	/**
+	 * <p>
+	 * Get the JAXB representation of the devices present in the environment,
+	 * without their network-related properties, suitable for end-user
+	 * visualizations.
+	 * </p>
+	 * <p>
+	 * This method returns a shallow copy of the JAXB devices present in Dog
+	 * and, for this reason, MUST NOT be used when the JAXB devices
+	 * representation needs to be modified.
+	 * </p>
+	 * 
+	 * @return a {@link List} of {@link Controllables}, i.e., all the configured
+	 *         devices without the network-related properties.
+	 */
+	public List<Controllables> getSimpleDevices();
 }
