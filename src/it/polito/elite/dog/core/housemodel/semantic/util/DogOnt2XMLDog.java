@@ -681,6 +681,8 @@ public class DogOnt2XMLDog
 		// get all the controllable devices
 		Set<String> allControllableInstances = this.qWrapper.getAllControllableInstances();
 		
+		long time = System.currentTimeMillis();
+		
 		// create a device object for each controllable and then fill it
 		for (String cControllableInst : allControllableInstances)
 		{
@@ -746,6 +748,9 @@ public class DogOnt2XMLDog
 			// add the device
 			controllables.getDevice().add(device);
 		}
+		
+		// debug
+		System.out.println("All controllables extracted in " + (System.currentTimeMillis() - time));
 		
 		return controllables;
 	}

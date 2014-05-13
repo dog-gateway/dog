@@ -326,7 +326,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 				}
 				catch (Exception e)
 				{
-					logger.log(LogService.LOG_ERROR, "Error while translating the ontology to JAXBXML" + e);
+					logger.log(LogService.LOG_ERROR, "Error while translating the ontology to JAXBXML ", e);
 				}
 				
 				// register the services provided by the bundle

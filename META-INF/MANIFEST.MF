@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: it.polito.elite.dog.core.housemodel.semantic
 Bundle-SymbolicName: it.polito.elite.dog.core.housemodel.semantic
-Bundle-Version: 0.10.0.pre
+Bundle-Version: 0.10.1.pre
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.hp.hpl.jena.ontology,
  com.hp.hpl.jena.ontology.impl,

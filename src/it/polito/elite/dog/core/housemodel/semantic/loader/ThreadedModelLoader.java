@@ -265,7 +265,7 @@ public class ThreadedModelLoader extends Thread
 					this.pModel.read(reasonedModelStream, this.modelToLoadNS);
 					
 					// create a pellet-based model over the plain model
-					this.model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF, pModel);
+					this.model = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM_RDFS_INF, pModel); //OWL_MEM_MICRO_RULE_INF, pModel);
 					this.model.setStrictMode(false);
 					
 					this.model.prepare();
