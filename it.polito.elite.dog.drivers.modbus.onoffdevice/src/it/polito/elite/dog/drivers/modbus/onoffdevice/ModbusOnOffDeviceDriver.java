@@ -46,71 +46,72 @@ import org.osgi.service.log.LogService;
  */
 public class ModbusOnOffDeviceDriver implements Driver
 {
-	
+
 	// The OSGi framework context
 	protected BundleContext context;
-	
+
 	// System logger
 	LogHelper logger;
-	
+
 	// the log identifier, unique for the class
 	public static String logId = "[ModbusOnOffDeviceDriver]: ";
-	
+
 	// a reference to the network driver
 	private ModbusNetwork network;
-	
+
 	// a reference to the gateway driver
 	private ModbusGatewayDriver gateway;
-	
+
 	// the list of driver instances currently connected to a device
 	private Vector<ModbusOnOffDeviceDriverInstance> connectedDrivers;
-	
+
 	// the registration object needed to handle the life span of this bundle in
 	// the OSGi framework (it is a ServiceRegistration object for use by the
 	// bundle registering the service to update the service's properties or to
 	// unregister the service).
 	private ServiceRegistration<?> regDriver;
-	
+
 	// what are the on/off device categories that can match with this driver?
 	private Set<String> OnOffDeviceCategories;
-	
+
 	public ModbusOnOffDeviceDriver()
 	{
 		// intentionally left empty
 	}
-	
+
 	public void activate(BundleContext bundleContext)
 	{
 		// init the logger
 		this.logger = new LogHelper(context);
-		
+
 		// store the context
 		this.context = bundleContext;
-		
+
 		// initialize the connected drivers list
 		this.connectedDrivers = new Vector<ModbusOnOffDeviceDriverInstance>();
-		
+
 		// initialize the set of implemented device categories
 		this.OnOffDeviceCategories = new HashSet<String>();
-		
+
 		// fill the categories
 		properFillDeviceCategories();
-		
+
 		// try to register the service
 		this.register();
 	}
-	
+
 	public void deactivate()
 	{
 		// log deactivation
-		this.logger.log(LogService.LOG_DEBUG, ModbusOnOffDeviceDriver.logId + " Deactivation required");
-		
+		this.logger.log(LogService.LOG_DEBUG, ModbusOnOffDeviceDriver.logId
+				+ " Deactivation required");
+
 		// unregister from the network driver
 		for (ModbusOnOffDeviceDriverInstance instance : this.connectedDrivers)
 			this.network.removeDriver(instance);
-		
+
 		this.unRegister();
-		
+
 		// null the inner data structures
 		this.context = null;
 		this.logger = null;
@@ -118,7 +119,7 @@ public class ModbusOnOffDeviceDriver implements Driver
 		this.gateway = null;
 		this.connectedDrivers = null;
 	}
-	
+
 	/**
 	 * Handles the "availability" of a Modbus network driver (store a reference
 	 * to the driver and try to start).
@@ -130,11 +131,11 @@ public class ModbusOnOffDeviceDriver implements Driver
 	{
 		// store a reference to the network driver
 		this.network = netDriver;
-		
+
 		// try to start service offering
 		this.register();
 	}
-	
+
 	/**
 	 * Handles the removal of the connected network driver by unregistering the
 	 * services provided by this driver
@@ -143,11 +144,11 @@ public class ModbusOnOffDeviceDriver implements Driver
 	{
 		// un-register this service
 		this.unRegister();
-		
+
 		// null the reference to the network driver
 		this.network = null;
 	}
-	
+
 	/**
 	 * Handles the "availability" of a Modbus gateway driver (store a reference
 	 * to the driver and try to start).
@@ -159,11 +160,11 @@ public class ModbusOnOffDeviceDriver implements Driver
 	{
 		// store a reference to the gateway driver
 		this.gateway = gwDriver;
-		
+
 		// try to start service offering
 		this.register();
 	}
-	
+
 	/**
 	 * Handles the removal of the connected network driver by unregistering the
 	 * services provided by this driver
@@ -172,46 +173,56 @@ public class ModbusOnOffDeviceDriver implements Driver
 	{
 		// un-register this service
 		this.unRegister();
-		
+
 		// null the reference to the network driver
 		this.gateway = null;
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public int match(ServiceReference reference) throws Exception
 	{
 		int matchValue = Device.MATCH_NONE;
-		
-		if ((this.network != null) && (this.gateway != null) && (this.regDriver != null))
+
+		if ((this.network != null) && (this.gateway != null)
+				&& (this.regDriver != null))
 		{
 			// the device category for this device
-			String deviceCategory = (String) reference.getProperty(DeviceCostants.DEVICE_CATEGORY);
-			
+			String deviceCategory = (String) reference
+					.getProperty(DeviceCostants.DEVICE_CATEGORY);
+
 			try
 			{
 				// get the device class
-				if (Controllable.class.isAssignableFrom(ModbusOnOffDeviceDriver.class.getClassLoader().loadClass(
-						deviceCategory)))
+				if (Controllable.class
+						.isAssignableFrom(ModbusOnOffDeviceDriver.class
+								.getClassLoader().loadClass(deviceCategory)))
 				{
-					
+
 					// the manufacturer
-					String manufacturer = (String) reference.getProperty(DeviceCostants.MANUFACTURER);
-					
+					String manufacturer = (String) reference
+							.getProperty(DeviceCostants.MANUFACTURER);
+
 					// get the gateway to which the device is connected
-					String gateway = (String) reference.getProperty(DeviceCostants.GATEWAY);
-					
+					String gateway = (String) reference
+							.getProperty(DeviceCostants.GATEWAY);
+
 					// compute the matching score between the given device and
 					// this driver
 					if (deviceCategory != null)
 					{
-						if (manufacturer != null && (gateway != null) && (manufacturer.equals(ModbusInfo.MANUFACTURER))
-								&& (OnOffDeviceCategories.contains(deviceCategory))
+						if (manufacturer != null
+								&& (gateway != null)
+								&& (manufacturer
+										.equals(ModbusInfo.MANUFACTURER))
+								&& (OnOffDeviceCategories
+										.contains(deviceCategory))
 								&& (this.gateway.isGatewayAvailable(gateway)))
 						{
-							matchValue = Lamp.MATCH_MANUFACTURER + Lamp.MATCH_TYPE;
+							matchValue = Lamp.MATCH_MANUFACTURER
+									+ Lamp.MATCH_TYPE;
 						}
-						
+
 					}
 				}
 			}
@@ -220,10 +231,10 @@ public class ModbusOnOffDeviceDriver implements Driver
 				// skip --> no match
 			}
 		}
-		
+
 		return matchValue;
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public String attach(ServiceReference reference) throws Exception
@@ -231,17 +242,22 @@ public class ModbusOnOffDeviceDriver implements Driver
 		if (this.regDriver != null)
 		{
 			// get the gateway to which the device is connected
-			String gateway = (String) ((ControllableDevice) this.context.getService(reference)).getDeviceDescriptor()
-					.getGateway();
-			
+			String gateway = (String) ((ControllableDevice) this.context
+					.getService(reference)).getDeviceDescriptor().getGateway();
+
 			// create a new driver instance
-			ModbusOnOffDeviceDriverInstance driverInstance = new ModbusOnOffDeviceDriverInstance(network,
-					(ControllableDevice) this.context.getService(reference), this.gateway.getSpecificGateway(gateway)
-							.getGatewayAddress(), this.gateway.getSpecificGateway(gateway).getGatewayPort(),
-					this.gateway.getSpecificGateway(gateway).getGwProtocol(), this.context);
-			
-			((ControllableDevice) context.getService(reference)).setDriver(driverInstance);
-			
+			ModbusOnOffDeviceDriverInstance driverInstance = new ModbusOnOffDeviceDriverInstance(
+					network,
+					(ControllableDevice) this.context.getService(reference),
+					this.gateway.getSpecificGateway(gateway)
+							.getGatewayAddress(), this.gateway
+							.getSpecificGateway(gateway).getGatewayPort(),
+					this.gateway.getSpecificGateway(gateway).getGwProtocol(),
+					this.context);
+
+			((ControllableDevice) context.getService(reference))
+					.setDriver(driverInstance);
+
 			synchronized (this.connectedDrivers)
 			{
 				this.connectedDrivers.add(driverInstance);
@@ -249,7 +265,7 @@ public class ModbusOnOffDeviceDriver implements Driver
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Unregisters this driver from the OSGi framework...
 	 */
@@ -261,29 +277,32 @@ public class ModbusOnOffDeviceDriver implements Driver
 			this.regDriver.unregister();
 			this.regDriver = null;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Registers this driver in the OSGi framework making its services available
 	 * for all the other Dog bundles
 	 */
 	private void register()
 	{
-		if ((this.network != null) && (this.gateway != null) && (this.context != null) && (this.regDriver == null))
+		if ((this.network != null) && (this.gateway != null)
+				&& (this.context != null) && (this.regDriver == null))
 		{
 			// create a new property object describing this driver
 			Hashtable<String, Object> propDriver = new Hashtable<String, Object>();
-			
+
 			// add the id of this driver to the properties
-			propDriver.put(DeviceCostants.DRIVER_ID, ModbusOnOffDeviceDriver.class.getName());
-			
+			propDriver.put(DeviceCostants.DRIVER_ID,
+					ModbusOnOffDeviceDriver.class.getName());
+
 			// register this driver in the OSGi framework
-			this.regDriver = this.context.registerService(Driver.class.getName(), this, propDriver);
+			this.regDriver = this.context.registerService(
+					Driver.class.getName(), this, propDriver);
 		}
-		
+
 	}
-	
+
 	/**
 	 * Fill a set with all the device categories whose devices can match with
 	 * this driver. Automatically retrieve the device categories list by reading
@@ -291,10 +310,11 @@ public class ModbusOnOffDeviceDriver implements Driver
 	 */
 	private void properFillDeviceCategories()
 	{
-		for (Class<?> devCat : ModbusOnOffDeviceDriverInstance.class.getInterfaces())
+		for (Class<?> devCat : ModbusOnOffDeviceDriverInstance.class
+				.getInterfaces())
 		{
 			this.OnOffDeviceCategories.add(devCat.getName());
 		}
 	}
-	
+
 }

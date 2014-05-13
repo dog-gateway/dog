@@ -42,14 +42,16 @@ import org.osgi.service.log.LogService;
  * 
  */
 public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
-		implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet {
+		implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet
+{
 
 	// the class logger
 	private LogHelper logger;
 
 	public ModbusOnOffDeviceDriverInstance(ModbusNetwork network,
 			ControllableDevice device, String gatewayAddress,
-			String gatewayPort, String gatewayProtocol, BundleContext context) {
+			String gatewayPort, String gatewayProtocol, BundleContext context)
+	{
 		super(network, device, gatewayAddress, gatewayPort, gatewayProtocol);
 
 		// create a logger
@@ -59,53 +61,63 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 		this.initializeStates();
 	}
 
-	private void initializeStates() {
+	private void initializeStates()
+	{
 		this.currentState.setState(OnOffState.class.getSimpleName(),
 				new OnOffState(new OffStateValue()));
 
 		// read the initial state (should be just one...)
-		for (ModbusRegisterInfo register : this.register2Notification.keySet()) {
+		for (ModbusRegisterInfo register : this.register2Notification.keySet())
+		{
 			this.network.read(register);
 		}
 	}
 
 	@Override
-	public void storeScene(Integer sceneNumber) {
+	public void storeScene(Integer sceneNumber)
+	{
 		// intentionally left empty
 	}
 
 	@Override
-	public void deleteScene(Integer sceneNumber) {
+	public void deleteScene(Integer sceneNumber)
+	{
 		// intentionally left empty
 	}
 
 	@Override
-	public void deleteGroup(String groupID) {
+	public void deleteGroup(String groupID)
+	{
 		// intentionally left empty
 	}
 
 	@Override
-	public void storeGroup(String groupID) {
+	public void storeGroup(String groupID)
+	{
 		// intentionally left empty
 	}
 
 	@Override
-	public void on() {
+	public void on()
+	{
 		this.network.write(this.managedRegisters.iterator().next(), "true");
 	}
 
 	@Override
-	public void off() {
+	public void off()
+	{
 		this.network.write(this.managedRegisters.iterator().next(), "false");
 	}
 
 	@Override
-	public DeviceStatus getState() {
+	public DeviceStatus getState()
+	{
 		return this.currentState;
 	}
 
 	@Override
-	public void notifyStateChanged(State newState) {
+	public void notifyStateChanged(State newState)
+	{
 		// debug
 		this.logger.log(LogService.LOG_DEBUG, ModbusOnOffDeviceDriver.logId
 				+ "Device " + this.device.getDeviceId() + " is now "
@@ -116,11 +128,16 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 
 	@Override
 	public void newMessageFromHouse(ModbusRegisterInfo dataPointInfo,
-			String value) {
-		if ((value != null) && (!value.isEmpty())) {
-			if (value.equalsIgnoreCase("true")) {
+			String value)
+	{
+		if ((value != null) && (!value.isEmpty()))
+		{
+			if (value.equalsIgnoreCase("true"))
+			{
 				this.changeCurrentState(OnOffState.ON);
-			} else if (value.equalsIgnoreCase("false")) {
+			}
+			else if (value.equalsIgnoreCase("false"))
+			{
 				this.changeCurrentState(OnOffState.OFF);
 			}
 		}
@@ -128,13 +145,15 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 	}
 
 	@Override
-	protected void specificConfiguration() {
+	protected void specificConfiguration()
+	{
 		// prepare the device state map
 		this.currentState = new DeviceStatus(device.getDeviceId());
 	}
 
 	@Override
-	protected void addToNetworkDriver(ModbusRegisterInfo register) {
+	protected void addToNetworkDriver(ModbusRegisterInfo register)
+	{
 		this.network.addDriver(register, this);
 	}
 
@@ -145,20 +164,25 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 	 * @param OnOffValue
 	 *            OnOffState.ON or OnOffState.OFF
 	 */
-	private void changeCurrentState(String OnOffValue) {
+	private void changeCurrentState(String OnOffValue)
+	{
 		// get the current state
 		final State state = this.currentState.getState(OnOffState.class
 				.getSimpleName());
 
 		// no current state defined, the first run
-		if (state == null) {
+		if (state == null)
+		{
 			updateCurrentState(OnOffValue);
-		} else {
+		}
+		else
+		{
 			final String currentStateValue = (String) state
 					.getCurrentStateValue()[0].getValue();
 
 			// if the current states it is different from the new state
-			if (!currentStateValue.equalsIgnoreCase(OnOffValue)) {
+			if (!currentStateValue.equalsIgnoreCase(OnOffValue))
+			{
 				updateCurrentState(OnOffValue);
 			}
 		}
@@ -171,12 +195,16 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 	 * @param OnOffValue
 	 *            OnOffState.ON or OnOffState.OFF
 	 */
-	private void updateCurrentState(String OnOffValue) {
+	private void updateCurrentState(String OnOffValue)
+	{
 		State newState;
 		// set the new state to on or off...
-		if (OnOffValue.equalsIgnoreCase(OnOffState.ON)) {
+		if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
+		{
 			newState = new OnOffState(new OnStateValue());
-		} else {
+		}
+		else
+		{
 			newState = new OnOffState(new OffStateValue());
 		}
 		// ... then set the new state for the device and throw a state
