@@ -272,7 +272,7 @@ public class DogOnt2XMLDog
 	
 		
 		PelletInfGraph infG = ((PelletInfGraph) this.ontology.getGraph());
-		infG.classify();
+		//infG.classify();
 		infG.realize();
 		infG.setAutoDetectChanges(false);
 		
