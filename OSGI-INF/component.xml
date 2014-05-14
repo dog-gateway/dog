@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" enabled="true" immediate="false" name="it.polito.elite.dog.addons.streamprocessor.simple">
    <implementation class="it.polito.elite.dog.addons.streamprocessor.simple.SimpleStreamProcessor"/>
-    <property name="event.topics" type="String" value="it/polito/elite/domotics/model/notification/*"/>
+    <property name="event.topics" type="String" value="it/polito/elite/dog/core/library/model/notification/*"/>
    <service>
       <provide interface="org.osgi.service.cm.ManagedService"/>
       <provide interface="org.osgi.service.event.EventHandler"/>
