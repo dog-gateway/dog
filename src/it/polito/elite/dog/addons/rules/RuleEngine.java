@@ -313,7 +313,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 		// Add this bundle as a listener of monitor, TimedTriggerNotification
 		// and DogOntNotification events
 		p.put(EventConstants.EVENT_TOPIC, new String[] { "org/osgi/service/monitor/MonitorEvent",
-				TimedTriggerNotification.notificationTopic, "it/polito/elite/domotics/model/notification/*" });
+				TimedTriggerNotification.notificationTopic, "it/polito/elite/dog/core/library/model/notification/*" });
 		this.srEventHandler = this.context.registerService(EventHandler.class.getName(), this, p);
 		this.srDogRulesService = this.context.registerService(RuleEngineApi.class.getName(), this, null);
 		
@@ -769,7 +769,7 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 					// Received a notification from the devices or a
 					// TimedTriggerNotification (DogScheduler)
 					else if (eventTopic != null
-							&& (eventTopic.startsWith("it/polito/elite/domotics/model/notification/") || eventTopic
+							&& (eventTopic.startsWith("it/polito/elite/dog/core/library/model/notification/") || eventTopic
 									.equals(TimedTriggerNotification.notificationTopic)))
 					{
 						// debug
