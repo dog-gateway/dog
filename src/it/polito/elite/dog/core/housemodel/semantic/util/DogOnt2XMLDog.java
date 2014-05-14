@@ -737,8 +737,9 @@ public class DogOnt2XMLDog
 				else if (networkType.endsWith("Gateway"))
 					cIndex = networkType.indexOf("Gateway");
 				
-				// sets the domotic system of the device
-				device.setDomoticSystem(networkType.substring(0, cIndex).toUpperCase());
+				if(cIndex != -1)
+					// sets the domotic system of the device
+					device.setDomoticSystem(networkType.substring(0, cIndex).toUpperCase());
 				
 			}
 				
