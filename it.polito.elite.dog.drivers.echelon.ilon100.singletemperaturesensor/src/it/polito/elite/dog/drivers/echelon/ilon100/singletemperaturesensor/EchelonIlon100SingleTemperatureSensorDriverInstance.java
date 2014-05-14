@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2014 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.SingleTemperatureSensor;
 import it.polito.elite.dog.core.library.model.notification.TemperatureMeasurementNotification;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.state.TemperatureState;
 import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 import it.polito.elite.dog.drivers.echelon.ilon100.network.EchelonIlon100DriverInstance;
@@ -136,11 +135,17 @@ public class EchelonIlon100SingleTemperatureSensorDriverInstance extends Echelon
 		return this.currentState;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.library.model.devicecategory.SingleTemperatureSensor
+	 * #updateStatus()
+	 */
 	@Override
-	public void notifyStateChanged(State newState)
+	public void updateStatus()
 	{
-		// probably unused...
-		((SingleTemperatureSensor) this.device).notifyStateChanged(newState);
+		((SingleTemperatureSensor) this.device).updateStatus();
 	}
 	
 	@Override
@@ -182,6 +187,9 @@ public class EchelonIlon100SingleTemperatureSensorDriverInstance extends Echelon
 							+ "Unable to find a suitable notification method for the datapoint: " + dataPointInfo
 							+ ":\n" + e);
 				}
+				
+				// notify the monitor admin
+				this.updateStatus();
 				
 			}
 		}
@@ -239,6 +247,24 @@ public class EchelonIlon100SingleTemperatureSensorDriverInstance extends Echelon
 		// add the datapoint to the network driver, no further operation needed
 		this.network.addDriver(dp, this);
 		
+	}
+	
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+	
+	@Override
+	public void notifyBelongToGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+	
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// intentionally left empty
 	}
 	
 }

@@ -24,7 +24,6 @@ import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.EchelonIlon100Gateway;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.drivers.echelon.ilon100.network.EchelonIlon100DriverInstance;
 import it.polito.elite.dog.drivers.echelon.ilon100.network.info.DataPointInfo;
 import it.polito.elite.dog.drivers.echelon.ilon100.network.interfaces.EchelonIlon100Network;
@@ -60,13 +59,6 @@ public class EchelonIlon100GatewayDriverInstance extends EchelonIlon100DriverIns
 		
 		// try datapoint discovery.... just to log available datapoints
 		//this.network.discoverDatapoints(this.endpointAddress);
-	}
-	
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// intentionally left empty
-		
 	}
 	
 	@Override
@@ -110,6 +102,12 @@ public class EchelonIlon100GatewayDriverInstance extends EchelonIlon100DriverIns
 	protected void addToNetworkDriver(DataPointInfo dp)
 	{
 		// at the moment no datapoints are managed by this driver....
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// intentionally left empty
 	}
 	
 }
