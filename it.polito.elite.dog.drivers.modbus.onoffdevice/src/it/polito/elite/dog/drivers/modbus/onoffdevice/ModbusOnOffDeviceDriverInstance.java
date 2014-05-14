@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@ import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
 import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
 import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
+import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
+
+import javax.measure.Measure;
+
 import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -41,94 +45,80 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
-		implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet
+public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance implements Lamp, SimpleLamp, Buzzer,
+		MainsPowerOutlet
 {
-
+	
 	// the class logger
 	private LogHelper logger;
-
-	public ModbusOnOffDeviceDriverInstance(ModbusNetwork network,
-			ControllableDevice device, String gatewayAddress,
+	
+	public ModbusOnOffDeviceDriverInstance(ModbusNetwork network, ControllableDevice device, String gatewayAddress,
 			String gatewayPort, String gatewayProtocol, BundleContext context)
 	{
 		super(network, device, gatewayAddress, gatewayPort, gatewayProtocol);
-
+		
 		// create a logger
 		this.logger = new LogHelper(context);
-
+		
 		// read the initial state of devices
 		this.initializeStates();
 	}
-
+	
 	private void initializeStates()
 	{
-		this.currentState.setState(OnOffState.class.getSimpleName(),
-				new OnOffState(new OffStateValue()));
-
+		this.currentState.setState(OnOffState.class.getSimpleName(), new OnOffState(new OffStateValue()));
+		
 		// read the initial state (should be just one...)
 		for (ModbusRegisterInfo register : this.register2Notification.keySet())
 		{
 			this.network.read(register);
 		}
 	}
-
+	
 	@Override
 	public void storeScene(Integer sceneNumber)
 	{
 		// intentionally left empty
 	}
-
+	
 	@Override
 	public void deleteScene(Integer sceneNumber)
 	{
 		// intentionally left empty
 	}
-
+	
 	@Override
 	public void deleteGroup(String groupID)
 	{
 		// intentionally left empty
 	}
-
+	
 	@Override
 	public void storeGroup(String groupID)
 	{
 		// intentionally left empty
 	}
-
+	
 	@Override
 	public void on()
 	{
 		this.network.write(this.managedRegisters.iterator().next(), "true");
 	}
-
+	
 	@Override
 	public void off()
 	{
 		this.network.write(this.managedRegisters.iterator().next(), "false");
 	}
-
+	
 	@Override
 	public DeviceStatus getState()
 	{
 		return this.currentState;
 	}
-
+	
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// debug
-		this.logger.log(LogService.LOG_DEBUG, ModbusOnOffDeviceDriver.logId
-				+ "Device " + this.device.getDeviceId() + " is now "
-				+ ((OnOffState) newState).getCurrentStateValue()[0].getValue());
-		((ElectricalSystem) this.device).notifyStateChanged(newState);
-
-	}
-
-	@Override
-	public void newMessageFromHouse(ModbusRegisterInfo dataPointInfo,
-			String value)
+	public void newMessageFromHouse(ModbusRegisterInfo dataPointInfo, String value)
 	{
 		if ((value != null) && (!value.isEmpty()))
 		{
@@ -141,22 +131,22 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 				this.changeCurrentState(OnOffState.OFF);
 			}
 		}
-
+		
 	}
-
+	
 	@Override
 	protected void specificConfiguration()
 	{
 		// prepare the device state map
 		this.currentState = new DeviceStatus(device.getDeviceId());
 	}
-
+	
 	@Override
 	protected void addToNetworkDriver(ModbusRegisterInfo register)
 	{
 		this.network.addDriver(register, this);
 	}
-
+	
 	/**
 	 * Check if the current state has been changed or never set. In that case,
 	 * fire a state change message, otherwise it does nothing
@@ -167,9 +157,8 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 	private void changeCurrentState(String OnOffValue)
 	{
 		// get the current state
-		final State state = this.currentState.getState(OnOffState.class
-				.getSimpleName());
-
+		final State state = this.currentState.getState(OnOffState.class.getSimpleName());
+		
 		// no current state defined, the first run
 		if (state == null)
 		{
@@ -177,9 +166,8 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 		}
 		else
 		{
-			final String currentStateValue = (String) state
-					.getCurrentStateValue()[0].getValue();
-
+			final String currentStateValue = (String) state.getCurrentStateValue()[0].getValue();
+			
 			// if the current states it is different from the new state
 			if (!currentStateValue.equalsIgnoreCase(OnOffValue))
 			{
@@ -187,7 +175,7 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 			}
 		}
 	}
-
+	
 	/**
 	 * Update the current state of driver instance and fire a state change
 	 * message
@@ -202,15 +190,88 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance
 		if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
 		{
 			newState = new OnOffState(new OnStateValue());
+			this.notifyOn();
 		}
 		else
 		{
 			newState = new OnOffState(new OffStateValue());
+			this.notifyOff();
 		}
-		// ... then set the new state for the device and throw a state
-		// changed notification
+		// ... then set the new state for the device and throw a status
+		// update
 		this.currentState.setState(newState.getStateName(), newState);
-		this.notifyStateChanged(newState);
+		
+		// debug
+		this.logger.log(LogService.LOG_DEBUG, ModbusOnOffDeviceDriver.logId + "Device " + this.device.getDeviceId()
+				+ " is now " + ((OnOffState) newState).getCurrentStateValue()[0].getValue());
+		
+		this.updateStatus();
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.library.model.devicecategory.Lamp#notifyOn()
+	 */
+	@Override
+	public void notifyOn()
+	{
+		((OnOffOutput) this.device).notifyOn();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.library.model.devicecategory.Lamp#notifyOff()
+	 */
+	@Override
+	public void notifyOff()
+	{
+		((OnOffOutput) this.device).notifyOff();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.library.model.devicecategory.Lamp#updateStatus()
+	 */
+	@Override
+	public void updateStatus()
+	{
+		((ElectricalSystem) this.device).updateStatus();
+	}
+	
+	@Override
+	public void notifyStoredScene(Integer sceneNumber)
+	{
+		// intentionally left empty
+	}
+	
+	@Override
+	public void notifyDeletedScene(Measure<?, ?> sceneNumber)
+	{
+		// intentionally left empty
+	}
+	
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+	
+	@Override
+	public void notifyBelongToGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+	
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+	
 }

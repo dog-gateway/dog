@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.SingleTemperatureSensor;
 import it.polito.elite.dog.core.library.model.notification.TemperatureMeasurementNotification;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.state.TemperatureState;
 import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
@@ -141,16 +140,12 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriverIns
 	
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see it.polito.elite.domotics.model.devicecategory.TemperatureSensor#
-	 * notifyStateChanged(it.polito.elite.domotics.model.state.State)
+	 * @see it.polito.elite.dog.core.library.model.devicecategory.SingleTemperatureSensor#updateStatus()
 	 */
 	@Override
-	public void notifyStateChanged(State newState)
+	public void updateStatus()
 	{
-		// probably unused...
-		((SingleTemperatureSensor) this.device).notifyStateChanged(newState);
-		
+		((SingleTemperatureSensor) this.device).updateStatus();
 	}
 	
 	/*
@@ -201,6 +196,8 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriverIns
 							+ e);
 				}
 				
+				// notify the monitor admin
+				this.updateStatus();
 			}
 		}
 		
@@ -269,6 +266,24 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriverIns
 		
 		// read the initial state
 		this.network.readAll(this.register2Notification.keySet());
+	}
+
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyBelongToGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// intentionally left empty
 	}
 	
 }

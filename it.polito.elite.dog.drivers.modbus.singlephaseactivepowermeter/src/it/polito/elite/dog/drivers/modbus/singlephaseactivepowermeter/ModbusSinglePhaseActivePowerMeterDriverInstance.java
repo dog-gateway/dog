@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.SinglePhaseActivePowerMeter;
 import it.polito.elite.dog.core.library.model.notification.SinglePhaseActivePowerMeasurementNotification;
 import it.polito.elite.dog.core.library.model.state.SinglePhaseActivePowerMeasurementState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
@@ -121,22 +120,20 @@ public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDrive
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * it.polito.elite.domotics.model.devicecategory.SinglePhaseActivePowerMeter
-	 * #notifyStateChanged(it.polito.elite.domotics.model.state.State)
+	 * @see it.polito.elite.dog.core.library.model.devicecategory.
+	 * SinglePhaseActivePowerMeter#updateStatus()
 	 */
 	@Override
-	public void notifyStateChanged(State newState)
+	public void updateStatus()
 	{
-		((SinglePhaseActivePowerMeter) this.device).notifyStateChanged(newState);
+		((SinglePhaseActivePowerMeter) this.device).updateStatus();
 	}
 	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
-	 * newMessageFromHouse
-	 * (it.polito.elite.dog.drivers.modbus.network.info
+	 * newMessageFromHouse (it.polito.elite.dog.drivers.modbus.network.info
 	 * .ModbusRegisterInfo, java.lang.String)
 	 */
 	@Override
@@ -181,6 +178,8 @@ public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDrive
 					e.printStackTrace();
 				}
 				
+				// notify the monitor admin
+				this.updateStatus();
 			}
 		}
 		
@@ -204,8 +203,7 @@ public class ModbusSinglePhaseActivePowerMeterDriverInstance extends ModbusDrive
 	 * (non-Javadoc)
 	 * 
 	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
-	 * addToNetworkDriver
-	 * (it.polito.elite.dog.drivers.modbus.network.info.
+	 * addToNetworkDriver (it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo)
 	 */
 	@Override

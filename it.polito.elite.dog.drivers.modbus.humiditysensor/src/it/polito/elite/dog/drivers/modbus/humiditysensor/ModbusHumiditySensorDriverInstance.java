@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.HumiditySensor;
 import it.polito.elite.dog.core.library.model.notification.HumidityMeasurementNotification;
 import it.polito.elite.dog.core.library.model.state.HumidityMeasurementState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.HumidityStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
@@ -45,33 +44,32 @@ import org.osgi.service.log.LogService;
  * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
- *
+ * 
  */
-public class ModbusHumiditySensorDriverInstance extends ModbusDriverInstance implements
-		HumiditySensor {
+public class ModbusHumiditySensorDriverInstance extends ModbusDriverInstance implements HumiditySensor
+{
 	// the class logger
 	private LogHelper logger;
-
+	
 	/**
 	 * @param network
 	 * @param device
 	 * @param gatewayAddress
 	 * @param context
 	 */
-	public ModbusHumiditySensorDriverInstance(ModbusNetwork network,
-			ControllableDevice device, String gatewayAddress,
+	public ModbusHumiditySensorDriverInstance(ModbusNetwork network, ControllableDevice device, String gatewayAddress,
 			String gatewayPort, String gatewayProtocol, BundleContext context)
 	{
 		super(network, device, gatewayAddress, gatewayPort, gatewayProtocol);
-
+		
 		// create a logger
 		this.logger = new LogHelper(context);
-
+		
 		// TODO: get the initial state of the device....(states can be updated
 		// by reading notification group addresses)
 		this.initializeStates();
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -80,12 +78,12 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriverInstance imp
 	 * ()
 	 */
 	@Override
-	public Measure<?, ?> getRelativeHumidity() {
-		return (Measure<?, ?>) this.currentState.getState(
-				HumidityMeasurementState.class.getSimpleName())
+	public Measure<?, ?> getRelativeHumidity()
+	{
+		return (Measure<?, ?>) this.currentState.getState(HumidityMeasurementState.class.getSimpleName())
 				.getCurrentStateValue()[0].getValue();
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -93,23 +91,11 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriverInstance imp
 	 * it.polito.elite.domotics.model.devicecategory.HumiditySensor#getState()
 	 */
 	@Override
-	public DeviceStatus getState() {
+	public DeviceStatus getState()
+	{
 		return this.currentState;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see it.polito.elite.domotics.model.devicecategory.HumiditySensor#
-	 * notifyStateChanged(it.polito.elite.domotics.model.state.State)
-	 */
-	@Override
-	public void notifyStateChanged(State newState) {
-		// probably unused...
-		((HumiditySensor) this.device).notifyStateChanged(newState);
-
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -117,73 +103,88 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriverInstance imp
 	 * notifyNewHumidityValue(javax.measure.Measure)
 	 */
 	@Override
-	public void notifyChangedRelativeHumidity(Measure<?, ?> humidityValue) {
+	public void notifyChangedRelativeHumidity(Measure<?, ?> humidityValue)
+	{
 		// update the state
 		HumidityStateValue pValue = new HumidityStateValue();
 		pValue.setValue(humidityValue);
-		this.currentState.setState(HumidityMeasurementState.class.getSimpleName(),
-				new HumidityMeasurementState(pValue));
-
+		this.currentState
+				.setState(HumidityMeasurementState.class.getSimpleName(), new HumidityMeasurementState(pValue));
+		
 		// notify the new measure
-		((HumiditySensor) this.device)
-				.notifyChangedRelativeHumidity(humidityValue);
+		((HumiditySensor) this.device).notifyChangedRelativeHumidity(humidityValue);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
-	 * newMessageFromHouse
-	 * (it.polito.elite.dog.drivers.modbus.network.info
+	 * newMessageFromHouse (it.polito.elite.dog.drivers.modbus.network.info
 	 * .ModbusRegisterInfo, java.lang.String)
 	 */
 	@Override
-	public void newMessageFromHouse(ModbusRegisterInfo register, String value) {
-		if (value != null) {
+	public void newMessageFromHouse(ModbusRegisterInfo register, String value)
+	{
+		if (value != null)
+		{
 			// gets the corresponding notification set...
-			Set<CNParameters> notificationInfos = this.register2Notification
-					.get(register);
-
+			Set<CNParameters> notificationInfos = this.register2Notification.get(register);
+			
 			// handle the notifications
-			for (CNParameters notificationInfo : notificationInfos) {
+			for (CNParameters notificationInfo : notificationInfos)
+			{
 				// black magic here...
 				String notificationName = notificationInfo.getName();
-
+				
 				// get the hypothetical class method name
-				String notifyMethod = "notify"
-						+ Character.toUpperCase(notificationName.charAt(0))
+				String notifyMethod = "notify" + Character.toUpperCase(notificationName.charAt(0))
 						+ notificationName.substring(1);
-
+				
 				// search the method and execute it
-				try {
+				try
+				{
 					// log notification
-					this.logger.log(LogService.LOG_DEBUG,
-							ModbusHumiditySensorDriver.logId + "Device: "
-									+ this.device.getDeviceId()
-									+ " is notifying " + notificationName
-									+ " value:"
-									+ register.getXlator().getValue());
-					// get the method
-
-					Method notify = ModbusHumiditySensorDriverInstance.class
-							.getDeclaredMethod(notifyMethod, Measure.class);
-					// invoke the method
-					notify.invoke(this, DecimalMeasure.valueOf(register
-							.getXlator().getValue()));
-				} catch (Exception e) {
-					// log the error
 					this.logger
-							.log(LogService.LOG_WARNING,
-									ModbusHumiditySensorDriver.logId
-											+ "Unable to find a suitable notification method for the datapoint: "
-											+ register + ":\n" + e);
+							.log(LogService.LOG_DEBUG,
+									ModbusHumiditySensorDriver.logId + "Device: " + this.device.getDeviceId()
+											+ " is notifying " + notificationName + " value:"
+											+ register.getXlator().getValue());
+					// get the method
+					
+					Method notify = ModbusHumiditySensorDriverInstance.class.getDeclaredMethod(notifyMethod,
+							Measure.class);
+					// invoke the method
+					notify.invoke(this, DecimalMeasure.valueOf(register.getXlator().getValue()));
 				}
-
+				catch (Exception e)
+				{
+					// log the error
+					this.logger.log(LogService.LOG_WARNING, ModbusHumiditySensorDriver.logId
+							+ "Unable to find a suitable notification method for the datapoint: " + register + ":\n"
+							+ e);
+				}
+				
+				// notify the monitor admin
+				this.updateStatus();
+				
 			}
 		}
-
+		
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.library.model.devicecategory.HumiditySensor#
+	 * updateStatus()
+	 */
+	@Override
+	public void updateStatus()
+	{
+		((HumiditySensor) this.device).updateStatus();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -191,53 +192,56 @@ public class ModbusHumiditySensorDriverInstance extends ModbusDriverInstance imp
 	 * specificConfiguration()
 	 */
 	@Override
-	protected void specificConfiguration() {
+	protected void specificConfiguration()
+	{
 		// prepare the device state map
 		this.currentState = new DeviceStatus(device.getDeviceId());
-
+		
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
-	 * addToNetworkDriver
-	 * (it.polito.elite.dog.drivers.modbus.network.info.
+	 * addToNetworkDriver (it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo)
 	 */
 	@Override
-	protected void addToNetworkDriver(ModbusRegisterInfo register) {
+	protected void addToNetworkDriver(ModbusRegisterInfo register)
+	{
 		this.network.addDriver(register, this);
 	}
-
-	private void initializeStates() {
+	
+	private void initializeStates()
+	{
 		// Since this driver handles the device metering according to a well
 		// defined interface, we can get the unit of measure from all the
 		// notifications handled by this device except from state notifications
 		Unit<Dimensionless> PERCENTAGE = Unit.ONE.alternate("%");
 		String humidityUOM = PERCENTAGE.toString();
-
+		
 		// search the energy unit of measures declared in the device
 		// configuration
-		for (ModbusRegisterInfo register : this.register2Notification.keySet()) {
-			Set<CNParameters> notificationInfos = this.register2Notification
-					.get(register);
-
-			for (CNParameters notificationInfo : notificationInfos) {
-
-				if (notificationInfo.getName().equalsIgnoreCase(
-						HumidityMeasurementNotification.notificationName)) {
+		for (ModbusRegisterInfo register : this.register2Notification.keySet())
+		{
+			Set<CNParameters> notificationInfos = this.register2Notification.get(register);
+			
+			for (CNParameters notificationInfo : notificationInfos)
+			{
+				
+				if (notificationInfo.getName().equalsIgnoreCase(HumidityMeasurementNotification.notificationName))
+				{
 					humidityUOM = register.getXlator().getUnitOfMeasure();
 				}
 			}
 		}
-
+		
 		// create all the states
 		HumidityStateValue pValue = new HumidityStateValue();
 		pValue.setValue(DecimalMeasure.valueOf("0 " + humidityUOM));
-		this.currentState.setState(HumidityMeasurementState.class.getSimpleName(),
-				new HumidityMeasurementState(pValue));
-
+		this.currentState
+				.setState(HumidityMeasurementState.class.getSimpleName(), new HumidityMeasurementState(pValue));
+		
 		// read the initial state
 		this.network.readAll(this.register2Notification.keySet());
 	}
