@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RuleEngine
 Bundle-SymbolicName: it.polito.elite.dog.addons.rules.ruleengine
-Bundle-Version: 1.1.0.unstable
+Bundle-Version: 1.1.1.unstable
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: it.polito.elite.dog.core.library.model;version="1.1.0",
  it.polito.elite.dog.core.library.model.notification;version="1.1.0",

@@ -1,7 +1,7 @@
 /*
  * Dog - Addons
  * 
- * Copyright (c) 2011-2013 Dario Bonino, Luigi De Russis and Emiliano Castellina
+ * Copyright (c) 2011-2014 Dario Bonino, Luigi De Russis and Emiliano Castellina
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,7 @@ import it.polito.elite.dog.core.library.model.AbstractDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.notification.Notification;
-import it.polito.elite.dog.core.library.model.notification.StateChangeNotification;
 import it.polito.elite.dog.core.library.model.notification.core.TimedTriggerNotification;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.util.Executor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
@@ -716,59 +714,9 @@ public class RuleEngine implements ManagedService, RuleEngineApi, EventHandler
 				
 				if (runtimeRuleSession != null)
 				{
-					// Received a generic MonitorAdmin event (No MonitoringJob,
-					// so
-					// mon.listener.id property is null)
-					if (eventTopic != null && eventTopic.equals("org/osgi/service/monitor/MonitorEvent")
-							&& event.getProperty("mon.listener.id") == null)
-					{
-						DeviceStatus currentDeviceStatus = null;
-						try
-						{
-							// Try the deserialization of the DeviceStatus
-							// (property
-							// mon.statusvariable.value)
-							currentDeviceStatus = DeviceStatus.deserializeFromString((String) event
-									.getProperty("mon.statusvariable.value"));
-						}
-						
-						catch (Exception e)
-						{
-							logger.log(LogService.LOG_ERROR, RuleEngine.logId + " device status deserialization error",
-									e);
-						}
-						
-						// If the deserialization works
-						if (currentDeviceStatus != null)
-						{
-							Map<String, State> allStates = currentDeviceStatus.getStates();
-							for (State cState : allStates.values())
-							{
-								// store the received notification
-								receivedNotification = new StateChangeNotification(cState);
-								receivedNotification.setDeviceUri(currentDeviceStatus.getDeviceURI());
-								
-								// debug
-								logger.log(LogService.LOG_DEBUG, RuleEngine.logId
-										+ " handling state change notification(s): " + receivedNotification);
-								
-								// insert the notification in the working memory
-								FactHandle notificationHandle = runtimeRuleSession
-										.insert((StateChangeNotification) receivedNotification);
-								
-								// fire rules
-								runtimeRuleSession.fireAllRules();
-								
-								// retract the notification
-								runtimeRuleSession.retract(notificationHandle);
-								
-							}
-						}
-						
-					}
 					// Received a notification from the devices or a
 					// TimedTriggerNotification (DogScheduler)
-					else if (eventTopic != null
+					if (eventTopic != null
 							&& (eventTopic.startsWith("it/polito/elite/dog/core/library/model/notification/") || eventTopic
 									.equals(TimedTriggerNotification.notificationTopic)))
 					{
