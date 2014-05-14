@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2011-2013 Luigi De Russis and Dario Bonino
+ * Copyright (c) 2011-2014 Luigi De Russis and Dario Bonino
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,10 @@ import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
 import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
 import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
+import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
+
+import javax.measure.Measure;
+
 import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -153,13 +157,6 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 		return this.currentState;
 	}
 	
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		((ElectricalSystem) this.device).notifyStateChanged(newState);
-		
-	}
-	
 	/*
 	 * Handle the driver behavior when it received a new message from the KNX IP network: typically it involves a state
 	 * change.
@@ -211,23 +208,42 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 			if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
 			{
 				newState = new OnOffState(new OnStateValue());
-				// newState = new OnOffState(OnOffState.ON);
+				this.notifyOn();
 			}
 			else
 			{
 				newState = new OnOffState(new OffStateValue());
-				// newState = new OnOffState(OnOffState.OFF);
+				this.notifyOff();
 			}
 			// ... then set the new state for the device and throw a state
 			// changed notification
 			this.currentState.setState(newState.getStateName(), newState);
-			this.notifyStateChanged(newState);
+			this.updateStatus();
 			
 			// log
 			this.logger.log(LogService.LOG_INFO, KnxIPOnOffDeviceDriverInstance.logId + "Notified new state: "
 					+ newState.getCurrentStateValue()[0].getValue());
 		}
 		
+	}
+	
+	@Override
+	public void updateStatus()
+	{
+		((ElectricalSystem) this.device).updateStatus();
+	}
+	
+
+	@Override
+	public void notifyOn()
+	{
+		((OnOffOutput) this.device).notifyOn();
+	}
+
+	@Override
+	public void notifyOff()
+	{
+		((OnOffOutput) this.device).notifyOff();
 	}
 	
 	@Override
@@ -277,6 +293,36 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 	{
 		// intentionally left empty
 		
+	}
+
+	@Override
+	public void notifyStoredScene(Integer sceneNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyDeletedScene(Measure<?, ?> sceneNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyBelongToGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// intentionally left empty
 	}
 	
 }

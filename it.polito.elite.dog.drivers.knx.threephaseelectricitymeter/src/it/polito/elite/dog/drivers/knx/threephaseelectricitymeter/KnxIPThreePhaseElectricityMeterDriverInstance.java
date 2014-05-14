@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2011-2013 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import it.polito.elite.dog.core.library.model.notification.PowerFactorMeasuremen
 import it.polito.elite.dog.core.library.model.notification.SinglePhaseActiveEnergyMeasurementNotification;
 import it.polito.elite.dog.core.library.model.notification.SinglePhaseActivePowerMeasurementNotification;
 import it.polito.elite.dog.core.library.model.notification.SinglePhaseReactiveEnergyMeasurementNotification;
-import it.polito.elite.dog.core.library.model.notification.StateChangeNotification;
 import it.polito.elite.dog.core.library.model.notification.ThreePhaseActivePowerMeasurementNotification;
 import it.polito.elite.dog.core.library.model.notification.ThreePhaseApparentPowerMeasurementNotification;
 import it.polito.elite.dog.core.library.model.notification.ThreePhaseCurrentMeasurementNotification;
@@ -81,11 +80,12 @@ import tuwien.auto.calimero.dptxlator.DPTXlator4ByteInteger;
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
- *         TODO: Add support to total power (active, reactive, apparent...),
- *         must come from DogOnt2Dog
+ *      TODO: Add support to total power (active, reactive, apparent...), must
+ *      come from DogOnt2Dog
  * 
  */
-public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverInstance implements ThreePhaseElectricityMeter
+public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverInstance implements
+		ThreePhaseElectricityMeter
 {
 	// the notification name to DPT map
 	private Map<String, DPT> notification2DPT;
@@ -113,7 +113,7 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverIn
 		super(network, device, gatewayAddress);
 		
 		// create a logger
-		this.logger = new LogHelper(context);		
+		this.logger = new LogHelper(context);
 	}
 	
 	/**
@@ -228,14 +228,6 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverIn
 		
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device).notifyNewFrequencyValue(frequency);
-		
-	}
-	
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// probably unused...
-		((ThreePhaseElectricityMeter) this.device).notifyStateChanged(newState);
 		
 	}
 	
@@ -392,6 +384,9 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverIn
 			}
 		}
 		
+		// notify the monitor admin
+		this.updateStatus();
+		
 	}
 	
 	@Override
@@ -409,26 +404,20 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverIn
 			// try to detect the right DPT...
 			for (KnxIPDeviceInfo cInfo : notificationsSet)
 			{
-				// ignore state change notifications...
-				if (!cInfo.getName().equals(StateChangeNotification.class.getSimpleName()))
+				if (cDpt == null)
 				{
-					if (cDpt == null)
+					cDpt = this.notification2DPT.get(cInfo.getName());
+				}
+				else
+				{
+					if (!this.notification2DPT.get(cInfo.getName()).getUnit().equals(cDpt.getUnit()))
 					{
-						cDpt = this.notification2DPT.get(cInfo.getName());
-					}
-					else
-					{
-						if (!this.notification2DPT.get(cInfo.getName()).getUnit().equals(cDpt.getUnit()))
-						{
-							// do nothing and log the error...
-							this.logger.log(
-									LogService.LOG_ERROR,
-									KnxIPThreePhaseElectricityMeterDriverInstance.logId
-											+ "Found Incompatible DPTs for the same group address "
-											+ deviceInfo.getGroupAddress() + "ignoring the corresponding notification");
-							cDpt = null;
-							break;
-						}
+						// do nothing and log the error...
+						this.logger.log(LogService.LOG_ERROR, KnxIPThreePhaseElectricityMeterDriverInstance.logId
+								+ "Found Incompatible DPTs for the same group address " + deviceInfo.getGroupAddress()
+								+ "ignoring the corresponding notification");
+						cDpt = null;
+						break;
 					}
 				}
 			}
@@ -564,8 +553,8 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverIn
 		PowerFactorStateValue powerFactorStateValue = new PowerFactorStateValue();
 		powerFactorStateValue.setValue(DecimalMeasure.valueOf("0 " + Unit.ONE));
 		
-		this.currentState.setState(PowerFactorMeasurementState.class.getSimpleName(),
-				new PowerFactorMeasurementState(powerFactorStateValue));
+		this.currentState.setState(PowerFactorMeasurementState.class.getSimpleName(), new PowerFactorMeasurementState(
+				powerFactorStateValue));
 		// --------------------------------------------------------------------
 		
 		// ---------------------- ThreePhaseApparentPower ---------------------
@@ -688,6 +677,12 @@ public class KnxIPThreePhaseElectricityMeterDriverInstance extends KnxIPDriverIn
 				currentStateValue[i].setValue(DecimalMeasure.valueOf(value.toString()));
 			}
 		}
+	}
+	
+	@Override
+	public void updateStatus()
+	{
+		((ThreePhaseElectricityMeter) this.device).updateStatus();
 	}
 	
 }
