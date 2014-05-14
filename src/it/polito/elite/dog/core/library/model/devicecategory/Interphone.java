@@ -40,4 +40,5 @@ public interface Interphone extends Communication
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

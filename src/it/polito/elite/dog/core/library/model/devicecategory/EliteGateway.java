@@ -40,4 +40,5 @@ public interface EliteGateway extends HomeGateway
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

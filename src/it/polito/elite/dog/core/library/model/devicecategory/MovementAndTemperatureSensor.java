@@ -57,4 +57,5 @@ public interface MovementAndTemperatureSensor extends MovementSensor, SingleTemp
 	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

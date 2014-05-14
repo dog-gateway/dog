@@ -61,4 +61,9 @@ public class DogControl extends AbstractDevice implements Control
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

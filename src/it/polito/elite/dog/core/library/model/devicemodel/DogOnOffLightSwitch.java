@@ -76,4 +76,9 @@ public class DogOnOffLightSwitch extends AbstractDevice implements OnOffLightSwi
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

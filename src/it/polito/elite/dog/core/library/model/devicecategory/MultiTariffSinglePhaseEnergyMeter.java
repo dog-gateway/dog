@@ -48,4 +48,5 @@ public interface MultiTariffSinglePhaseEnergyMeter extends MultiTariffEnergyMete
 	public void notifyNewReactiveEnergyValue(String tariffID, Measure<?,?>  value);
 	/*Notification: MultiTariffSinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(String tariffID, Measure<?,?>  value);
+	public void updateStatus();
 }

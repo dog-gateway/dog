@@ -40,4 +40,5 @@ public interface EchelonIlon100Gateway extends HomeGateway
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

@@ -45,4 +45,5 @@ public interface PowerFactorMeter extends ElectricityMeter
 
 	/*Notification: PowerFactorMeasurementNotification*/
 	public void notifyNewPowerFactorValue(Measure<?,?>  powerFactor);
+	public void updateStatus();
 }

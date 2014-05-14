@@ -40,4 +40,5 @@ public interface SecuritySystem extends HousePlants
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

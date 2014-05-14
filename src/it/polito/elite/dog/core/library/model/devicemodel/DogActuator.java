@@ -61,4 +61,9 @@ public class DogActuator extends AbstractDevice implements Actuator
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

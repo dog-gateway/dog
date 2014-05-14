@@ -57,4 +57,5 @@ public interface DimmerLamp extends Lamp
 	public void notifyStepDown();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

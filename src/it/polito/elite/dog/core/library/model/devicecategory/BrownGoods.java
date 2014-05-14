@@ -40,4 +40,5 @@ public interface BrownGoods extends Appliances
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

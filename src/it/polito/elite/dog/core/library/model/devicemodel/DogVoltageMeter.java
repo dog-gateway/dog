@@ -61,4 +61,9 @@ public class DogVoltageMeter extends AbstractDevice implements VoltageMeter
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

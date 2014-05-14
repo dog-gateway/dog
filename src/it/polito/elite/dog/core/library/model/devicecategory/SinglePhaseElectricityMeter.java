@@ -53,10 +53,10 @@ public interface SinglePhaseElectricityMeter extends SinglePhaseApparentPowerMet
 
 	/*Notification: FrequencyMeasurementNotification*/
 	public void notifyNewFrequencyValue(Measure<?,?>  frequency);
-	/*Notification: SinglePhaseActivePowerMeasurementNotification*/
-	public void notifyNewActivePowerValue(Measure<?,?>  powerValue);
 	/*Notification: SinglePhaseReactivePowerMeasurementNotification*/
 	public void notifyNewReactivePowerValue(Measure<?,?>  powerValue);
+	/*Notification: SinglePhaseActivePowerMeasurementNotification*/
+	public void notifyNewActivePowerValue(Measure<?,?>  powerValue);
 	/*Notification: SinglePhaseApparentPowerMeasurementNotification*/
 	public void notifyNewApparentPowerValue(Measure<?,?>  powerValue);
 	/*Notification: SinglePhaseReactiveEnergyMeasurementNotification*/
@@ -69,4 +69,5 @@ public interface SinglePhaseElectricityMeter extends SinglePhaseApparentPowerMet
 	public void notifyNewPhaseNeutralVoltageValue(Measure<?,?>  lnVoltage);
 	/*Notification: SinglePhaseCurrentMeasurementNotification*/
 	public void notifyNewCurrentValue(Measure<?,?>  value);
+	public void updateStatus();
 }

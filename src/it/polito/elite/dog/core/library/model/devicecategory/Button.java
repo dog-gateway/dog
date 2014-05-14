@@ -44,4 +44,5 @@ public interface Button extends Control
 	public void notifyPressed();
 	/*Notification: ReleasedNotification*/
 	public void notifyReleased();
+	public void updateStatus();
 }

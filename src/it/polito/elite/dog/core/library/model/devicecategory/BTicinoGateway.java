@@ -40,4 +40,5 @@ public interface BTicinoGateway extends HomeGateway
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

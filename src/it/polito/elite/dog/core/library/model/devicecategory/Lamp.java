@@ -46,4 +46,5 @@ public interface Lamp extends Lighting
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

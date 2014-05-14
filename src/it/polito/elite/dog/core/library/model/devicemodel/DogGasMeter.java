@@ -80,4 +80,9 @@ public class DogGasMeter extends AbstractDevice implements GasMeter
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

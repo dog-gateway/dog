@@ -187,4 +187,9 @@ public class DogElectricalCooker extends AbstractDevice implements ElectricalCoo
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

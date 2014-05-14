@@ -61,4 +61,9 @@ public class DogAppliances extends AbstractDevice implements Appliances
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

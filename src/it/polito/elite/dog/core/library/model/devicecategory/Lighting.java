@@ -40,4 +40,5 @@ public interface Lighting extends ElectricalSystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

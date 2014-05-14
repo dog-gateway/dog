@@ -67,14 +67,15 @@ public interface EnergyAndPowerMeteringLevelControllableOutput extends SinglePha
 	public void notifyOn();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
-	/*Notification: LevelStepDownNotification*/
-	public void notifyStepDown();
 	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(Measure<?,?>  value);
+	/*Notification: LevelStepDownNotification*/
+	public void notifyStepDown();
 	/*Notification: GroupNotification*/
 	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

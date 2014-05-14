@@ -46,4 +46,5 @@ public interface Buzzer extends Acoustic
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

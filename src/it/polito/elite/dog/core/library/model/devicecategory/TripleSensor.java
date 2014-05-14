@@ -60,4 +60,5 @@ public interface TripleSensor extends MovementSensor, SingleTemperatureSensor, L
 	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

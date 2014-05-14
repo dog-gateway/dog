@@ -76,4 +76,9 @@ public class DogSmokeSensor extends AbstractDevice implements SmokeSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

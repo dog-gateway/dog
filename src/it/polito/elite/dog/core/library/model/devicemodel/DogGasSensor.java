@@ -76,4 +76,9 @@ public class DogGasSensor extends AbstractDevice implements GasSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

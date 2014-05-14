@@ -40,4 +40,5 @@ public interface KNXNetIPGateway extends HomeGateway
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

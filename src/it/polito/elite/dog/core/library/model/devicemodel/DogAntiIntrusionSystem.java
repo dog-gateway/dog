@@ -61,4 +61,9 @@ public class DogAntiIntrusionSystem extends AbstractDevice implements AntiIntrus
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

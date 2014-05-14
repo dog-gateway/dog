@@ -61,4 +61,9 @@ public class DogHousePlants extends AbstractDevice implements HousePlants
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

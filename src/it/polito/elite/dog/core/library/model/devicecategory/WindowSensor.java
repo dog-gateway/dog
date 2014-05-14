@@ -44,4 +44,5 @@ public interface WindowSensor extends AntiIntrusionSystem, Sensor
 	public void notifyOpen();
 	/*Notification: CloseNotification*/
 	public void notifyClose();
+	public void updateStatus();
 }

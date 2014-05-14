@@ -40,4 +40,5 @@ public interface ReactivePowerMeter extends PowerMeter
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

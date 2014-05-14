@@ -116,4 +116,9 @@ public class DogSelfClosingDoorActuator extends AbstractDevice implements SelfCl
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -56,4 +56,5 @@ public interface TemperatureAndHumiditySensor extends SingleTemperatureSensor, H
 	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

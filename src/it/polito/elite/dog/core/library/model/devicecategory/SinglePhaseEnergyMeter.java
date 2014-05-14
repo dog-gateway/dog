@@ -48,4 +48,5 @@ public interface SinglePhaseEnergyMeter extends SingleTariffEnergyMeter
 	public void notifyNewReactiveEnergyValue(Measure<?,?>  value);
 	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(Measure<?,?>  value);
+	public void updateStatus();
 }

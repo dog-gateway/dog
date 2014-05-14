@@ -51,4 +51,5 @@ public interface Knob extends Control
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: LevelStepDownNotification*/
 	public void notifyStepDown();
+	public void updateStatus();
 }

@@ -61,4 +61,9 @@ public class DogAcoustic extends AbstractDevice implements Acoustic
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

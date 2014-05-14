@@ -92,4 +92,9 @@ public class DogLamp extends AbstractDevice implements Lamp
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

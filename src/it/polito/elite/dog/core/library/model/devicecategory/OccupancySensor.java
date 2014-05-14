@@ -47,4 +47,5 @@ public interface OccupancySensor extends Sensor
 	public void notifyIsPresent();
 	/*Notification: NotPresentNotification*/
 	public void notifyNotPresent();
+	public void updateStatus();
 }

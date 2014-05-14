@@ -60,4 +60,5 @@ public interface PelletHeater extends Heater
 	public void notifyOff();
 	/*Notification: StopHeatingCoolingNotification*/
 	public void notifyStoppedHeatingOrCooling();
+	public void updateStatus();
 }

@@ -67,4 +67,5 @@ public interface Hotplate extends Cooker
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

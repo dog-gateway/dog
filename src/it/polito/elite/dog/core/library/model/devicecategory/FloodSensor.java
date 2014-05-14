@@ -44,4 +44,5 @@ public interface FloodSensor extends Sensor, FloodSystem
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

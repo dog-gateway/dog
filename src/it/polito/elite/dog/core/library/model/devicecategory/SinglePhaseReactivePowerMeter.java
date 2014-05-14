@@ -45,4 +45,5 @@ public interface SinglePhaseReactivePowerMeter extends ReactivePowerMeter
 
 	/*Notification: SinglePhaseReactivePowerMeasurementNotification*/
 	public void notifyNewReactivePowerValue(Measure<?,?>  powerValue);
+	public void updateStatus();
 }

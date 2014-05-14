@@ -40,4 +40,5 @@ public interface VoltageMeter extends ElectricityMeter
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

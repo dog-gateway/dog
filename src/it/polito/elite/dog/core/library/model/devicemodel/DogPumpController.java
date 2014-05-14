@@ -85,16 +85,16 @@ public class DogPumpController extends AbstractDevice implements PumpController
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: FlowRateMeasurementNotification*/
-	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue){
-		FlowRateMeasurementNotification notificationEvent=new FlowRateMeasurementNotification(flowRateValue );
+	/*Notification: IdentifyNotification*/
+	public void notifyIdentifyMe(){
+		IdentifyNotification notificationEvent=new IdentifyNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: IdentifyNotification*/
-	public void notifyIdentifyMe(){
-		IdentifyNotification notificationEvent=new IdentifyNotification();
+	/*Notification: FlowRateMeasurementNotification*/
+	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue){
+		FlowRateMeasurementNotification notificationEvent=new FlowRateMeasurementNotification(flowRateValue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -120,16 +120,16 @@ public class DogPumpController extends AbstractDevice implements PumpController
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OffNotification*/
-	public void notifyOff(){
-		OffNotification notificationEvent=new OffNotification();
+	/*Notification: PressureMeasurementNotification*/
+	public void notifyNewPressureValue(Measure<?,?>  pressureValue){
+		PressureMeasurementNotification notificationEvent=new PressureMeasurementNotification(pressureValue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: PressureMeasurementNotification*/
-	public void notifyNewPressureValue(Measure<?,?>  pressureValue){
-		PressureMeasurementNotification notificationEvent=new PressureMeasurementNotification(pressureValue );
+	/*Notification: OffNotification*/
+	public void notifyOff(){
+		OffNotification notificationEvent=new OffNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -161,5 +161,10 @@ public class DogPumpController extends AbstractDevice implements PumpController
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
+	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
 	}
 }

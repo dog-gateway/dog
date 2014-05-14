@@ -76,4 +76,9 @@ public class DogInfraredSensor extends AbstractDevice implements InfraredSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

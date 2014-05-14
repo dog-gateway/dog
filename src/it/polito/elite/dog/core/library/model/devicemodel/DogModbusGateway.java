@@ -61,4 +61,9 @@ public class DogModbusGateway extends AbstractDevice implements ModbusGateway
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

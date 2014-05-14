@@ -40,4 +40,5 @@ public interface HVACSystem extends HousePlants
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

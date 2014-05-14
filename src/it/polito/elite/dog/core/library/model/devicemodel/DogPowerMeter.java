@@ -61,4 +61,9 @@ public class DogPowerMeter extends AbstractDevice implements PowerMeter
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

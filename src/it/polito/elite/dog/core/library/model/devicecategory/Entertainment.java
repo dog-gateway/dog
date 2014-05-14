@@ -40,4 +40,5 @@ public interface Entertainment extends BrownGoods
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

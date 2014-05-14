@@ -61,4 +61,9 @@ public class DogFlowSensor extends AbstractDevice implements FlowSensor
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

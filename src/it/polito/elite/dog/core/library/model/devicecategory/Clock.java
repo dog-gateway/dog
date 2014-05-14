@@ -40,4 +40,5 @@ public interface Clock extends BrownGoods
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

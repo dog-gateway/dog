@@ -73,4 +73,5 @@ public interface DeepFreezer extends WhiteGoods
 	public void notifyOff();
 	/*Notification: StoppedSuperFreezingNotification*/
 	public void notifyStoppedSuperFreezing();
+	public void updateStatus();
 }

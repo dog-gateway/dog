@@ -46,4 +46,5 @@ public interface SimpleLamp extends Lamp
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

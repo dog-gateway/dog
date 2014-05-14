@@ -52,4 +52,5 @@ public interface ColorDimmerSwitch extends DimmerSwitch
 	public void notifyStepDown();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

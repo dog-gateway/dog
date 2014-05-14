@@ -80,4 +80,9 @@ public class DogHeatingEnergyMeter extends AbstractDevice implements HeatingEner
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

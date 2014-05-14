@@ -19,7 +19,6 @@ package it.polito.elite.dog.core.library.model;
 
 import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.notification.Notification;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.util.EventFactory;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
@@ -339,7 +338,7 @@ public abstract class AbstractDevice extends ControllableDevice implements
 	}
 
 	/* Notification: StateChangeNotification */
-	public void notifyStateChanged(State newState)
+	public void updateStatus()
 	{
 		// When the device is notified, retrieve the DeviceStatus
 		DeviceStatus deviceStatus = ((DeviceStatus) this.getState());

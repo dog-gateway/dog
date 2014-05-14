@@ -40,4 +40,5 @@ public interface Controllable
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

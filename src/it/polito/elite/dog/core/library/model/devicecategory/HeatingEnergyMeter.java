@@ -45,4 +45,5 @@ public interface HeatingEnergyMeter extends Meter
 
 	/*Notification: HeatingEnergyMeasurementNotification*/
 	public void notifyNewHeatingEnergyValue(Measure<?,?>  heatingEnergy);
+	public void updateStatus();
 }

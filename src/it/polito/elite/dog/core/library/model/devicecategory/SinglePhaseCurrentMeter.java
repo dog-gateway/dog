@@ -45,4 +45,5 @@ public interface SinglePhaseCurrentMeter extends CurrentMeter
 
 	/*Notification: SinglePhaseCurrentMeasurementNotification*/
 	public void notifyNewCurrentValue(Measure<?,?>  value);
+	public void updateStatus();
 }

@@ -57,4 +57,5 @@ public interface Ventilator extends VentilatingSystem
 	public void notifyChangedSpeed(Measure<?,?>  newSpeed);
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

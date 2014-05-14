@@ -80,4 +80,9 @@ public class DogCo2Sensor extends AbstractDevice implements Co2Sensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

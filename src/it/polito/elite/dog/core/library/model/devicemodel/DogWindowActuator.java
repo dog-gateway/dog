@@ -106,4 +106,9 @@ public class DogWindowActuator extends AbstractDevice implements WindowActuator
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -61,4 +61,9 @@ public class DogClock extends AbstractDevice implements Clock
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

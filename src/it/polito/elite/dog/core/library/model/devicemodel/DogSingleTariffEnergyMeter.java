@@ -61,4 +61,9 @@ public class DogSingleTariffEnergyMeter extends AbstractDevice implements Single
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

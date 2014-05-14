@@ -60,4 +60,5 @@ public interface GasoilHeater extends Heater
 	public void notifyOff();
 	/*Notification: StopHeatingCoolingNotification*/
 	public void notifyStoppedHeatingOrCooling();
+	public void updateStatus();
 }

@@ -40,4 +40,5 @@ public interface FloodSystem extends SecuritySystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

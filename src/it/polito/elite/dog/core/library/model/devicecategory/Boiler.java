@@ -73,4 +73,5 @@ public interface Boiler extends WhiteGoods
 	public void notifyOff();
 	/*Notification: StartedSuperHeatingNotification*/
 	public void notifyStartedSuperHeating();
+	public void updateStatus();
 }

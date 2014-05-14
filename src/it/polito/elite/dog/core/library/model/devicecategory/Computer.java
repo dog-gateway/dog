@@ -40,4 +40,5 @@ public interface Computer extends BrownGoods
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

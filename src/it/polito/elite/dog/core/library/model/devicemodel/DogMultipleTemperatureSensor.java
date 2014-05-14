@@ -117,4 +117,9 @@ public class DogMultipleTemperatureSensor extends AbstractDevice implements Mult
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

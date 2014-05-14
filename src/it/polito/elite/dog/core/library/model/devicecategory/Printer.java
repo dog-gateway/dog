@@ -40,4 +40,5 @@ public interface Printer extends BrownGoods
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

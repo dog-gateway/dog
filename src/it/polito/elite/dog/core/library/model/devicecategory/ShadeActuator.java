@@ -75,4 +75,5 @@ public interface ShadeActuator extends Actuator
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

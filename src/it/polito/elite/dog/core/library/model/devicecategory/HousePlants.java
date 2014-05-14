@@ -40,4 +40,5 @@ public interface HousePlants extends Controllable
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

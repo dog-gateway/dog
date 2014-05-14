@@ -74,4 +74,5 @@ public interface Thermostat extends Control, HVACSystem
 	public void notifyLeftGroup(Integer groupNumber);
 	/*Notification: StopHeatingCoolingNotification*/
 	public void notifyStoppedHeatingOrCooling();
+	public void updateStatus();
 }

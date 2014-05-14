@@ -45,4 +45,5 @@ public interface FrequencyMeter extends ElectricityMeter
 
 	/*Notification: FrequencyMeasurementNotification*/
 	public void notifyNewFrequencyValue(Measure<?,?>  frequency);
+	public void updateStatus();
 }

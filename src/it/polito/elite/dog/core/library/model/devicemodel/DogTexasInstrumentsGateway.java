@@ -61,4 +61,9 @@ public class DogTexasInstrumentsGateway extends AbstractDevice implements TexasI
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

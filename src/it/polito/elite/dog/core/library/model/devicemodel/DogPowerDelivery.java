@@ -61,4 +61,9 @@ public class DogPowerDelivery extends AbstractDevice implements PowerDelivery
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

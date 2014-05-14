@@ -63,4 +63,5 @@ public interface ThermostaticRadiatorValve extends Actuator, HVACSystem
 	public void notifyChangedWeeklyClimateSchedule(DailyClimateSchedule[] dailySchedules);
 	/*Notification: StopHeatingCoolingNotification*/
 	public void notifyStoppedHeatingOrCooling();
+	public void updateStatus();
 }

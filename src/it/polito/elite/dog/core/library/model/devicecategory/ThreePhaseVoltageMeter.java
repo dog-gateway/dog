@@ -48,4 +48,5 @@ public interface ThreePhaseVoltageMeter extends VoltageMeter
 	public void notifyNewPhasePhaseVoltageValue(String phaseID, Measure<?,?>  value);
 	/*Notification: ThreePhaseLNVoltageMeasurementNotification*/
 	public void notifyNewPhaseNeutralVoltageValue(String phaseID, Measure<?,?>  value);
+	public void updateStatus();
 }

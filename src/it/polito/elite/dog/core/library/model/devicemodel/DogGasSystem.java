@@ -61,4 +61,9 @@ public class DogGasSystem extends AbstractDevice implements GasSystem
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

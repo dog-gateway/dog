@@ -45,4 +45,5 @@ public interface ThreePhaseReactivePowerMeter extends ReactivePowerMeter
 
 	/*Notification: ThreePhaseReactivePowerMeasurementNotification*/
 	public void notifyNewReactivePowerValue(String phaseID, Measure<?,?>  value);
+	public void updateStatus();
 }

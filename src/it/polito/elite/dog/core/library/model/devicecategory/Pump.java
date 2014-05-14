@@ -54,6 +54,8 @@ public interface Pump extends Actuator, HVACSystem
 
 	/*Generated Notifications*/
 
+	/*Notification: StoreSceneNotification*/
+	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: DeleteSceneNotification*/
 	public void notifyDeletedScene(Measure<?,?>  sceneNumber);
 	/*Notification: LevelStepUpNotification*/
@@ -64,20 +66,19 @@ public interface Pump extends Actuator, HVACSystem
 	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: LevelStepDownNotification*/
 	public void notifyStepDown();
-	/*Notification: PressureMeasurementNotification*/
-	public void notifyNewPressureValue(Measure<?,?>  pressureValue);
-	/*Notification: OffNotification*/
-	public void notifyOff();
-	/*Notification: LeaveGroupNotification*/
-	public void notifyLeftGroup(Integer groupNumber);
-	/*Notification: StoreSceneNotification*/
-	public void notifyStoredScene(Integer sceneNumber);
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: GroupNotification*/
 	public void notifyBelongToGroup(Integer groupNumber);
+	/*Notification: OffNotification*/
+	public void notifyOff();
+	/*Notification: PressureMeasurementNotification*/
+	public void notifyNewPressureValue(Measure<?,?>  pressureValue);
+	/*Notification: LeaveGroupNotification*/
+	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

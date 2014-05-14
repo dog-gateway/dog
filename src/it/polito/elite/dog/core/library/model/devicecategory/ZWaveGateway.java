@@ -46,4 +46,5 @@ public interface ZWaveGateway extends HomeGateway
 	public void notifyAssociating();
 	/*Notification: DisassociatingDeviceNotification*/
 	public void notifyDisassociating();
+	public void updateStatus();
 }

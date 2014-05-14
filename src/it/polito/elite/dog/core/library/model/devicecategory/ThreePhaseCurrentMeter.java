@@ -45,4 +45,5 @@ public interface ThreePhaseCurrentMeter extends CurrentMeter
 
 	/*Notification: ThreePhaseCurrentMeasurementNotification*/
 	public void notifyNewCurrentValue(String phaseID, Measure<?,?>  value);
+	public void updateStatus();
 }

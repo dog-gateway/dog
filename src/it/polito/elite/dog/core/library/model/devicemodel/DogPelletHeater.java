@@ -154,4 +154,9 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

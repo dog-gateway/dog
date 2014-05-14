@@ -44,4 +44,5 @@ public interface PresenceSensor extends Sensor, AccessControlSystem
 	public void notifyIsPresent();
 	/*Notification: NotPresentNotification*/
 	public void notifyNotPresent();
+	public void updateStatus();
 }

@@ -61,4 +61,9 @@ public class DogBTicinoGateway extends AbstractDevice implements BTicinoGateway
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

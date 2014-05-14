@@ -40,4 +40,5 @@ public interface Actuator extends ElectricalSystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

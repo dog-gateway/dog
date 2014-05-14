@@ -40,4 +40,5 @@ public interface AnsweringMachine extends Communication
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

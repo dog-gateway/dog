@@ -80,4 +80,9 @@ public class DogThreePhaseActivePowerMeter extends AbstractDevice implements Thr
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

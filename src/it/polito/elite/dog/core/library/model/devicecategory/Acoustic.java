@@ -40,4 +40,5 @@ public interface Acoustic extends ElectricalSystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

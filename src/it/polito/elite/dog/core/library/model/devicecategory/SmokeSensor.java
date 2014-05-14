@@ -44,4 +44,5 @@ public interface SmokeSensor extends Sensor, FireSystem
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

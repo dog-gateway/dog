@@ -61,4 +61,9 @@ public class DogActivePowerMeter extends AbstractDevice implements ActivePowerMe
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

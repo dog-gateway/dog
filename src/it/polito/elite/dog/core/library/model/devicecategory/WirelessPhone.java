@@ -40,4 +40,5 @@ public interface WirelessPhone extends Phone
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

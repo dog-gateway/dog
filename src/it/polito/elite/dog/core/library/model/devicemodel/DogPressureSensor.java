@@ -80,4 +80,9 @@ public class DogPressureSensor extends AbstractDevice implements PressureSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

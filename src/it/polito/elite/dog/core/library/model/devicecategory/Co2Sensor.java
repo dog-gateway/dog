@@ -45,4 +45,5 @@ public interface Co2Sensor extends Sensor
 
 	/*Notification: Co2MeasurementNotification*/
 	public void notifyChangedCo2Concentration(Measure<?,?>  co2Concentration);
+	public void updateStatus();
 }

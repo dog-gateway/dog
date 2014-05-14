@@ -45,4 +45,5 @@ public interface SingleFlowSensor extends FlowSensor, HVACSystem
 
 	/*Notification: FlowRateMeasurementNotification*/
 	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue);
+	public void updateStatus();
 }

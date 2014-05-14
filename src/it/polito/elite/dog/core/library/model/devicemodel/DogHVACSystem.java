@@ -61,4 +61,9 @@ public class DogHVACSystem extends AbstractDevice implements HVACSystem
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

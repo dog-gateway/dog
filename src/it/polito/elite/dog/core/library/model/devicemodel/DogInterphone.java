@@ -61,4 +61,9 @@ public class DogInterphone extends AbstractDevice implements Interphone
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -61,4 +61,9 @@ public class DogEnergyMeter extends AbstractDevice implements EnergyMeter
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

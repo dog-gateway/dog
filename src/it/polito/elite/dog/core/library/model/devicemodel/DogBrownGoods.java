@@ -61,4 +61,9 @@ public class DogBrownGoods extends AbstractDevice implements BrownGoods
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

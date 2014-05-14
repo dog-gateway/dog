@@ -161,4 +161,9 @@ public class DogLampHolder extends AbstractDevice implements LampHolder
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

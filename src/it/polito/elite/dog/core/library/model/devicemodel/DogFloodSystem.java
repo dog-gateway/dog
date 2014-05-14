@@ -61,4 +61,9 @@ public class DogFloodSystem extends AbstractDevice implements FloodSystem
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -61,4 +61,9 @@ public class DogTemperatureSensor extends AbstractDevice implements TemperatureS
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

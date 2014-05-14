@@ -40,4 +40,5 @@ public interface GasSystem extends SecuritySystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

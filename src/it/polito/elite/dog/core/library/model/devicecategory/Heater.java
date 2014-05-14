@@ -60,4 +60,5 @@ public interface Heater extends HeatingSystem
 	public void notifyOff();
 	/*Notification: StopHeatingCoolingNotification*/
 	public void notifyStoppedHeatingOrCooling();
+	public void updateStatus();
 }

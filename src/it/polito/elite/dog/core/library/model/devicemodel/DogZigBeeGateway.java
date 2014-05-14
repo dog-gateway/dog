@@ -108,4 +108,9 @@ public class DogZigBeeGateway extends AbstractDevice implements ZigBeeGateway
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

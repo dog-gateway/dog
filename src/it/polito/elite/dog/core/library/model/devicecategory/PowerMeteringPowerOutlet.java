@@ -65,4 +65,5 @@ public interface PowerMeteringPowerOutlet extends MainsPowerOutlet, SinglePhaseA
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

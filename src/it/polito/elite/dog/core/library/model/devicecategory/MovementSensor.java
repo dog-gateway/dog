@@ -44,4 +44,5 @@ public interface MovementSensor extends Sensor, AccessControlSystem
 	public void notifyCeasedMovement();
 	/*Notification: SimpleMovementNotification*/
 	public void notifyStartedMovement();
+	public void updateStatus();
 }

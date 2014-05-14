@@ -40,4 +40,5 @@ public interface Phone extends Communication
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

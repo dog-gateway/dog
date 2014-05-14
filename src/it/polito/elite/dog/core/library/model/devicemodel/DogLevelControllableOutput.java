@@ -206,4 +206,9 @@ public class DogLevelControllableOutput extends AbstractDevice implements LevelC
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

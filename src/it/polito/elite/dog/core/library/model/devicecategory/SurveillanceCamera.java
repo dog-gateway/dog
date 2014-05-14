@@ -46,4 +46,5 @@ public interface SurveillanceCamera extends AntiIntrusionSystem
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

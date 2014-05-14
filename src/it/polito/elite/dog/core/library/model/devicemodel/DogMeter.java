@@ -61,4 +61,9 @@ public class DogMeter extends AbstractDevice implements Meter
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

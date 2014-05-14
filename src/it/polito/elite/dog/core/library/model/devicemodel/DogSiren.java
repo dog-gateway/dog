@@ -92,4 +92,9 @@ public class DogSiren extends AbstractDevice implements Siren
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

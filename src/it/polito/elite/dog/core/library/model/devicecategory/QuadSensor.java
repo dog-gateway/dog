@@ -63,4 +63,5 @@ public interface QuadSensor extends MovementSensor, SingleTemperatureSensor, Lig
 	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

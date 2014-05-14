@@ -161,4 +161,9 @@ public class DogMainsPowerOutlet extends AbstractDevice implements MainsPowerOut
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -106,4 +106,9 @@ public class DogGateActuator extends AbstractDevice implements GateActuator
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

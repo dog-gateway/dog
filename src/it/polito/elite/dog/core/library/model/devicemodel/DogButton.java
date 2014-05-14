@@ -76,4 +76,9 @@ public class DogButton extends AbstractDevice implements Button
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -96,4 +96,9 @@ public class DogThreePhaseVoltageMeter extends AbstractDevice implements ThreePh
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

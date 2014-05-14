@@ -40,4 +40,5 @@ public interface ElectricityMeter extends Meter
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

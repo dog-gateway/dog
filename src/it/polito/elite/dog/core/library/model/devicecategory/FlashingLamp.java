@@ -48,4 +48,5 @@ public interface FlashingLamp extends SimpleLamp
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

@@ -76,4 +76,9 @@ public class DogDoorSensor extends AbstractDevice implements DoorSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

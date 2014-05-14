@@ -71,4 +71,5 @@ public interface DimmableLight extends DimmerLamp
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

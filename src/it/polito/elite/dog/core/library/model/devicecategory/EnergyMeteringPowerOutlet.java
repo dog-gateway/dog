@@ -68,4 +68,5 @@ public interface EnergyMeteringPowerOutlet extends SinglePhaseEnergyMeter, Mains
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

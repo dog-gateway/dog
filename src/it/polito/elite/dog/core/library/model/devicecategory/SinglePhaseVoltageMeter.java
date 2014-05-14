@@ -45,4 +45,5 @@ public interface SinglePhaseVoltageMeter extends VoltageMeter
 
 	/*Notification: SinglePhaseVoltageMeasurementNotification*/
 	public void notifyNewPhaseNeutralVoltageValue(Measure<?,?>  lnVoltage);
+	public void updateStatus();
 }

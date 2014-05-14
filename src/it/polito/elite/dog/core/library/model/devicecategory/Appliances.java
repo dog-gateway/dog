@@ -40,4 +40,5 @@ public interface Appliances extends Controllable
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

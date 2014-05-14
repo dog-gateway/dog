@@ -40,4 +40,5 @@ public interface HomeGateway extends Controllable
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

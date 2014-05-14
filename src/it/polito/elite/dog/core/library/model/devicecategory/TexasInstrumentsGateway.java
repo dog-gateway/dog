@@ -40,4 +40,5 @@ public interface TexasInstrumentsGateway extends HomeGateway
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

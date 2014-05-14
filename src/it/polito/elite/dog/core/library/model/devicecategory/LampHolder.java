@@ -62,4 +62,5 @@ public interface LampHolder extends OnOffOutput
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

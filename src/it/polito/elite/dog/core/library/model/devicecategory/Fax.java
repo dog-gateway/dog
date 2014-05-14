@@ -40,4 +40,5 @@ public interface Fax extends Communication
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

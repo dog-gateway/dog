@@ -49,4 +49,5 @@ public interface eZ430Chronos extends Clock
 	public void notifyNew3DAccelerationValue(Double accX, Double accY, Double accZ);
 	/*Notification: ReleasedMNotification*/
 	public void notifyReleased(String buttonID);
+	public void updateStatus();
 }

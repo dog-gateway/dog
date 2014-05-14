@@ -40,4 +40,5 @@ public interface ApparentPowerMeter extends PowerMeter
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

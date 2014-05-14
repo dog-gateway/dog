@@ -40,4 +40,5 @@ public interface FlowSensor extends Sensor
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

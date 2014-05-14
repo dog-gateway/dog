@@ -69,4 +69,9 @@ public class DogHueBridge extends AbstractDevice implements HueBridge
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

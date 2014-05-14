@@ -45,4 +45,5 @@ public interface MultipleFlowSensor extends FlowSensor, HVACSystem
 
 	/*Notification: FlowRateMeasurementMNotification*/
 	public void notifyChangedFlowRateAt(Measure<?,?>  flowRateValue, String sensorID);
+	public void updateStatus();
 }

@@ -61,4 +61,9 @@ public class DogSensor extends AbstractDevice implements Sensor
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

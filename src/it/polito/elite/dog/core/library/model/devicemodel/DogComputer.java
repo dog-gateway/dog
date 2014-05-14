@@ -61,4 +61,9 @@ public class DogComputer extends AbstractDevice implements Computer
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

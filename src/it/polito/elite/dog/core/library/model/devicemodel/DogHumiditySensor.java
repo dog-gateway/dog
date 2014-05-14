@@ -80,4 +80,9 @@ public class DogHumiditySensor extends AbstractDevice implements HumiditySensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

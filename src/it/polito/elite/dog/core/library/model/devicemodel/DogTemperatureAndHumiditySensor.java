@@ -133,4 +133,9 @@ public class DogTemperatureAndHumiditySensor extends AbstractDevice implements T
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

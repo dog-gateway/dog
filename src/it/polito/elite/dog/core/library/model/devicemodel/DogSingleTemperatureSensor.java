@@ -117,4 +117,9 @@ public class DogSingleTemperatureSensor extends AbstractDevice implements Single
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

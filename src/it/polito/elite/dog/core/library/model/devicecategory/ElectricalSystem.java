@@ -40,4 +40,5 @@ public interface ElectricalSystem extends HousePlants
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

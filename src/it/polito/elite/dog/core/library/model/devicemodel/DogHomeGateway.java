@@ -61,4 +61,9 @@ public class DogHomeGateway extends AbstractDevice implements HomeGateway
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

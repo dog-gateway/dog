@@ -45,4 +45,5 @@ public interface ThreePhaseActivePowerMeter extends ActivePowerMeter
 
 	/*Notification: ThreePhaseActivePowerMeasurementNotification*/
 	public void notifyNewActivePowerValue(String phaseID, Measure<?,?>  value);
+	public void updateStatus();
 }

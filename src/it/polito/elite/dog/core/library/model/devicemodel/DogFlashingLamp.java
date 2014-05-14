@@ -108,4 +108,9 @@ public class DogFlashingLamp extends AbstractDevice implements FlashingLamp
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

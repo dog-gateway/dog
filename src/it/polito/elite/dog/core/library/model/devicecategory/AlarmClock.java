@@ -40,4 +40,5 @@ public interface AlarmClock extends Clock
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

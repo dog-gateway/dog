@@ -80,4 +80,9 @@ public class DogFrequencyMeter extends AbstractDevice implements FrequencyMeter
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

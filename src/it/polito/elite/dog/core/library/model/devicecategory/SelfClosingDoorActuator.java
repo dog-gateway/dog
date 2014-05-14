@@ -53,4 +53,5 @@ public interface SelfClosingDoorActuator extends DoorActuator
 	public void notifyStartedMovement();
 	/*Notification: CloseNotification*/
 	public void notifyClose();
+	public void updateStatus();
 }

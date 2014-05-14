@@ -40,4 +40,5 @@ public interface SingleTariffEnergyMeter extends EnergyMeter
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

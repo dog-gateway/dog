@@ -58,10 +58,10 @@ public interface Tv extends Entertainment
 	public void notifyStepUp();
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: LevelControlNotification*/
-	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: TuningStepUpNotification*/
 	public void notifyChannelStepDown();
+	/*Notification: LevelControlNotification*/
+	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: LevelStepDownNotification*/
 	public void notifyStepDown();
 	/*Notification: StandByNotification*/
@@ -70,4 +70,5 @@ public interface Tv extends Entertainment
 	public void notifyOff();
 	/*Notification: ChannelControlNotification*/
 	public void notifyChangedChannel(String channelId);
+	public void updateStatus();
 }

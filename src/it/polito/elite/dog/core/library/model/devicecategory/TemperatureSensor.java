@@ -40,4 +40,5 @@ public interface TemperatureSensor extends Sensor
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

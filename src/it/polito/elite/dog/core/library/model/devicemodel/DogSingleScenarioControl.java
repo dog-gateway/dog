@@ -92,4 +92,9 @@ public class DogSingleScenarioControl extends AbstractDevice implements SingleSc
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

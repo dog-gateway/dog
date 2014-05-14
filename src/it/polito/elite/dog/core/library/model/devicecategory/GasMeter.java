@@ -45,4 +45,5 @@ public interface GasMeter extends Meter
 
 	/*Notification: GasM3MeasurementNotification*/
 	public void notifyNewConsumedM3GasValue(Measure<?,?>  consumedGasCubeMeters);
+	public void updateStatus();
 }

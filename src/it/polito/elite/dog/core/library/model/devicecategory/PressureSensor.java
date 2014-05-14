@@ -45,4 +45,5 @@ public interface PressureSensor extends Sensor, HVACSystem
 
 	/*Notification: PressureMeasurementNotification*/
 	public void notifyNewPressureValue(Measure<?,?>  pressureValue);
+	public void updateStatus();
 }

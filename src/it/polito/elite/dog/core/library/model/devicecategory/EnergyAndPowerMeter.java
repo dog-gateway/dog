@@ -51,4 +51,5 @@ public interface EnergyAndPowerMeter extends SinglePhaseEnergyMeter, SinglePhase
 	public void notifyNewReactiveEnergyValue(Measure<?,?>  value);
 	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(Measure<?,?>  value);
+	public void updateStatus();
 }

@@ -61,4 +61,9 @@ public class DogEchelonIlon100Gateway extends AbstractDevice implements EchelonI
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -53,4 +53,5 @@ public interface MultipleTemperatureSensor extends TemperatureSensor, HVACSystem
 	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	public void updateStatus();
 }

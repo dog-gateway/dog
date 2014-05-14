@@ -61,4 +61,9 @@ public class DogHeatingSystem extends AbstractDevice implements HeatingSystem
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -76,4 +76,5 @@ public interface WashingMachine extends WhiteGoods
 	public void notifyPause();
 	/*Notification: StopApplianceNotification*/
 	public void notifyStop();
+	public void updateStatus();
 }

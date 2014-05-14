@@ -61,4 +61,9 @@ public class DogKNXNetIPGateway extends AbstractDevice implements KNXNetIPGatewa
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

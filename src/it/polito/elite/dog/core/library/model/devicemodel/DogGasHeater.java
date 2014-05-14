@@ -154,4 +154,9 @@ public class DogGasHeater extends AbstractDevice implements GasHeater
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

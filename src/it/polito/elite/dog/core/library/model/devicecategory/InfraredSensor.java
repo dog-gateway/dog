@@ -44,4 +44,5 @@ public interface InfraredSensor extends AntiIntrusionSystem, Sensor
 	public void notifyDetected();
 	/*Notification: NotDetectedNotification*/
 	public void notifyNotDetected();
+	public void updateStatus();
 }

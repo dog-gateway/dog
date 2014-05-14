@@ -61,4 +61,9 @@ public class DogKonnexGateway extends AbstractDevice implements KonnexGateway
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

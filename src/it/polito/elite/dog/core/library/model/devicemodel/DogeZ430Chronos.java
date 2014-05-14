@@ -107,4 +107,9 @@ public class DogeZ430Chronos extends AbstractDevice implements eZ430Chronos
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

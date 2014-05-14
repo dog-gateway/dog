@@ -40,4 +40,5 @@ public interface Meter extends ElectricalSystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

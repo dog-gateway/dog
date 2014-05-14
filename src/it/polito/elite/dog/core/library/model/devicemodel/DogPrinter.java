@@ -61,4 +61,9 @@ public class DogPrinter extends AbstractDevice implements Printer
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

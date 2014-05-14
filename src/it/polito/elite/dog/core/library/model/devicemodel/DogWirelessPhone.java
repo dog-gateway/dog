@@ -61,4 +61,9 @@ public class DogWirelessPhone extends AbstractDevice implements WirelessPhone
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

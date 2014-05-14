@@ -61,4 +61,9 @@ public class DogVentilatingSystem extends AbstractDevice implements VentilatingS
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

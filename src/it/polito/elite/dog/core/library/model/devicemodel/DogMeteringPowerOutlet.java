@@ -225,4 +225,9 @@ public class DogMeteringPowerOutlet extends AbstractDevice implements MeteringPo
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

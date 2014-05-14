@@ -61,4 +61,9 @@ public class DogAnsweringMachine extends AbstractDevice implements AnsweringMach
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -40,4 +40,5 @@ public interface ModbusGateway extends HomeGateway
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

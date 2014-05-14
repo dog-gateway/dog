@@ -61,4 +61,9 @@ public class DogSwitch extends AbstractDevice implements Switch
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

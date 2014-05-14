@@ -40,4 +40,5 @@ public interface MultiTariffEnergyMeter extends EnergyMeter
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

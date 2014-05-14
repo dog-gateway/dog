@@ -61,4 +61,9 @@ public class DogCoffeeMaker extends AbstractDevice implements CoffeeMaker
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

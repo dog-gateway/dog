@@ -40,4 +40,5 @@ public interface AntiIntrusionSystem extends AccessControlSystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

@@ -163,4 +163,9 @@ public class DogQuadSensor extends AbstractDevice implements QuadSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

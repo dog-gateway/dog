@@ -61,4 +61,9 @@ public class DogFireSystem extends AbstractDevice implements FireSystem
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

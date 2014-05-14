@@ -112,4 +112,9 @@ public class DogEnergyAndPowerMeter extends AbstractDevice implements EnergyAndP
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -76,4 +76,9 @@ public class DogMovementSensor extends AbstractDevice implements MovementSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

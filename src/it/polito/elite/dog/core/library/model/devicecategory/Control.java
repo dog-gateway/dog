@@ -40,4 +40,5 @@ public interface Control extends ElectricalSystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

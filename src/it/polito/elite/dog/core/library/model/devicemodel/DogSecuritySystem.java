@@ -61,4 +61,9 @@ public class DogSecuritySystem extends AbstractDevice implements SecuritySystem
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

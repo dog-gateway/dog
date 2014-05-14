@@ -61,4 +61,9 @@ public class DogMultiTariffEnergyMeter extends AbstractDevice implements MultiTa
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

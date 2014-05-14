@@ -40,4 +40,5 @@ public interface CoffeeMaker extends BrownGoods
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

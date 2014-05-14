@@ -40,4 +40,5 @@ public interface KonnexGateway extends HomeGateway
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

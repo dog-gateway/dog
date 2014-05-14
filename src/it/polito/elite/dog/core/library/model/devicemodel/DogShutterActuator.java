@@ -100,16 +100,16 @@ public class DogShutterActuator extends AbstractDevice implements ShutterActuato
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: MovingDownNotification*/
-	public void notifyMovingDown(){
-		MovingDownNotification notificationEvent=new MovingDownNotification();
+	/*Notification: RestUpNotification*/
+	public void notifyRestingUp(){
+		RestUpNotification notificationEvent=new RestUpNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: RestUpNotification*/
-	public void notifyRestingUp(){
-		RestUpNotification notificationEvent=new RestUpNotification();
+	/*Notification: MovingDownNotification*/
+	public void notifyMovingDown(){
+		MovingDownNotification notificationEvent=new MovingDownNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -120,5 +120,10 @@ public class DogShutterActuator extends AbstractDevice implements ShutterActuato
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
+	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
 	}
 }

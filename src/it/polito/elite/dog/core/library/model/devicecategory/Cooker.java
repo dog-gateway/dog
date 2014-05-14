@@ -67,4 +67,5 @@ public interface Cooker extends WhiteGoods
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

@@ -61,4 +61,9 @@ public class DogElectricalSystem extends AbstractDevice implements ElectricalSys
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

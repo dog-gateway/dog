@@ -61,4 +61,9 @@ public class DogSceneSelector extends AbstractDevice implements SceneSelector
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

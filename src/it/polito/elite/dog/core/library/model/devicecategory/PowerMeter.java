@@ -40,4 +40,5 @@ public interface PowerMeter extends ElectricityMeter
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

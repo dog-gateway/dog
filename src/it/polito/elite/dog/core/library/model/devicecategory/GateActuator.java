@@ -50,4 +50,5 @@ public interface GateActuator extends Actuator
 	public void notifyStartedMovement();
 	/*Notification: CloseNotification*/
 	public void notifyClose();
+	public void updateStatus();
 }

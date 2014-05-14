@@ -96,4 +96,9 @@ public class DogThreePhaseEnergyMeter extends AbstractDevice implements ThreePha
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

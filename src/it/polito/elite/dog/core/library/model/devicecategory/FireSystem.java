@@ -40,4 +40,5 @@ public interface FireSystem extends SecuritySystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

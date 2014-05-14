@@ -70,4 +70,5 @@ public interface Radio extends Entertainment
 	public void notifyOff();
 	/*Notification: ChannelControlNotification*/
 	public void notifyChangedChannel(String channelId);
+	public void updateStatus();
 }

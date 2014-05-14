@@ -45,4 +45,5 @@ public interface MultiplePressureSensor extends Sensor, HVACSystem
 
 	/*Notification: PressureMeasurementMNotification*/
 	public void notifyChangedPressureAt(Measure<?,?>  pressureValue, String sensorID);
+	public void updateStatus();
 }

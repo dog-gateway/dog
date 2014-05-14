@@ -41,4 +41,5 @@ public interface HueBridge extends HomeGateway
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

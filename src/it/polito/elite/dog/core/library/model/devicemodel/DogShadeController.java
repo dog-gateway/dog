@@ -141,4 +141,9 @@ public class DogShadeController extends AbstractDevice implements ShadeControlle
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

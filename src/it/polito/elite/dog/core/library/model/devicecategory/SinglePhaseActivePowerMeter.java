@@ -45,4 +45,5 @@ public interface SinglePhaseActivePowerMeter extends ActivePowerMeter
 
 	/*Notification: SinglePhaseActivePowerMeasurementNotification*/
 	public void notifyNewActivePowerValue(Measure<?,?>  powerValue);
+	public void updateStatus();
 }

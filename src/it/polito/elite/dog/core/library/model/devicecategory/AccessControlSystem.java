@@ -40,4 +40,5 @@ public interface AccessControlSystem extends SecuritySystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

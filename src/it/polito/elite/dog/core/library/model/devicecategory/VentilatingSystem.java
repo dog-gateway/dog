@@ -40,4 +40,5 @@ public interface VentilatingSystem extends HVACSystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

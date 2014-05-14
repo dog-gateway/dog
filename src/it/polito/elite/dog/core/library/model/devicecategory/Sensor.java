@@ -40,4 +40,5 @@ public interface Sensor extends ElectricalSystem
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

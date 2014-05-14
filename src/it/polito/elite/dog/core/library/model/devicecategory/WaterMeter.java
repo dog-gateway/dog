@@ -48,4 +48,5 @@ public interface WaterMeter extends Meter
 	public void notifyNewColdWaterAmountInM3(Measure<?,?>  m3OfColdWater);
 	/*Notification: HotWaterM3MeasurementNotification*/
 	public void notifyNewHotWaterAmountInM3(Measure<?,?>  m3OfHotWater);
+	public void updateStatus();
 }

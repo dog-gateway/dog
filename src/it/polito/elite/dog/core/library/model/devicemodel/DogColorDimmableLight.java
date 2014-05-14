@@ -213,4 +213,9 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

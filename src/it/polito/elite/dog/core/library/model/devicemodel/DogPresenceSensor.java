@@ -76,4 +76,9 @@ public class DogPresenceSensor extends AbstractDevice implements PresenceSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

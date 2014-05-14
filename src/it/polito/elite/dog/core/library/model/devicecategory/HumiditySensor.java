@@ -45,4 +45,5 @@ public interface HumiditySensor extends Sensor
 
 	/*Notification: HumidityMeasurementNotification*/
 	public void notifyChangedRelativeHumidity(Measure<?,?>  relativeHumidity);
+	public void updateStatus();
 }

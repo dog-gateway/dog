@@ -44,4 +44,5 @@ public interface GasSensor extends Sensor, GasSystem
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

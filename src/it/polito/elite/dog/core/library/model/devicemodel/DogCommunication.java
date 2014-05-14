@@ -61,4 +61,9 @@ public class DogCommunication extends AbstractDevice implements Communication
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

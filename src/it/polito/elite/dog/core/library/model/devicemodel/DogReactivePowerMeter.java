@@ -61,4 +61,9 @@ public class DogReactivePowerMeter extends AbstractDevice implements ReactivePow
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

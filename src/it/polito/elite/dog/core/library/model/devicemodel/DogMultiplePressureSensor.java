@@ -80,4 +80,9 @@ public class DogMultiplePressureSensor extends AbstractDevice implements Multipl
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

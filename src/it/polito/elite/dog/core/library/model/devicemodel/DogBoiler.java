@@ -217,4 +217,9 @@ public class DogBoiler extends AbstractDevice implements Boiler
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

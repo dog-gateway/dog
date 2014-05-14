@@ -223,4 +223,9 @@ public class DogThermostat extends AbstractDevice implements Thermostat
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

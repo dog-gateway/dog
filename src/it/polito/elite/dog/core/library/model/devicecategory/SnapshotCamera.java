@@ -62,4 +62,5 @@ public interface SnapshotCamera extends SurveillanceCamera
 	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }

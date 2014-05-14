@@ -48,4 +48,5 @@ public interface ThreePhaseEnergyMeter extends SingleTariffEnergyMeter
 	public void notifyNewReactiveEnergyValue(String phaseID, Measure<?,?>  value);
 	/*Notification: ThreePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(String phaseID, Measure<?,?>  value);
+	public void updateStatus();
 }

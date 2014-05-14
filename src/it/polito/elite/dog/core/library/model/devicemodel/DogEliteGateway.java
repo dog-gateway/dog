@@ -61,4 +61,9 @@ public class DogEliteGateway extends AbstractDevice implements EliteGateway
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

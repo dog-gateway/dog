@@ -61,4 +61,9 @@ public class DogAccessControlSystem extends AbstractDevice implements AccessCont
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

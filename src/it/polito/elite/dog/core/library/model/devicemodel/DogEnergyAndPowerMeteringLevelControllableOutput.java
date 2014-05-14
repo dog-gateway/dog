@@ -203,16 +203,16 @@ public class DogEnergyAndPowerMeteringLevelControllableOutput extends AbstractDe
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: LevelStepDownNotification*/
-	public void notifyStepDown(){
-		LevelStepDownNotification notificationEvent=new LevelStepDownNotification();
+	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
+	public void notifyNewActiveEnergyValue(Measure<?,?>  value){
+		SinglePhaseActiveEnergyMeasurementNotification notificationEvent=new SinglePhaseActiveEnergyMeasurementNotification(value );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
-	public void notifyNewActiveEnergyValue(Measure<?,?>  value){
-		SinglePhaseActiveEnergyMeasurementNotification notificationEvent=new SinglePhaseActiveEnergyMeasurementNotification(value );
+	/*Notification: LevelStepDownNotification*/
+	public void notifyStepDown(){
+		LevelStepDownNotification notificationEvent=new LevelStepDownNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -237,5 +237,10 @@ public class DogEnergyAndPowerMeteringLevelControllableOutput extends AbstractDe
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
+	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
 	}
 }

@@ -61,4 +61,9 @@ public class DogFax extends AbstractDevice implements Fax
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

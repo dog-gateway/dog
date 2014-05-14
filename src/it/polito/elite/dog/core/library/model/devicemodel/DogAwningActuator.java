@@ -106,4 +106,9 @@ public class DogAwningActuator extends AbstractDevice implements AwningActuator
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

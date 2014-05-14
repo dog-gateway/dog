@@ -61,4 +61,9 @@ public class DogEntertainment extends AbstractDevice implements Entertainment
 
 	/*Generated Notifications*/
 
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

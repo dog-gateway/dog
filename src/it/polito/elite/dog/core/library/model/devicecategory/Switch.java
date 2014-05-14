@@ -40,4 +40,5 @@ public interface Switch extends Control
 
 	/*Generated Notifications*/
 
+	public void updateStatus();
 }

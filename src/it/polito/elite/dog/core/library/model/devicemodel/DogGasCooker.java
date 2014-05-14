@@ -195,4 +195,9 @@ public class DogGasCooker extends AbstractDevice implements GasCooker
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -80,4 +80,9 @@ public class DogSinglePhaseActiveEnergyMeter extends AbstractDevice implements S
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	@Override
+	public void updateStatus()
+	{
+		super.updateStatus();
+	}
 }

@@ -67,4 +67,5 @@ public interface WhiteGoods extends Appliances
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	public void updateStatus();
 }
