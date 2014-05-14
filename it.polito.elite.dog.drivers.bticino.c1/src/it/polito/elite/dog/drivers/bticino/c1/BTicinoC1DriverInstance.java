@@ -23,6 +23,7 @@ import it.polito.elite.dog.core.library.model.devicecategory.Button;
 import it.polito.elite.dog.core.library.model.devicecategory.DimmerLamp;
 import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
+import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
 import it.polito.elite.dog.core.library.model.devicecategory.OnOffSwitch;
 import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
@@ -33,6 +34,8 @@ import it.polito.elite.dog.drivers.bticino.interfaces.BTicinoNetworkDriver;
 import it.polito.elite.dog.drivers.bticino.interfaces.BTicinoSpecificDriver;
 
 import java.util.Set;
+
+import javax.measure.Measure;
 
 import com.bticino.core.OpenWebNet;
 
@@ -162,7 +165,7 @@ public class BTicinoC1DriverInstance implements BTicinoSpecificDriver, Lamp, Sim
 			{
 				this.notifyReleased();
 			}
-			else if (this.device instanceof OnOffSwitch)
+			else
 			{
 				this.notifyOff();
 			}
@@ -175,7 +178,7 @@ public class BTicinoC1DriverInstance implements BTicinoSpecificDriver, Lamp, Sim
 			{
 				this.notifyPressed();
 			}
-			else if (this.device instanceof OnOffSwitch)
+			else
 			{
 				this.notifyOn();
 			}
@@ -184,7 +187,7 @@ public class BTicinoC1DriverInstance implements BTicinoSpecificDriver, Lamp, Sim
 		if (state != null)
 		{
 			this.deviceInnerState.setState(state.getStateName(), state);
-			((ElectricalSystem) this.device).notifyStateChanged(state);
+			this.updateStatus();
 			
 		}
 	}
@@ -213,22 +216,7 @@ public class BTicinoC1DriverInstance implements BTicinoSpecificDriver, Lamp, Sim
 	@Override
 	public DeviceStatus getState()
 	{
-		
 		return this.deviceInnerState;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * it.polito.elite.domotics.model.devicecategory.Lamp#notifyStateChanged
-	 * (it.polito.elite.domotics.model.state.State)
-	 */
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// NOT IMPLEMENTED BY DRIVER BUT BY DEVICEMODEL
-		
 	}
 	
 	@Override
@@ -248,15 +236,41 @@ public class BTicinoC1DriverInstance implements BTicinoSpecificDriver, Lamp, Sim
 	@Override
 	public void notifyOn()
 	{
-		((OnOffSwitch) this.device).notifyOn();
+		((OnOffOutput) this.device).notifyOn();
 		
 	}
 	
 	@Override
 	public void notifyOff()
 	{
-		((OnOffSwitch) this.device).notifyOff();
+		((OnOffOutput) this.device).notifyOff();
 		
+	}
+
+	@Override
+	public void notifyStepUp()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void notifyChangedLevel(Measure<?, ?> newLevel)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void notifyStepDown()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		((ElectricalSystem) this.device).updateStatus();
 	}
 	
 }

@@ -138,10 +138,15 @@ public class BTicinoC2DriverInstance implements BTicinoSpecificDriver, ShutterAc
 			if (currentMovementState != null)
 			{
 				String currentMovementStateValue = (String) currentMovementState.getCurrentStateValue()[0].getValue();
-				if (this.device instanceof ShutterActuator && currentMovementStateValue.equals(ShutterState.RAISING)
-						|| currentMovementStateValue.equals(ShutterState.LOWERING))
+				if (this.device instanceof ShutterActuator && currentMovementStateValue.equals(ShutterState.RAISING))
 				{
 					state = new ShutterState(new RestTripleStateValue());
+					this.notifyRestingUp();
+				}
+				else if (this.device instanceof ShutterActuator && currentMovementStateValue.equals(ShutterState.LOWERING))
+				{
+					state = new ShutterState(new RestTripleStateValue());
+					this.notifyRestingDown();
 				}
 			}
 			if (this.device instanceof ShutterButton)
@@ -158,6 +163,7 @@ public class BTicinoC2DriverInstance implements BTicinoSpecificDriver, ShutterAc
 			
 			if (this.device instanceof ShutterActuator)
 			{
+				this.notifyMovingDown();
 				state = new ShutterState(new LoweringStateValue());
 				this.timedAction.schedule(new BTicinoUtilTimer(this, ShutterState.DOWN), BTicinoC2Driver.time);
 			}
@@ -173,6 +179,7 @@ public class BTicinoC2DriverInstance implements BTicinoSpecificDriver, ShutterAc
 			
 			if (this.device instanceof ShutterActuator)
 			{
+				this.notifyMovingUp();
 				state = new ShutterState(new RaisingStateValue());
 				this.timedAction.schedule(new BTicinoUtilTimer(this, ShutterState.UP), BTicinoC2Driver.time);
 			}
@@ -186,9 +193,8 @@ public class BTicinoC2DriverInstance implements BTicinoSpecificDriver, ShutterAc
 		
 		if (state != null)
 		{
-			
 			this.deviceState.setState(state.getStateName(), state);
-			((ElectricalSystem) this.device).notifyStateChanged(state);
+			this.updateStatus();
 		}
 		
 	}
@@ -236,19 +242,6 @@ public class BTicinoC2DriverInstance implements BTicinoSpecificDriver, ShutterAc
 		return this.deviceState;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see it.polito.elite.domotics.model.devicecategory.ShutterActuator#
-	 * notifyStateChanged(it.polito .elite.domotics.model.state.State)
-	 */
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// intentionally left empty
-		
-	}
-	
 	class BTicinoUtilTimer extends TimerTask
 	{
 		
@@ -282,22 +275,27 @@ public class BTicinoC2DriverInstance implements BTicinoSpecificDriver, ShutterAc
 			if (action.equalsIgnoreCase(ShutterState.DOWN))
 			{
 				state = new ShutterState(new DownTripleStateValue());
+				this.notifyRestingDown();
 			}
 			else if (action.equalsIgnoreCase(ShutterState.LOWERING))
 			{
 				state = new ShutterState(new LoweringStateValue());
+				this.notifyMovingDown();
 			}
 			else if (action.equalsIgnoreCase(ShutterState.RAISING))
 			{
 				state = new ShutterState(new RaisingStateValue());
+				this.notifyMovingUp();
 			}
 			else if (action.equalsIgnoreCase(ShutterState.REST))
 			{
 				state = new ShutterState(new RestTripleStateValue());
+				this.notifyResting();
 			}
 			else if (action.equalsIgnoreCase(ShutterState.UP))
 			{
 				state = new ShutterState(new UpTripleStateValue());
+				this.notifyRestingUp();
 			}
 		}
 		else
@@ -317,7 +315,7 @@ public class BTicinoC2DriverInstance implements BTicinoSpecificDriver, ShutterAc
 			
 		}
 		this.deviceState.setState(state.getStateName(), state);
-		((ElectricalSystem) this.device).notifyStateChanged(state);
+		this.updateStatus();
 		
 	}
 	
@@ -333,5 +331,42 @@ public class BTicinoC2DriverInstance implements BTicinoSpecificDriver, ShutterAc
 	{
 		((ShutterButton) this.device).notifyPressedDown();
 		
+	}
+
+	@Override
+	public void notifyRestingDown()
+	{
+		((ShutterActuator) this.device).notifyRestingDown();
+		
+	}
+
+	@Override
+	public void notifyResting()
+	{
+		((ShutterActuator) this.device).notifyResting();
+	}
+
+	@Override
+	public void notifyRestingUp()
+	{
+		((ShutterActuator) this.device).notifyRestingUp();
+	}
+
+	@Override
+	public void notifyMovingDown()
+	{
+		((ShutterActuator) this.device).notifyMovingDown();
+	}
+
+	@Override
+	public void notifyMovingUp()
+	{
+		((ShutterActuator) this.device).notifyMovingUp();
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		((ElectricalSystem) this.device).updateStatus();;
 	}
 }
