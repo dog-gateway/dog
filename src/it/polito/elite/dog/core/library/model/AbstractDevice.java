@@ -90,9 +90,6 @@ public abstract class AbstractDevice extends ControllableDevice implements
 
 	volatile boolean changedProperties = true;
 
-	// this field allows to avoid duplicated timestamps for the same device
-	private Integer timestampOffset = 0;
-
 	/**
 	 * Class constructor
 	 * 
@@ -352,8 +349,7 @@ public abstract class AbstractDevice extends ControllableDevice implements
 	}
 
 	/**
-	 * Notify to the event admin a just happened event (since Dog2.5 not
-	 * StateChangeNotification)
+	 * Notify to the event admin a just happened event 
 	 * 
 	 * @param eventTopic
 	 *            string representing the type of notification, e.g.
@@ -366,28 +362,17 @@ public abstract class AbstractDevice extends ControllableDevice implements
 	protected void notify(String eventTopic, Map<String, Object> eventProp)
 	{
 		EventAdmin ea = (EventAdmin) this.trackerEventAdmin.getService();
+		
 		// add standard properties:
-		// --add device uri (probably only useful for StateChangeNotifications)
-		// (since 2012-05-08)
+		
+		// --add device uri 
 		eventProp.put(DeviceCostants.DEVICEURI, this.deviceId);
 
-		// --add event name (apparently, it is useless) (since 2012-05-08)
+		// --add event name 
 		eventProp.put(org.osgi.service.event.EventConstants.EVENT_TOPIC,
 				eventTopic);
 
-		// /----- Avoid duplicated timestamps ------------------
-		long currentTimeStamp = 0;
-		synchronized (this.timestampOffset)
-		{
-			currentTimeStamp = (new GregorianCalendar()).getTimeInMillis();
-			currentTimeStamp += this.timestampOffset++;
-			if (this.timestampOffset > 200)
-			{
-				this.timestampOffset = 0;
-			}
-		}
 		GregorianCalendar calendar = new GregorianCalendar();
-		calendar.setTimeInMillis(currentTimeStamp);
 		eventProp
 				.put(org.osgi.service.event.EventConstants.TIMESTAMP, calendar);
 

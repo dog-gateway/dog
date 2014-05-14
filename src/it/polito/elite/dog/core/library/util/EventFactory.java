@@ -22,10 +22,7 @@ import java.util.HashMap;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 
-import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.notification.Notification;
-import it.polito.elite.dog.core.library.model.notification.StateChangeNotification;
 import it.polito.elite.dog.core.library.model.notification.core.MonitorNotification;
 
 /**
@@ -84,31 +81,5 @@ public class EventFactory{
 		
 		Event modifiedEvent = new Event(notification.getNotificationTopic(), eventProp);
 		return modifiedEvent;
-	}
-	
-	// TODO Remove!!!!!!!!!!!
-	/**
-	 * Factory for creating a state-related event
-	 * @param notification to convert
-	 * @param bundleSymbolicName name of the bundle that create the Event
-	 * @return the event to send
-	 */
-	public static Event createStateChangeEvent(StateChangeNotification notification, String bundleSymbolicName){
-		HashMap<String, Object> eventProp = new HashMap<String, Object>();
-		
-		// Add the event topic
-		eventProp.put(EventConstants.EVENT_TOPIC, notification.getNotificationTopic()+ StateChangeNotification.class.getSimpleName());
-		// Insert the bundle name inside the event properties (OSGi Event Admin Service Specification 1.3)
-		eventProp.put(EventConstants.BUNDLE_SYMBOLICNAME, bundleSymbolicName);
-		// Add the whole Notification to the Event (OSGi Event Admin Service Specification 1.3)
-		DeviceStatus ds = new DeviceStatus(notification.getDeviceUri());
-		ds.setState(notification.getNewState().getStateName(), notification.getNewState());
-		eventProp.put(EventConstants.EVENT, ds);
-		
-		eventProp.put(DeviceCostants.DEVICESTATE, true);
-		
-		Event modifiedEvent = new Event(StateChangeNotification.class.getSimpleName(), eventProp);
-		return modifiedEvent;
-	}
-	
+	}	
 }
