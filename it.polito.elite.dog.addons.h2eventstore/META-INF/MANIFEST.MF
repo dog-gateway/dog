@@ -4,8 +4,8 @@ Bundle-Name: it.polito.elite.dog.addons.h2eventstore
 Bundle-SymbolicName: it.polito.elite.dog.addons.h2eventstore
 Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: it.polito.elite.dog.core.library.model.notification,
- it.polito.elite.dog.core.library.util,
+Import-Package: it.polito.elite.dog.core.library.model.notification;version="1.1.0",
+ it.polito.elite.dog.core.library.util;version="1.1.0",
  it.polito.elite.stream.processing.events,
  javax.measure,
  javax.measure.quantity,
