@@ -19,6 +19,7 @@ package it.polito.elite.dog.drivers.zwave.threephaseelectricitymeter;
 
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.ThreePhaseElectricityMeter;
 import it.polito.elite.dog.core.library.model.state.FrequencyMeasurementState;
 import it.polito.elite.dog.core.library.model.state.PowerFactorMeasurementState;
@@ -372,7 +373,7 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 				}
 			}
 			
-			this.notifyStateChanged(null);
+			this.updateStatus();
 		}
 	}
 
@@ -512,14 +513,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	}
 
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// probably unused...
-		((ThreePhaseElectricityMeter) this.device).notifyStateChanged(newState);
-
-	}
-
-	@Override
 	public void notifyNewReactivePowerValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
@@ -653,6 +646,13 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 		((ThreePhaseElectricityMeter) this.device).notifyNewCurrentValue(
 				phaseID, value);
 
+	}
+	
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
 	}
 
 	private void updateThreePhaseStateValue(String stateClass, String phaseID,

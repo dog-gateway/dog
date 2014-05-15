@@ -22,7 +22,7 @@ import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import it.polito.elite.dog.core.library.model.DeviceDescriptorFactory;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.HomeGateway;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.ZWaveGateway;
 import it.polito.elite.dog.core.library.model.state.DeviceAssociationState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -77,7 +77,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 
 	// enable dynamic device detection
 	private boolean detectionEnabled = false;
-	
+
 	// the time to wait before attempting automatic device detection
 	private long waitBeforeDeviceInstall = 0;
 
@@ -114,13 +114,18 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 		// create a new device state (according to the current DogOnt model, no
 		// state is actually associated to a Modbus gateway)
 		currentState = new DeviceStatus(device.getDeviceId());
-		
+
 		// initialize device states
 		this.initializeStates();
 	}
 
-	@Override
-	public void notifyStateChanged(State newState)
+	/**
+	 * Updates the inner state accordingly to the given State instance and
+	 * triggers a device state update
+	 * 
+	 * @param newState The new State instance to update the inner state
+	 */
+	private void changeState(State newState)
 	{
 		// update the current state
 		this.currentState.setState(
@@ -133,8 +138,8 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 						+ device.getDeviceId() + " is now "
 						+ (newState).getCurrentStateValue()[0].getValue());
 
-		// call the super method
-		((HomeGateway) device).notifyStateChanged(newState);
+		// update the status
+		this.updateStatus();
 	}
 
 	/**
@@ -300,21 +305,32 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 					this.detectionEnabled = true;
 				}
 
-				this.notifyStateChanged(new DeviceAssociationState(
+				this.changeState(new DeviceAssociationState(
 						new IdleStateValue()));
+				
+				//notify the current idle state
+				this.notifyIdle();
+				
 				break;
 			}
 			case 1: // associating
 			{
-				this.notifyStateChanged(new DeviceAssociationState(
+				this.changeState(new DeviceAssociationState(
 						new AssociatingStateValue()));
+				
+				//notify the current associating state
+				this.notifyAssociating();
 
 				break;
 			}
 			case 5: // disassociating
 			{
-				this.notifyStateChanged(new DeviceAssociationState(
+				this.changeState(new DeviceAssociationState(
 						new DisassociatingStateValue()));
+				
+				//notify the current disassociating state
+				this.notifyDisassociating();
+				
 				break;
 			}
 			default:
@@ -374,10 +390,10 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 		this.logger.log(LogService.LOG_DEBUG,
 				"Updated dynamic device creation db");
 	}
-	
-	
+
 	/**
 	 * Gets the time to wait before automatic device detection, in milliseconds
+	 * 
 	 * @return
 	 */
 	public long getWaitBeforeDeviceInstall()
@@ -387,6 +403,7 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 
 	/**
 	 * Sets the time to wait before automatic device detection, in milliseconds
+	 * 
 	 * @param waitBeforeDeviceInstall
 	 */
 	public void setWaitBeforeDeviceInstall(long waitBeforeDeviceInstall)
@@ -416,7 +433,8 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 					.get(DataConst.MANUFACTURER_PRODUCT_ID).getValue()
 					.toString();
 
-			// wait for instances to be read.... (may be read with a certain variable delay)
+			// wait for instances to be read.... (may be read with a certain
+			// variable delay)
 			try
 			{
 				Thread.sleep(this.waitBeforeDeviceInstall);
@@ -539,4 +557,31 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 		workerThread.start();
 
 	}
+
+	@Override
+	public void notifyAssociating()
+	{
+		((ZWaveGateway)this.device).notifyAssociating();
+	}
+
+	@Override
+	public void notifyDisassociating()
+	{
+		((ZWaveGateway)this.device).notifyDisassociating();
+	}
+	
+	@Override
+	public void notifyIdle()
+	{
+		((ZWaveGateway)this.device).notifyIdle();
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
+	}
+
+	
 }

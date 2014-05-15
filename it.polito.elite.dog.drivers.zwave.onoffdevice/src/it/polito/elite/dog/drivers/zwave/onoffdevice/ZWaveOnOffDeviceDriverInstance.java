@@ -20,7 +20,7 @@ package it.polito.elite.dog.drivers.zwave.onoffdevice;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
 import it.polito.elite.dog.core.library.model.devicecategory.LampHolder;
 import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
@@ -46,12 +46,27 @@ import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 
-public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet, LampHolder, OnOffOutput
+public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
+		implements Lamp, SimpleLamp, Buzzer, MainsPowerOutlet, LampHolder,
+		OnOffOutput
 {
-	public ZWaveOnOffDeviceDriverInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
-			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
+
+	// the group set
+	private HashSet<Integer> groups;
+
+	// the scene set
+	private HashSet<Integer> scenes;
+
+	public ZWaveOnOffDeviceDriverInstance(ZWaveNetwork network,
+			ControllableDevice device, int deviceId, Set<Integer> instancesId,
+			int gatewayNodeId, int updateTimeMillis, BundleContext context)
 	{
-		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
+		super(network, device, deviceId, instancesId, gatewayNodeId,
+				updateTimeMillis, context);
+
+		// build inner data structures
+		this.groups = new HashSet<Integer>();
+		this.scenes = new HashSet<Integer>();
 
 		new LogHelper(context);
 
@@ -65,7 +80,8 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 	private void initializeStates()
 	{
 		// get the initial state of the device
-		Runnable worker = new Runnable() {
+		Runnable worker = new Runnable()
+		{
 			public void run()
 			{
 				network.read(nodeInfo, true);
@@ -78,27 +94,20 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 	}
 
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// debug
-		((ElectricalSystem) device).notifyStateChanged(newState);
-
-	}
-
-	@Override
-	public void newMessageFromHouse(Device deviceNode, Instance instanceNode, 
+	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
 		this.deviceNode = deviceNode;
 
 		// Read the value associated with the right CommandClass.
 		int nLevel = 0;
-		CommandClasses ccEntry = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY);
+		CommandClasses ccEntry = instanceNode
+				.getCommandClass(ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY);
 
 		// Check if it is a real new value or if it is an old one
-		if(ccEntry!=null)
+		if (ccEntry != null)
 		{
-			//update last update time
+			// update last update time
 			lastUpdateTime = ccEntry.getLevelUpdateTime();
 			nFailedUpdate = 0;
 
@@ -106,11 +115,20 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 				nLevel = ccEntry.getLevelAsInt();
 
 			if (nLevel > 0)
+			{
 				changeCurrentState(OnOffState.ON);
-			else
-				changeCurrentState(OnOffState.OFF);
 			
-			notifyStateChanged(null);
+				//notify on
+				this.notifyOn();
+			}
+			else
+			{
+				changeCurrentState(OnOffState.OFF);
+				
+				//notify off
+				this.notifyOff();
+			}
+			this.updateStatus();
 		}
 	}
 
@@ -127,7 +145,8 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 		State state = currentState.getState(OnOffState.class.getSimpleName());
 
 		if (state != null)
-			currentStateValue = (String) state.getCurrentStateValue()[0].getValue();
+			currentStateValue = (String) state.getCurrentStateValue()[0]
+					.getValue();
 
 		// if the current states it is different from the new state
 		if (!currentStateValue.equalsIgnoreCase(OnOffValue))
@@ -169,25 +188,72 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 	@Override
 	public void storeScene(Integer sceneNumber)
 	{
-		// intentionally left empty
+		// Store the given scene id
+		this.scenes.add(sceneNumber);
+		
+		//notify
+		this.notifyStoredScene(sceneNumber);
 	}
 
 	@Override
 	public void deleteScene(Integer sceneNumber)
 	{
-		// intentionally left empty
+		// Remove the given scene id
+		this.scenes.remove(sceneNumber);
+		
+		//notify
+		this.notifyDeletedScene(sceneNumber);
 	}
 
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
-		// intentionally left empty
+		// remove the given group id
+		this.groups.remove(groupID);
+		
+		//notify
+		this.notifyLeftGroup(groupID);
 	}
 
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
-		// intentionally left empty
+		// Store the given group id
+		this.groups.add(groupID);
+		
+		this.notifyJoinedGroup(groupID);
+	}
+
+	@Override
+	public void notifyStoredScene(Integer sceneNumber)
+	{
+		// send the store scene notification
+		((OnOffOutput)this.device).notifyStoredScene(sceneNumber);
+
+	}
+
+	@Override
+	public void notifyDeletedScene(Integer sceneNumber)
+	{
+		// send the delete scene notification
+		((OnOffOutput)this.device).notifyDeletedScene(sceneNumber);
+
+	}
+
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// send the joined group notification
+		((OnOffOutput)this.device).notifyJoinedGroup(groupNumber);
+
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// send the left group notification
+		((OnOffOutput)this.device).notifyLeftGroup(groupNumber);
+
 	}
 
 	@Override
@@ -199,33 +265,56 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance implemen
 	@Override
 	public void on()
 	{
-		//Sends on command to all instances, probably only one in this case
-		for(Integer instanceId : nodeInfo.getInstanceSet())
-			network.write(nodeInfo.getDeviceNodeId(), instanceId, ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY, "255");
+		// Sends on command to all instances, probably only one in this case
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY, "255");
 	}
 
 	@Override
 	public void off()
 	{
-		//Sends off command to all instances, probably only one in this case
-		for(Integer instanceId : nodeInfo.getInstanceSet())
-			network.write(nodeInfo.getDeviceNodeId(), instanceId, ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY, "0");
+		// Sends off command to all instances, probably only one in this case
+		for (Integer instanceId : nodeInfo.getInstanceSet())
+			network.write(nodeInfo.getDeviceNodeId(), instanceId,
+					ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY, "0");
 	}
 
 	@Override
-	protected ZWaveNodeInfo createNodeInfo(int deviceId, Set<Integer> instancesId, boolean isController) 
+	protected ZWaveNodeInfo createNodeInfo(int deviceId,
+			Set<Integer> instancesId, boolean isController)
 	{
-		HashMap<Integer,Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
+		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
 
 		HashSet<Integer> ccSet = new HashSet<Integer>();
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY);
 
-		//binary switch has its own command class 
-		for(Integer instanceId : instancesId)
+		// binary switch has its own command class
+		for (Integer instanceId : instancesId)
 		{
 			instanceCommand.put(instanceId, ccSet);
 		}
-		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand, isController);
+		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand,
+				isController);
 		return nodeInfo;
+	}
+
+	@Override
+	public void notifyOn()
+	{
+		((OnOffOutput)this.device).notifyOn();
+	}
+
+	@Override
+	public void notifyOff()
+	{
+		((OnOffOutput)this.device).notifyOff();
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
 	}
 }

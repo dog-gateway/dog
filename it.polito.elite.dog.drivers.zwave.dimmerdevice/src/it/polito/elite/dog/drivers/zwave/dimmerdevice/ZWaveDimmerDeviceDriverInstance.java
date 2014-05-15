@@ -304,8 +304,6 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 		// set the value
 		this.set(currentValue);
 
-		// notify for the step down event
-		this.notifyStepDown();
 	}
 
 	@Override
@@ -321,9 +319,6 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 
 		// set the value
 		this.set(currentValue);
-
-		// notify step up
-		this.notifyStepUp();
 	}
 
 	@Override
@@ -347,22 +342,22 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	}
 
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		// remove the given group id
 		this.groups.remove(groupID);
 		
 		//notify
-		this.notifyLeftGroup(groupNumber);
+		this.notifyLeftGroup(groupID);
 	}
 
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		// Store the given group id
 		this.groups.add(groupID);
 		
-		this.notifyLeftGroup(groupID);
+		this.notifyJoinedGroup(groupID);
 	}
 
 	@Override
@@ -374,7 +369,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	}
 
 	@Override
-	public void notifyDeletedScene(Measure<?, ?> sceneNumber)
+	public void notifyDeletedScene(Integer sceneNumber)
 	{
 		// send the delete scene notification
 		((LevelControllableOutput)this.device).notifyDeletedScene(sceneNumber);
@@ -390,27 +385,10 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	}
 
 	@Override
-	public void notifyBelongToGroup(Integer groupNumber)
-	{
-		// TODO Auto-generated method stub
-		
-
-	}
-
-	@Override
 	public void notifyLeftGroup(Integer groupNumber)
 	{
 		// send the left group notification
 		((LevelControllableOutput)this.device).notifyLeftGroup(groupNumber);
-
-	}
-
-	@Override
-	public void notifyStepUp()
-	{
-		// send the step up notification corresponding to the step-up action
-		// carried (externally or internally) on the device.
-		((LevelControllableOutput) this.device).notifyStepUp();
 
 	}
 
@@ -432,14 +410,6 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 
 	}
 
-	@Override
-	public void notifyStepDown()
-	{
-		// send the step down notification corresponding to the step-up action
-		// carried (externally or internally) on the device.
-		((LevelControllableOutput) this.device).notifyStepDown();
-
-	}
 
 	@Override
 	public void notifyOff()

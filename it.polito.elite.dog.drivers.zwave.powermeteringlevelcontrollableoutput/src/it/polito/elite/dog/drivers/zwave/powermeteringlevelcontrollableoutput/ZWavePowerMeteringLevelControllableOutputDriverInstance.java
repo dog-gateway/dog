@@ -19,8 +19,9 @@ package it.polito.elite.dog.drivers.zwave.powermeteringlevelcontrollableoutput;
 
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.EnergyAndPowerMeteringLevelControllableOutput;
+import it.polito.elite.dog.core.library.model.devicecategory.LevelControllableOutput;
 import it.polito.elite.dog.core.library.model.devicecategory.PowerMeteringLevelControllableOutput;
 import it.polito.elite.dog.core.library.model.state.LevelState;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
@@ -66,6 +67,12 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 	// the step increase / decrease
 	private int stepPercentage = 5; // default
 
+	// the group set
+	private HashSet<Integer> groups;
+
+	// the scene set
+	private HashSet<Integer> scenes;
+
 	public ZWavePowerMeteringLevelControllableOutputDriverInstance(
 			ZWaveNetwork network, ControllableDevice device, int deviceId,
 			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis,
@@ -75,6 +82,10 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 				updateTimeMillis, context);
 
 		this.stepPercentage = stepPercentage;
+
+		// build inner data structures
+		this.groups = new HashSet<Integer>();
+		this.scenes = new HashSet<Integer>();
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -127,12 +138,6 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 	}
 
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		((ElectricalSystem) device).notifyStateChanged(newState);
-	}
-
-	@Override
 	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
@@ -154,9 +159,19 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 				nLevel = ccEntry.getLevelAsInt();
 
 				if (nLevel > 0)
+				{
 					this.changeCurrentState(OnOffState.ON, nLevel);
+					
+					//notify on
+					this.notifyOn();
+				}
 				else
+				{
 					this.changeCurrentState(OnOffState.OFF, nLevel);
+					
+					//notify off
+					this.notifyOff();
+				}
 			}
 		}
 
@@ -176,8 +191,9 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 			{
 				double activeEnergy = Double.valueOf(energyEntry
 						.getDataElemValue("val").toString());
-				this.notifyNewActiveEnergyValue(DecimalMeasure.valueOf(activeEnergy
-						+ " " + SI.KILO(SI.WATT.times(NonSI.HOUR)).toString()));
+				this.notifyNewActiveEnergyValue(DecimalMeasure
+						.valueOf(activeEnergy + " "
+								+ SI.KILO(SI.WATT.times(NonSI.HOUR)).toString()));
 			}
 
 			// handle power data if available
@@ -186,13 +202,13 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 			{
 				double activePower = Double.valueOf(powerEntry
 						.getDataElemValue("val").toString());
-				this.notifyNewActivePowerValue(DecimalMeasure.valueOf(activePower
-						+ " " + SI.WATT.toString()));
+				this.notifyNewActivePowerValue(DecimalMeasure
+						.valueOf(activePower + " " + SI.WATT.toString()));
 			}
 
 		}
-		
-		this.notifyStateChanged(null);
+
+		this.updateStatus();
 	}
 
 	/**
@@ -385,29 +401,106 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 	@Override
 	public void storeScene(Integer sceneNumber)
 	{
-		// TODO Auto-generated method stub
+		// Store the given scene id
+		this.scenes.add(sceneNumber);
 
+		// notify
+		this.notifyStoredScene(sceneNumber);
 	}
 
 	@Override
 	public void deleteScene(Integer sceneNumber)
 	{
-		// TODO Auto-generated method stub
+		// Remove the given scene id
+		this.scenes.remove(sceneNumber);
+
+		// notify
+		this.notifyDeletedScene(sceneNumber);
+	}
+
+	@Override
+	public void deleteGroup(Integer groupID)
+	{
+		// remove the given group id
+		this.groups.remove(groupID);
+
+		// notify
+		this.notifyLeftGroup(groupID);
+	}
+
+	@Override
+	public void storeGroup(Integer groupID)
+	{
+		// Store the given group id
+		this.groups.add(groupID);
+
+		this.notifyJoinedGroup(groupID);
+	}
+
+	@Override
+	public void notifyStoredScene(Integer sceneNumber)
+	{
+		// send the store scene notification
+		((LevelControllableOutput) this.device).notifyStoredScene(sceneNumber);
 
 	}
 
 	@Override
-	public void deleteGroup(String groupID)
+	public void notifyDeletedScene(Integer sceneNumber)
 	{
-		// TODO Auto-generated method stub
+		// send the delete scene notification
+		((LevelControllableOutput) this.device).notifyDeletedScene(sceneNumber);
 
 	}
 
 	@Override
-	public void storeGroup(String groupID)
+	public void notifyJoinedGroup(Integer groupNumber)
 	{
-		// TODO Auto-generated method stub
+		// send the joined group notification
+		((LevelControllableOutput) this.device).notifyJoinedGroup(groupNumber);
 
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// send the left group notification
+		((LevelControllableOutput) this.device).notifyLeftGroup(groupNumber);
+
+	}
+
+	@Override
+	public void notifyOn()
+	{
+		// send the on notification corresponding to the on action carried
+		// (internally or externally) on the device.
+		((LevelControllableOutput) this.device).notifyOn();
+
+	}
+
+	@Override
+	public void notifyChangedLevel(Measure<?, ?> newLevel)
+	{
+		// send the changed level notification corresponding to the new state of
+		// the device.
+		((LevelControllableOutput) this.device).notifyChangedLevel(newLevel);
+
+	}
+
+	@Override
+	public void notifyOff()
+	{
+		// send the off notification corresponding to the on action carried
+		// (internally or externally) on the device.
+		((LevelControllableOutput) this.device).notifyOff();
+
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
 	}
 
 	@Override

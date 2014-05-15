@@ -17,21 +17,12 @@
  */
 package it.polito.elite.dog.drivers.zwave.meteringpoweroutlet;
 
-import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
-import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
-import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
-import it.polito.elite.dog.drivers.zwave.model.zway.json.DataElemObject;
-import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
-import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
-import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
-import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
-import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.EnergyMeteringPowerOutlet;
 import it.polito.elite.dog.core.library.model.devicecategory.MeteringPowerOutlet;
+import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
 import it.polito.elite.dog.core.library.model.devicecategory.PowerMeteringPowerOutlet;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
 import it.polito.elite.dog.core.library.model.state.SinglePhaseActiveEnergyState;
@@ -41,6 +32,16 @@ import it.polito.elite.dog.core.library.model.statevalue.ActiveEnergyStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
+import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.DataElemObject;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
+import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
+import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
+import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,12 +64,22 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 	// the class logger
 	private LogHelper logger;
 
+	// the group set
+	private HashSet<Integer> groups;
+
+	// the scene set
+	private HashSet<Integer> scenes;
+
 	public ZWaveMeteringPowerOutletInstance(ZWaveNetwork network,
 			ControllableDevice device, int deviceId, Set<Integer> instancesId,
 			int gatewayNodeId, int updateTimeMillis, BundleContext context)
 	{
 		super(network, device, deviceId, instancesId, gatewayNodeId,
 				updateTimeMillis, context);
+
+		// build inner data structures
+		this.groups = new HashSet<Integer>();
+		this.scenes = new HashSet<Integer>();
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -119,39 +130,78 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 	@Override
 	public void storeScene(Integer sceneNumber)
 	{
-		// intentionally left empty
+		// Store the given scene id
+		this.scenes.add(sceneNumber);
+
+		// notify
+		this.notifyStoredScene(sceneNumber);
 	}
 
 	@Override
 	public void deleteScene(Integer sceneNumber)
 	{
-		// intentionally left empty
+		// Remove the given scene id
+		this.scenes.remove(sceneNumber);
+
+		// notify
+		this.notifyDeletedScene(sceneNumber);
 	}
 
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
-		// intentionally left empty
+		// remove the given group id
+		this.groups.remove(groupID);
+
+		// notify
+		this.notifyLeftGroup(groupID);
 	}
 
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
-		// intentionally left empty
+		// Store the given group id
+		this.groups.add(groupID);
+
+		this.notifyJoinedGroup(groupID);
+	}
+
+	@Override
+	public void notifyStoredScene(Integer sceneNumber)
+	{
+		// send the store scene notification
+		((OnOffOutput) this.device).notifyStoredScene(sceneNumber);
+
+	}
+
+	@Override
+	public void notifyDeletedScene(Integer sceneNumber)
+	{
+		// send the delete scene notification
+		((OnOffOutput) this.device).notifyDeletedScene(sceneNumber);
+
+	}
+
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// send the joined group notification
+		((OnOffOutput) this.device).notifyJoinedGroup(groupNumber);
+
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// send the left group notification
+		((OnOffOutput) this.device).notifyLeftGroup(groupNumber);
+
 	}
 
 	@Override
 	public DeviceStatus getState()
 	{
 		return currentState;
-	}
-
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// debug
-		((ElectricalSystem) device).notifyStateChanged(newState);
-
 	}
 
 	@Override
@@ -190,11 +240,27 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 				{
 					double activeEnergy = Double.valueOf(energyEntry
 							.getDataElemValue("val").toString());
-					this.notifyNewActiveEnergyValue(DecimalMeasure
+
+					// build the energy measure
+					DecimalMeasure<?> value = DecimalMeasure
 							.valueOf(activeEnergy
 									+ " "
 									+ SI.KILO(SI.WATT.times(NonSI.HOUR))
-											.toString()));
+											.toString());
+
+					// update the state
+					ActiveEnergyStateValue pValue = new ActiveEnergyStateValue();
+					pValue.setValue(value);
+					currentState.setState(
+							SinglePhaseActiveEnergyState.class.getSimpleName(),
+							new SinglePhaseActiveEnergyState(pValue));
+
+					// debug
+					logger.log(LogService.LOG_DEBUG,
+							"Device " + device.getDeviceId()
+									+ " active energy " + value.toString());
+
+					this.notifyNewActiveEnergyValue(value);
 				}
 
 				// handle power data if available
@@ -203,11 +269,25 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 				{
 					double activePower = Double.valueOf(powerEntry
 							.getDataElemValue("val").toString());
-					this.notifyNewActivePowerValue(DecimalMeasure
-							.valueOf(activePower + " " + SI.WATT.toString()));
+					
+					//build the power measure
+					DecimalMeasure<?> powerValue = DecimalMeasure
+							.valueOf(activePower + " " + SI.WATT.toString());
+					
+					// update the state
+					ActivePowerStateValue pValue = new ActivePowerStateValue();
+					pValue.setValue(powerValue);
+					currentState.setState(
+							SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
+							new SinglePhaseActivePowerMeasurementState(pValue));
+
+					// debug
+					logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+							+ " active power " + powerValue.toString());
+					
+					this.notifyNewActivePowerValue(powerValue);
 				}
 			}
-
 
 			// always update on-off state
 			int nLevel = 0;
@@ -220,8 +300,8 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 				this.changeCurrentState(OnOffState.ON);
 			else
 				this.changeCurrentState(OnOffState.OFF);
-			
-			this.notifyStateChanged(null);
+
+			this.updateStatus();
 		}
 	}
 
@@ -249,10 +329,16 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 			if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
 			{
 				newState = new OnOffState(new OnStateValue());
+
+				// send the on notification
+				this.notifyOn();
 			}
 			else
 			{
 				newState = new OnOffState(new OffStateValue());
+
+				// send the off notification
+				this.notifyOff();
 			}
 			// ... then set the new state for the device and throw a state
 			// changed notification
@@ -316,17 +402,6 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewActiveEnergyValue(Measure<?, ?> value)
 	{
-		// update the state
-		ActiveEnergyStateValue pValue = new ActiveEnergyStateValue();
-		pValue.setValue(value);
-		currentState.setState(
-				SinglePhaseActiveEnergyState.class.getSimpleName(),
-				new SinglePhaseActiveEnergyState(pValue));
-
-		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " active energy " + value.toString());
-
 		// notify the new measure
 		((EnergyMeteringPowerOutlet) device).notifyNewActiveEnergyValue(value);
 
@@ -335,17 +410,6 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewActivePowerValue(Measure<?, ?> powerValue)
 	{
-		// update the state
-		ActivePowerStateValue pValue = new ActivePowerStateValue();
-		pValue.setValue(powerValue);
-		currentState.setState(
-				SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
-				new SinglePhaseActivePowerMeasurementState(pValue));
-
-		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " active power " + powerValue.toString());
-
 		// notify the new measure
 		((PowerMeteringPowerOutlet) device)
 				.notifyNewActivePowerValue(powerValue);
@@ -397,6 +461,25 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 	{
 		// Nothing to do: not supported by device...
 		return null;
+	}
+
+	@Override
+	public void notifyOn()
+	{
+		((OnOffOutput)this.device).notifyOn();
+
+	}
+
+	@Override
+	public void notifyOff()
+	{
+		((OnOffOutput)this.device).notifyOff();
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		((Controllable)this.device).updateStatus();
 	}
 
 }

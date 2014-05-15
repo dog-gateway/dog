@@ -17,6 +17,13 @@
  */
 package it.polito.elite.dog.drivers.zwave.lightsensor;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
+import it.polito.elite.dog.core.library.model.devicecategory.LightSensor;
+import it.polito.elite.dog.core.library.model.state.LightIntensityState;
+import it.polito.elite.dog.core.library.model.statevalue.LevelStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
@@ -25,14 +32,6 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
-import it.polito.elite.dog.core.library.model.devicecategory.LightSensor;
-import it.polito.elite.dog.core.library.model.state.LightIntensityState;
-import it.polito.elite.dog.core.library.model.state.State;
-import it.polito.elite.dog.core.library.model.statevalue.LevelStateValue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,20 +39,31 @@ import java.util.Set;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
+import javax.measure.quantity.Illuminance;
 import javax.measure.unit.SI;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implements LightSensor
+public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
+		implements LightSensor
 {
 	// the class logger
 	private LogHelper logger;
 
-	public ZWaveLightSensorDriverInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
-			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
+	// the group set
+	private HashSet<Integer> groups;
+
+
+	public ZWaveLightSensorDriverInstance(ZWaveNetwork network,
+			ControllableDevice device, int deviceId, Set<Integer> instancesId,
+			int gatewayNodeId, int updateTimeMillis, BundleContext context)
 	{
-		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
+		super(network, device, deviceId, instancesId, gatewayNodeId,
+				updateTimeMillis, context);
+
+		// build inner data structures
+		this.groups = new HashSet<Integer>();
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -68,10 +78,12 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implemen
 	private void initializeStates()
 	{
 		// initialize the state
-		currentState.setState(LightIntensityState.class.getSimpleName(), new LightIntensityState(new LevelStateValue()));
+		currentState.setState(LightIntensityState.class.getSimpleName(),
+				new LightIntensityState(new LevelStateValue()));
 
 		// get the initial state of the device
-		Runnable worker = new Runnable() {
+		Runnable worker = new Runnable()
+		{
 			public void run()
 			{
 				network.read(nodeInfo, true);
@@ -83,39 +95,49 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implemen
 	}
 
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		((ElectricalSystem) device).notifyStateChanged(newState);
-	}
-
-	@Override
-	public void newMessageFromHouse(Device deviceNode, Instance instanceNode, 
+	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
-		//update deviceNode
+		// update deviceNode
 		this.deviceNode = deviceNode;
 
 		// Read the value for light intensity.
-		CommandClasses ccInst = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_MULTILEVEL);
+		CommandClasses ccInst = instanceNode
+				.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_MULTILEVEL);
 
-		//first time we only save update time, no more
-		if(lastUpdateTime == 0)
+		// first time we only save update time, no more
+		if (lastUpdateTime == 0)
 			lastUpdateTime = ccInst.getValUpdateTime();
 		// Check if it is a real new value or if it is an old one.
-		else if(lastUpdateTime < ccInst.getValUpdateTime())
+		else if (lastUpdateTime < ccInst.getValUpdateTime())
 		{
-			//update last update time
+			// update last update time
 			lastUpdateTime = ccInst.getValUpdateTime();
 			nFailedUpdate = 0;
 
-			//Reads values and sensorType 
+			// Reads values and sensorType
 			double measure = ccInst.getVal();
 
-			//call the notify method 
-			this.notifyNewLuminosityValue(DecimalMeasure.valueOf(measure, SI.LUX));
-			
-			//update the state
-			this.notifyStateChanged(null);
+			// build the luminance value
+			Measure<Double, Illuminance> luminosityValue = DecimalMeasure
+					.valueOf(measure, SI.LUX);
+
+			// update the state
+			LevelStateValue pValue = new LevelStateValue();
+			pValue.setValue(luminosityValue);
+
+			currentState.setState(LightIntensityState.class.getSimpleName(),
+					new LightIntensityState(pValue));
+
+			// debug
+			logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+					+ " light intensity " + luminosityValue.toString());
+
+			// call the notify method
+			this.notifyNewLuminosityValue(luminosityValue);
+
+			// update the state
+			this.updateStatus();
 		}
 	}
 
@@ -139,15 +161,22 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implemen
 	}
 
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
-		// intentionally left empty
+		// remove the given group id
+		this.groups.remove(groupID);
+		
+		//notify
+		this.notifyLeftGroup(groupID);
 	}
 
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
-		// intentionally left empty
+		// Store the given group id
+		this.groups.add(groupID);
+		
+		this.notifyJoinedGroup(groupID);
 	}
 
 	@Override
@@ -155,9 +184,9 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implemen
 	{
 		return currentState;
 	}
-	
+
 	@Override
-	public Measure<?,?>  getLuminance()
+	public Measure<?, ?> getLuminance()
 	{
 		return (Measure<?, ?>) currentState.getState(
 				LightIntensityState.class.getSimpleName())
@@ -165,40 +194,52 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance implemen
 	}
 
 	@Override
-	public void notifyNewLuminosityValue(Measure<?, ?> luminosityValue) 
+	public void notifyNewLuminosityValue(Measure<?, ?> luminosityValue)
 	{
-		// update the state
-		LevelStateValue pValue = new LevelStateValue();
-		pValue.setValue(luminosityValue);
-
-		currentState.setState(LightIntensityState.class.getSimpleName(),
-				new LightIntensityState(pValue));
-
-		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " light intensity " + luminosityValue.toString());
-
 		// notify the new measure
 		((LightSensor) device).notifyNewLuminosityValue(luminosityValue);
 	}
 
 	@Override
-	protected ZWaveNodeInfo createNodeInfo(int deviceId, Set<Integer> instancesId, boolean isController) 
+	protected ZWaveNodeInfo createNodeInfo(int deviceId,
+			Set<Integer> instancesId, boolean isController)
 	{
-		HashMap<Integer,Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
+		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
 
-		//for this device the right Get command class is COMMAND_CLASS_SENSOR_MULTILEVEL for each instance.
+		// for this device the right Get command class is
+		// COMMAND_CLASS_SENSOR_MULTILEVEL for each instance.
 		HashSet<Integer> ccSet = new HashSet<Integer>();
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_SENSOR_MULTILEVEL);
 
-		for(Integer instanceId : instancesId)
+		for (Integer instanceId : instancesId)
 		{
 			instanceCommand.put(instanceId, ccSet);
 		}
-		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand, isController);
+		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand,
+				isController);
 
 		return nodeInfo;
 	}
 
-	//TODO: aggiungere metodo per la getLuminosity quando sara' presente in dogOnt
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// send the joined group notification
+		((LightSensor)this.device).notifyJoinedGroup(groupNumber);
+
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// send the left group notification
+		((LightSensor)this.device).notifyLeftGroup(groupNumber);
+
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		((Controllable)this.device).updateStatus();
+	}
 }
