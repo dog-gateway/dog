@@ -247,12 +247,6 @@ public class BTicinoC1DriverInstance implements BTicinoSpecificDriver, Lamp, Sim
 		
 	}
 
-	@Override
-	public void notifyStepUp()
-	{
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void notifyChangedLevel(Measure<?, ?> newLevel)
@@ -260,12 +254,6 @@ public class BTicinoC1DriverInstance implements BTicinoSpecificDriver, Lamp, Sim
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public void notifyStepDown()
-	{
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void updateStatus()
