@@ -202,14 +202,14 @@ public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implem
 	}
 	
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		// TODO Auto-generated method stub
 		
@@ -237,13 +237,6 @@ public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implem
 	
 	@Override
 	public void notifyJoinedGroup(Integer groupNumber)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void notifyBelongToGroup(Integer groupNumber)
 	{
 		// TODO Auto-generated method stub
 		

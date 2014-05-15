@@ -24,9 +24,6 @@ import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
 import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
 import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
-
-import javax.measure.Measure;
-
 import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
 import it.polito.elite.dog.core.library.model.state.State;
@@ -88,13 +85,13 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance implem
 	}
 	
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		// intentionally left empty
 	}
 	
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		// intentionally left empty
 	}
@@ -251,19 +248,13 @@ public class ModbusOnOffDeviceDriverInstance extends ModbusDriverInstance implem
 	}
 	
 	@Override
-	public void notifyDeletedScene(Measure<?, ?> sceneNumber)
+	public void notifyDeletedScene(Integer sceneNumber)
 	{
 		// intentionally left empty
 	}
 	
 	@Override
 	public void notifyJoinedGroup(Integer groupNumber)
-	{
-		// intentionally left empty
-	}
-	
-	@Override
-	public void notifyBelongToGroup(Integer groupNumber)
 	{
 		// intentionally left empty
 	}

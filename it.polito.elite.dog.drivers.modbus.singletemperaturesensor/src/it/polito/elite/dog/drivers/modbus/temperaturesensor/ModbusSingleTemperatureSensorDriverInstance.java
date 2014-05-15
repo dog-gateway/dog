@@ -85,7 +85,7 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriverIns
 	 * #deleteGroup(java.lang.String)
 	 */
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		// nothing to do by now... will be handled in the future... may be...
 		
@@ -99,7 +99,7 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriverIns
 	 * #storeGroup(java.lang.String)
 	 */
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		// nothing to do by now... will be handled in the future... may be...
 		
@@ -270,12 +270,6 @@ public class ModbusSingleTemperatureSensorDriverInstance extends ModbusDriverIns
 
 	@Override
 	public void notifyJoinedGroup(Integer groupNumber)
-	{
-		// intentionally left empty
-	}
-
-	@Override
-	public void notifyBelongToGroup(Integer groupNumber)
 	{
 		// intentionally left empty
 	}
