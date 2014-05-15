@@ -17,7 +17,6 @@
  */
 package it.polito.elite.dog.drivers.knx.onoffdevice;
 
-import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
@@ -25,14 +24,12 @@ import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
 import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
 import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
-
-import javax.measure.Measure;
-
 import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.knx.network.KnxIPDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
@@ -282,14 +279,14 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 	}
 	
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		// intentionally left empty
 		
 	}
 	
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		// intentionally left empty
 		
@@ -302,19 +299,13 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 	}
 
 	@Override
-	public void notifyDeletedScene(Measure<?, ?> sceneNumber)
+	public void notifyDeletedScene(Integer sceneNumber)
 	{
 		// intentionally left empty
 	}
 
 	@Override
 	public void notifyJoinedGroup(Integer groupNumber)
-	{
-		// intentionally left empty
-	}
-
-	@Override
-	public void notifyBelongToGroup(Integer groupNumber)
 	{
 		// intentionally left empty
 	}
