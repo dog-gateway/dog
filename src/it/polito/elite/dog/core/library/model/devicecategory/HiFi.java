@@ -78,14 +78,14 @@ public interface HiFi extends Entertainment
 	public void notifyChangedSource(String sourceId);
 	/*Notification: TuningStepDownNotification*/
 	public void notifyChannelStepUp();
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: PausePlaybackNotification*/
 	public void notifyPause();
-	/*Notification: ForwardNotification*/
-	public void notifyFwd();
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: TuningStepUpNotification*/
 	public void notifyChannelStepDown();
+	/*Notification: ForwardNotification*/
+	public void notifyFwd();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
 	/*Notification: StopPlaybackNotification*/

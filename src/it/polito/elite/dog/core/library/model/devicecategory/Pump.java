@@ -40,8 +40,8 @@ public interface Pump extends Actuator, HVACSystem
 	public void stepDown();
 	public DeviceStatus getState();
 	public void on();
-	public void deleteGroup(String groupID);
-	public void storeGroup(String groupID);
+	public void deleteGroup(Integer groupID);
+	public void storeGroup(Integer groupID);
 	public void off();
 	public Measure<?,?>  getFlowRate();
 	public void stepUp();
@@ -57,11 +57,11 @@ public interface Pump extends Actuator, HVACSystem
 	/*Notification: StoreSceneNotification*/
 	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber);
-	/*Notification: LevelStepUpNotification*/
-	public void notifyStepUp();
+	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
+	/*Notification: LevelStepUpNotification*/
+	public void notifyStepUp();
 	/*Notification: FlowRateMeasurementNotification*/
 	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue);
 	/*Notification: JoinGroupNotification*/
@@ -72,12 +72,10 @@ public interface Pump extends Actuator, HVACSystem
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: LevelStepDownNotification*/
 	public void notifyStepDown();
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
-	/*Notification: OffNotification*/
-	public void notifyOff();
 	/*Notification: PressureMeasurementNotification*/
 	public void notifyNewPressureValue(Measure<?,?>  pressureValue);
+	/*Notification: OffNotification*/
+	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
 	public void updateStatus();

@@ -41,9 +41,9 @@ public interface PowerMeteringPowerOutlet extends MainsPowerOutlet, SinglePhaseA
 	public void storeScene(Integer sceneNumber);
 	public void deleteScene(Integer sceneNumber);
 	public void on();
-	public void deleteGroup(String groupID);
+	public void deleteGroup(Integer groupID);
 	public Measure<?,?>  getActivePower();
-	public void storeGroup(String groupID);
+	public void storeGroup(Integer groupID);
 	public void off();
 
 
@@ -54,13 +54,11 @@ public interface PowerMeteringPowerOutlet extends MainsPowerOutlet, SinglePhaseA
 	/*Notification: StoreSceneNotification*/
 	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber);
+	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/

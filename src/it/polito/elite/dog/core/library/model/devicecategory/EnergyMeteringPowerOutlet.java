@@ -43,8 +43,8 @@ public interface EnergyMeteringPowerOutlet extends SinglePhaseEnergyMeter, Mains
 	public void deleteScene(Integer sceneNumber);
 	public void on();
 	public Measure<?,?>  getActiveEnergyValue();
-	public void deleteGroup(String groupID);
-	public void storeGroup(String groupID);
+	public void deleteGroup(Integer groupID);
+	public void storeGroup(Integer groupID);
 	public void off();
 
 
@@ -53,17 +53,15 @@ public interface EnergyMeteringPowerOutlet extends SinglePhaseEnergyMeter, Mains
 	/*Notification: StoreSceneNotification*/
 	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber);
+	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: SinglePhaseReactiveEnergyMeasurementNotification*/
 	public void notifyNewReactiveEnergyValue(Measure<?,?>  value);
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(Measure<?,?>  value);
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/

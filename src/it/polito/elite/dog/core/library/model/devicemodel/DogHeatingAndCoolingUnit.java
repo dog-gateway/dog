@@ -92,7 +92,7 @@ public class DogHeatingAndCoolingUnit extends AbstractDevice implements HeatingA
 		}
 	}
 
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -100,7 +100,7 @@ public class DogHeatingAndCoolingUnit extends AbstractDevice implements HeatingA
 		}
 	}
 
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -200,7 +200,7 @@ public class DogHeatingAndCoolingUnit extends AbstractDevice implements HeatingA
 		notifyEventAdmin(notificationEvent);
 	}
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber){
+	public void notifyDeletedScene(Integer sceneNumber){
 		DeleteSceneNotification notificationEvent=new DeleteSceneNotification(sceneNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
@@ -220,16 +220,16 @@ public class DogHeatingAndCoolingUnit extends AbstractDevice implements HeatingA
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: CoolNotification*/
-	public void notifyCool(){
-		CoolNotification notificationEvent=new CoolNotification();
+	/*Notification: JoinGroupNotification*/
+	public void notifyJoinedGroup(Integer groupNumber){
+		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: JoinGroupNotification*/
-	public void notifyJoinedGroup(Integer groupNumber){
-		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
+	/*Notification: CoolNotification*/
+	public void notifyCool(){
+		CoolNotification notificationEvent=new CoolNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -293,13 +293,6 @@ public class DogHeatingAndCoolingUnit extends AbstractDevice implements HeatingA
 	/*Notification: SpeedControlNotification*/
 	public void notifyChangedSpeed(Measure<?,?>  newSpeed){
 		SpeedControlNotification notificationEvent=new SpeedControlNotification(newSpeed );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber){
-		GroupNotification notificationEvent=new GroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

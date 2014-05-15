@@ -44,8 +44,8 @@ public interface DimmableLight extends DimmerLamp
 	public void deleteScene(Integer sceneNumber);
 	public void set(Object value);
 	public void on();
-	public void deleteGroup(String groupID);
-	public void storeGroup(String groupID);
+	public void deleteGroup(Integer groupID);
+	public void storeGroup(Integer groupID);
 	public void off();
 
 
@@ -54,7 +54,7 @@ public interface DimmableLight extends DimmerLamp
 	/*Notification: StoreSceneNotification*/
 	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber);
+	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: LevelStepUpNotification*/
 	public void notifyStepUp();
 	/*Notification: JoinGroupNotification*/
@@ -65,8 +65,6 @@ public interface DimmableLight extends DimmerLamp
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: LevelStepDownNotification*/
 	public void notifyStepDown();
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/

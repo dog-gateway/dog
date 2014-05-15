@@ -67,7 +67,7 @@ public class DogOccupancySensor extends AbstractDevice implements OccupancySenso
 		 return null;
 	}
 
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -75,7 +75,7 @@ public class DogOccupancySensor extends AbstractDevice implements OccupancySenso
 		}
 	}
 
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{

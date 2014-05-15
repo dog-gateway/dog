@@ -78,7 +78,7 @@ public class DogTemperatureAndHumiditySensor extends AbstractDevice implements T
 		 return null;
 	}
 
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -86,7 +86,7 @@ public class DogTemperatureAndHumiditySensor extends AbstractDevice implements T
 		}
 	}
 
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -115,13 +115,6 @@ public class DogTemperatureAndHumiditySensor extends AbstractDevice implements T
 	/*Notification: HumidityMeasurementNotification*/
 	public void notifyChangedRelativeHumidity(Measure<?,?>  relativeHumidity){
 		HumidityMeasurementNotification notificationEvent=new HumidityMeasurementNotification(relativeHumidity );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber){
-		GroupNotification notificationEvent=new GroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

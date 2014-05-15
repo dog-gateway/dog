@@ -69,7 +69,7 @@ public class DogSingleTemperatureSensor extends AbstractDevice implements Single
 		 return null;
 	}
 
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -77,7 +77,7 @@ public class DogSingleTemperatureSensor extends AbstractDevice implements Single
 		}
 	}
 
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -99,13 +99,6 @@ public class DogSingleTemperatureSensor extends AbstractDevice implements Single
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber){
 		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber){
-		GroupNotification notificationEvent=new GroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

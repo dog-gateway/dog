@@ -39,22 +39,20 @@ public interface MovementAndTemperatureSensor extends MovementSensor, SingleTemp
 
 	public Measure<?,?>  getTemperature();
 	public DeviceStatus getState();
-	public void deleteGroup(String groupID);
-	public void storeGroup(String groupID);
+	public void deleteGroup(Integer groupID);
+	public void storeGroup(Integer groupID);
 
 
 	/*Generated Notifications*/
 
-	/*Notification: TemperatureMeasurementNotification*/
-	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
 	/*Notification: SimpleNoMovementNotification*/
 	public void notifyCeasedMovement();
+	/*Notification: TemperatureMeasurementNotification*/
+	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: SimpleMovementNotification*/
 	public void notifyStartedMovement();
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
 	public void updateStatus();

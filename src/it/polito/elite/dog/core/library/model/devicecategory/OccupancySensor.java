@@ -37,8 +37,8 @@ public interface OccupancySensor extends Sensor
 
 	public Boolean getOccupancy();
 	public DeviceStatus getState();
-	public void deleteGroup(String groupID);
-	public void storeGroup(String groupID);
+	public void deleteGroup(Integer groupID);
+	public void storeGroup(Integer groupID);
 
 
 	/*Generated Notifications*/

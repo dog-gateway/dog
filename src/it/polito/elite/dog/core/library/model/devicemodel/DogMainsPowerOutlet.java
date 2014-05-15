@@ -34,8 +34,6 @@ import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
 import it.polito.elite.dog.core.library.model.notification.*;
-import javax.measure.Measure;
-
 public class DogMainsPowerOutlet extends AbstractDevice implements MainsPowerOutlet
 {
 
@@ -84,7 +82,7 @@ public class DogMainsPowerOutlet extends AbstractDevice implements MainsPowerOut
 		}
 	}
 
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -92,7 +90,7 @@ public class DogMainsPowerOutlet extends AbstractDevice implements MainsPowerOut
 		}
 	}
 
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -120,7 +118,7 @@ public class DogMainsPowerOutlet extends AbstractDevice implements MainsPowerOut
 		notifyEventAdmin(notificationEvent);
 	}
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber){
+	public void notifyDeletedScene(Integer sceneNumber){
 		DeleteSceneNotification notificationEvent=new DeleteSceneNotification(sceneNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
@@ -136,13 +134,6 @@ public class DogMainsPowerOutlet extends AbstractDevice implements MainsPowerOut
 	/*Notification: OnNotification*/
 	public void notifyOn(){
 		OnNotification notificationEvent=new OnNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber){
-		GroupNotification notificationEvent=new GroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

@@ -39,8 +39,8 @@ public interface LightSensor extends Sensor
 
 	public DeviceStatus getState();
 	public Measure<?,?>  getLuminance();
-	public void deleteGroup(String groupID);
-	public void storeGroup(String groupID);
+	public void deleteGroup(Integer groupID);
+	public void storeGroup(Integer groupID);
 
 
 	/*Generated Notifications*/
@@ -49,8 +49,6 @@ public interface LightSensor extends Sensor
 	public void notifyNewLuminosityValue(Measure<?,?>  luminosityValue);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
 	public void updateStatus();

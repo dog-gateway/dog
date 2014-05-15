@@ -60,24 +60,24 @@ public interface Dvd extends Entertainment
 	public void notifyPlay();
 	/*Notification: LevelStepUpNotification*/
 	public void notifyStepUp();
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: PausePlaybackNotification*/
 	public void notifyPause();
-	/*Notification: ForwardNotification*/
-	public void notifyFwd();
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
+	/*Notification: ForwardNotification*/
+	public void notifyFwd();
 	/*Notification: LevelStepDownNotification*/
 	public void notifyStepDown();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
 	/*Notification: OffNotification*/
 	public void notifyOff();
-	/*Notification: RewindNotification*/
-	public void notifyRew();
 	/*Notification: StopPlaybackNotification*/
 	public void notifyStop();
+	/*Notification: RewindNotification*/
+	public void notifyRew();
 	/*Notification: TrackControlNotification*/
 	public void notifyChangedTrack(String trackId);
 	public void updateStatus();

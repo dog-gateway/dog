@@ -108,7 +108,7 @@ public class DogLevelControllableOutput extends AbstractDevice implements LevelC
 		}
 	}
 
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -116,7 +116,7 @@ public class DogLevelControllableOutput extends AbstractDevice implements LevelC
 		}
 	}
 
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -144,7 +144,7 @@ public class DogLevelControllableOutput extends AbstractDevice implements LevelC
 		notifyEventAdmin(notificationEvent);
 	}
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber){
+	public void notifyDeletedScene(Integer sceneNumber){
 		DeleteSceneNotification notificationEvent=new DeleteSceneNotification(sceneNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
@@ -181,13 +181,6 @@ public class DogLevelControllableOutput extends AbstractDevice implements LevelC
 	/*Notification: LevelStepDownNotification*/
 	public void notifyStepDown(){
 		LevelStepDownNotification notificationEvent=new LevelStepDownNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber){
-		GroupNotification notificationEvent=new GroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

@@ -47,21 +47,11 @@ public class PlayState extends DiscreteState
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String PLAYING = "playing";
 	public static final String REWIND = "rewind";
-	public static final String STOP = "stop";
+	public static final String PLAYING = "playing";
 	public static final String PAUSE = "pause";
+	public static final String STOP = "stop";
 	public static final String FORWARD = "forward";
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public PlayState(PlayStateValue playstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{playstatevalue});
-	}
 
 
 	/**
@@ -77,10 +67,10 @@ public class PlayState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public PlayState(StopStateValue stopstatevalue)
+	public PlayState(PlayStateValue playstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{stopstatevalue});
+		super(new StateValue[]{playstatevalue});
 	}
 
 
@@ -97,6 +87,16 @@ public class PlayState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
+	public PlayState(StopStateValue stopstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{stopstatevalue});
+	}
+
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
 	public PlayState(ForwardStateValue forwardstatevalue)
 	{
 		//call the super class constructor
@@ -106,10 +106,10 @@ public class PlayState extends DiscreteState
 	@Deprecated
 	private void initCommon()
 	{
-		this.old2NewMap.put(PlayState.PLAYING, new PlayStateValue());
 		this.old2NewMap.put(PlayState.REWIND, new RewindStateValue());
-		this.old2NewMap.put(PlayState.STOP, new StopStateValue());
+		this.old2NewMap.put(PlayState.PLAYING, new PlayStateValue());
 		this.old2NewMap.put(PlayState.PAUSE, new PauseStateValue());
+		this.old2NewMap.put(PlayState.STOP, new StopStateValue());
 		this.old2NewMap.put(PlayState.FORWARD, new ForwardStateValue());
 	}
 	/**

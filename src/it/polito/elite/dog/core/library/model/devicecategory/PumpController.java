@@ -43,15 +43,15 @@ public interface PumpController extends HVACSystem, Control
 	/*Generated Notifications*/
 
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber);
-	/*Notification: LevelStepUpNotification*/
-	public void notifyStepUp();
+	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
-	/*Notification: IdentifyNotification*/
-	public void notifyIdentifyMe();
+	/*Notification: LevelStepUpNotification*/
+	public void notifyStepUp();
 	/*Notification: FlowRateMeasurementNotification*/
 	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue);
+	/*Notification: IdentifyNotification*/
+	public void notifyIdentifyMe();
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: LevelControlNotification*/
@@ -68,7 +68,5 @@ public interface PumpController extends HVACSystem, Control
 	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
 	public void updateStatus();
 }

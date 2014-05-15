@@ -87,7 +87,7 @@ public class DogQuadSensor extends AbstractDevice implements QuadSensor
 		 return null;
 	}
 
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -95,7 +95,7 @@ public class DogQuadSensor extends AbstractDevice implements QuadSensor
 		}
 	}
 
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
 		{
@@ -114,16 +114,16 @@ public class DogQuadSensor extends AbstractDevice implements QuadSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: TemperatureMeasurementNotification*/
-	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue){
-		TemperatureMeasurementNotification notificationEvent=new TemperatureMeasurementNotification(temperatureValue );
+	/*Notification: SimpleNoMovementNotification*/
+	public void notifyCeasedMovement(){
+		SimpleNoMovementNotification notificationEvent=new SimpleNoMovementNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SimpleNoMovementNotification*/
-	public void notifyCeasedMovement(){
-		SimpleNoMovementNotification notificationEvent=new SimpleNoMovementNotification();
+	/*Notification: TemperatureMeasurementNotification*/
+	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue){
+		TemperatureMeasurementNotification notificationEvent=new TemperatureMeasurementNotification(temperatureValue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -145,13 +145,6 @@ public class DogQuadSensor extends AbstractDevice implements QuadSensor
 	/*Notification: SimpleMovementNotification*/
 	public void notifyStartedMovement(){
 		SimpleMovementNotification notificationEvent=new SimpleMovementNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber){
-		GroupNotification notificationEvent=new GroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

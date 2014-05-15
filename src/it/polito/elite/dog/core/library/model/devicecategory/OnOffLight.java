@@ -29,8 +29,6 @@ package it.polito.elite.dog.core.library.model.devicecategory;
 
 
 import it.polito.elite.dog.core.library.model.DeviceStatus;
-import javax.measure.Measure;
-
 public interface OnOffLight extends SimpleLamp
 {
 	public static int MATCH_TYPE=100;
@@ -41,8 +39,8 @@ public interface OnOffLight extends SimpleLamp
 	public void storeScene(Integer sceneNumber);
 	public void deleteScene(Integer sceneNumber);
 	public void on();
-	public void deleteGroup(String groupID);
-	public void storeGroup(String groupID);
+	public void deleteGroup(Integer groupID);
+	public void storeGroup(Integer groupID);
 	public void off();
 
 
@@ -51,13 +49,11 @@ public interface OnOffLight extends SimpleLamp
 	/*Notification: StoreSceneNotification*/
 	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: DeleteSceneNotification*/
-	public void notifyDeletedScene(Measure<?,?>  sceneNumber);
+	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/

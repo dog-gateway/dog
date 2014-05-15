@@ -43,9 +43,9 @@ public interface Thermostat extends Control, HVACSystem
 	public void storeScene(Integer sceneNumber);
 	public void deleteScene(Integer sceneNumber);
 	public void cool();
-	public void deleteGroup(String groupID);
+	public void deleteGroup(Integer groupID);
 	public void stopHeatingOrCooling();
-	public void storeGroup(String groupID);
+	public void storeGroup(Integer groupID);
 	public void setTemperatureAt(Measure<?,?>  temperature);
 	public void heat();
 
@@ -56,20 +56,18 @@ public interface Thermostat extends Control, HVACSystem
 	public void notifySpeedUp();
 	/*Notification: ChangedDesiredTemperatureNotification*/
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
-	/*Notification: JoinGroupNotification*/
-	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: CoolNotification*/
 	public void notifyCool();
 	/*Notification: SpeedStepDownNotification*/
 	public void notifySpeedDown();
+	/*Notification: JoinGroupNotification*/
+	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: HeatNotification*/
 	public void notifyHeat();
 	/*Notification: HumidityMeasurementNotification*/
 	public void notifyChangedRelativeHumidity(Measure<?,?>  relativeHumidity);
 	/*Notification: SpeedControlNotification*/
 	public void notifyChangedSpeed(Measure<?,?>  newSpeed);
-	/*Notification: GroupNotification*/
-	public void notifyBelongToGroup(Integer groupNumber);
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
 	/*Notification: StopHeatingCoolingNotification*/
