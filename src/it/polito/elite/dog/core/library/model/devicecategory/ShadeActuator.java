@@ -57,8 +57,6 @@ public interface ShadeActuator extends Actuator
 	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: SimpleNoMovementNotification*/
 	public void notifyCeasedMovement();
-	/*Notification: LevelStepUpNotification*/
-	public void notifyStepUp();
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: OnNotification*/
@@ -67,8 +65,6 @@ public interface ShadeActuator extends Actuator
 	public void notifyStartedMovement();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
-	/*Notification: LevelStepDownNotification*/
-	public void notifyStepDown();
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/

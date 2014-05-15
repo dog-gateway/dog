@@ -78,6 +78,13 @@ public class DogZWaveGateway extends AbstractDevice implements ZWaveGateway
 
 	/*Generated Notifications*/
 
+	/*Notification: IdleNotification*/
+	public void notifyIdle(){
+		IdleNotification notificationEvent=new IdleNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
 	/*Notification: AssociatingDeviceNotification*/
 	public void notifyAssociating(){
 		AssociatingDeviceNotification notificationEvent=new AssociatingDeviceNotification();

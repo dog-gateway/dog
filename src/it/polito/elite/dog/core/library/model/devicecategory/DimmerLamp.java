@@ -47,14 +47,10 @@ public interface DimmerLamp extends Lamp
 
 	/*Generated Notifications*/
 
-	/*Notification: LevelStepUpNotification*/
-	public void notifyStepUp();
 	/*Notification: OnNotification*/
 	public void notifyOn();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
-	/*Notification: LevelStepDownNotification*/
-	public void notifyStepDown();
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	public void updateStatus();

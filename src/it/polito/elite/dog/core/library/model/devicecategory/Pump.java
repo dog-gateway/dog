@@ -60,8 +60,6 @@ public interface Pump extends Actuator, HVACSystem
 	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
-	/*Notification: LevelStepUpNotification*/
-	public void notifyStepUp();
 	/*Notification: FlowRateMeasurementNotification*/
 	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue);
 	/*Notification: JoinGroupNotification*/
@@ -70,8 +68,6 @@ public interface Pump extends Actuator, HVACSystem
 	public void notifyOn();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
-	/*Notification: LevelStepDownNotification*/
-	public void notifyStepDown();
 	/*Notification: PressureMeasurementNotification*/
 	public void notifyNewPressureValue(Measure<?,?>  pressureValue);
 	/*Notification: OffNotification*/

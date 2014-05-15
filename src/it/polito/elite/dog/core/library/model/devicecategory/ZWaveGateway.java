@@ -42,6 +42,8 @@ public interface ZWaveGateway extends HomeGateway
 
 	/*Generated Notifications*/
 
+	/*Notification: IdleNotification*/
+	public void notifyIdle();
 	/*Notification: AssociatingDeviceNotification*/
 	public void notifyAssociating();
 	/*Notification: DisassociatingDeviceNotification*/

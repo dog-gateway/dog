@@ -57,16 +57,12 @@ public interface ColorDimmableLight extends DimmableLight
 	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: ColorNotification*/
 	public void notifyChangedColor(String colorRGB);
-	/*Notification: LevelStepUpNotification*/
-	public void notifyStepUp();
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: OnNotification*/
 	public void notifyOn();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
-	/*Notification: LevelStepDownNotification*/
-	public void notifyStepDown();
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
