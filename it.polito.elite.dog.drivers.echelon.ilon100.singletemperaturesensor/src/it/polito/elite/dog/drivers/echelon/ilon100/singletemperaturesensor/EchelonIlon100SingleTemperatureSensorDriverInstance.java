@@ -98,20 +98,6 @@ public class EchelonIlon100SingleTemperatureSensorDriverInstance extends Echelon
 	}
 	
 	@Override
-	public void deleteGroup(String groupID)
-	{
-		// nothing to do by now... will be handled in the future... may be...
-		
-	}
-	
-	@Override
-	public void storeGroup(String groupID)
-	{
-		// nothing to do by now... will be handled in the future... may be...
-		
-	}
-	
-	@Override
 	public void notifyNewTemperatureValue(Measure<?, ?> temperatureValue)
 	{
 		// update the state
@@ -256,15 +242,23 @@ public class EchelonIlon100SingleTemperatureSensorDriverInstance extends Echelon
 	}
 	
 	@Override
-	public void notifyBelongToGroup(Integer groupNumber)
-	{
-		// intentionally left empty
-	}
-	
-	@Override
 	public void notifyLeftGroup(Integer groupNumber)
 	{
 		// intentionally left empty
+	}
+
+	@Override
+	public void deleteGroup(Integer groupID)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeGroup(Integer groupID)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
