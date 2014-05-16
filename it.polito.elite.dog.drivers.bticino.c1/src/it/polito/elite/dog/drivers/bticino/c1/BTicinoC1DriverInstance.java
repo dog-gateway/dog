@@ -23,7 +23,6 @@ import it.polito.elite.dog.core.library.model.devicecategory.Button;
 import it.polito.elite.dog.core.library.model.devicecategory.DimmerLamp;
 import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
-import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
 import it.polito.elite.dog.core.library.model.devicecategory.OnOffSwitch;
 import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
@@ -236,15 +235,27 @@ public class BTicinoC1DriverInstance implements BTicinoSpecificDriver, Lamp, Sim
 	@Override
 	public void notifyOn()
 	{
-		((OnOffOutput) this.device).notifyOn();
-		
+		if(this.device instanceof Lamp)
+		{
+			((Lamp) this.device).notifyOn();
+		}
+		else
+		{
+			((OnOffSwitch) this.device).notifyOn();
+		}
 	}
 	
 	@Override
 	public void notifyOff()
 	{
-		((OnOffOutput) this.device).notifyOff();
-		
+		if(this.device instanceof Lamp)
+		{
+			((Lamp) this.device).notifyOff();
+		}
+		else
+		{
+			((OnOffSwitch) this.device).notifyOff();
+		}
 	}
 
 
