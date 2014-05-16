@@ -9,15 +9,6 @@
 			#foreach( $instanceId in $instanceIds )
 			<dhc:param value="$instanceId" name="InstanceID" type="network" />
 			#end
-			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
-				<dhc:notifications>
-					<dhc:notification
-						id="StateChangeNotification$name" class="StateChangeNotification">
-						<dhc:param value="stateChanged" name="notificationName" />
-						<dhc:param type="State" value="newState" name="notificationParamName" />
-					</dhc:notification>
-				</dhc:notifications>
-			</dhc:notificationFunctionality>
 			<dhc:notificationFunctionality
 				class="ThreePhaseVoltageMeasurementNotificationFunctionality">
 				<dhc:notifications>

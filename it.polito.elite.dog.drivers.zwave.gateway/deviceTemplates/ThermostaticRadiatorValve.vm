@@ -65,14 +65,38 @@
 					</dhc:command>
 				</dhc:commands>
 			</dhc:controlFunctionality>
-			<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+            <dhc:notificationFunctionality class="ClimateScheduleNotificationFunctionality">
 				<dhc:notifications>
-					<dhc:notification class="StateChangeNotification"
-						id="StateChangeNotification_$name">
-						<dhc:param name="nParams" value="1" />
-						<dhc:param name="notificationName" value="stateChanged" />
-						<dhc:param name="notificationParamName" value="newState"
-							type="State" />
+					<dhc:notification id="DailyClimateScheduleNotification_$name" class="DailyClimateScheduleNotification">
+						<dhc:param name="nParams" value="1"/>
+						<dhc:param value="changedDailyClimateSchedule" name="notificationName" />
+						<dhc:param value="daySchedule" name="notificationParamName" type="DailyClimateSchedule" />
+					</dhc:notification>
+					<dhc:notification id="WeeklyClimateScheduleNotification_$name" class="WeeklyClimateScheduleNotification">
+						<dhc:param name="nParams" value="1"/>
+						<dhc:param value="changedWeeklyClimateSchedule" name="notificationName" />
+						<dhc:param value="dailySchedules" name="notificationParamName" type="DailyClimateSchedule[]" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:notificationFunctionality class="ThermostatNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification id="ChangedDesiredTemperatureNotification_$name" class="ChangedDesiredTemperatureNotification">
+						<dhc:param name="nParams" value="1"/>
+						<dhc:param value="changedDesiredTemperatureSetting" name="notificationName" />
+						<dhc:param value="newTemperatureValue" name="notificationParamName" type="Measure" />
+					</dhc:notification>
+					<dhc:notification id="CoolNotification_$name" class="CoolNotification">
+						<dhc:param name="nParams" value="0"/>
+						<dhc:param value="cool" name="notificationName" />
+					</dhc:notification>
+					<dhc:notification id="HeatNotification_$name" class="HeatNotification">
+						<dhc:param name="nParams" value="0"/>
+						<dhc:param value="heat" name="notificationName" />
+					</dhc:notification>
+					<dhc:notification id="StopHeatingCoolingNotification_$name" class="StopHeatingCoolingNotification">
+						<dhc:param name="nParams" value="0"/>
+						<dhc:param value="stopHeatingOrCooling" name="notificationName" />
 					</dhc:notification>
 				</dhc:notifications>
 			</dhc:notificationFunctionality>

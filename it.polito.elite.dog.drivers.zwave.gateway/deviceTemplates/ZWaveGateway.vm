@@ -18,6 +18,18 @@
 					</dhc:command>
 				</dhc:commands>
 			</dhc:controlFunctionality>
+			<dhc:notificationFunctionality class="AssociationNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification id="AssociatingDeviceNotification_$name" class="AssociatingDeviceNotification">
+						<dhc:param name="nParams" value="0"/>
+						<dhc:param value="associating" name="notificationName" />
+					</dhc:notification>
+					<dhc:notification id="DisassociatingDeviceNotification_$name" class="DisassociatingDeviceNotification">
+						<dhc:param name="nParams" value="0"/>
+						<dhc:param value="disassociating" name="notificationName" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>			
 		</dhc:device>
 	</dhc:controllables>
 </dhc:dogHomeConfiguration>
