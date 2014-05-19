@@ -234,13 +234,31 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 	@Override
 	public void notifyOn()
 	{
-		((OnOffOutput) this.device).notifyOn();
+		if(this.device instanceof Lamp)
+		{
+			((Lamp) this.device).notifyOn();
+		}
+		else if(this.device instanceof Buzzer)
+		{
+			((Buzzer) this.device).notifyOn();
+		}
+		else
+			((OnOffOutput) this.device).notifyOn();
 	}
 
 	@Override
 	public void notifyOff()
 	{
-		((OnOffOutput) this.device).notifyOff();
+		if(this.device instanceof Lamp)
+		{
+			((Lamp) this.device).notifyOff();
+		}
+		else if(this.device instanceof Buzzer)
+		{
+			((Buzzer) this.device).notifyOff();
+		}
+		else
+			((OnOffOutput) this.device).notifyOff();
 	}
 	
 	@Override
