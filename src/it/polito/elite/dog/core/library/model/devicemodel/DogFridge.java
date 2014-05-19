@@ -179,16 +179,16 @@ public class DogFridge extends AbstractDevice implements Fridge
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: EventNotification*/
-	public void notifyNewEvent(Object event){
-		EventNotification notificationEvent=new EventNotification(event );
+	/*Notification: MultipleAlertNotification*/
+	public void notifyNewAlertSet(Object[] alerts){
+		MultipleAlertNotification notificationEvent=new MultipleAlertNotification(alerts );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: MultipleAlertNotification*/
-	public void notifyNewAlertSet(Object[] alerts){
-		MultipleAlertNotification notificationEvent=new MultipleAlertNotification(alerts );
+	/*Notification: EventNotification*/
+	public void notifyNewEvent(Object event){
+		EventNotification notificationEvent=new EventNotification(event );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -242,16 +242,16 @@ public class DogFridge extends AbstractDevice implements Fridge
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: HeatNotification*/
-	public void notifyHeat(){
-		HeatNotification notificationEvent=new HeatNotification();
+	/*Notification: OnNotification*/
+	public void notifyOn(){
+		OnNotification notificationEvent=new OnNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OnNotification*/
-	public void notifyOn(){
-		OnNotification notificationEvent=new OnNotification();
+	/*Notification: HeatNotification*/
+	public void notifyHeat(){
+		HeatNotification notificationEvent=new HeatNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -263,16 +263,16 @@ public class DogFridge extends AbstractDevice implements Fridge
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StoppedSuperCoolingNotification*/
-	public void notifyStoppedSuperCooling(){
-		StoppedSuperCoolingNotification notificationEvent=new StoppedSuperCoolingNotification();
+	/*Notification: StopHeatingCoolingNotification*/
+	public void notifyStoppedHeatingOrCooling(){
+		StopHeatingCoolingNotification notificationEvent=new StopHeatingCoolingNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StopHeatingCoolingNotification*/
-	public void notifyStoppedHeatingOrCooling(){
-		StopHeatingCoolingNotification notificationEvent=new StopHeatingCoolingNotification();
+	/*Notification: StoppedSuperCoolingNotification*/
+	public void notifyStoppedSuperCooling(){
+		StoppedSuperCoolingNotification notificationEvent=new StoppedSuperCoolingNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

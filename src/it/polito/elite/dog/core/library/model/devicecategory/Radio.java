@@ -56,10 +56,10 @@ public interface Radio extends Entertainment
 	public void notifyChannelStepUp();
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: TuningStepUpNotification*/
-	public void notifyChannelStepDown();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
+	/*Notification: TuningStepUpNotification*/
+	public void notifyChannelStepDown();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
 	/*Notification: OffNotification*/

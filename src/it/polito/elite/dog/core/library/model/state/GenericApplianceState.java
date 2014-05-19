@@ -23,12 +23,12 @@ package it.polito.elite.dog.core.library.model.state;
 
 
 import it.polito.elite.dog.core.library.model.statevalue.FailureStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ConnectedStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.PauseStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgramInterruptedStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StandByStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.RunningStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.InServiceStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgrammedStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgrammedAndWaitingToStartStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.IdleStateValue;
@@ -61,9 +61,9 @@ public class GenericApplianceState extends DiscreteState
 	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
 	public static final String PROGRAMMED = "programmed";
-	public static final String SERVICE = "service";
 	public static final String OFF = "off";
 	public static final String RUNNING = "running";
+	public static final String CONNECTED = "connected";
 
 
 	/**
@@ -149,16 +149,6 @@ public class GenericApplianceState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public GenericApplianceState(InServiceStateValue inservicestatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{inservicestatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
 	public GenericApplianceState(OffStateValue offstatevalue)
 	{
 		//call the super class constructor
@@ -175,6 +165,16 @@ public class GenericApplianceState extends DiscreteState
 		super(new StateValue[]{runningstatevalue});
 	}
 
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public GenericApplianceState(ConnectedStateValue connectedstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{connectedstatevalue});
+	}
+
 	@Deprecated
 	private void initCommon()
 	{
@@ -186,9 +186,9 @@ public class GenericApplianceState extends DiscreteState
 		this.old2NewMap.put(GenericApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
 		this.old2NewMap.put(GenericApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
 		this.old2NewMap.put(GenericApplianceState.PROGRAMMED, new ProgrammedStateValue());
-		this.old2NewMap.put(GenericApplianceState.SERVICE, new InServiceStateValue());
 		this.old2NewMap.put(GenericApplianceState.OFF, new OffStateValue());
 		this.old2NewMap.put(GenericApplianceState.RUNNING, new RunningStateValue());
+		this.old2NewMap.put(GenericApplianceState.CONNECTED, new ConnectedStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

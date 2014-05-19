@@ -182,6 +182,13 @@ public class DogThreePhaseElectricityMeter extends AbstractDevice implements Thr
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	/*Notification: ThreePhaseLNVoltageMeasurementNotification*/
+	public void notifyNewPhaseNeutralVoltageValue(String phaseID, Measure<?,?>  value){
+		ThreePhaseLNVoltageMeasurementNotification notificationEvent=new ThreePhaseLNVoltageMeasurementNotification(phaseID , value );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
 	/*Notification: ThreePhaseLLVoltageMeasurementNotification*/
 	public void notifyNewPhasePhaseVoltageValue(String phaseID, Measure<?,?>  value){
 		ThreePhaseLLVoltageMeasurementNotification notificationEvent=new ThreePhaseLLVoltageMeasurementNotification(phaseID , value );
@@ -189,9 +196,9 @@ public class DogThreePhaseElectricityMeter extends AbstractDevice implements Thr
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: ThreePhaseLNVoltageMeasurementNotification*/
-	public void notifyNewPhaseNeutralVoltageValue(String phaseID, Measure<?,?>  value){
-		ThreePhaseLNVoltageMeasurementNotification notificationEvent=new ThreePhaseLNVoltageMeasurementNotification(phaseID , value );
+	/*Notification: ThreePhaseActivePowerMeasurementNotification*/
+	public void notifyNewActivePowerValue(String phaseID, Measure<?,?>  value){
+		ThreePhaseActivePowerMeasurementNotification notificationEvent=new ThreePhaseActivePowerMeasurementNotification(phaseID , value );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -206,13 +213,6 @@ public class DogThreePhaseElectricityMeter extends AbstractDevice implements Thr
 	/*Notification: PowerFactorMeasurementNotification*/
 	public void notifyNewPowerFactorValue(Measure<?,?>  powerFactor){
 		PowerFactorMeasurementNotification notificationEvent=new PowerFactorMeasurementNotification(powerFactor );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: ThreePhaseActivePowerMeasurementNotification*/
-	public void notifyNewActivePowerValue(String phaseID, Measure<?,?>  value){
-		ThreePhaseActivePowerMeasurementNotification notificationEvent=new ThreePhaseActivePowerMeasurementNotification(phaseID , value );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

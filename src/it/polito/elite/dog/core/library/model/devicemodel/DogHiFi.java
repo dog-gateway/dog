@@ -280,13 +280,6 @@ public class DogHiFi extends AbstractDevice implements HiFi
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: ForwardNotification*/
-	public void notifyFwd(){
-		ForwardNotification notificationEvent=new ForwardNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: TuningStepUpNotification*/
 	public void notifyChannelStepDown(){
 		TuningStepUpNotification notificationEvent=new TuningStepUpNotification();
@@ -294,16 +287,16 @@ public class DogHiFi extends AbstractDevice implements HiFi
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StandByNotification*/
-	public void notifyStandby(){
-		StandByNotification notificationEvent=new StandByNotification();
+	/*Notification: ForwardNotification*/
+	public void notifyFwd(){
+		ForwardNotification notificationEvent=new ForwardNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: ChannelControlNotification*/
-	public void notifyChangedChannel(String channelId){
-		ChannelControlNotification notificationEvent=new ChannelControlNotification(channelId );
+	/*Notification: StandByNotification*/
+	public void notifyStandby(){
+		StandByNotification notificationEvent=new StandByNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -318,6 +311,13 @@ public class DogHiFi extends AbstractDevice implements HiFi
 	/*Notification: StopPlaybackNotification*/
 	public void notifyStop(){
 		StopPlaybackNotification notificationEvent=new StopPlaybackNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: ChannelControlNotification*/
+	public void notifyChangedChannel(String channelId){
+		ChannelControlNotification notificationEvent=new ChannelControlNotification(channelId );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

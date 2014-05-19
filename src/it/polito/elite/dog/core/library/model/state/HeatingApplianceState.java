@@ -28,10 +28,10 @@ import it.polito.elite.dog.core.library.model.statevalue.StandByStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.IdleStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.FailureStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.ConnectedStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.RunningStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgrammedAndWaitingToStartStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgrammedStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.InServiceStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 
 
@@ -59,13 +59,13 @@ public class HeatingApplianceState extends GenericApplianceState
 	public static final String STANDBY = "standBy";
 	public static final String IDLE = "idle";
 	public static final String SUPERHEATING = "superHeating";
-	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
+	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
 	public static final String PROGRAMMED = "programmed";
-	public static final String SERVICE = "service";
 	public static final String OFF = "off";
 	public static final String RUNNING = "running";
+	public static final String CONNECTED = "connected";
 
 
 	/**
@@ -121,20 +121,20 @@ public class HeatingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public HeatingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
+	public HeatingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{endprogrammedstatevalue});
+		super(new StateValue[]{programmedandwaitingtostartstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public HeatingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
+	public HeatingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{programmedandwaitingtostartstatevalue});
+		super(new StateValue[]{endprogrammedstatevalue});
 	}
 
 
@@ -161,16 +161,6 @@ public class HeatingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public HeatingApplianceState(InServiceStateValue inservicestatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{inservicestatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
 	public HeatingApplianceState(OffStateValue offstatevalue)
 	{
 		//call the super class constructor
@@ -187,6 +177,16 @@ public class HeatingApplianceState extends GenericApplianceState
 		super(new StateValue[]{runningstatevalue});
 	}
 
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public HeatingApplianceState(ConnectedStateValue connectedstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{connectedstatevalue});
+	}
+
 	@Deprecated
 	private void initCommon()
 	{
@@ -195,13 +195,13 @@ public class HeatingApplianceState extends GenericApplianceState
 		this.old2NewMap.put(HeatingApplianceState.STANDBY, new StandByStateValue());
 		this.old2NewMap.put(HeatingApplianceState.IDLE, new IdleStateValue());
 		this.old2NewMap.put(HeatingApplianceState.SUPERHEATING, new SuperHeatingStateValue());
-		this.old2NewMap.put(HeatingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(HeatingApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
+		this.old2NewMap.put(HeatingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(HeatingApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
 		this.old2NewMap.put(HeatingApplianceState.PROGRAMMED, new ProgrammedStateValue());
-		this.old2NewMap.put(HeatingApplianceState.SERVICE, new InServiceStateValue());
 		this.old2NewMap.put(HeatingApplianceState.OFF, new OffStateValue());
 		this.old2NewMap.put(HeatingApplianceState.RUNNING, new RunningStateValue());
+		this.old2NewMap.put(HeatingApplianceState.CONNECTED, new ConnectedStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).
