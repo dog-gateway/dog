@@ -17,7 +17,9 @@
  */
 package it.polito.elite.dog.drivers.zwave.network.info;
 
-public class ZWaveInfo
+import it.polito.elite.dog.core.library.model.ConfigurationConstants;
+
+public class ZWaveInfo extends ConfigurationConstants
 {
 	// the manufacturer identifier (ZWave)
 	public static String MANUFACTURER = "ZWave";	
@@ -27,12 +29,6 @@ public class ZWaveInfo
 	
 	// the instance ID
 	public static String INSTANCE_ID = "InstanceID";
-	
-	// the command name to which a specific configuration refers
-	public static String COMMAND_NAME = "realCommandName";
-	
-	// the notification name to which a specific configuration refers
-	public static String NOTIFICATION_NAME = "notificationName";
 	
 	// constant for configuration
 	public static final String PROPERTY_UPDATETIME = "updateTimeMillis";
