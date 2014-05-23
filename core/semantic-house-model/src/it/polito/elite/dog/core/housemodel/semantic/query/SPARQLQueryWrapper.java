@@ -874,6 +874,7 @@ public class SPARQLQueryWrapper
 		// iterate over device classes
 		for (OntClass currentCls : deviceClasses)
 		{
+			if(!currentCls.isAnon() && !currentCls.getURI().equals("http://www.w3.org/2002/07/owl#NamedIndividual")){
 			// get the class resources
 			if ((filter == null) || ((filter != null) && (!currentCls.hasSuperClass(filter))))
 			{
@@ -899,6 +900,7 @@ public class SPARQLQueryWrapper
 					subClassNumber = 0;
 				}
 			}
+		}
 		}
 		
 		return mostSpecificType;

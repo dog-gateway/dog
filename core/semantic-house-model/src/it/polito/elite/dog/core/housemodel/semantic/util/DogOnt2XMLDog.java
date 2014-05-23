@@ -45,6 +45,7 @@ import it.polito.elite.dog.core.library.jaxb.Statevalues;
 import it.polito.elite.dog.core.library.jaxb.Storey;
 import it.polito.elite.dog.core.library.jaxb.Wall;
 import it.polito.elite.dog.core.library.jaxb.WallOpening;
+import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
 import it.polito.elite.utilities.cmd.Options;
 
 import java.io.BufferedReader;
@@ -226,7 +227,7 @@ public class DogOnt2XMLDog
 		
 		
 		PelletInfGraph infG = ((PelletInfGraph) this.ontology.getGraph());
-		infG.classify();
+		//infG.classify();
 		infG.realize();
 		infG.setAutoDetectChanges(false);
 		
@@ -271,7 +272,7 @@ public class DogOnt2XMLDog
 	
 		
 		PelletInfGraph infG = ((PelletInfGraph) this.ontology.getGraph());
-		infG.classify();
+		//infG.classify();
 		infG.realize();
 		infG.setAutoDetectChanges(false);
 		
@@ -680,6 +681,8 @@ public class DogOnt2XMLDog
 		// get all the controllable devices
 		Set<String> allControllableInstances = this.qWrapper.getAllControllableInstances();
 		
+		long time = System.currentTimeMillis();
+		
 		// create a device object for each controllable and then fill it
 		for (String cControllableInst : allControllableInstances)
 		{
@@ -734,8 +737,9 @@ public class DogOnt2XMLDog
 				else if (networkType.endsWith("Gateway"))
 					cIndex = networkType.indexOf("Gateway");
 				
-				// sets the domotic system of the device
-				device.setDomoticSystem(networkType.substring(0, cIndex).toUpperCase());
+				if(cIndex != -1)
+					// sets the domotic system of the device
+					device.setDomoticSystem(networkType.substring(0, cIndex).toUpperCase());
 				
 			}
 				
@@ -745,6 +749,9 @@ public class DogOnt2XMLDog
 			// add the device
 			controllables.getDevice().add(device);
 		}
+		
+		// debug
+		System.out.println("All controllables extracted in " + (System.currentTimeMillis() - time));
 		
 		return controllables;
 	}
