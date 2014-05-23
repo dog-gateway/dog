@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: it.polito.elite.dog.communication.rest.environment.api
 Bundle-SymbolicName: it.polito.elite.dog.communication.rest.environment.api
-Bundle-Version: 1.1.0
+Bundle-Version: 1.2.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: it.polito.elite.dog.core.housemodel.api;version="1.2.0",
  it.polito.elite.dog.core.library.jaxb;version="1.1.1",

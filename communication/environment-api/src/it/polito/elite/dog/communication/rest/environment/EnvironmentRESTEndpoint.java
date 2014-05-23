@@ -475,6 +475,40 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.communication.rest.environment.api.EnvironmentRESTApi
+	 * #removeRoomFromFlat(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void removeRoomFromFlat(String roomId, String flatId)
+	{
+		if (this.environmentModel.get() != null)
+		{
+			// remove the given room from the Environmental Model
+			this.environmentModel.get().removeRoomFromBuilding(roomId, flatId);
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.communication.rest.environment.api.EnvironmentRESTApi
+	 * #removeFlat(java.lang.String)
+	 */
+	@Override
+	public void removeFlat(String flatId)
+	{
+		if (this.environmentModel.get() != null)
+		{
+			// remove the given flat from the Environmental Model
+			this.environmentModel.get().removeFlatFromBuilding(flatId);
+		}
+	}
+	
 	/**
 	 * Get all the building environments configured in Dog from the
 	 * {@link EnvironmentModel}
@@ -541,8 +575,7 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		if (this.environmentModel.get() != null)
 		{
 			// get all the flats for the first building
-			List<Flat> flats = this.environmentModel.get().getBuildingEnvironment().get(0).getBuilding().get(0)
-					.getFlat();
+			List<Flat> flats = this.environmentModel.get().getJAXBEnvironment().get(0).getBuilding().get(0).getFlat();
 			
 			// look for the desired flat
 			for (Flat singleFlat : flats)
