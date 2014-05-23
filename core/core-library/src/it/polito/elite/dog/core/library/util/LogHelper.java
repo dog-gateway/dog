@@ -25,10 +25,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
 /**
- * This class wraps a LogService, as defined in OSGi.<br/>
- * If the LogService is available in the OSGi context, the log methods are used,
- * otherwise this class uses standard output for providing some logging
- * capabilities.
+ * A utility class that helps lessen the lines of code needed to log a
+ * message by using the OSGi LogService. If the OSGi LogService is not
+ * available, it provides a basic log on the standard output.
  * 
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
@@ -39,9 +38,7 @@ public class LogHelper
 	private BundleContext context;
 	
 	/**
-	 * A utility class that helps lessen the lines of code needed to log a
-	 * message by using the OSGi LogService. If the OSGi LogService is not
-	 * available, it provides a basic log on the standard output.
+	 * Default constructor
 	 * 
 	 * @param context
 	 *            the bundle context
