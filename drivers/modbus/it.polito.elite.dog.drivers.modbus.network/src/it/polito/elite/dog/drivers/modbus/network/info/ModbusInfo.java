@@ -17,22 +17,18 @@
  */
 package it.polito.elite.dog.drivers.modbus.network.info;
 
+import it.polito.elite.dog.core.library.model.ConfigurationConstants;
+
 /**
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a> 
  *
  * @since Mar 1, 2012
  */
-public class ModbusInfo
+public class ModbusInfo extends ConfigurationConstants
 {
 	// the manufacturer identifier (Modbus)
 	public static String MANUFACTURER = "Modbus";	
-	
-	// the command name to which a specific configuration refers
-	public static String COMMAND_NAME = "realCommandName";
-	
-	// the notification name to which a specific configuration refers
-	public static String NOTIFICATION_NAME = "notificationName";
 	
 	// the gateway address
 	public static String GATEWAY_ADDRESS = "IPAddress";

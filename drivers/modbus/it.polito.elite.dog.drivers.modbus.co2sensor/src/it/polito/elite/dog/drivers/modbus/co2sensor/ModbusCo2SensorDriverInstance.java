@@ -17,6 +17,7 @@
  */
 package it.polito.elite.dog.drivers.modbus.co2sensor;
 
+import it.polito.elite.dog.core.library.model.CNParameters;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Co2Sensor;
@@ -26,7 +27,6 @@ import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.Co2MeasurementStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
-import it.polito.elite.dog.drivers.modbus.network.info.CmdNotificationInfo;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
 import it.polito.elite.dog.drivers.modbus.network.interfaces.ModbusNetwork;
 
@@ -141,10 +141,10 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implemen
 		if (value != null)
 		{
 			// gets the corresponding notification set...
-			Set<CmdNotificationInfo> notificationInfos = this.register2Notification.get(register);
+			Set<CNParameters> notificationInfos = this.register2Notification.get(register);
 			
 			// handle the notifications
-			for (CmdNotificationInfo notificationInfo : notificationInfos)
+			for (CNParameters notificationInfo : notificationInfos)
 			{
 				// black magic here...
 				String notificationName = notificationInfo.getName();
@@ -219,9 +219,9 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implemen
 		// configuration
 		for (ModbusRegisterInfo register : this.register2Notification.keySet())
 		{
-			Set<CmdNotificationInfo> notificationInfos = this.register2Notification.get(register);
+			Set<CNParameters> notificationInfos = this.register2Notification.get(register);
 			
-			for (CmdNotificationInfo notificationInfo : notificationInfos)
+			for (CNParameters notificationInfo : notificationInfos)
 			{
 				
 				if (notificationInfo.getName().equalsIgnoreCase(Co2MeasurementNotification.notificationName))

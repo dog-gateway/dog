@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ModbusOnOffDeviceDriver
 Bundle-SymbolicName: it.polito.elite.dog.drivers.modbus.onoffdevice
-Bundle-Version: 1.1.0
+Bundle-Version: 1.1.1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: it.polito.elite.dog.core.library.model,
  it.polito.elite.dog.core.library.model.devicecategory,
