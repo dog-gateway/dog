@@ -338,13 +338,13 @@ public class XivelyClient implements ManagedService, EventHandler
 			Object eventFeed = properties
 					.get(XivelyClient.XIVELY_DEFAULT_EVENT_FEED);
 			this.defaultEventFeed = (eventFeed instanceof String) ? Integer
-					.valueOf((String) eventFeed) : (Integer) eventFeed;
+					.valueOf(((String) eventFeed).trim()) : (Integer) eventFeed;
 
 			// get the base feed, if needed
 			Object alertFeed = (String) properties
 					.get(XivelyClient.XIVELY_DEFAULT_ALERT_FEED);
 			this.defaultAlertFeed = (alertFeed instanceof String) ? Integer
-					.valueOf((String) alertFeed) : (Integer) alertFeed;
+					.valueOf(((String) alertFeed).trim()) : (Integer) alertFeed;
 
 			try
 			{
