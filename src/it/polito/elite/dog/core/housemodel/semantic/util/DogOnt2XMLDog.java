@@ -198,7 +198,8 @@ public class DogOnt2XMLDog
 		// ready to perform the conversion...
 	}
 	
-	public DogOnt2XMLDog(OntModel ontologyModel, Map<String, String> namespaces, String modelToLoadNS) throws JAXBException
+	public DogOnt2XMLDog(OntModel ontologyModel, Map<String, String> namespaces, String modelToLoadNS)
+			throws JAXBException
 	{
 		// store the model
 		this.ontology = ontologyModel;
@@ -225,9 +226,8 @@ public class DogOnt2XMLDog
 		// disable reasoned model change detection (works only if the ontology
 		// is loaded with Pellet
 		
-		
 		PelletInfGraph infG = ((PelletInfGraph) this.ontology.getGraph());
-		//infG.classify();
+		// infG.classify();
 		infG.realize();
 		infG.setAutoDetectChanges(false);
 		
@@ -269,11 +269,13 @@ public class DogOnt2XMLDog
 		// prepare the model and disable the model listener
 		// disable reasoned model change detection (works only if the ontology
 		// is loaded with Pellet
-	
 		
 		PelletInfGraph infG = ((PelletInfGraph) this.ontology.getGraph());
-		//infG.classify();
-		infG.realize();
+		// not needed: classification is performed by the realize() method; and
+		// the realize action is performed by the first query on the reasoned
+		// model
+		// infG.classify();
+		// infG.realize();
 		infG.setAutoDetectChanges(false);
 		
 		// create the xmldog document
@@ -722,7 +724,7 @@ public class DogOnt2XMLDog
 			String networkType = this.qWrapper.getType(cControllableInst, this.namespaces.get("dogOnt")
 					+ "#BuildingThing");
 			
-			if(networkType==null)
+			if (networkType == null)
 			{
 				networkType = this.qWrapper.getType(cControllableInst, null);
 			}
@@ -737,12 +739,12 @@ public class DogOnt2XMLDog
 				else if (networkType.endsWith("Gateway"))
 					cIndex = networkType.indexOf("Gateway");
 				
-				if(cIndex != -1)
+				if (cIndex != -1)
 					// sets the domotic system of the device
 					device.setDomoticSystem(networkType.substring(0, cIndex).toUpperCase());
 				
 			}
-				
+			
 			// get all other device infos
 			this.getDeviceInformation(factory, device);
 			
@@ -1202,7 +1204,7 @@ public class DogOnt2XMLDog
 		}
 		
 	}
-
+	
 	/**
 	 * @return the jc
 	 */
