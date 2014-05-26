@@ -21,7 +21,6 @@ import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.SnapshotCamera;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
 import it.polito.elite.dog.drivers.bticino.interfaces.BTicinoNetworkDriver;
@@ -202,10 +201,12 @@ public class BTicinoC8DriverInstance implements BTicinoSpecificDriver, SnapshotC
 			if (what.equals(on))
 			{
 				onOffState = new OnOffState(new OnStateValue());
+				this.notifyOn();
 			}
 			else if (what.equals(off))
 			{
 				onOffState = new OnOffState(new OffStateValue());
+				this.notifyOff();
 			}
 			
 			if (onOffState != null)
@@ -225,7 +226,7 @@ public class BTicinoC8DriverInstance implements BTicinoSpecificDriver, SnapshotC
 	private void setInnerState(OnOffState onOffState)
 	{
 		this.deviceState.setState(onOffState.getStateName(), onOffState);
-		((SnapshotCamera) this.device).notifyStateChanged(onOffState);
+		this.updateStatus();
 		
 	}
 	
@@ -434,17 +435,23 @@ public class BTicinoC8DriverInstance implements BTicinoSpecificDriver, SnapshotC
 		return this.deviceState;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see it.polito.elite.domotics.model.devicecategory.SnapshotCamera#
-	 * notifyStateChanged(it.polito.elite.domotics.model.state.State)
-	 */
+
 	@Override
-	public void notifyStateChanged(State newState)
+	public void notifyOn()
 	{
-		// intentionally left empty
-		
+		((SnapshotCamera) this.device).notifyOn();
+	}
+
+	@Override
+	public void notifyOff()
+	{
+		((SnapshotCamera) this.device).notifyOff();
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		((SnapshotCamera) this.device).updateStatus();
 	}
 	
 }
