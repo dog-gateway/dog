@@ -250,6 +250,8 @@ public class FrameworkMonitorEndpoint implements FrameworkMonitor
 						if (isDeviceActive)
 							nActiveDevices++;
 					}
+					
+					this.context.ungetService(allDevices[i]);
 				}
 			}
 		}
