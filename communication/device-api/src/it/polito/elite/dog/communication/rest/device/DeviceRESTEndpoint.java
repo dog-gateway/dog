@@ -582,6 +582,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						// get the response payload for the current device
 						deviceStateResponsePayload[i] = this.getControllableStatus(currentDevice, allDevices[i]);
 					}
+					
+					this.context.ungetService(allDevices[i]);
 				}
 				// store the device
 				responsePayload.setDevicesStatus(deviceStateResponsePayload);
@@ -642,6 +644,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						deviceStateResponsePayload = this.getControllableStatus(currentDevice, deviceService[0]);
 					}
 					
+					this.context.ungetService(deviceService[0]);
 				}
 				
 				// convert the response body to json
