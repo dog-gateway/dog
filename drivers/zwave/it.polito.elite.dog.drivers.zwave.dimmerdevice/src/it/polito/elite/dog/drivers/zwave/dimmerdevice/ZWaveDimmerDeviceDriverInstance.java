@@ -19,8 +19,8 @@ package it.polito.elite.dog.drivers.zwave.dimmerdevice;
 
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.DimmerLamp;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.LevelControllableOutput;
 import it.polito.elite.dog.core.library.model.state.LevelState;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
@@ -42,6 +42,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.measure.DecimalMeasure;
+import javax.measure.Measure;
+import javax.measure.unit.Unit;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
@@ -53,6 +57,12 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 
 	// the step increase / decrease
 	private int stepPercentage = 5; // default
+	
+	// the group set
+	private HashSet<Integer> groups;
+	
+	// the scene set
+	private HashSet<Integer> scenes;
 
 	public ZWaveDimmerDeviceDriverInstance(ZWaveNetwork network,
 			ControllableDevice device, int deviceId, Set<Integer> instancesId,
@@ -63,6 +73,10 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 				updateTimeMillis, context);
 
 		this.stepPercentage = stepPercentage;
+		
+		//build inner data structures
+		this.groups = new HashSet<Integer>();
+		this.scenes = new HashSet<Integer>();
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -91,13 +105,6 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	}
 
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		((ElectricalSystem) device).notifyStateChanged(newState);
-
-	}
-
-	@Override
 	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
@@ -120,12 +127,22 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 				nLevel = ccEntry.getLevelAsInt();
 
 				if (nLevel > 0)
+				{
 					changeCurrentState(OnOffState.ON, nLevel);
-				else
+
+					// notify on
+					this.notifyOn();
+
+				} else
+				{
 					changeCurrentState(OnOffState.OFF, nLevel);
-				
-				//notify state changed
-				this.notifyStateChanged(null);
+
+					// notify off
+					this.notifyOff();
+				}
+
+				// update the monitor admin
+				this.updateStatus();
 			}
 		}
 	}
@@ -164,8 +181,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 								+ " is now "
 								+ ((OnOffState) onState).getCurrentStateValue()[0]
 										.getValue());
-			}
-			else
+			} else
 			{
 				// update the state
 				OnOffState offState = new OnOffState(new OffStateValue());
@@ -189,6 +205,9 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 
 		currentState.setState(LevelState.class.getSimpleName(), new LevelState(
 				pValue));
+
+		// send the changed level notification
+		this.notifyChangedLevel(DecimalMeasure.valueOf(nLevel, Unit.ONE));
 
 		// debug
 		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
@@ -300,34 +319,111 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 
 		// set the value
 		this.set(currentValue);
-
 	}
 
 	@Override
 	public void storeScene(Integer sceneNumber)
 	{
-		// TODO Auto-generated method stub
-
+		// Store the given scene id
+		this.scenes.add(sceneNumber);
+		
+		//notify
+		this.notifyStoredScene(sceneNumber);
 	}
 
 	@Override
 	public void deleteScene(Integer sceneNumber)
 	{
-		// TODO Auto-generated method stub
+		// Remove the given scene id
+		this.scenes.remove(sceneNumber);
+		
+		//notify
+		this.notifyDeletedScene(sceneNumber);
+	}
+
+	@Override
+	public void deleteGroup(Integer groupID)
+	{
+		// remove the given group id
+		this.groups.remove(groupID);
+		
+		//notify
+		this.notifyLeftGroup(groupID);
+	}
+
+	@Override
+	public void storeGroup(Integer groupID)
+	{
+		// Store the given group id
+		this.groups.add(groupID);
+		
+		this.notifyJoinedGroup(groupID);
+	}
+
+	@Override
+	public void notifyStoredScene(Integer sceneNumber)
+	{
+		// send the store scene notification
+		((LevelControllableOutput)this.device).notifyStoredScene(sceneNumber);
 
 	}
 
 	@Override
-	public void deleteGroup(String groupID)
+	public void notifyDeletedScene(Integer sceneNumber)
 	{
-		// TODO Auto-generated method stub
+		// send the delete scene notification
+		((LevelControllableOutput)this.device).notifyDeletedScene(sceneNumber);
 
 	}
 
 	@Override
-	public void storeGroup(String groupID)
+	public void notifyJoinedGroup(Integer groupNumber)
 	{
-		// TODO Auto-generated method stub
+		// send the joined group notification
+		((LevelControllableOutput)this.device).notifyJoinedGroup(groupNumber);
 
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// send the left group notification
+		((LevelControllableOutput)this.device).notifyLeftGroup(groupNumber);
+
+	}
+
+	@Override
+	public void notifyOn()
+	{
+		// send the on notification corresponding to the on action carried
+		// (internally or externally) on the device.
+		((LevelControllableOutput) this.device).notifyOn();
+
+	}
+
+	@Override
+	public void notifyChangedLevel(Measure<?, ?> newLevel)
+	{
+		// send the changed level notification corresponding to the new state of
+		// the device.
+		((LevelControllableOutput) this.device).notifyChangedLevel(newLevel);
+
+	}
+
+
+	@Override
+	public void notifyOff()
+	{
+		// send the off notification corresponding to the on action carried
+		// (internally or externally) on the device.
+		((LevelControllableOutput) this.device).notifyOff();
+
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
 	}
 }

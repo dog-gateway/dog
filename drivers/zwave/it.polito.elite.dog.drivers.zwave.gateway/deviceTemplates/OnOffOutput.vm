@@ -22,13 +22,15 @@
 			</dhc:command>
 		</dhc:commands>
 	</dhc:controlFunctionality>
-	<dhc:notificationFunctionality class="StateChangeNotificationFunctionality">
+	<dhc:notificationFunctionality class="OnOffNotificationFunctionality">
 		<dhc:notifications>
-			<dhc:notification id="StateChangeNotification_$name"
-				class="StateChangeNotification">
-				<dhc:param value="1" name="nParams" />
-				<dhc:param value="stateChanged" name="notificationName" />
-				<dhc:param type="State" value="newState" name="notificationParamName" />
+			<dhc:notification id="OnNotification_$name" class="OnNotification">
+				<dhc:param name="nParams" value="0"/>
+				<dhc:param value="on" name="notificationName" />
+			</dhc:notification>
+			<dhc:notification id="OffNotification_$name" class="OffNotification">
+				<dhc:param name="nParams" value="0"/>
+				<dhc:param value="off" name="notificationName" />
 			</dhc:notification>
 		</dhc:notifications>
 	</dhc:notificationFunctionality>

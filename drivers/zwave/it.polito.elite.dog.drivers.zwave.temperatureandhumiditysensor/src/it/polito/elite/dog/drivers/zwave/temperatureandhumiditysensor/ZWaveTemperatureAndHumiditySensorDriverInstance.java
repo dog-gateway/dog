@@ -17,6 +17,16 @@
  */
 package it.polito.elite.dog.drivers.zwave.temperatureandhumiditysensor;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
+import it.polito.elite.dog.core.library.model.devicecategory.QuadSensor;
+import it.polito.elite.dog.core.library.model.devicecategory.TemperatureAndHumiditySensor;
+import it.polito.elite.dog.core.library.model.state.HumidityMeasurementState;
+import it.polito.elite.dog.core.library.model.state.TemperatureState;
+import it.polito.elite.dog.core.library.model.statevalue.HumidityStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.SensorType;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
@@ -28,16 +38,6 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
-import it.polito.elite.dog.core.library.model.devicecategory.TemperatureAndHumiditySensor;
-import it.polito.elite.dog.core.library.model.state.HumidityMeasurementState;
-import it.polito.elite.dog.core.library.model.state.State;
-import it.polito.elite.dog.core.library.model.state.TemperatureState;
-import it.polito.elite.dog.core.library.model.statevalue.HumidityStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +65,9 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 	private long temperatureUpdateTime = 0;
 	private long humidityUpdateTime = 0;
 
+	// the group set
+	private HashSet<Integer> groups;
+
 	public ZWaveTemperatureAndHumiditySensorDriverInstance(
 			ZWaveNetwork network, ControllableDevice device, int deviceId,
 			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis,
@@ -72,6 +75,9 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 	{
 		super(network, device, deviceId, instancesId, gatewayNodeId,
 				updateTimeMillis, context);
+
+		// build inner data structures
+		this.groups = new HashSet<Integer>();
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -109,12 +115,6 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 
 		Thread workerThread = new Thread(worker);
 		workerThread.start();
-	}
-
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		((ElectricalSystem) device).notifyStateChanged(newState);
 	}
 
 	@Override
@@ -206,8 +206,8 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 			}
 
 		}
-		
-		this.notifyStateChanged(null);
+
+		this.updateStatus();
 	}
 
 	@Override
@@ -230,15 +230,22 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 	}
 
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
-		// intentionally left empty
+		// remove the given group id
+		this.groups.remove(groupID);
+
+		// notify
+		this.notifyLeftGroup(groupID);
 	}
 
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
-		// intentionally left empty
+		// Store the given group id
+		this.groups.add(groupID);
+
+		this.notifyJoinedGroup(groupID);
 	}
 
 	@Override
@@ -266,22 +273,6 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 	@Override
 	public void notifyNewTemperatureValue(Measure<?, ?> temperatureValue)
 	{
-		// if the given temperature is null, than the network-level value is not
-		// up-to-date
-		// and the currently stored value should be notified
-		if (temperatureValue != null)
-		{
-			// update the state
-			TemperatureStateValue pValue = new TemperatureStateValue();
-			pValue.setValue(temperatureValue);
-			currentState.setState(TemperatureState.class.getSimpleName(),
-					new TemperatureState(pValue));
-		}
-		
-		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " temperature " + temperatureValue.toString());
-
 		// notify the new measure
 		((TemperatureAndHumiditySensor) device)
 				.notifyNewTemperatureValue(temperatureValue);
@@ -290,26 +281,32 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 	@Override
 	public void notifyChangedRelativeHumidity(Measure<?, ?> relativeHumidity)
 	{
-		// if the given temperature is null, than the network-level value is not
-		// up-to-date
-		// and the currently stored value should be notified
-		if (relativeHumidity != null)
-		{
-			// update the state
-			HumidityStateValue pValue = new HumidityStateValue();
-			pValue.setValue(relativeHumidity);
-			currentState.setState(
-					HumidityMeasurementState.class.getSimpleName(),
-					new HumidityMeasurementState(pValue));
-		}
-		
-		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " humidity " + relativeHumidity.toString());
-
 		// notify the new measure
 		((TemperatureAndHumiditySensor) device)
 				.notifyChangedRelativeHumidity(relativeHumidity);
+	}
+
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// send the joined group notification
+		((QuadSensor) this.device).notifyJoinedGroup(groupNumber);
+
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// send the left group notification
+		((QuadSensor) this.device).notifyLeftGroup(groupNumber);
+
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
 	}
 
 	@Override
@@ -343,10 +340,35 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 			if (this.temperatureUpdateTime < updateTime)
 			{
 				this.temperatureUpdateTime = updateTime;
-				this.notifyNewTemperatureValue(DecimalMeasure.valueOf(measure
-						+ " "
-						+ (unitOfMeasure.contains("C") ? SI.CELSIUS.toString()
-								: NonSI.FAHRENHEIT.toString())));
+
+				// build the temperature measure
+				DecimalMeasure<?> temperatureValue = DecimalMeasure
+						.valueOf(measure
+								+ " "
+								+ (unitOfMeasure.contains("C") ? SI.CELSIUS
+										.toString() : NonSI.FAHRENHEIT
+										.toString()));
+
+				// if the given temperature is null, than the network-level
+				// value is not
+				// up-to-date
+				// and the currently stored value should be notified
+				if (temperatureValue != null)
+				{
+					// update the state
+					TemperatureStateValue pValue = new TemperatureStateValue();
+					pValue.setValue(temperatureValue);
+					currentState.setState(
+							TemperatureState.class.getSimpleName(),
+							new TemperatureState(pValue));
+				}
+
+				// debug
+				logger.log(LogService.LOG_DEBUG,
+						"Device " + device.getDeviceId() + " temperature "
+								+ temperatureValue.toString());
+
+				this.notifyNewTemperatureValue(temperatureValue);
 			}
 		}
 		else if (sensorType.equals(SensorType.SENSORTYPE_HUMIDITY))
@@ -355,8 +377,31 @@ public class ZWaveTemperatureAndHumiditySensorDriverInstance extends
 			if (this.humidityUpdateTime < updateTime)
 			{
 				this.humidityUpdateTime = updateTime;
-				this.notifyChangedRelativeHumidity(DecimalMeasure
-						.valueOf(measure + " " + unitOfMeasure));
+
+				// build the humidity measure
+				DecimalMeasure<?> relativeHumidity = DecimalMeasure
+						.valueOf(measure + " " + unitOfMeasure);
+				// if the given temperature is null, than the network-level
+				// value is not
+				// up-to-date
+				// and the currently stored value should be notified
+				if (relativeHumidity != null)
+				{
+					// update the state
+					HumidityStateValue pValue = new HumidityStateValue();
+					pValue.setValue(relativeHumidity);
+					currentState.setState(
+							HumidityMeasurementState.class.getSimpleName(),
+							new HumidityMeasurementState(pValue));
+
+					this.notifyChangedRelativeHumidity(relativeHumidity);
+
+					// debug
+					logger.log(LogService.LOG_DEBUG,
+							"Device " + device.getDeviceId() + " humidity "
+									+ relativeHumidity.toString());
+				}
+
 			}
 		}
 	}

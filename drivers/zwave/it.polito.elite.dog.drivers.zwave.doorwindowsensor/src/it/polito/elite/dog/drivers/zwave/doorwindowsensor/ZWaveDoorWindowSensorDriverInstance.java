@@ -17,6 +17,16 @@
  */
 package it.polito.elite.dog.drivers.zwave.doorwindowsensor;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
+import it.polito.elite.dog.core.library.model.devicecategory.DoorSensor;
+import it.polito.elite.dog.core.library.model.devicecategory.WindowSensor;
+import it.polito.elite.dog.core.library.model.state.OpenCloseState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.CloseStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.OpenStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
@@ -25,16 +35,6 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.DoorSensor;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
-import it.polito.elite.dog.core.library.model.devicecategory.WindowSensor;
-import it.polito.elite.dog.core.library.model.state.OpenCloseState;
-import it.polito.elite.dog.core.library.model.state.State;
-import it.polito.elite.dog.core.library.model.statevalue.CloseStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.OpenStateValue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,12 +87,6 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance
 	}
 
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		((ElectricalSystem) device).notifyStateChanged(newState);
-	}
-
-	@Override
 	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
@@ -110,9 +104,9 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance
 			changeCurrentState(OpenCloseState.OPEN);
 		else
 			changeCurrentState(OpenCloseState.CLOSE);
-		
-		//notify state changed
-		this.notifyStateChanged(null);
+
+		// notify state changed
+		this.updateStatus();
 	}
 
 	/**
@@ -221,5 +215,12 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance
 		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand,
 				isController);
 		return nodeInfo;
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
 	}
 }

@@ -17,6 +17,15 @@
  */
 package it.polito.elite.dog.drivers.zwave.movementsensor;
 
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
+import it.polito.elite.dog.core.library.model.devicecategory.MovementSensor;
+import it.polito.elite.dog.core.library.model.state.MovementState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.MovingStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.NotMovingStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
@@ -25,15 +34,6 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 import it.polito.elite.dog.drivers.zwave.network.interfaces.ZWaveNetwork;
-import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
-import it.polito.elite.dog.core.library.model.devicecategory.MovementSensor;
-import it.polito.elite.dog.core.library.model.state.MovementState;
-import it.polito.elite.dog.core.library.model.state.State;
-import it.polito.elite.dog.core.library.model.statevalue.MovingStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.NotMovingStateValue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,12 +81,6 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 	}
 
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		((ElectricalSystem) device).notifyStateChanged(newState);
-	}
-
-	@Override
 	public void newMessageFromHouse(Device deviceNode, Instance instanceNode, 
 			Controller controllerNode, String sValue)
 	{
@@ -104,7 +98,7 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 		else
 			this.changeCurrentState(MovementState.NOTMOVING);
 		
-		this.notifyStateChanged(null);
+		this.updateStatus();
 	}
 
 	/**
@@ -126,7 +120,7 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 		{
 			// set the new state to open or close...
 			if (movementState.equalsIgnoreCase(MovementState.ISMOVING))
-				notifyDetectedMovement();
+				notifyStartedMovement();
 			else
 				notifyCeasedMovement();
 		}
@@ -189,7 +183,7 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 	}
 
 	@Override
-	public void notifyDetectedMovement() 
+	public void notifyStartedMovement() 
 	{
 		// update the state
 		MovementState movState = new MovementState(new MovingStateValue());
@@ -198,6 +192,13 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
 				+ " value is now " + ((MovementState) movState).getCurrentStateValue()[0].getValue());
 
-		((MovementSensor) device).notifyDetectedMovement();
+		((MovementSensor) device).notifyStartedMovement();
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
 	}
 }

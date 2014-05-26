@@ -2,15 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ZWaveGatewayDriver
 Bundle-SymbolicName: it.polito.elite.dog.drivers.zwave.gateway
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/component.xml
 Import-Package: it.polito.elite.dog.core.devicefactory.api;version="1.0.0",
- it.polito.elite.dog.core.library.model,
- it.polito.elite.dog.core.library.model.devicecategory,
- it.polito.elite.dog.core.library.model.state,
- it.polito.elite.dog.core.library.model.statevalue,
+ it.polito.elite.dog.core.library.model;version="1.1.0",
+ it.polito.elite.dog.core.library.model.devicecategory;version="1.1.0",
+ it.polito.elite.dog.core.library.model.state;version="1.1.0",
+ it.polito.elite.dog.core.library.model.statevalue;version="1.1.0",
  it.polito.elite.dog.core.library.util,
  it.polito.elite.dog.drivers.zwave,
  it.polito.elite.dog.drivers.zwave.model.zway.json,

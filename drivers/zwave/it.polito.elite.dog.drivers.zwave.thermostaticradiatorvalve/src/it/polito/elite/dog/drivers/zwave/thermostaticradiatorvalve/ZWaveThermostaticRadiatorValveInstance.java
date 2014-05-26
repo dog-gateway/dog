@@ -21,10 +21,9 @@ import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.climate.ClimateScheduleSwitchPoint;
 import it.polito.elite.dog.core.library.model.climate.DailyClimateSchedule;
-import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.devicecategory.ThermostaticRadiatorValve;
 import it.polito.elite.dog.core.library.model.state.ClimateScheduleState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.state.TemperatureState;
 import it.polito.elite.dog.core.library.model.statevalue.ClimateScheduleStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
@@ -103,7 +102,8 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 				// build a file object pointing at the persistence store
 				this.persistentStore = new JSONPersistenceManager(
 						persistentStoreName);
-			} catch (Exception e)
+			}
+			catch (Exception e)
 			{
 				// explicitly set the persistent store at null
 				this.persistentStore = null;
@@ -114,7 +114,8 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 								"Unable to create/acquire the persistent store for climate schedules, running in-memory only: all changes will be lost upon restart.",
 								e);
 			}
-		} else
+		}
+		else
 		{
 			// explicitly set the persistent store at null
 			this.persistentStore = null;
@@ -155,11 +156,18 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			}
 		}
 
+		// notify the change
+		this.notifyChangedDailyClimateSchedule(daySchedule);
+		
+		// update the status
+		this.updateStatus();
+
 		// persist the schedules
 		try
 		{
 			this.persistentStore.persist(schedules);
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			this.logger.log(LogService.LOG_ERROR,
 					"Unable to save schedule data.", e);
@@ -184,11 +192,18 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 		currentState.setState(ClimateScheduleState.class.getSimpleName(),
 				new ClimateScheduleState(values));
 
+		// notify the change
+		this.notifyChangedWeeklyClimateSchedule(dailySchedules);
+		
+		// update the status
+		this.updateStatus();
+
 		// persist the schedules
 		try
 		{
 			this.persistentStore.persist(dailySchedules);
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			this.logger.log(LogService.LOG_ERROR,
 					"Unable to save schedule data.", e);
@@ -239,6 +254,9 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			network.write(nodeInfo.getDeviceNodeId(), instanceId,
 					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
 							+ ThermostatMode.MODE_COOL);
+		
+		//notify
+		this.notifyCool();
 
 	}
 
@@ -250,6 +268,9 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			network.write(nodeInfo.getDeviceNodeId(), instanceId,
 					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
 							+ ThermostatMode.MODE_OFF);
+		
+		//notify
+		this.notifyStoppedHeatingOrCooling();
 
 	}
 
@@ -276,6 +297,9 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			network.write(nodeInfo.getDeviceNodeId(), instanceId,
 					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
 							+ ThermostatMode.MODE_HEAT);
+		
+		//notify
+		this.notifyHeat();
 
 	}
 
@@ -283,21 +307,6 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 	public DeviceStatus getState()
 	{
 		return currentState;
-	}
-
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// check the state type
-		if (newState instanceof TemperatureState)
-		{
-			// update the inner set point state
-			this.currentState.setState(TemperatureState.class.getSimpleName(),
-					newState);
-		}
-
-		// notify the state change
-		((ElectricalSystem) this.device).notifyStateChanged(newState);
 	}
 
 	@Override
@@ -342,19 +351,35 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 				unitOfMeasure = unitOfMeasure.trim();
 
 				// convert to a decimal measure
+				DecimalMeasure<?> setPointTemperature = DecimalMeasure
+						.valueOf(setPoint + " " + unitOfMeasure);
+
 				TemperatureStateValue setPointStateValue = new TemperatureStateValue();
-				setPointStateValue.setValue(DecimalMeasure.valueOf(setPoint
-						+ " " + unitOfMeasure));
+				setPointStateValue.setValue(setPointTemperature);
 				TemperatureState setPointState = new TemperatureState(
 						setPointStateValue);
 
+				// update the inner set point state
+				this.currentState.setState(
+						TemperatureState.class.getSimpleName(), setPointState);
+
+				// notify the temperature change
+				this.notifyChangedDesiredTemperatureSetting(setPointTemperature);
+
 				// notify the new state
-				this.notifyStateChanged(setPointState);
+				this.updateStatus();
 
 			}
 
 		}
 
+	}
+
+	@Override
+	public void updateStatus()
+	{
+		// update the monitor admin status snapshot
+		((Controllable) this.device).updateStatus();
 	}
 
 	@Override
@@ -418,7 +443,8 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 					schedules = persistentStore
 							.load(DailyClimateSchedule[].class);
 
-				} else
+				}
+				else
 				{
 					// create the schedules
 					schedules = new DailyClimateSchedule[7];
@@ -503,6 +529,49 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			}
 
 		}
+	}
+
+	@Override
+	public void notifyChangedDailyClimateSchedule(
+			DailyClimateSchedule daySchedule)
+	{
+		((ThermostaticRadiatorValve) this.device)
+				.notifyChangedDailyClimateSchedule(daySchedule);
+	}
+
+	@Override
+	public void notifyChangedDesiredTemperatureSetting(
+			Measure<?, ?> newTemperatureValue)
+	{
+		((ThermostaticRadiatorValve) this.device)
+				.notifyChangedDesiredTemperatureSetting(newTemperatureValue);
+	}
+
+	@Override
+	public void notifyCool()
+	{
+		((ThermostaticRadiatorValve) this.device).notifyCool();
+	}
+
+	@Override
+	public void notifyHeat()
+	{
+		((ThermostaticRadiatorValve) this.device).notifyHeat();
+	}
+
+	@Override
+	public void notifyChangedWeeklyClimateSchedule(
+			DailyClimateSchedule[] dailySchedules)
+	{
+		((ThermostaticRadiatorValve) this.device)
+				.notifyChangedWeeklyClimateSchedule(dailySchedules);
+	}
+
+	@Override
+	public void notifyStoppedHeatingOrCooling()
+	{
+		((ThermostaticRadiatorValve) this.device)
+				.notifyStoppedHeatingOrCooling();
 	}
 
 }
