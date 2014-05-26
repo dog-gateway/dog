@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,8 @@ import org.osgi.service.log.LogService;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriverInstance implements ThreePhaseElectricityMeter
+public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriverInstance implements
+		ThreePhaseElectricityMeter
 {
 	// the class logger
 	private LogHelper logger;
@@ -178,14 +179,6 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 	}
 	
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// probably unused...
-		((ThreePhaseElectricityMeter) this.device).notifyStateChanged(newState);
-		
-	}
-	
-	@Override
 	public void notifyNewReactivePowerValue(String phaseID, Measure<?, ?> value)
 	{
 		// update the state....
@@ -280,6 +273,18 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.polito.elite.dog.core.library.model.devicecategory.
+	 * ThreePhaseElectricityMeter#updateStatus()
+	 */
+	@Override
+	public void updateStatus()
+	{
+		((ThreePhaseElectricityMeter) this.device).updateStatus();
+	}
+	
 	@Override
 	public void newMessageFromHouse(ModbusRegisterInfo register, String value)
 	{
@@ -330,6 +335,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 							+ e);
 				}
 				
+				// notify the monitor admin
+				this.updateStatus();
 			}
 		}
 		
@@ -459,8 +466,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		// -------------- SinglePhaseActivePower ---------------------------
 		ActiveEnergyStateValue activeEnergyStateValue = new ActiveEnergyStateValue();
 		activeEnergyStateValue.setValue(DecimalMeasure.valueOf("0 " + activeEnergyUOM));
-		this.currentState.setState(SinglePhaseActiveEnergyState.class.getSimpleName(), new SinglePhaseActiveEnergyState(
-				activeEnergyStateValue));
+		this.currentState.setState(SinglePhaseActiveEnergyState.class.getSimpleName(),
+				new SinglePhaseActiveEnergyState(activeEnergyStateValue));
 		// ------------------------------------------------------------------
 		
 		// -------------- ThreePhaseCurrent ---------------------------------
@@ -476,8 +483,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		currentStateL3.setFeature("phaseID", "L3");
 		currentStateL3.setValue(DecimalMeasure.valueOf("0 " + currentUOM));
 		
-		this.currentState.setState(ThreePhaseCurrentState.class.getSimpleName(), new ThreePhaseCurrentState(currentStateL1,
-				currentStateL2, currentStateL3));
+		this.currentState.setState(ThreePhaseCurrentState.class.getSimpleName(), new ThreePhaseCurrentState(
+				currentStateL1, currentStateL2, currentStateL3));
 		// -------------------------------------------------------------------
 		
 		// ------------- ThreePhaseReactivePower -----------------------------
@@ -527,8 +534,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		// ------------------------ Single Phase Reactive Energy
 		ReactiveEnergyStateValue reactiveEnergyStateValue = new ReactiveEnergyStateValue();
 		reactiveEnergyStateValue.setValue(DecimalMeasure.valueOf("0 " + reactiveEnergyUOM));
-		this.currentState.setState(SinglePhaseReactiveEnergyState.class.getSimpleName(), new SinglePhaseReactiveEnergyState(
-				reactiveEnergyStateValue));
+		this.currentState.setState(SinglePhaseReactiveEnergyState.class.getSimpleName(),
+				new SinglePhaseReactiveEnergyState(reactiveEnergyStateValue));
 		// -----------------------------------------------------------------------
 		
 		// ------------------------ ThreePhaseLNVoltage
@@ -544,8 +551,8 @@ public class ModbusThreePhaseElectricityMeterDriverInstance extends ModbusDriver
 		voltageStateL3N.setFeature("phaseID", "L3");
 		voltageStateL3N.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
 		
-		this.currentState.setState(ThreePhaseVoltageState.class.getSimpleName(), new ThreePhaseVoltageState(voltageStateL1N,
-				voltageStateL2N, voltageStateL3N));
+		this.currentState.setState(ThreePhaseVoltageState.class.getSimpleName(), new ThreePhaseVoltageState(
+				voltageStateL1N, voltageStateL2N, voltageStateL3N));
 		// ----------------------------------------------------------
 		
 		// ------------------------ ThreePhaseLLVoltage

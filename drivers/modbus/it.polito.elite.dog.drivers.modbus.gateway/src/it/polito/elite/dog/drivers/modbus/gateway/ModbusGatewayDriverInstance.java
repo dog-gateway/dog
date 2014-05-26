@@ -1,7 +1,7 @@
 /*
  * Dog - Gateway Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package it.polito.elite.dog.drivers.modbus.gateway;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.ModbusGateway;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
 import it.polito.elite.dog.drivers.modbus.network.info.ModbusRegisterInfo;
@@ -59,13 +58,6 @@ public class ModbusGatewayDriverInstance extends ModbusDriverInstance implements
 	}
 	
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// intentionally left empty
-		
-	}
-	
-	@Override
 	public synchronized DeviceStatus getState()
 	{
 		return this.currentState;
@@ -84,6 +76,13 @@ public class ModbusGatewayDriverInstance extends ModbusDriverInstance implements
 		this.logger.log(LogService.LOG_INFO, ModbusGatewayDriverInstance.logId
 				+ "Received new message from house involving the register:\n " + registerInfo
 				+ "\n No operation is currently supported");
+		
+	}
+	
+	@Override
+	public void updateStatus()
+	{
+		// intentionally left empty
 		
 	}
 

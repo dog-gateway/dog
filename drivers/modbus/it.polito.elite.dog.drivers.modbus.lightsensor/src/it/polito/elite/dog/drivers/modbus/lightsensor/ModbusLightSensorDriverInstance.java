@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2013 Dario Bonino
+ * Copyright (c) 2013-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import it.polito.elite.dog.core.library.model.devicecategory.LightSensor;
 import it.polito.elite.dog.core.library.model.notification.LuminosityMeasurementNotification;
 import it.polito.elite.dog.core.library.model.state.HumidityMeasurementState;
 import it.polito.elite.dog.core.library.model.state.LightIntensityState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.LevelStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
@@ -45,7 +44,7 @@ import org.osgi.service.log.LogService;
  * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
- *
+ * 
  */
 public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implements LightSensor
 {
@@ -83,20 +82,12 @@ public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implem
 		return this.currentState;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see it.polito.elite.domotics.model.devicecategory.HumiditySensor#
-	 * notifyStateChanged(it.polito.elite.domotics.model.state.State)
-	 */
 	@Override
-	public void notifyStateChanged(State newState)
+	public void updateStatus()
 	{
-		// probably unused...
-		((LightSensor) this.device).notifyStateChanged(newState);
-		
+		((LightSensor) this.device).updateStatus();
 	}
-		
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -144,6 +135,8 @@ public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implem
 							+ e);
 				}
 				
+				// notify the monitor admin
+				this.updateStatus();
 			}
 		}
 		
@@ -183,7 +176,6 @@ public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implem
 		// notifications handled by this device except from state notifications
 		String lightIntensityUOM = SI.LUX.toString();
 		
-		
 		// search the energy unit of measures declared in the device
 		// configuration
 		for (ModbusRegisterInfo register : this.register2Notification.keySet())
@@ -203,33 +195,31 @@ public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implem
 		// create all the states
 		LevelStateValue pValue = new LevelStateValue();
 		pValue.setValue(DecimalMeasure.valueOf("0 " + lightIntensityUOM));
-		this.currentState
-				.setState(HumidityMeasurementState.class.getSimpleName(), new LightIntensityState(pValue));
+		this.currentState.setState(HumidityMeasurementState.class.getSimpleName(), new LightIntensityState(pValue));
 		
 		// read the initial state
 		this.network.readAll(this.register2Notification.keySet());
 	}
 	
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
-	public Measure<?,?>  getLuminance()
+	public Measure<?, ?> getLuminance()
 	{
-		return (Measure<?, ?>) currentState.getState(
-				LightIntensityState.class.getSimpleName())
-				.getCurrentStateValue()[0].getValue();
+		return (Measure<?, ?>) currentState.getState(LightIntensityState.class.getSimpleName()).getCurrentStateValue()[0]
+				.getValue();
 	}
 	
 	@Override
@@ -238,11 +228,24 @@ public class ModbusLightSensorDriverInstance extends ModbusDriverInstance implem
 		// update the state
 		LevelStateValue pValue = new LevelStateValue();
 		pValue.setValue(luminosityValue);
-		this.currentState
-				.setState(HumidityMeasurementState.class.getSimpleName(), new LightIntensityState(pValue));
+		this.currentState.setState(HumidityMeasurementState.class.getSimpleName(), new LightIntensityState(pValue));
 		
 		// notify the new measure
 		((LightSensor) this.device).notifyNewLuminosityValue(luminosityValue);
+		
+	}
+	
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// TODO Auto-generated method stub
 		
 	}
 	

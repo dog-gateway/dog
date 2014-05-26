@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.PressureSensor;
 import it.polito.elite.dog.core.library.model.notification.PressureMeasurementNotification;
 import it.polito.elite.dog.core.library.model.state.PressureState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.PressureStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
@@ -99,20 +98,6 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriverInstance imp
 	 * (non-Javadoc)
 	 * 
 	 * @see it.polito.elite.domotics.model.devicecategory.PressureSensor#
-	 * notifyStateChanged(it.polito.elite.domotics.model.state.State)
-	 */
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// probably unused...
-		((PressureSensor) this.device).notifyStateChanged(newState);
-		
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see it.polito.elite.domotics.model.devicecategory.PressureSensor#
 	 * notifyNewPressureValue(javax.measure.Measure)
 	 */
 	@Override
@@ -130,9 +115,21 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriverInstance imp
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see
+	 * it.polito.elite.dog.core.library.model.devicecategory.PressureSensor#
+	 * updateStatus()
+	 */
+	@Override
+	public void updateStatus()
+	{
+		((PressureSensor) this.device).updateStatus();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
-	 * newMessageFromHouse
-	 * (it.polito.elite.dog.drivers.modbus.network.info
+	 * newMessageFromHouse (it.polito.elite.dog.drivers.modbus.network.info
 	 * .ModbusRegisterInfo, java.lang.String)
 	 */
 	@Override
@@ -177,6 +174,8 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriverInstance imp
 							+ e);
 				}
 				
+				// notify the monitor admin
+				this.updateStatus();
 			}
 		}
 		
@@ -200,8 +199,7 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriverInstance imp
 	 * (non-Javadoc)
 	 * 
 	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
-	 * addToNetworkDriver
-	 * (it.polito.elite.dog.drivers.modbus.network.info.
+	 * addToNetworkDriver (it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo)
 	 */
 	@Override
@@ -217,7 +215,6 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriverInstance imp
 		// notifications handled by this device except from state notifications
 		String pressureUOM = SI.PASCAL.toString();
 		
-		
 		// search the energy unit of measures declared in the device
 		// configuration
 		for (ModbusRegisterInfo register : this.register2Notification.keySet())
@@ -227,8 +224,7 @@ public class ModbusPressureSensorDriverInstance extends ModbusDriverInstance imp
 			for (CNParameters notificationInfo : notificationInfos)
 			{
 				
-				if (notificationInfo.getName().equalsIgnoreCase(
-						PressureMeasurementNotification.notificationName))
+				if (notificationInfo.getName().equalsIgnoreCase(PressureMeasurementNotification.notificationName))
 				{
 					pressureUOM = register.getXlator().getUnitOfMeasure();
 				}

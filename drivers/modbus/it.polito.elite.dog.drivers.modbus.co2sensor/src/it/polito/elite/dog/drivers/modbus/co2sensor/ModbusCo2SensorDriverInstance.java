@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Co2Sensor;
 import it.polito.elite.dog.core.library.model.notification.Co2MeasurementNotification;
 import it.polito.elite.dog.core.library.model.state.Co2MeasurementState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.Co2MeasurementStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.modbus.network.ModbusDriverInstance;
@@ -45,7 +44,7 @@ import org.osgi.service.log.LogService;
  * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
- *
+ * 
  */
 public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implements Co2Sensor
 {
@@ -71,7 +70,6 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implemen
 		this.initializeStates();
 	}
 	
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -80,8 +78,8 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implemen
 	@Override
 	public Measure<?, ?> getCo2Concentration()
 	{
-		return (Measure<?, ?>) this.currentState.getState(Co2MeasurementState.class.getSimpleName()).getCurrentStateValue()[0]
-				.getValue();
+		return (Measure<?, ?>) this.currentState.getState(Co2MeasurementState.class.getSimpleName())
+				.getCurrentStateValue()[0].getValue();
 	}
 	
 	/*
@@ -93,20 +91,6 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implemen
 	public DeviceStatus getState()
 	{
 		return this.currentState;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see it.polito.elite.domotics.model.devicecategory.Co2Sensor#
-	 * notifyStateChanged(it.polito.elite.domotics.model.state.State)
-	 */
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// probably unused...
-		((Co2Sensor) this.device).notifyStateChanged(newState);
-		
 	}
 	
 	/*
@@ -131,8 +115,7 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implemen
 	 * (non-Javadoc)
 	 * 
 	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
-	 * newMessageFromHouse
-	 * (it.polito.elite.dog.drivers.modbus.network.info
+	 * newMessageFromHouse (it.polito.elite.dog.drivers.modbus.network.info
 	 * .ModbusRegisterInfo, java.lang.String)
 	 */
 	@Override
@@ -174,6 +157,8 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implemen
 							+ e);
 				}
 				
+				// notify the monitor admin
+				this.updateStatus();
 			}
 		}
 		
@@ -196,9 +181,21 @@ public class ModbusCo2SensorDriverInstance extends ModbusDriverInstance implemen
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see
+	 * it.polito.elite.dog.core.library.model.devicecategory.Co2Sensor#updateStatus
+	 * ()
+	 */
+	@Override
+	public void updateStatus()
+	{
+		((Co2Sensor) this.device).updateStatus();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see it.polito.elite.dog.drivers.modbus.network.ModbusDriver#
-	 * addToNetworkDriver
-	 * (it.polito.elite.dog.drivers.modbus.network.info.
+	 * addToNetworkDriver (it.polito.elite.dog.drivers.modbus.network.info.
 	 * ModbusRegisterInfo)
 	 */
 	@Override
