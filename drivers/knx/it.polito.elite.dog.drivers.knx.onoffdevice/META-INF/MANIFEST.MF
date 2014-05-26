@@ -2,17 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KnxIPOnOffDeviceDriver
 Bundle-SymbolicName: it.polito.elite.dog.drivers.knx.onoffdevice
-Bundle-Version: 1.1.1
+Bundle-Version: 1.1.2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: it.polito.elite.dog.core.library.model,
- it.polito.elite.dog.core.library.model.devicecategory,
- it.polito.elite.dog.core.library.model.state,
- it.polito.elite.dog.core.library.model.statevalue,
- it.polito.elite.dog.core.library.util,
+Import-Package: it.polito.elite.dog.core.library.model;version="1.1.0",
+ it.polito.elite.dog.core.library.model.devicecategory;version="1.1.0",
+ it.polito.elite.dog.core.library.model.state;version="1.1.0",
+ it.polito.elite.dog.core.library.model.statevalue;version="1.1.0",
+ it.polito.elite.dog.core.library.util;version="1.1.0",
  it.polito.elite.dog.drivers.knx.gateway,
  it.polito.elite.dog.drivers.knx.network,
  it.polito.elite.dog.drivers.knx.network.info,
  it.polito.elite.dog.drivers.knx.network.interfaces,
+ javax.measure;version="4.3.1",
  org.osgi.framework;version="1.3.0",
  org.osgi.service.device,
  org.osgi.service.log;version="1.3.0",

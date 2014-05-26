@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2013 Luigi De Russis
+ * Copyright (c) 2012-2014 Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import it.polito.elite.dog.core.library.model.notification.SinglePhaseCurrentMea
 import it.polito.elite.dog.core.library.model.notification.SinglePhaseReactiveEnergyMeasurementNotification;
 import it.polito.elite.dog.core.library.model.notification.SinglePhaseReactivePowerMeasurementNotification;
 import it.polito.elite.dog.core.library.model.notification.SinglePhaseVoltageMeasurementNotification;
-import it.polito.elite.dog.core.library.model.notification.StateChangeNotification;
 import it.polito.elite.dog.core.library.model.state.FrequencyMeasurementState;
 import it.polito.elite.dog.core.library.model.state.PowerFactorMeasurementState;
 import it.polito.elite.dog.core.library.model.state.SinglePhaseActiveEnergyState;
@@ -40,7 +39,6 @@ import it.polito.elite.dog.core.library.model.state.SinglePhaseCurrentState;
 import it.polito.elite.dog.core.library.model.state.SinglePhaseReactiveEnergyState;
 import it.polito.elite.dog.core.library.model.state.SinglePhaseReactivePowerMeasurementState;
 import it.polito.elite.dog.core.library.model.state.SinglePhaseVoltageState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.state.VoltageMeasurementState;
 import it.polito.elite.dog.core.library.model.statevalue.ActiveEnergyStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
@@ -79,7 +77,8 @@ import tuwien.auto.calimero.dptxlator.DPTXlator4ByteInteger;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverInstance implements SinglePhaseElectricityMeter
+public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverInstance implements
+		SinglePhaseElectricityMeter
 {
 	// the device state
 	private DeviceStatus innerState;
@@ -197,8 +196,8 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 		// reactive energy state
 		ReactiveEnergyStateValue initialReactiveEnergyValue = new ReactiveEnergyStateValue();
 		initialReactiveEnergyValue.setValue(DecimalMeasure.valueOf(0, VAR.times(NonSI.HOUR)));
-		this.innerState.setState(SinglePhaseReactiveEnergyState.class.getSimpleName(), new SinglePhaseReactiveEnergyState(
-				initialReactiveEnergyValue));
+		this.innerState.setState(SinglePhaseReactiveEnergyState.class.getSimpleName(),
+				new SinglePhaseReactiveEnergyState(initialReactiveEnergyValue));
 		
 		// voltage state
 		VoltageStateValue initialVoltageValue = new VoltageStateValue();
@@ -212,13 +211,13 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 			// read states (asynchronously)
 			try
 			{
-			KnxIPDeviceInfo devInfo = new KnxIPDeviceInfo(this.device.getDeviceId(), groupAddress);
-			devInfo.setGatewayIPAddress(InetAddress.getByName(this.gwAddress));
-			this.network.read(devInfo);
+				KnxIPDeviceInfo devInfo = new KnxIPDeviceInfo(this.device.getDeviceId(), groupAddress);
+				devInfo.setGatewayIPAddress(InetAddress.getByName(this.gwAddress));
+				this.network.read(devInfo);
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
-				//TODO handle exception here
+				// TODO handle exception here
 			}
 		}
 	}
@@ -267,16 +266,16 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 	public Measure<?, ?> getPhaseNeutralVoltageValue()
 	{
 		// TODO Check if it works... and then extend to multiple state values
-		return (Measure<?, ?>) this.innerState.getState(VoltageMeasurementState.class.getSimpleName()).getCurrentStateValue()[0]
-				.getValue();
+		return (Measure<?, ?>) this.innerState.getState(VoltageMeasurementState.class.getSimpleName())
+				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
 	public Measure<?, ?> getElectricCurrentValue()
 	{
 		// TODO Check if it works... and then extend to multiple state values
-		return (Measure<?, ?>) this.innerState.getState(SinglePhaseCurrentState.class.getSimpleName()).getCurrentStateValue()[0]
-				.getValue();
+		return (Measure<?, ?>) this.innerState.getState(SinglePhaseCurrentState.class.getSimpleName())
+				.getCurrentStateValue()[0].getValue();
 	}
 	
 	@Override
@@ -307,8 +306,8 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 		// update the state
 		FrequencyStateValue newFrequency = new FrequencyStateValue();
 		newFrequency.setValue(frequency);
-		this.innerState
-				.setState(FrequencyMeasurementState.class.getSimpleName(), new FrequencyMeasurementState(newFrequency));
+		this.innerState.setState(FrequencyMeasurementState.class.getSimpleName(), new FrequencyMeasurementState(
+				newFrequency));
 		
 		// notify the new measure
 		((SinglePhaseElectricityMeter) this.device).notifyNewFrequencyValue(frequency);
@@ -341,13 +340,6 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 	}
 	
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// probably unused...
-		((SinglePhaseElectricityMeter) this.device).notifyStateChanged(newState);
-	}
-	
-	@Override
 	public void notifyNewApparentPowerValue(Measure<?, ?> powerValue)
 	{
 		// update the state
@@ -366,8 +358,8 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 		// update the state
 		ReactiveEnergyStateValue newReactiveEnergyValue = new ReactiveEnergyStateValue();
 		newReactiveEnergyValue.setValue(value);
-		this.innerState.setState(SinglePhaseReactiveEnergyState.class.getSimpleName(), new SinglePhaseReactiveEnergyState(
-				newReactiveEnergyValue));
+		this.innerState.setState(SinglePhaseReactiveEnergyState.class.getSimpleName(),
+				new SinglePhaseReactiveEnergyState(newReactiveEnergyValue));
 		
 		// notify the new measure
 		((SinglePhaseElectricityMeter) this.device).notifyNewReactiveEnergyValue(value);
@@ -405,7 +397,8 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 		// update the state
 		VoltageStateValue newVoltageValue = new VoltageStateValue();
 		newVoltageValue.setValue(lnVoltage);
-		this.innerState.setState(VoltageMeasurementState.class.getSimpleName(), new VoltageMeasurementState(newVoltageValue));
+		this.innerState.setState(VoltageMeasurementState.class.getSimpleName(), new VoltageMeasurementState(
+				newVoltageValue));
 		
 		// notify the new measure
 		((SinglePhaseElectricityMeter) this.device).notifyNewPhaseNeutralVoltageValue(lnVoltage);
@@ -417,7 +410,8 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 		// update the state
 		CurrentStateValue newCurrentValue = new CurrentStateValue();
 		newCurrentValue.setValue(value);
-		this.innerState.setState(SinglePhaseCurrentState.class.getSimpleName(), new SinglePhaseCurrentState(newCurrentValue));
+		this.innerState.setState(SinglePhaseCurrentState.class.getSimpleName(), new SinglePhaseCurrentState(
+				newCurrentValue));
 		
 		// notify the new measure
 		((SinglePhaseElectricityMeter) this.device).notifyNewCurrentValue(value);
@@ -474,6 +468,9 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 				this.notifyNewPowerFactorValue(DecimalMeasure.valueOf(value));
 			}
 		}
+		
+		// notify the monitor admin...
+		this.updateStatus();
 	}
 	
 	@Override
@@ -491,27 +488,23 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 			// try to detect the right DPT...
 			for (KnxIPDeviceInfo cInfo : notificationsSet)
 			{
-				// ignore state change notifications...
-				if (!cInfo.getName().equals(StateChangeNotification.class.getSimpleName()))
+				if (cDpt == null)
 				{
-					if (cDpt == null)
+					cDpt = this.notification2DPT.get(cInfo.getName());
+				}
+				else
+				{
+					if (!this.notification2DPT.get(cInfo.getName()).getUnit().equals(cDpt.getUnit()))
 					{
-						cDpt = this.notification2DPT.get(cInfo.getName());
-					}
-					else
-					{
-						if (!this.notification2DPT.get(cInfo.getName()).getUnit().equals(cDpt.getUnit()))
-						{
-							// do nothing and log the error...
-							this.logger.log(LogService.LOG_ERROR,
-									KnxIPSinglePhaseElectricityMeterDriverInstance.logId
-											+ "Found Incompatible DPTs for the same group address " + deviceInfo.getGroupAddress()
-											+ " ignoring the corresponding notification");
-							cDpt = null;
-							break;
-						}
+						// do nothing and log the error...
+						this.logger.log(LogService.LOG_ERROR, KnxIPSinglePhaseElectricityMeterDriverInstance.logId
+								+ "Found Incompatible DPTs for the same group address " + deviceInfo.getGroupAddress()
+								+ " ignoring the corresponding notification");
+						cDpt = null;
+						break;
 					}
 				}
+				
 			}
 			
 			// add the dpt if not null
@@ -519,14 +512,16 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 			{
 				try
 				{
-				KnxIPDeviceInfo devInfo = new KnxIPDeviceInfo(this.device.getDeviceId(), deviceInfo.getGroupAddress());
-				devInfo.setGatewayIPAddress(InetAddress.getByName(this.gwAddress));
-				this.network.addDriver(devInfo, 14, cDpt, this); // TODO Is 14
-																	// correct?
+					KnxIPDeviceInfo devInfo = new KnxIPDeviceInfo(this.device.getDeviceId(),
+							deviceInfo.getGroupAddress());
+					devInfo.setGatewayIPAddress(InetAddress.getByName(this.gwAddress));
+					this.network.addDriver(devInfo, 14, cDpt, this); // TODO Is
+																		// 14
+																		// correct?
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
-					//TODO handle exception here
+					// TODO handle exception here
 				}
 			}
 		}
@@ -545,6 +540,12 @@ public class KnxIPSinglePhaseElectricityMeterDriverInstance extends KnxIPDriverI
 		// initialize the notification to DPXlator conversion map
 		this.notification2DPT = new HashMap<String, DPT>();
 		this.initializeNotification2DPT();
+	}
+	
+	@Override
+	public void updateStatus()
+	{
+		((SinglePhaseElectricityMeter) this.device).updateStatus();
 	}
 	
 }

@@ -1,7 +1,7 @@
 /*
  * Dog - Gateway Driver
  * 
- * Copyright (c) 2012-2013 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package it.polito.elite.dog.drivers.knx.gateway;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.KNXNetIPGateway;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.knx.network.KnxIPDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
@@ -63,13 +62,6 @@ public class KnxIPGatewayDriverInstance extends KnxIPDriverInstance implements K
 	}
 
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void newMessageFromHouse(String source, String destination, String value)
 	{
 		// TODO Auto-generated method stub
@@ -85,6 +77,13 @@ public class KnxIPGatewayDriverInstance extends KnxIPDriverInstance implements K
 
 	@Override
 	protected void specificConfiguration()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateStatus()
 	{
 		// TODO Auto-generated method stub
 		

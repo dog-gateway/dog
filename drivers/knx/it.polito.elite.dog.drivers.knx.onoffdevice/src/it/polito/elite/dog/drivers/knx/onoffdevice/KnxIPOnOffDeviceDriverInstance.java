@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2011-2013 Luigi De Russis and Dario Bonino
+ * Copyright (c) 2011-2014 Luigi De Russis and Dario Bonino
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,19 @@
  */
 package it.polito.elite.dog.drivers.knx.onoffdevice;
 
-import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Buzzer;
 import it.polito.elite.dog.core.library.model.devicecategory.ElectricalSystem;
 import it.polito.elite.dog.core.library.model.devicecategory.Lamp;
 import it.polito.elite.dog.core.library.model.devicecategory.MainsPowerOutlet;
+import it.polito.elite.dog.core.library.model.devicecategory.OnOffOutput;
 import it.polito.elite.dog.core.library.model.devicecategory.SimpleLamp;
 import it.polito.elite.dog.core.library.model.state.OnOffState;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
+import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.knx.network.KnxIPDriverInstance;
 import it.polito.elite.dog.drivers.knx.network.info.KnxIPDeviceInfo;
 import it.polito.elite.dog.drivers.knx.network.interfaces.KnxIPNetwork;
@@ -153,13 +154,6 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 		return this.currentState;
 	}
 	
-	@Override
-	public void notifyStateChanged(State newState)
-	{
-		((ElectricalSystem) this.device).notifyStateChanged(newState);
-		
-	}
-	
 	/*
 	 * Handle the driver behavior when it received a new message from the KNX IP network: typically it involves a state
 	 * change.
@@ -211,23 +205,60 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 			if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
 			{
 				newState = new OnOffState(new OnStateValue());
-				// newState = new OnOffState(OnOffState.ON);
+				this.notifyOn();
 			}
 			else
 			{
 				newState = new OnOffState(new OffStateValue());
-				// newState = new OnOffState(OnOffState.OFF);
+				this.notifyOff();
 			}
 			// ... then set the new state for the device and throw a state
 			// changed notification
 			this.currentState.setState(newState.getStateName(), newState);
-			this.notifyStateChanged(newState);
+			this.updateStatus();
 			
 			// log
 			this.logger.log(LogService.LOG_INFO, KnxIPOnOffDeviceDriverInstance.logId + "Notified new state: "
 					+ newState.getCurrentStateValue()[0].getValue());
 		}
 		
+	}
+	
+	@Override
+	public void updateStatus()
+	{
+		((ElectricalSystem) this.device).updateStatus();
+	}
+	
+
+	@Override
+	public void notifyOn()
+	{
+		if(this.device instanceof Lamp)
+		{
+			((Lamp) this.device).notifyOn();
+		}
+		else if(this.device instanceof Buzzer)
+		{
+			((Buzzer) this.device).notifyOn();
+		}
+		else
+			((OnOffOutput) this.device).notifyOn();
+	}
+
+	@Override
+	public void notifyOff()
+	{
+		if(this.device instanceof Lamp)
+		{
+			((Lamp) this.device).notifyOff();
+		}
+		else if(this.device instanceof Buzzer)
+		{
+			((Buzzer) this.device).notifyOff();
+		}
+		else
+			((OnOffOutput) this.device).notifyOff();
 	}
 	
 	@Override
@@ -266,17 +297,41 @@ public class KnxIPOnOffDeviceDriverInstance extends KnxIPDriverInstance implemen
 	}
 	
 	@Override
-	public void deleteGroup(String groupID)
+	public void deleteGroup(Integer groupID)
 	{
 		// intentionally left empty
 		
 	}
 	
 	@Override
-	public void storeGroup(String groupID)
+	public void storeGroup(Integer groupID)
 	{
 		// intentionally left empty
 		
+	}
+
+	@Override
+	public void notifyStoredScene(Integer sceneNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyDeletedScene(Integer sceneNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyJoinedGroup(Integer groupNumber)
+	{
+		// intentionally left empty
+	}
+
+	@Override
+	public void notifyLeftGroup(Integer groupNumber)
+	{
+		// intentionally left empty
 	}
 	
 }
