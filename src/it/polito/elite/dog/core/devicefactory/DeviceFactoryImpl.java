@@ -198,10 +198,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 	
 	@Override
 	public void addNewDevice(DeviceDescriptor descriptor)
-	{
-		// update the model
-		houseModel.get().addToConfiguration(descriptor);
-		
+	{	
 		// get the device URI
 		String deviceUri = descriptor.getDeviceURI();
 		
@@ -217,6 +214,9 @@ public class DeviceFactoryImpl implements DeviceFactory
 			{
 				// the device does not exists, so we can create it
 				this.createDeviceFromDeviceDescriptor(descriptor);
+				
+				// update the model
+				houseModel.get().addToConfiguration(descriptor);
 			}
 			else
 			{
@@ -235,10 +235,7 @@ public class DeviceFactoryImpl implements DeviceFactory
 	
 	@Override
 	public void removeDevice(String deviceURI)
-	{
-		// update the model
-		this.houseModel.get().removeFromConfiguration(deviceURI);
-		
+	{	
 		// log
 		this.logger.log(LogService.LOG_INFO, "Removing " + deviceURI + "...");
 		
@@ -252,6 +249,9 @@ public class DeviceFactoryImpl implements DeviceFactory
 				AbstractDevice device = (AbstractDevice) this.context.getService(references[0]);
 				// effectively remove the device
 				device.removeDevice();
+				
+				// update the model
+				this.houseModel.get().removeFromConfiguration(deviceURI);
 				
 				// log success
 				this.logger.log(LogService.LOG_INFO, deviceURI + " has been successfully removed!");
