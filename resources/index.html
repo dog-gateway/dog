@@ -55,10 +55,10 @@
               <a href="#/home"><span class="glyphicon glyphicon-dashboard"></span> Overview</a>
               </li>
             <li ng-class="{ active: isActive('/devices') }">
-              <a href="#/devices"><span class="fa fa-lightbulb-o fa-lg"></span> Devices <span class="badge pull-right" ng-controller="FrameworkCtrl">{{data.devices.stats.active}}</span></a>
+              <a href="#/devices"><span class="fa fa-lightbulb-o fa-lg"></span> Devices <span class="badge pull-right" ng-controller="DeviceStatsCtrl">{{data.devices.stats.active}}</span></a>
               </li>
             <li ng-class="{ active: isActive('/components') }">
-              <a href="#/components"><span class="glyphicon glyphicon-th-list"></span> Components <span class="badge pull-right" ng-controller="FrameworkCtrl">{{data.bundles.stats.active}}</span></a>
+              <a href="#/components"><span class="glyphicon glyphicon-th-list"></span> Components <span class="badge pull-right" ng-controller="BundleStatsCtrl">{{data.bundles.stats.active}}</span></a>
             </li>
           </ul>
         </div>
@@ -74,14 +74,15 @@
   <script src="lib/angular/angular-resource.min.js"></script>
   <script src="lib/ui-bootstrap-tpls-0.10.0.min.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/services.js"></script>
+  <script src="js/services/rest-services.js"></script>
+  <script src="js/services/helpers.js"></script>
   <script src="js/controllers/main.js"></script>
   <script src="js/controllers/nav-ctrl.js"></script>
   <script src="js/controllers/device-ctrl.js"></script>
   <script src="js/controllers/bundle-ctrl.js"></script>
   <script src="js/controllers/framework-ctrl.js"></script>
-  <script src="js/filters.js"></script>
-  <script src="js/directives.js"></script>
+  <script src="js/controllers/device-stats-ctrl.js"></script>
+  <script src="js/controllers/bundle-stats-ctrl.js"></script>
 </body>
 
 </html>

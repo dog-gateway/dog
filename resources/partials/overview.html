@@ -20,12 +20,12 @@
                 <span ng-if="data.memory.free.ratio>0.33 && data.memory.free.ratio<=0.66" class="label label-warning pull-right">{{data.memory.free.value}}</span>
                 <span ng-if="data.memory.free.ratio<=0.33" class="label label-danger pull-right">{{data.memory.free.value}}</span>
               </p>
-              <p>Devices:
+              <p ng-controller="DeviceStatsCtrl">Devices:
                 <span ng-if="data.devices.stats.activeRatio>0.66" class="label label-success pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
                 <span ng-if="data.devices.stats.activeRatio>=0.33 && data.devices.stats.activeRatio<=0.66" class="label label-warning pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
                 <span ng-if="data.devices.stats.activeRatio<0.33" class="label label-danger pull-right">{{data.devices.stats.active}} Active / {{data.devices.stats.idle}} Idle</span>
               </p>
-              <p>Bundles:
+              <p ng-controller="BundleStatsCtrl">Bundles:
                 <span ng-if="data.bundles.stats.activeRatio==1" class="label label-success pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>
                 <span ng-if="data.bundles.stats.activeRatio>=0.5 && data.bundles.stats.activeRatio<1" class="label label-warning pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>
                 <span ng-if="data.bundles.stats.activeRatio<0.5" class="label label-danger pull-right">{{data.bundles.stats.active}} Active / {{data.bundles.stats.resolved}} Resolved / {{data.bundles.stats.installed}} Installed</span>

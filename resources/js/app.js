@@ -4,9 +4,7 @@
 angular.module('dogUI', [
   'ngRoute',
   'ui.bootstrap',
-  'dogUI.filters',
   'dogUI.services',
-  'dogUI.directives',
   'dogUI.controllers'
 ]).
 /* Handle app routes */
