@@ -1,5 +1,5 @@
 'use strict';
 
-/* Controllers Init */
+/* Init AngularJS Controllers */
 
 var dogUIController = angular.module('dogUI.controllers', []);
