@@ -1,7 +1,7 @@
 /*
  * Dog - Environment REST Endpoint
  * 
- * Copyright (c) 2013-2014 Luigi De Russis
+ * Copyright (c) 2013-2014 Luigi De Russis and Teodoro Montanaro
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,9 @@ import javax.ws.rs.Path;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -188,7 +191,19 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 					"Error in creating the JSON representing the entire building environment", e);
 		}
 		
-		return environmentJSON;
+		// if no buildings are available, send a 404 Not found HTTP response
+		// assume only one building environment in the configuration, as before
+		boolean noBuilding = dhc.getBuildingEnvironment().get(0).getBuilding().isEmpty();
+		
+		if (environmentJSON.isEmpty() || noBuilding)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+		{
+			return environmentJSON;
+		}
 	}
 	
 	/*
@@ -203,13 +218,25 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	{
 		String environmentXML = "";
 		
-		// get the JAXB object containing all the configured devices
+		// get the JAXB object containing all the configured buildings
 		DogHomeConfiguration dhc = this.getBuildingFromModel();
 		
 		// create the XML for replying the request
 		environmentXML = this.generateXML(dhc);
 		
-		return environmentXML;
+		// if no buildings are available, send a 404 Not found HTTP response
+		// assume only one building environment in the configuration, as before
+		boolean noBuilding = dhc.getBuildingEnvironment().get(0).getBuilding().isEmpty();
+		
+		if (environmentXML.isEmpty() || noBuilding)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+		{
+			return environmentXML;
+		}
 	}
 	
 	/*
@@ -227,6 +254,14 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		// get the JAXB object containing all the information about flats
 		Building building = this.getFlatsFromModel();
 		
+		// if building is null, send a 404 Not found
+		//
+		if (building == null)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		
 		try
 		{
 			// create the response string in JSON format
@@ -237,7 +272,14 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			this.logger.log(LogService.LOG_ERROR, "Error in creating the JSON representing all the flats", e);
 		}
 		
-		return flatsJSON;
+		// no flat
+		if (flatsJSON.isEmpty() || building.getFlat().isEmpty())
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return flatsJSON;
 	}
 	
 	/*
@@ -250,6 +292,10 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void addNewFlat(String addedFlat)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		try
 		{
 			// create the JAXB object from the JSON representing the flat to add
@@ -259,13 +305,27 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			{
 				// add the new flat to the model
 				this.environmentModel.get().addFlatToBuilding(flat);
+				
+				// set the variable used to store the HTTP response by the right
+				// value
+				// CREATED: the flat was added successfully
+				response = Response.Status.CREATED;
 			}
 		}
 		catch (Exception e)
 		{
 			// exception
 			this.logger.log(LogService.LOG_ERROR, "Impossible to add a new flat", e);
+			
+			// set the variable used to store the HTTP response by the right
+			// value
+			// NOT_MODIFIED: the flat was not added
+			// it was the best response status available
+			response = Response.Status.NOT_MODIFIED;
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 	}
 	
 	/*
@@ -284,6 +344,12 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		// flat
 		Flat flat = this.getFlatFromModel(flatId);
 		
+		// no flat, 404 response
+		if (flat == null)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
 		try
 		{
 			// create the response string in JSON format
@@ -295,7 +361,14 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 					.log(LogService.LOG_ERROR, "Error in creating the JSON representing the flat named " + flatId, e);
 		}
 		
-		return flatJSON;
+		// the desired flat or its rooms don't exist
+		if (flatJSON.isEmpty() || flat.getRoom().isEmpty())
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return flatJSON;
 	}
 	
 	/*
@@ -308,6 +381,10 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void updateFlat(String flatId, String updatedFlat)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		// check if the flat exists
 		Flat flat = this.getFlatFromModel(flatId);
 		
@@ -325,19 +402,39 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 				{
 					// update the model with the new flat
 					this.environmentModel.get().updateBuildingConfiguration(flatToUpdate);
+					
+					// set the variable used to store the HTTP response by the
+					// right value
+					// OK: the flat was updated
+					response = Response.Status.OK;
 				}
 			}
 			else
 			{
 				this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId
 						+ " since it does not exists!");
+				
+				// set the variable used to store the HTTP response by the right
+				// value
+				// PRECONDITION_FAILED: impossible to update the flat
+				// since it does not exists
+				// it was the best response status available
+				response = Response.Status.PRECONDITION_FAILED;
 			}
 		}
 		catch (Exception e)
 		{
 			// exception
 			this.logger.log(LogService.LOG_ERROR, "Impossible to update the flat named " + flatId, e);
+			
+			// set the variable used to store the HTTP response by the right
+			// value
+			// NOT_MODIFIED: impossible to update the flat
+			response = Response.Status.NOT_MODIFIED;
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 	}
 	
 	/*
@@ -356,6 +453,13 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		// flat
 		Flat flat = this.getFlatFromModel(flatId);
 		
+		// no flat, 404
+		if (flat == null)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		
 		// remove everything but the room list from the retrieved flat
 		flat.setClazz(null);
 		flat.setDescription(null);
@@ -373,7 +477,14 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 					"Error in creating the JSON representing the rooms present in the flat named " + flatId, e);
 		}
 		
-		return roomsJSON;
+		// no rooms (or empty rooms): 404
+		if (roomsJSON.isEmpty() || flat.getRoom().isEmpty())
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return roomsJSON;
 	}
 	
 	/*
@@ -386,6 +497,10 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void addNewRoomInFlat(String flatId, String addedRoom)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		try
 		{
 			// create the JAXB object from the JSON representing the room to add
@@ -395,13 +510,26 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 			{
 				// add the new flat to the model
 				this.environmentModel.get().addRoomToBuilding(room, flatId);
+				
+				// set the variable used to store the HTTP response by the right
+				// value
+				// CREATED: the room was successfully added
+				response = Response.Status.CREATED;
 			}
 		}
 		catch (Exception e)
 		{
 			// exception
 			this.logger.log(LogService.LOG_ERROR, "Impossible to add a new room to the flat named " + flatId, e);
+			
+			// set the variable used to store the HTTP response by the right
+			// value
+			// NOT_MODIFIED: impossible to add a new room to the flat
+			response = Response.Status.NOT_MODIFIED;
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 	}
 	
 	/*
@@ -420,6 +548,12 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		// room
 		Room room = this.getRoomFromModel(flatId, roomId);
 		
+		// no room, 404
+		if (room == null)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
 		try
 		{
 			// create the response string in JSON format
@@ -431,7 +565,14 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 					.log(LogService.LOG_ERROR, "Error in creating the JSON representing the room named " + roomId, e);
 		}
 		
-		return roomsJSON;
+		// empty room, send a 404
+		if (roomsJSON.isEmpty())
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return roomsJSON;
 	}
 	
 	/*
@@ -444,6 +585,10 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 	@Override
 	public void updateRoomInFlat(String flatId, String roomId, String updatedRoom)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		// get the room to check if it exists
 		Room room = this.getRoomFromModel(flatId, roomId);
 		
@@ -460,19 +605,39 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 				{
 					// update the model with the new room
 					this.environmentModel.get().updateBuildingConfiguration(roomToUpdate, flatId);
+					
+					// set the variable used to store the HTTP response by the
+					// right value
+					// OK: the room was successfully updated
+					response = Response.Status.OK;
 				}
 			}
 			else
 			{
 				this.logger.log(LogService.LOG_ERROR, "Impossible to update the room named " + roomId
 						+ " since it does not exists!");
+				
+				// set the variable used to store the HTTP response by the right
+				// value
+				// PRECONDITION_FAILED: impossible to update the room since it
+				// does not exists
+				// it was the best response status available
+				response = Response.Status.PRECONDITION_FAILED;
 			}
 		}
 		catch (Exception e)
 		{
 			// exception
 			this.logger.log(LogService.LOG_ERROR, "Impossible to update the room named " + roomId, e);
+			
+			// set the variable used to store the HTTP response by the right
+			// value
+			// NOT_MODIFIED: impossible to update the room
+			response = Response.Status.NOT_MODIFIED;
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 	}
 	
 	/*
@@ -489,6 +654,15 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		{
 			// remove the given room from the Environmental Model
 			this.environmentModel.get().removeRoomFromBuilding(roomId, flatId);
+			
+			// take care of the action - success
+			throw new WebApplicationException(Response.Status.NO_CONTENT);
+		}
+		else
+		{
+			// no environment model available, the request cannot be executed
+			// it was the best response status available
+			throw new WebApplicationException(Response.Status.PRECONDITION_FAILED);
 		}
 	}
 	
@@ -506,6 +680,15 @@ public class EnvironmentRESTEndpoint implements EnvironmentRESTApi
 		{
 			// remove the given flat from the Environmental Model
 			this.environmentModel.get().removeFlatFromBuilding(flatId);
+			
+			// take care of the action - success
+			throw new WebApplicationException(Response.Status.NO_CONTENT);
+		}
+		else
+		{
+			// no environment model available, the request cannot be executed
+			// it was the best response status available
+			throw new WebApplicationException(Response.Status.PRECONDITION_FAILED);
 		}
 	}
 	
