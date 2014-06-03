@@ -262,7 +262,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// assume, as before, that only one Controllables tag exists
 		boolean noDevices = dhc.getControllables().get(0).getDevice().isEmpty();
 		
-		if (devicesJSON.isEmpty() || !noDevices)
+		if (devicesJSON.isEmpty() || noDevices)
 		{
 			// launch the exception responsible for sending the HTTP response
 			throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -294,7 +294,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// assume, as before, that only one Controllables tag exists
 		boolean noDevices = dhc.getControllables().get(0).getDevice().isEmpty();
 		
-		if (devicesXML.isEmpty() || !noDevices)
+		if (devicesXML.isEmpty() || noDevices)
 		{
 			// launch the exception responsible for sending the HTTP response
 			throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -492,8 +492,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 								// update the device configuration
 								this.deviceFactory.get().updateDevice(currentDeviceDescr);
 								// set the variable used to store the HTTP
-								// response by the right value: OK (The device
-								// location was successfully updated)
+								// response by the right value
+								// OK: the device location was successfully
+								// updated
 								response = Response.Status.OK;
 								
 							}
@@ -503,17 +504,17 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 										.log(LogService.LOG_WARNING,
 												"Impossible to update the device location: the Device Factory is not available!");
 								// set the variable used to store the HTTP
-								// response by the right value:
-								// PRECONDITION_FAILED (Impossible to update the
+								// response by the right value
+								// PRECONDITION_FAILED: impossible to update the
 								// device location since the Device Factory is
-								// not available)
+								// not available
 								// it was the best response status available
 								response = Response.Status.PRECONDITION_FAILED;
 							}
 						}
 					}
 					
-					// Releases all the services object referenced at the
+					// releases all the services object referenced at the
 					// beginning of the method
 					for (ServiceReference<?> singleServiceReference : deviceService)
 					{
@@ -525,8 +526,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			{
 				this.logger.log(LogService.LOG_ERROR, "Error in updating the location of device " + deviceId, e);
 				// set the variable used to store the HTTP response by the right
-				// value: NOT_MODIFIED (Impossible to update the location of
-				// device)
+				// value
+				// NOT_MODIFIED: impossible to update the location of the device
 				response = Response.Status.NOT_MODIFIED;
 			}
 			
@@ -590,8 +591,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 								// update the device configuration
 								this.deviceFactory.get().updateDevice(currentDeviceDescr);
 								// set the variable used to store the HTTP
-								// response by the right value: OK (The
-								// description was successfully updated)
+								// response by the right value
+								// OK: the description was successfully updated
 								response = Response.Status.OK;
 							}
 							else
@@ -600,17 +601,17 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 										.log(LogService.LOG_WARNING,
 												"Impossible to update the device description: the Device Factory is not available!");
 								// set the variable used to store the HTTP
-								// response by the right value:
-								// PRECONDITION_FAILED (Impossible to update the
+								// response by the right value
+								// PRECONDITION_FAILED: impossible to update the
 								// device description since the Device Factory
-								// is not available)
+								// is not available
 								// it was the best response status available
 								response = Response.Status.PRECONDITION_FAILED;
 							}
 						}
 					}
 					
-					// Releases all the services object referenced at the
+					// releases all the services object referenced at the
 					// beginning of the method
 					for (ServiceReference<?> singleServiceReference : deviceService)
 					{
@@ -622,8 +623,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			{
 				this.logger.log(LogService.LOG_ERROR, "Error in updating the description of device " + deviceId, e);
 				// set the variable used to store the HTTP response by the right
-				// value: NOT_MODIFIED (Impossible to update the description of
-				// the device)
+				// value
+				// NOT_MODIFIED: impossible to update the description of the
+				// device
 				// it was the best response status available
 				response = Response.Status.NOT_MODIFIED;
 			}
