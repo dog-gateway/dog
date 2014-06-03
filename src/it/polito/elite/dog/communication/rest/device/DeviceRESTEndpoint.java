@@ -1,7 +1,7 @@
 /*
  * Dog - Device Rest Endpoint
  * 
- * Copyright (c) 2013-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2013-2014 Dario Bonino, Luigi De Russis and Teodoro Montanaro
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.util.Executor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +55,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -256,7 +258,19 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					e);
 		}
 		
-		return devicesJSON;
+		// if no devices are available, send a 404 Not found HTTP response
+		// assume, as before, that only one Controllables tag exists
+		boolean noDevices = dhc.getControllables().get(0).getDevice().isEmpty();
+		
+		if (devicesJSON.isEmpty() || !noDevices)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+		{
+			return devicesJSON;
+		}
 	}
 	
 	/*
@@ -276,13 +290,25 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// create the XML for replying the request
 		devicesXML = this.generateXML(dhc);
 		
-		return devicesXML;
+		// if no devices are available, send a 404 Not found HTTP response
+		// assume, as before, that only one Controllables tag exists
+		boolean noDevices = dhc.getControllables().get(0).getDevice().isEmpty();
+		
+		if (devicesXML.isEmpty() || !noDevices)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+		{
+			return devicesXML;
+		}
 	}
 	
 	/**
-	 * Get all the devices configured in Dog from the {@link HouseModel} and
-	 * perform some "cleaning" operations, such as removing all the
-	 * network-related information and removing unneeded tabs or newlines
+	 * Get all the devices configured in Dog from the {@link HouseModel} in
+	 * their "clean" format, e.g., without all the network-related information
+	 * and unneeded tabs or newlines
 	 * 
 	 * @return a {@link DogHomeConfiguration} object with all the devices
 	 *         information
@@ -333,9 +359,16 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				this.logger.log(LogService.LOG_ERROR,
 						"Error in creating the JSON representing all the configured devices", e);
 			}
+			
+			return deviceJSON;
+		}
+		else
+		{
+			// the requested device is not present, send a 404 Not found HTTP
+			// response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
 		}
 		
-		return deviceJSON;
 	}
 	
 	/*
@@ -352,10 +385,19 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// get the requested device configuration
 		DogHomeConfiguration dhc = this.getDevice(deviceId);
 		
-		// create the XML for replying the request
-		deviceXML = this.generateXML(dhc);
-		
-		return deviceXML;
+		if (dhc.getControllables().get(0).getDevice() != null)
+		{
+			// create the XML for replying the request
+			deviceXML = this.generateXML(dhc);
+			
+			return deviceXML;
+		}
+		else
+		{
+			// the requested device is not present, send a 404 Not found HTTP
+			// response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
 	}
 	
 	/**
@@ -406,6 +448,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Override
 	public void updateDeviceLocation(String deviceId, String location)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
 		if (location != null && !location.isEmpty())
 		{
 			// create filter for getting the desired device
@@ -446,21 +491,47 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 							{
 								// update the device configuration
 								this.deviceFactory.get().updateDevice(currentDeviceDescr);
+								// set the variable used to store the HTTP
+								// response by the right value: OK (The device
+								// location was successfully updated)
+								response = Response.Status.OK;
+								
 							}
 							else
 							{
 								this.logger
 										.log(LogService.LOG_WARNING,
 												"Impossible to update the device location: the Device Factory is not available!");
+								// set the variable used to store the HTTP
+								// response by the right value:
+								// PRECONDITION_FAILED (Impossible to update the
+								// device location since the Device Factory is
+								// not available)
+								// it was the best response status available
+								response = Response.Status.PRECONDITION_FAILED;
 							}
 						}
+					}
+					
+					// Releases all the services object referenced at the
+					// beginning of the method
+					for (ServiceReference<?> singleServiceReference : deviceService)
+					{
+						this.context.ungetService(singleServiceReference);
 					}
 				}
 			}
 			catch (Exception e)
 			{
 				this.logger.log(LogService.LOG_ERROR, "Error in updating the location of device " + deviceId, e);
+				// set the variable used to store the HTTP response by the right
+				// value: NOT_MODIFIED (Impossible to update the location of
+				// device)
+				response = Response.Status.NOT_MODIFIED;
 			}
+			
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(response);
 		}
 	}
 	
@@ -473,6 +544,10 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	@Override
 	public void updateDeviceDescription(String deviceId, String description)
 	{
+		// set and init the variable used to store the HTTP response that will
+		// be sent by exception to the client
+		Status response = null;
+		
 		if (description != null && !description.isEmpty())
 		{
 			// create filter for getting the desired device
@@ -514,21 +589,47 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 							{
 								// update the device configuration
 								this.deviceFactory.get().updateDevice(currentDeviceDescr);
+								// set the variable used to store the HTTP
+								// response by the right value: OK (The
+								// description was successfully updated)
+								response = Response.Status.OK;
 							}
 							else
 							{
 								this.logger
 										.log(LogService.LOG_WARNING,
 												"Impossible to update the device description: the Device Factory is not available!");
+								// set the variable used to store the HTTP
+								// response by the right value:
+								// PRECONDITION_FAILED (Impossible to update the
+								// device description since the Device Factory
+								// is not available)
+								// it was the best response status available
+								response = Response.Status.PRECONDITION_FAILED;
 							}
 						}
+					}
+					
+					// Releases all the services object referenced at the
+					// beginning of the method
+					for (ServiceReference<?> singleServiceReference : deviceService)
+					{
+						this.context.ungetService(singleServiceReference);
 					}
 				}
 			}
 			catch (Exception e)
 			{
 				this.logger.log(LogService.LOG_ERROR, "Error in updating the description of device " + deviceId, e);
+				// set the variable used to store the HTTP response by the right
+				// value: NOT_MODIFIED (Impossible to update the description of
+				// the device)
+				// it was the best response status available
+				response = Response.Status.NOT_MODIFIED;
 			}
+			
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(response);
 		}
 	}
 	
@@ -546,6 +647,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// the response
 		String responseAsString = "";
+		boolean listIsEmpty = true;
 		
 		// get all the installed device services
 		try
@@ -581,6 +683,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						
 						// get the response payload for the current device
 						deviceStateResponsePayload[i] = this.getControllableStatus(currentDevice, allDevices[i]);
+						// if we are here it means that the list will not be
+						// empty
+						listIsEmpty = false;
 					}
 					
 					this.context.ungetService(allDevices[i]);
@@ -590,6 +695,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				
 				// convert the response body to json
 				responseAsString = this.mapper.writeValueAsString(responsePayload);
+				
+				// Releases all the services object referenced at the beginning
+				// of the method
+				for (ServiceReference<?> singleServiceReference : allDevices)
+				{
+					this.context.ungetService(singleServiceReference);
+				}
 			}
 			
 		}
@@ -598,7 +710,16 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			this.logger.log(LogService.LOG_ERROR, "Error while composing the response", e);
 		}
 		
-		return responseAsString;
+		// if the responseAsString variable is empty we have to send an HTTP
+		// response
+		// 404 Not found
+		if (responseAsString.isEmpty() || listIsEmpty == true)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return responseAsString;
 	}
 	
 	/*
@@ -612,6 +733,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	{
 		// the response
 		String responseAsString = "";
+		boolean listIsEmpty = true;
 		
 		// create filter for getting the desired device
 		String deviceFilter = String.format("(&(%s=*)(%s=%s))", Constants.DEVICE_CATEGORY, DeviceCostants.DEVICEURI,
@@ -642,6 +764,9 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 						
 						// get the response payload
 						deviceStateResponsePayload = this.getControllableStatus(currentDevice, deviceService[0]);
+						// if we are here it means that the list will not be
+						// empty
+						listIsEmpty = false;
 					}
 					
 					this.context.ungetService(deviceService[0]);
@@ -649,6 +774,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 				
 				// convert the response body to json
 				responseAsString = this.mapper.writeValueAsString(deviceStateResponsePayload);
+				
+				// Releases all the services object referenced at the beginning
+				// of the method
+				for (ServiceReference<?> singleServiceReference : deviceService)
+				{
+					this.context.ungetService(singleServiceReference);
+				}
 			}
 		}
 		catch (Exception e)
@@ -657,7 +789,16 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					.log(LogService.LOG_ERROR, "Error while composing the response for the status of " + deviceId, e);
 		}
 		
-		return responseAsString;
+		// if the responseAsString variable is empty we have to send an HTTP
+		// response
+		// 404 Not found
+		if (responseAsString.isEmpty() || listIsEmpty == true)
+		{
+			// launch the exception responsible for sending the HTTP response
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+		else
+			return responseAsString;
 	}
 	
 	/**
@@ -699,8 +840,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 			allStates = state.getStates();
 		}
 		
-		// check if the device state is available, i.e., not
-		// null
+		// check if the device state is available, i.e., not null
 		if (allStates != null)
 		{
 			// iterate over all states
@@ -801,6 +941,13 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	 */
 	private void executeCommand(String deviceId, String commandName, String commandParameters)
 	{
+		
+		// set default value for the variable used to store the HTTP response by
+		// the right value: EXPECTATION_FAILED (If something goes wrong we will
+		// say to user that the command was not executed successfully)
+		// it was the best response status available
+		Status response = Response.Status.EXPECTATION_FAILED;
+		
 		// get the executor instance
 		Executor executor = Executor.getInstance();
 		
@@ -822,22 +969,49 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 					// if payload !=null
 					executor.execute(context, deviceId, commandName, new Object[] { payload.getValue() });
 					
+					// set the variable used to store the HTTP response by the
+					// right value
+					// OK: the command was executed without exception
+					response = Response.Status.OK;
+					
 					break;
 				}
-				catch (IOException e)
+				catch (Exception e)
 				{
-					// TODO Auto-generated catch block
-					// do nothing and proceed to the next trial
-					// e.printStackTrace();
+					// set the variable used to store the HTTP response by the
+					// right value
+					// EXPECTATION_FAILED: An exception occured so the command
+					// was not executed as expected
+					// it was the best response status available
+					response = Response.Status.EXPECTATION_FAILED;
+					// then proceed to the next trial
 				}
 			}
-			
 		}
 		else
 		{
 			// exec the command
-			executor.execute(context, deviceId, commandName, new Object[] {});
+			try
+			{
+				executor.execute(context, deviceId, commandName, new Object[] {});
+				// set the variable used to store the HTTP response by the right
+				// value
+				// OK: the command was executed without exception
+				response = Response.Status.OK;
+			}
+			catch (Exception e)
+			{
+				// set the variable used to store the HTTP response by the right
+				// value
+				// EXPECTATION_FAILED: An exception occured so the command was
+				// not executed as expected
+				// it was the best response status available
+				response = Response.Status.EXPECTATION_FAILED;
+			}
 		}
+		
+		// launch the exception responsible for sending the HTTP response
+		throw new WebApplicationException(response);
 		
 	}
 	
