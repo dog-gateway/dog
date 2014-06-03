@@ -76,6 +76,14 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		 return null;
 	}
 
+	public void setColorRGB(Integer red, Integer blue, Integer green)
+	{
+		if(this.driver!=null)
+		{
+			((ColorDimmableLight) this.driver).setColorRGB(red, blue, green);
+		}
+	}
+
 	public void storeScene(Integer sceneNumber)
 	{
 		if(this.driver!=null)
@@ -116,6 +124,14 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		}
 	}
 
+	public void setColorHSB(Integer saturation, Integer brightness, Integer hue)
+	{
+		if(this.driver!=null)
+		{
+			((ColorDimmableLight) this.driver).setColorHSB(saturation, brightness, hue);
+		}
+	}
+
 	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
@@ -150,13 +166,6 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: ColorNotification*/
-	public void notifyChangedColor(String colorRGB){
-		ColorNotification notificationEvent=new ColorNotification(colorRGB );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber){
 		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
@@ -178,6 +187,13 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	/*Notification: ColorRGBNotification*/
+	public void notifyChangedColorRGB(Integer red, Integer blue, Integer green){
+		ColorRGBNotification notificationEvent=new ColorRGBNotification(red , blue , green );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
 	/*Notification: OffNotification*/
 	public void notifyOff(){
 		OffNotification notificationEvent=new OffNotification();
@@ -188,6 +204,13 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber){
 		LeaveGroupNotification notificationEvent=new LeaveGroupNotification(groupNumber );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: ColorHSBNotification*/
+	public void notifyChangedColorHSB(Integer saturation, Integer brightness, Integer hue){
+		ColorHSBNotification notificationEvent=new ColorHSBNotification(saturation , brightness , hue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

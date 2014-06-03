@@ -49,8 +49,8 @@ public class PlayState extends DiscreteState
 
 	public static final String PLAYING = "playing";
 	public static final String REWIND = "rewind";
-	public static final String PAUSE = "pause";
 	public static final String STOP = "stop";
+	public static final String PAUSE = "pause";
 	public static final String FORWARD = "forward";
 
 
@@ -77,20 +77,20 @@ public class PlayState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public PlayState(PauseStateValue pausestatevalue)
+	public PlayState(StopStateValue stopstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{pausestatevalue});
+		super(new StateValue[]{stopstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public PlayState(StopStateValue stopstatevalue)
+	public PlayState(PauseStateValue pausestatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{stopstatevalue});
+		super(new StateValue[]{pausestatevalue});
 	}
 
 
@@ -108,8 +108,8 @@ public class PlayState extends DiscreteState
 	{
 		this.old2NewMap.put(PlayState.PLAYING, new PlayStateValue());
 		this.old2NewMap.put(PlayState.REWIND, new RewindStateValue());
-		this.old2NewMap.put(PlayState.PAUSE, new PauseStateValue());
 		this.old2NewMap.put(PlayState.STOP, new StopStateValue());
+		this.old2NewMap.put(PlayState.PAUSE, new PauseStateValue());
 		this.old2NewMap.put(PlayState.FORWARD, new ForwardStateValue());
 	}
 	/**

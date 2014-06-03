@@ -95,11 +95,11 @@ public class DogCooker extends AbstractDevice implements Cooker
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Cooker) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((Cooker) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 

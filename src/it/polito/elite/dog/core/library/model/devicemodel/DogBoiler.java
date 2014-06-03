@@ -111,11 +111,11 @@ public class DogBoiler extends AbstractDevice implements Boiler
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Boiler) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((Boiler) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 

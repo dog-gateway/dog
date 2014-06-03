@@ -64,8 +64,8 @@ public class WashingApplianceState extends GenericApplianceState
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
 	public static final String PROGRAMMED = "programmed";
 	public static final String OFF = "off";
-	public static final String RUNNING = "running";
 	public static final String CONNECTED = "connected";
+	public static final String RUNNING = "running";
 
 
 	/**
@@ -171,20 +171,20 @@ public class WashingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public WashingApplianceState(RunningStateValue runningstatevalue)
+	public WashingApplianceState(ConnectedStateValue connectedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{runningstatevalue});
+		super(new StateValue[]{connectedstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public WashingApplianceState(ConnectedStateValue connectedstatevalue)
+	public WashingApplianceState(RunningStateValue runningstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{connectedstatevalue});
+		super(new StateValue[]{runningstatevalue});
 	}
 
 	@Deprecated
@@ -200,8 +200,8 @@ public class WashingApplianceState extends GenericApplianceState
 		this.old2NewMap.put(WashingApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
 		this.old2NewMap.put(WashingApplianceState.PROGRAMMED, new ProgrammedStateValue());
 		this.old2NewMap.put(WashingApplianceState.OFF, new OffStateValue());
-		this.old2NewMap.put(WashingApplianceState.RUNNING, new RunningStateValue());
 		this.old2NewMap.put(WashingApplianceState.CONNECTED, new ConnectedStateValue());
+		this.old2NewMap.put(WashingApplianceState.RUNNING, new RunningStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

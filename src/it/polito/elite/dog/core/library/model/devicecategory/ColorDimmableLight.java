@@ -40,11 +40,13 @@ public interface ColorDimmableLight extends DimmableLight
 	public void stepDown();
 	public void stepUp();
 	public DeviceStatus getState();
+	public void setColorRGB(Integer red, Integer blue, Integer green);
 	public void storeScene(Integer sceneNumber);
 	public void deleteScene(Integer sceneNumber);
 	public void set(Object value);
 	public void on();
 	public void deleteGroup(Integer groupID);
+	public void setColorHSB(Integer saturation, Integer brightness, Integer hue);
 	public void storeGroup(Integer groupID);
 	public void off();
 
@@ -55,17 +57,19 @@ public interface ColorDimmableLight extends DimmableLight
 	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: DeleteSceneNotification*/
 	public void notifyDeletedScene(Integer sceneNumber);
-	/*Notification: ColorNotification*/
-	public void notifyChangedColor(String colorRGB);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: OnNotification*/
 	public void notifyOn();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
+	/*Notification: ColorRGBNotification*/
+	public void notifyChangedColorRGB(Integer red, Integer blue, Integer green);
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
+	/*Notification: ColorHSBNotification*/
+	public void notifyChangedColorHSB(Integer saturation, Integer brightness, Integer hue);
 	public void updateStatus();
 }

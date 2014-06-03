@@ -44,9 +44,9 @@ public interface ZigBeeGateway extends HomeGateway
 
 	/*Generated Notifications*/
 
-	/*Notification: NetworkOpenedNotification*/
-	public void notifyOpen();
 	/*Notification: NetworkClosedNotification*/
 	public void notifyClose();
+	/*Notification: NetworkOpenedNotification*/
+	public void notifyOpen();
 	public void updateStatus();
 }

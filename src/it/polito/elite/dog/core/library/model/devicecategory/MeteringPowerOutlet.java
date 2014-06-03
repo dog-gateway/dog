@@ -60,10 +60,10 @@ public interface MeteringPowerOutlet extends EnergyMeteringPowerOutlet, PowerMet
 	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
-	/*Notification: SinglePhaseReactiveEnergyMeasurementNotification*/
-	public void notifyNewReactiveEnergyValue(Measure<?,?>  value);
 	/*Notification: OnNotification*/
 	public void notifyOn();
+	/*Notification: SinglePhaseReactiveEnergyMeasurementNotification*/
+	public void notifyNewReactiveEnergyValue(Measure<?,?>  value);
 	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(Measure<?,?>  value);
 	/*Notification: PowerFactorMeasurementNotification*/
