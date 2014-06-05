@@ -95,11 +95,11 @@ public class DogHotplate extends AbstractDevice implements Hotplate
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Hotplate) this.driver).setStartTime(endTime, remainingTime, startTime);
+			((Hotplate) this.driver).setStartTime(remainingTime, endTime, startTime);
 		}
 	}
 

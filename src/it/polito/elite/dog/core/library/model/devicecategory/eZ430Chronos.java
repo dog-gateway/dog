@@ -43,10 +43,10 @@ public interface eZ430Chronos extends Clock
 
 	/*Generated Notifications*/
 
-	/*Notification: PressedMNotification*/
-	public void notifyPressed(String buttonID);
 	/*Notification: TridimensionalAccelerationNotification*/
 	public void notifyNew3DAccelerationValue(Double accX, Double accY, Double accZ);
+	/*Notification: PressedMNotification*/
+	public void notifyPressed(String buttonID);
 	/*Notification: ReleasedMNotification*/
 	public void notifyReleased(String buttonID);
 	public void updateStatus();

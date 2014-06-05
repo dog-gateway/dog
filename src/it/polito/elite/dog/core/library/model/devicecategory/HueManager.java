@@ -49,7 +49,7 @@ public interface HueManager extends HueComponent
 	/*Notification: PushLinkAuthenticationActiveNotification*/
 	public void notifyActivatedPushLinkAuth();
 	/*Notification: DiscoveryIdleNotification*/
-	public void notifyDeActivatedDiscovery();
+	public void notifyDeactivatedDiscovery();
 	/*Notification: DiscoveryActiveNotification*/
 	public void notifyActivatedDiscovery();
 	public void updateStatus();

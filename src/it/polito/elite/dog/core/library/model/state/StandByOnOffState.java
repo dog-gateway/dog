@@ -46,8 +46,8 @@ public class StandByOnOffState extends TripleValuedState
 	private static final long serialVersionUID = 1L;
 
 	public static final String ON = "on";
-	public static final String OFF = "off";
 	public static final String STANDBY = "standBy";
+	public static final String OFF = "off";
 
 
 	/**
@@ -63,28 +63,28 @@ public class StandByOnOffState extends TripleValuedState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public StandByOnOffState(OffStateValue offstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{offstatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
 	public StandByOnOffState(StandByStateValue standbystatevalue)
 	{
 		//call the super class constructor
 		super(new StateValue[]{standbystatevalue});
 	}
 
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public StandByOnOffState(OffStateValue offstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{offstatevalue});
+	}
+
 	@Deprecated
 	private void initCommon()
 	{
 		this.old2NewMap.put(StandByOnOffState.ON, new OnStateValue());
-		this.old2NewMap.put(StandByOnOffState.OFF, new OffStateValue());
 		this.old2NewMap.put(StandByOnOffState.STANDBY, new StandByStateValue());
+		this.old2NewMap.put(StandByOnOffState.OFF, new OffStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

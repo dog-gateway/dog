@@ -109,7 +109,7 @@ public class DogHueManager extends AbstractDevice implements HueManager
 		notifyEventAdmin(notificationEvent);
 	}
 	/*Notification: DiscoveryIdleNotification*/
-	public void notifyDeActivatedDiscovery(){
+	public void notifyDeactivatedDiscovery(){
 		DiscoveryIdleNotification notificationEvent=new DiscoveryIdleNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin

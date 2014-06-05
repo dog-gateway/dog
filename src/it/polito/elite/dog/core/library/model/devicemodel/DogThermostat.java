@@ -160,13 +160,6 @@ public class DogThermostat extends AbstractDevice implements Thermostat
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: CoolNotification*/
-	public void notifyCool(){
-		CoolNotification notificationEvent=new CoolNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: SpeedStepDownNotification*/
 	public void notifySpeedDown(){
 		SpeedStepDownNotification notificationEvent=new SpeedStepDownNotification();
@@ -177,6 +170,13 @@ public class DogThermostat extends AbstractDevice implements Thermostat
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber){
 		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: CoolNotification*/
+	public void notifyCool(){
+		CoolNotification notificationEvent=new CoolNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
