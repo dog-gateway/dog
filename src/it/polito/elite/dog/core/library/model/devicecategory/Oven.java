@@ -47,7 +47,7 @@ public interface Oven extends WhiteGoods
 	public void start();
 	public void pause();
 	public Object[] getEventsAndAlerts();
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
 	public void off();
 	public Measure<?,?>  getStartTime();
 
@@ -68,19 +68,19 @@ public interface Oven extends WhiteGoods
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop();
 	/*Notification: StoppedSuperHeatingNotification*/
 	public void notifyStoppedSuperHeating();
 	/*Notification: StartTimeChangedNotification*/
 	public void notifyChangedStartTime(Measure<?,?>  startTime);
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause();
 	/*Notification: StartedSuperHeatingNotification*/
 	public void notifyStartedSuperHeating();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause();
 	public void updateStatus();
 }

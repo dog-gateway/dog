@@ -57,14 +57,6 @@ public class DogHueBridge extends AbstractDevice implements HueBridge
 		 return null;
 	}
 
-	public void link()
-	{
-		if(this.driver!=null)
-		{
-			((HueBridge) this.driver).link();
-		}
-	}
-
 
 
 	/*Generated Notifications*/

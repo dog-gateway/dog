@@ -47,7 +47,7 @@ public interface ElectricalOven extends Oven
 	public void start();
 	public void pause();
 	public Object[] getEventsAndAlerts();
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
 	public void off();
 	public Measure<?,?>  getStartTime();
 
@@ -68,10 +68,10 @@ public interface ElectricalOven extends Oven
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop();
 	/*Notification: StoppedSuperHeatingNotification*/
 	public void notifyStoppedSuperHeating();
 	/*Notification: StartTimeChangedNotification*/

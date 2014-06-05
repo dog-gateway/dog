@@ -135,11 +135,11 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((MicrowaveOven) this.driver).setStartTime(endTime, remainingTime, startTime);
+			((MicrowaveOven) this.driver).setStartTime(remainingTime, endTime, startTime);
 		}
 	}
 
@@ -213,16 +213,16 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop(){
-		StopApplianceNotification notificationEvent=new StopApplianceNotification();
+	/*Notification: OffNotification*/
+	public void notifyOff(){
+		OffNotification notificationEvent=new OffNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OffNotification*/
-	public void notifyOff(){
-		OffNotification notificationEvent=new OffNotification();
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop(){
+		StopApplianceNotification notificationEvent=new StopApplianceNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

@@ -86,16 +86,16 @@ public class DogShutterActuator extends AbstractDevice implements ShutterActuato
 
 	/*Generated Notifications*/
 
-	/*Notification: RestNotification*/
-	public void notifyResting(){
-		RestNotification notificationEvent=new RestNotification();
+	/*Notification: RestDownNotification*/
+	public void notifyRestingDown(){
+		RestDownNotification notificationEvent=new RestDownNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: RestDownNotification*/
-	public void notifyRestingDown(){
-		RestDownNotification notificationEvent=new RestDownNotification();
+	/*Notification: RestNotification*/
+	public void notifyResting(){
+		RestNotification notificationEvent=new RestNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

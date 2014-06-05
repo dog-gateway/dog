@@ -93,11 +93,11 @@ public class DogFridge extends AbstractDevice implements Fridge
 		}
 	}
 
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Fridge) this.driver).setStartTime(endTime, remainingTime, startTime);
+			((Fridge) this.driver).setStartTime(remainingTime, endTime, startTime);
 		}
 	}
 
