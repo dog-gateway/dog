@@ -29,7 +29,7 @@ package it.polito.elite.dog.core.library.model.notification;
 
 public class PushLinkAuthenticationIdleNotification implements HueNotification
 {
-	public static String notificationName = "de-activated push-link auth";
+	public static String notificationName = "deactivatedPushLinkAuth";
 
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/PushLinkAuthenticationIdleNotification";
 

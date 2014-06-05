@@ -61,10 +61,10 @@ public interface ShadeActuator extends Actuator
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: LevelControlNotification*/
-	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: SimpleMovementNotification*/
 	public void notifyStartedMovement();
+	/*Notification: LevelControlNotification*/
+	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/

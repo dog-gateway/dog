@@ -44,7 +44,7 @@ public class DiscoveryState extends DiscreteState
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String SEARCHING_FOR_NEW_DEVICES = "searching for new devices";
+	public static final String SEARCHING = "searching";
 	public static final String IDLE = "idle";
 
 
@@ -70,7 +70,7 @@ public class DiscoveryState extends DiscreteState
 	@Deprecated
 	private void initCommon()
 	{
-		this.old2NewMap.put(DiscoveryState.SEARCHING_FOR_NEW_DEVICES, new ActiveDiscoveryStateValue());
+		this.old2NewMap.put(DiscoveryState.SEARCHING, new ActiveDiscoveryStateValue());
 		this.old2NewMap.put(DiscoveryState.IDLE, new IdleStateValue());
 	}
 	/**

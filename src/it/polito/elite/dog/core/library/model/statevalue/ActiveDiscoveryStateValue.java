@@ -45,6 +45,6 @@ public class ActiveDiscoveryStateValue extends DiscreteValue
 	public ActiveDiscoveryStateValue()
 	{
 		super();
-		this.setFeature("realStateValue","searching for new devices");
+		this.setFeature("realStateValue","searching");
 	}
 }

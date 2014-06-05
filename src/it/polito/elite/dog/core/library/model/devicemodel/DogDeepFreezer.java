@@ -103,11 +103,11 @@ public class DogDeepFreezer extends AbstractDevice implements DeepFreezer
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((DeepFreezer) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((DeepFreezer) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 

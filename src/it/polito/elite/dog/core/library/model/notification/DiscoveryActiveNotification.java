@@ -29,7 +29,7 @@ package it.polito.elite.dog.core.library.model.notification;
 
 public class DiscoveryActiveNotification implements HueNotification
 {
-	public static String notificationName = "activated discovery";
+	public static String notificationName = "activatedDiscovery";
 
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/DiscoveryActiveNotification";
 

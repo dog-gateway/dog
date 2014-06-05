@@ -44,7 +44,7 @@ public interface Boiler extends WhiteGoods
 	public void on();
 	public void stopSuperHeating();
 	public Object[] getEventsAndAlerts();
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
 	public void off();
 	public Measure<?,?>  getStartTime();
 

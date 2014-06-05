@@ -135,16 +135,16 @@ public class DogQuadSensor extends AbstractDevice implements QuadSensor
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: HumidityMeasurementNotification*/
-	public void notifyChangedRelativeHumidity(Measure<?,?>  relativeHumidity){
-		HumidityMeasurementNotification notificationEvent=new HumidityMeasurementNotification(relativeHumidity );
+	/*Notification: SimpleMovementNotification*/
+	public void notifyStartedMovement(){
+		SimpleMovementNotification notificationEvent=new SimpleMovementNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SimpleMovementNotification*/
-	public void notifyStartedMovement(){
-		SimpleMovementNotification notificationEvent=new SimpleMovementNotification();
+	/*Notification: HumidityMeasurementNotification*/
+	public void notifyChangedRelativeHumidity(Measure<?,?>  relativeHumidity){
+		HumidityMeasurementNotification notificationEvent=new HumidityMeasurementNotification(relativeHumidity );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

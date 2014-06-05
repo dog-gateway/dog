@@ -29,7 +29,7 @@ package it.polito.elite.dog.core.library.model.notification;
 
 public class PushLinkAuthenticationActiveNotification implements HueNotification
 {
-	public static String notificationName = "activated push-link auth";
+	public static String notificationName = "activatedPushLinkAuth";
 
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/PushLinkAuthenticationActiveNotification";
 

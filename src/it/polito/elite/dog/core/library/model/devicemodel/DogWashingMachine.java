@@ -119,11 +119,11 @@ public class DogWashingMachine extends AbstractDevice implements WashingMachine
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((WashingMachine) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((WashingMachine) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 

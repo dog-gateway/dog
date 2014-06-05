@@ -58,10 +58,10 @@ public interface Thermostat extends Control, HVACSystem
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
 	/*Notification: CoolNotification*/
 	public void notifyCool();
-	/*Notification: JoinGroupNotification*/
-	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: SpeedStepDownNotification*/
 	public void notifySpeedDown();
+	/*Notification: JoinGroupNotification*/
+	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: HeatNotification*/
 	public void notifyHeat();
 	/*Notification: HumidityMeasurementNotification*/
