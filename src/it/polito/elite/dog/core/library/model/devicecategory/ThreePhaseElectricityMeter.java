@@ -64,12 +64,12 @@ public interface ThreePhaseElectricityMeter extends SinglePhaseEnergyMeter, Thre
 	public void notifyNewPhasePhaseVoltageValue(String phaseID, Measure<?,?>  value);
 	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(Measure<?,?>  value);
-	/*Notification: PowerFactorMeasurementNotification*/
-	public void notifyNewPowerFactorValue(Measure<?,?>  powerFactor);
-	/*Notification: ThreePhaseApparentPowerMeasurementNotification*/
-	public void notifyNewApparentPowerValue(String phaseID, Measure<?,?>  value);
 	/*Notification: ThreePhaseActivePowerMeasurementNotification*/
 	public void notifyNewActivePowerValue(String phaseID, Measure<?,?>  value);
+	/*Notification: ThreePhaseApparentPowerMeasurementNotification*/
+	public void notifyNewApparentPowerValue(String phaseID, Measure<?,?>  value);
+	/*Notification: PowerFactorMeasurementNotification*/
+	public void notifyNewPowerFactorValue(Measure<?,?>  powerFactor);
 	/*Notification: ThreePhaseCurrentMeasurementNotification*/
 	public void notifyNewCurrentValue(String phaseID, Measure<?,?>  value);
 	public void updateStatus();

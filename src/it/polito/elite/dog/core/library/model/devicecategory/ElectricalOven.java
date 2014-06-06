@@ -58,29 +58,29 @@ public interface ElectricalOven extends Oven
 	public void notifyStart();
 	/*Notification: MultipleEventNotification*/
 	public void notifyNewEventSet(Object[] events);
-	/*Notification: MultipleAlertNotification*/
-	public void notifyNewAlertSet(Object[] alerts);
 	/*Notification: EventNotification*/
 	public void notifyNewEvent(Object event);
-	/*Notification: StoppedSuperHeatingNotification*/
-	public void notifyStoppedSuperHeating();
+	/*Notification: MultipleAlertNotification*/
+	public void notifyNewAlertSet(Object[] alerts);
 	/*Notification: AlertNotification*/
 	public void notifyNewAlert(Object alert);
-	/*Notification: StartTimeChangedNotification*/
-	public void notifyChangedStartTime(Measure<?,?>  startTime);
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: EndTimeChangedNotification*/
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause();
 	/*Notification: StopApplianceNotification*/
 	public void notifyStop();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StoppedSuperHeatingNotification*/
+	public void notifyStoppedSuperHeating();
+	/*Notification: StartTimeChangedNotification*/
+	public void notifyChangedStartTime(Measure<?,?>  startTime);
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: StartedSuperHeatingNotification*/
 	public void notifyStartedSuperHeating();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause();
 	public void updateStatus();
 }

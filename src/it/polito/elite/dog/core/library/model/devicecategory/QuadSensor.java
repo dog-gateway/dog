@@ -49,10 +49,10 @@ public interface QuadSensor extends MovementSensor, SingleTemperatureSensor, Lig
 
 	/*Notification: LuminosityMeasurementNotification*/
 	public void notifyNewLuminosityValue(Measure<?,?>  luminosityValue);
-	/*Notification: SimpleNoMovementNotification*/
-	public void notifyCeasedMovement();
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
+	/*Notification: SimpleNoMovementNotification*/
+	public void notifyCeasedMovement();
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: HumidityMeasurementNotification*/

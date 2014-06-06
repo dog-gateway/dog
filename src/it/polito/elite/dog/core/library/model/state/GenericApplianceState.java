@@ -57,13 +57,13 @@ public class GenericApplianceState extends DiscreteState
 	public static final String FAILURE = "failure";
 	public static final String STANDBY = "standBy";
 	public static final String IDLE = "idle";
-	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
+	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
 	public static final String PROGRAMMED = "programmed";
 	public static final String OFF = "off";
-	public static final String RUNNING = "running";
 	public static final String CONNECTED = "connected";
+	public static final String RUNNING = "running";
 
 
 	/**
@@ -109,20 +109,20 @@ public class GenericApplianceState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public GenericApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
+	public GenericApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{endprogrammedstatevalue});
+		super(new StateValue[]{programmedandwaitingtostartstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public GenericApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
+	public GenericApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{programmedandwaitingtostartstatevalue});
+		super(new StateValue[]{endprogrammedstatevalue});
 	}
 
 
@@ -159,20 +159,20 @@ public class GenericApplianceState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public GenericApplianceState(RunningStateValue runningstatevalue)
+	public GenericApplianceState(ConnectedStateValue connectedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{runningstatevalue});
+		super(new StateValue[]{connectedstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public GenericApplianceState(ConnectedStateValue connectedstatevalue)
+	public GenericApplianceState(RunningStateValue runningstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{connectedstatevalue});
+		super(new StateValue[]{runningstatevalue});
 	}
 
 	@Deprecated
@@ -182,13 +182,13 @@ public class GenericApplianceState extends DiscreteState
 		this.old2NewMap.put(GenericApplianceState.FAILURE, new FailureStateValue());
 		this.old2NewMap.put(GenericApplianceState.STANDBY, new StandByStateValue());
 		this.old2NewMap.put(GenericApplianceState.IDLE, new IdleStateValue());
-		this.old2NewMap.put(GenericApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(GenericApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
+		this.old2NewMap.put(GenericApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(GenericApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
 		this.old2NewMap.put(GenericApplianceState.PROGRAMMED, new ProgrammedStateValue());
 		this.old2NewMap.put(GenericApplianceState.OFF, new OffStateValue());
-		this.old2NewMap.put(GenericApplianceState.RUNNING, new RunningStateValue());
 		this.old2NewMap.put(GenericApplianceState.CONNECTED, new ConnectedStateValue());
+		this.old2NewMap.put(GenericApplianceState.RUNNING, new RunningStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

@@ -94,16 +94,16 @@ public class DogZigBeeGateway extends AbstractDevice implements ZigBeeGateway
 
 	/*Generated Notifications*/
 
-	/*Notification: NetworkClosedNotification*/
-	public void notifyClose(){
-		NetworkClosedNotification notificationEvent=new NetworkClosedNotification();
+	/*Notification: NetworkOpenedNotification*/
+	public void notifyOpen(){
+		NetworkOpenedNotification notificationEvent=new NetworkOpenedNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: NetworkOpenedNotification*/
-	public void notifyOpen(){
-		NetworkOpenedNotification notificationEvent=new NetworkOpenedNotification();
+	/*Notification: NetworkClosedNotification*/
+	public void notifyClose(){
+		NetworkClosedNotification notificationEvent=new NetworkClosedNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

@@ -72,9 +72,9 @@ public interface Dishwasher extends WhiteGoods
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause();
 	/*Notification: StopApplianceNotification*/
 	public void notifyStop();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause();
 	public void updateStatus();
 }

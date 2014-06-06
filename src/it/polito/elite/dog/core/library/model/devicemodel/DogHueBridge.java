@@ -33,6 +33,7 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
+import it.polito.elite.dog.core.library.model.notification.*;
 public class DogHueBridge extends AbstractDevice implements HueBridge
 {
 
@@ -57,10 +58,40 @@ public class DogHueBridge extends AbstractDevice implements HueBridge
 		 return null;
 	}
 
+	public void stopPushLinkAuth()
+	{
+		if(this.driver!=null)
+		{
+			((HueBridge) this.driver).stopPushLinkAuth();
+		}
+	}
+
+	public void startPushLinkAuth()
+	{
+		if(this.driver!=null)
+		{
+			((HueBridge) this.driver).startPushLinkAuth();
+		}
+	}
+
 
 
 	/*Generated Notifications*/
 
+	/*Notification: PushLinkAuthenticationIdleNotification*/
+	public void notifyDeactivatedPushLinkAuth(){
+		PushLinkAuthenticationIdleNotification notificationEvent=new PushLinkAuthenticationIdleNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: PushLinkAuthenticationActiveNotification*/
+	public void notifyActivatedPushLinkAuth(){
+		PushLinkAuthenticationActiveNotification notificationEvent=new PushLinkAuthenticationActiveNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
 	@Override
 	public void updateStatus()
 	{

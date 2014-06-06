@@ -23,10 +23,11 @@ package it.polito.elite.dog.core.library.model.state;
 
 
 import it.polito.elite.dog.core.library.model.statevalue.ActivePushLinkAuthenticationStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.IdleStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.NeedingAuthenticationStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 
 
+import it.polito.elite.dog.core.library.model.statevalue.AuthenticatedStateValue;
 
 
 
@@ -44,17 +45,28 @@ public class PushLinkAuthenticationState extends DiscreteState
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String IDLE = "idle";
+	public static final String AUTHENTICATED = "authenticated";
+	public static final String NEEDSAUTHENTICATION = "needsAuthentication";
 	public static final String AUTHENTICATING = "authenticating";
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public PushLinkAuthenticationState(IdleStateValue idlestatevalue)
+	public PushLinkAuthenticationState(AuthenticatedStateValue authenticatedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{idlestatevalue});
+		super(new StateValue[]{authenticatedstatevalue});
+	}
+
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public PushLinkAuthenticationState(NeedingAuthenticationStateValue needingauthenticationstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{needingauthenticationstatevalue});
 	}
 
 
@@ -70,7 +82,8 @@ public class PushLinkAuthenticationState extends DiscreteState
 	@Deprecated
 	private void initCommon()
 	{
-		this.old2NewMap.put(PushLinkAuthenticationState.IDLE, new IdleStateValue());
+		this.old2NewMap.put(PushLinkAuthenticationState.AUTHENTICATED, new AuthenticatedStateValue());
+		this.old2NewMap.put(PushLinkAuthenticationState.NEEDSAUTHENTICATION, new NeedingAuthenticationStateValue());
 		this.old2NewMap.put(PushLinkAuthenticationState.AUTHENTICATING, new ActivePushLinkAuthenticationStateValue());
 	}
 	/**

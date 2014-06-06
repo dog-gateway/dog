@@ -74,40 +74,10 @@ public class DogHueManager extends AbstractDevice implements HueManager
 		}
 	}
 
-	public void stopPushLinkAuth()
-	{
-		if(this.driver!=null)
-		{
-			((HueManager) this.driver).stopPushLinkAuth();
-		}
-	}
-
-	public void startPushLinkAuth()
-	{
-		if(this.driver!=null)
-		{
-			((HueManager) this.driver).startPushLinkAuth();
-		}
-	}
-
 
 
 	/*Generated Notifications*/
 
-	/*Notification: PushLinkAuthenticationIdleNotification*/
-	public void notifyDeactivatedPushLinkAuth(){
-		PushLinkAuthenticationIdleNotification notificationEvent=new PushLinkAuthenticationIdleNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: PushLinkAuthenticationActiveNotification*/
-	public void notifyActivatedPushLinkAuth(){
-		PushLinkAuthenticationActiveNotification notificationEvent=new PushLinkAuthenticationActiveNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: DiscoveryIdleNotification*/
 	public void notifyDeactivatedDiscovery(){
 		DiscoveryIdleNotification notificationEvent=new DiscoveryIdleNotification();
