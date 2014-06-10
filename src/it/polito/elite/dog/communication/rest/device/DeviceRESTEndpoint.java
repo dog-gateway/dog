@@ -22,7 +22,9 @@ import it.polito.elite.dog.communication.rest.device.command.ClimateSchedulePayl
 import it.polito.elite.dog.communication.rest.device.command.CommandPayload;
 import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedulePayload;
 import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
+import it.polito.elite.dog.communication.rest.device.command.HSBColorPayload;
 import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
+import it.polito.elite.dog.communication.rest.device.command.RGBColorPayload;
 import it.polito.elite.dog.communication.rest.device.status.AllDeviceStatesResponsePayload;
 import it.polito.elite.dog.communication.rest.device.status.DeviceStateResponsePayload;
 import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
@@ -54,7 +56,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -135,6 +136,8 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		// to avoid matching pure doubles to measures with no unit.
 		this.payloads.add(DoublePayload.class);
 		this.payloads.add(MeasurePayload.class);
+		this.payloads.add(HSBColorPayload.class);
+		this.payloads.add(RGBColorPayload.class);
 		
 		// initialize the instance-wide object mapper
 		this.mapper = new ObjectMapper();
@@ -641,10 +644,6 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 	 * @see it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi#
 	 * getAllDeviceStatus()
 	 */
-	@Override
-	@GET
-	@Path("/status")
-	@Produces(MediaType.APPLICATION_JSON)
 	public String getAllDeviceStatus()
 	{
 		// the response
