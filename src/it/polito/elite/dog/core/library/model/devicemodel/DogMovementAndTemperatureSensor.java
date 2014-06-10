@@ -89,16 +89,16 @@ public class DogMovementAndTemperatureSensor extends AbstractDevice implements M
 
 	/*Generated Notifications*/
 
-	/*Notification: TemperatureMeasurementNotification*/
-	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue){
-		TemperatureMeasurementNotification notificationEvent=new TemperatureMeasurementNotification(temperatureValue );
+	/*Notification: SimpleNoMovementNotification*/
+	public void notifyCeasedMovement(){
+		SimpleNoMovementNotification notificationEvent=new SimpleNoMovementNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SimpleNoMovementNotification*/
-	public void notifyCeasedMovement(){
-		SimpleNoMovementNotification notificationEvent=new SimpleNoMovementNotification();
+	/*Notification: TemperatureMeasurementNotification*/
+	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue){
+		TemperatureMeasurementNotification notificationEvent=new TemperatureMeasurementNotification(temperatureValue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

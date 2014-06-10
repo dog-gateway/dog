@@ -183,13 +183,6 @@ public class DogDvd extends AbstractDevice implements Dvd
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: PausePlaybackNotification*/
-	public void notifyPause(){
-		PausePlaybackNotification notificationEvent=new PausePlaybackNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: OnNotification*/
 	public void notifyOn(){
 		OnNotification notificationEvent=new OnNotification();
@@ -197,9 +190,9 @@ public class DogDvd extends AbstractDevice implements Dvd
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: ForwardNotification*/
-	public void notifyFwd(){
-		ForwardNotification notificationEvent=new ForwardNotification();
+	/*Notification: PausePlaybackNotification*/
+	public void notifyPause(){
+		PausePlaybackNotification notificationEvent=new PausePlaybackNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -211,9 +204,9 @@ public class DogDvd extends AbstractDevice implements Dvd
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OffNotification*/
-	public void notifyOff(){
-		OffNotification notificationEvent=new OffNotification();
+	/*Notification: ForwardNotification*/
+	public void notifyFwd(){
+		ForwardNotification notificationEvent=new ForwardNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -225,9 +218,9 @@ public class DogDvd extends AbstractDevice implements Dvd
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StopPlaybackNotification*/
-	public void notifyStop(){
-		StopPlaybackNotification notificationEvent=new StopPlaybackNotification();
+	/*Notification: OffNotification*/
+	public void notifyOff(){
+		OffNotification notificationEvent=new OffNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -235,6 +228,13 @@ public class DogDvd extends AbstractDevice implements Dvd
 	/*Notification: RewindNotification*/
 	public void notifyRew(){
 		RewindNotification notificationEvent=new RewindNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: StopPlaybackNotification*/
+	public void notifyStop(){
+		StopPlaybackNotification notificationEvent=new StopPlaybackNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

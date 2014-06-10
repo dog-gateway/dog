@@ -52,10 +52,10 @@ public interface Heater extends HeatingSystem
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
 	/*Notification: CoolNotification*/
 	public void notifyCool();
-	/*Notification: HeatNotification*/
-	public void notifyHeat();
 	/*Notification: OnNotification*/
 	public void notifyOn();
+	/*Notification: HeatNotification*/
+	public void notifyHeat();
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: StopHeatingCoolingNotification*/

@@ -17,6 +17,7 @@ Import-Package: it.polito.elite.dog.core.library.jaxb;version="1.1.1",
  org.osgi.util.tracker;version="1.5.1"
 Export-Package: it.polito.elite.dog.core.library.model;version="1.1.0",
  it.polito.elite.dog.core.library.model.climate;version="1.1.0",
+ it.polito.elite.dog.core.library.model.color,
  it.polito.elite.dog.core.library.model.devicecategory;version="1.1.0",
  it.polito.elite.dog.core.library.model.devicemodel;version="1.1.0",
  it.polito.elite.dog.core.library.model.notification;version="1.1.0",

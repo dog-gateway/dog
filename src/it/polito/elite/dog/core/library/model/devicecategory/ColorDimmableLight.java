@@ -29,6 +29,8 @@ package it.polito.elite.dog.core.library.model.devicecategory;
 
 
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.color.RGBColor;
+import it.polito.elite.dog.core.library.model.color.HSBColor;
 import javax.measure.Measure;
 
 public interface ColorDimmableLight extends DimmableLight
@@ -40,13 +42,13 @@ public interface ColorDimmableLight extends DimmableLight
 	public void stepDown();
 	public void stepUp();
 	public DeviceStatus getState();
-	public void setColorRGB(Integer red, Integer blue, Integer green);
+	public void setColorRGB(RGBColor colorRGB);
 	public void storeScene(Integer sceneNumber);
 	public void deleteScene(Integer sceneNumber);
 	public void set(Object value);
 	public void on();
 	public void deleteGroup(Integer groupID);
-	public void setColorHSB(Integer saturation, Integer brightness, Integer hue);
+	public void setColorHSB(HSBColor colorHSB);
 	public void storeGroup(Integer groupID);
 	public void off();
 
@@ -64,12 +66,12 @@ public interface ColorDimmableLight extends DimmableLight
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: ColorRGBNotification*/
-	public void notifyChangedColorRGB(Integer red, Integer blue, Integer green);
+	public void notifyChangedColorRGB(RGBColor colorRGB);
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
 	/*Notification: ColorHSBNotification*/
-	public void notifyChangedColorHSB(Integer saturation, Integer brightness, Integer hue);
+	public void notifyChangedColorHSB(HSBColor colorHSB);
 	public void updateStatus();
 }

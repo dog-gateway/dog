@@ -33,6 +33,8 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
+import it.polito.elite.dog.core.library.model.color.RGBColor;
+import it.polito.elite.dog.core.library.model.color.HSBColor;
 import it.polito.elite.dog.core.library.model.notification.*;
 import javax.measure.Measure;
 
@@ -76,11 +78,11 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		 return null;
 	}
 
-	public void setColorRGB(Integer red, Integer blue, Integer green)
+	public void setColorRGB(RGBColor colorRGB)
 	{
 		if(this.driver!=null)
 		{
-			((ColorDimmableLight) this.driver).setColorRGB(red, blue, green);
+			((ColorDimmableLight) this.driver).setColorRGB(colorRGB);
 		}
 	}
 
@@ -124,11 +126,11 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		}
 	}
 
-	public void setColorHSB(Integer saturation, Integer brightness, Integer hue)
+	public void setColorHSB(HSBColor colorHSB)
 	{
 		if(this.driver!=null)
 		{
-			((ColorDimmableLight) this.driver).setColorHSB(saturation, brightness, hue);
+			((ColorDimmableLight) this.driver).setColorHSB(colorHSB);
 		}
 	}
 
@@ -188,8 +190,8 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		notifyEventAdmin(notificationEvent);
 	}
 	/*Notification: ColorRGBNotification*/
-	public void notifyChangedColorRGB(Integer red, Integer blue, Integer green){
-		ColorRGBNotification notificationEvent=new ColorRGBNotification(red , blue , green );
+	public void notifyChangedColorRGB(RGBColor colorRGB){
+		ColorRGBNotification notificationEvent=new ColorRGBNotification(colorRGB );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -209,8 +211,8 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		notifyEventAdmin(notificationEvent);
 	}
 	/*Notification: ColorHSBNotification*/
-	public void notifyChangedColorHSB(Integer saturation, Integer brightness, Integer hue){
-		ColorHSBNotification notificationEvent=new ColorHSBNotification(saturation , brightness , hue );
+	public void notifyChangedColorHSB(HSBColor colorHSB){
+		ColorHSBNotification notificationEvent=new ColorHSBNotification(colorHSB );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

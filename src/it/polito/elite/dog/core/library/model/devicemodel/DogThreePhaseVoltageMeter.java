@@ -82,16 +82,16 @@ public class DogThreePhaseVoltageMeter extends AbstractDevice implements ThreePh
 
 	/*Generated Notifications*/
 
-	/*Notification: ThreePhaseLNVoltageMeasurementNotification*/
-	public void notifyNewPhaseNeutralVoltageValue(String phaseID, Measure<?,?>  value){
-		ThreePhaseLNVoltageMeasurementNotification notificationEvent=new ThreePhaseLNVoltageMeasurementNotification(phaseID , value );
+	/*Notification: ThreePhaseLLVoltageMeasurementNotification*/
+	public void notifyNewPhasePhaseVoltageValue(String phaseID, Measure<?,?>  value){
+		ThreePhaseLLVoltageMeasurementNotification notificationEvent=new ThreePhaseLLVoltageMeasurementNotification(phaseID , value );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: ThreePhaseLLVoltageMeasurementNotification*/
-	public void notifyNewPhasePhaseVoltageValue(String phaseID, Measure<?,?>  value){
-		ThreePhaseLLVoltageMeasurementNotification notificationEvent=new ThreePhaseLLVoltageMeasurementNotification(phaseID , value );
+	/*Notification: ThreePhaseLNVoltageMeasurementNotification*/
+	public void notifyNewPhaseNeutralVoltageValue(String phaseID, Measure<?,?>  value){
+		ThreePhaseLNVoltageMeasurementNotification notificationEvent=new ThreePhaseLNVoltageMeasurementNotification(phaseID , value );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

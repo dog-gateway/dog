@@ -59,13 +59,13 @@ public class CoolingApplianceState extends GenericApplianceState
 	public static final String FAILURE = "failure";
 	public static final String STANDBY = "standBy";
 	public static final String IDLE = "idle";
-	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
 	public static final String ENDPROGRAMMED = "endProgrammed";
+	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
 	public static final String PROGRAMMED = "programmed";
 	public static final String OFF = "off";
-	public static final String RUNNING = "running";
 	public static final String CONNECTED = "connected";
+	public static final String RUNNING = "running";
 
 
 	/**
@@ -121,20 +121,20 @@ public class CoolingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public CoolingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
+	public CoolingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{programmedandwaitingtostartstatevalue});
+		super(new StateValue[]{endprogrammedstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public CoolingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
+	public CoolingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{endprogrammedstatevalue});
+		super(new StateValue[]{programmedandwaitingtostartstatevalue});
 	}
 
 
@@ -171,20 +171,20 @@ public class CoolingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public CoolingApplianceState(RunningStateValue runningstatevalue)
+	public CoolingApplianceState(ConnectedStateValue connectedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{runningstatevalue});
+		super(new StateValue[]{connectedstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public CoolingApplianceState(ConnectedStateValue connectedstatevalue)
+	public CoolingApplianceState(RunningStateValue runningstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{connectedstatevalue});
+		super(new StateValue[]{runningstatevalue});
 	}
 
 	@Deprecated
@@ -195,13 +195,13 @@ public class CoolingApplianceState extends GenericApplianceState
 		this.old2NewMap.put(CoolingApplianceState.FAILURE, new FailureStateValue());
 		this.old2NewMap.put(CoolingApplianceState.STANDBY, new StandByStateValue());
 		this.old2NewMap.put(CoolingApplianceState.IDLE, new IdleStateValue());
-		this.old2NewMap.put(CoolingApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
 		this.old2NewMap.put(CoolingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
+		this.old2NewMap.put(CoolingApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
 		this.old2NewMap.put(CoolingApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
 		this.old2NewMap.put(CoolingApplianceState.PROGRAMMED, new ProgrammedStateValue());
 		this.old2NewMap.put(CoolingApplianceState.OFF, new OffStateValue());
-		this.old2NewMap.put(CoolingApplianceState.RUNNING, new RunningStateValue());
 		this.old2NewMap.put(CoolingApplianceState.CONNECTED, new ConnectedStateValue());
+		this.old2NewMap.put(CoolingApplianceState.RUNNING, new RunningStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).
