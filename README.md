@@ -1,9 +1,9 @@
 # [The Dog Gateway](http://dog-gateway.github.io)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.10144.png)](https://zenodo.org/record/10144)
 
-The Dog Gateway (*Dog*, for friends!) is an OSGi compliant implementation of a smart environment gateway and IoT platform featuring *multi-protocol* capabilities, REST-based application *APIs*, *Uniform device representation*, Rule-based activations, Realtime data elaboration (with complex event processing technologies), Xively integration (to enable social sharing of consumptions and activations), etc.
+**The Dog Gateway** (*Dog*, for friends!) is an OSGi compliant implementation of a smart environment gateway and IoT platform featuring *multi-protocol* capabilities, REST-based application *APIs*, *Uniform device representation*, Rule-based activations, Realtime data elaboration (with complex event processing technologies), Xively integration (to enable social sharing of consumptions and activations), etc.
 
-The **Dog Gateway** development team is striving to improve and enrich the gateway day by day, and as result of this effort, several new features are currently on the way such as: integration of EnOcean devices, Philips Hue interoperability, Android example apps, etc.
+The Dog development team is striving to improve and enrich the gateway day by day, and as result of this effort, several new features are currently on the way such as: integration of EnOcean devices, Philips Hue interoperability, Android example apps, etc.
 
 ## Getting Started
 * [Download](https://github.com/dog-gateway/dog/releases) the latest standalone release
