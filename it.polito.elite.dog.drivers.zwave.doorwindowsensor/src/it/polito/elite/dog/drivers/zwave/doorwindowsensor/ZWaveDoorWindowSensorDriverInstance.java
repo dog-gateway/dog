@@ -93,20 +93,20 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance
 		this.deviceNode = deviceNode;
 
 		// Read the value associated with the right CommandClass.
-		boolean bState = false;
 		CommandClasses ccEntry = instanceNode
 				.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_BINARY);
 
 		if (ccEntry != null)
-			bState = ccEntry.getLevelAsBoolean();
+		{
+			// notify open/close only if changed
+			if (changeOpenCloseState((ccEntry.getLevelAsBoolean() ? OpenCloseState.OPEN
+					: OpenCloseState.CLOSE)))
+			{
+				// notify state changed
+				this.updateStatus();
+			}
+		}
 
-		if (bState)
-			changeCurrentState(OpenCloseState.OPEN);
-		else
-			changeCurrentState(OpenCloseState.CLOSE);
-
-		// notify state changed
-		this.updateStatus();
 	}
 
 	/**
@@ -116,8 +116,12 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance
 	 * @param openCloseValue
 	 *            OpenCloseState.CLOSE or OpenCloseState.OPEN
 	 */
-	private void changeCurrentState(String openCloseValue)
+	private boolean changeOpenCloseState(String openCloseValue)
 	{
+		// the state change flag
+		boolean stateChanged = false;
+
+		// get the current state
 		String currentStateValue = "";
 		State state = currentState.getState(OpenCloseState.class
 				.getSimpleName());
@@ -131,10 +135,33 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance
 		{
 			// set the new state to open or close...
 			if (openCloseValue.equalsIgnoreCase(OpenCloseState.CLOSE))
-				notifyClose();
+			{
+				// update the state
+				OpenCloseState closeState = new OpenCloseState(
+						new CloseStateValue());
+				currentState.setState(OpenCloseState.class.getSimpleName(),
+						closeState);
+
+				notifyClose(); // notify close
+			}
 			else
-				notifyOpen();
+			{
+				// update the state
+				OpenCloseState openState = new OpenCloseState(
+						new OpenStateValue());
+				currentState.setState(OpenCloseState.class.getSimpleName(),
+						openState);
+
+				notifyOpen(); // notify open
+			}
+
+			logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+					+ " is now " + openCloseValue);
+
+			stateChanged = true;
 		}
+
+		return stateChanged;
 	}
 
 	@Override
@@ -165,36 +192,12 @@ public class ZWaveDoorWindowSensorDriverInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyOpen()
 	{
-		// update the state
-		OpenCloseState openState = new OpenCloseState(new OpenStateValue());
-		currentState.setState(OpenCloseState.class.getSimpleName(), openState);
-
-		logger.log(
-				LogService.LOG_DEBUG,
-				"Device "
-						+ device.getDeviceId()
-						+ " is now "
-						+ ((OpenCloseState) openState).getCurrentStateValue()[0]
-								.getValue());
-
 		((DoorSensor) device).notifyOpen();
 	}
 
 	@Override
 	public void notifyClose()
 	{
-		// update the state
-		OpenCloseState closeState = new OpenCloseState(new CloseStateValue());
-		currentState.setState(OpenCloseState.class.getSimpleName(), closeState);
-
-		logger.log(
-				LogService.LOG_DEBUG,
-				"Device "
-						+ device.getDeviceId()
-						+ " is now "
-						+ ((OpenCloseState) closeState).getCurrentStateValue()[0]
-								.getValue());
-
 		((DoorSensor) device).notifyClose();
 	}
 

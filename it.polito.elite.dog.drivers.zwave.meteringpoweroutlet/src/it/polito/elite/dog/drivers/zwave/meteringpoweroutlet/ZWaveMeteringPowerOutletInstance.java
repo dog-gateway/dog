@@ -106,12 +106,22 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 		// initialize the state
 		this.currentState.setState(OnOffState.class.getSimpleName(),
 				new OnOffState(new OffStateValue()));
+
+		// initialize the energy state value
+		ActiveEnergyStateValue energyStateValue = new ActiveEnergyStateValue();
+		energyStateValue.setValue(DecimalMeasure.valueOf("0.0 "
+				+ SI.KILO(SI.WATT.times(NonSI.HOUR)).toString()));
 		this.currentState.setState(
 				SinglePhaseActiveEnergyState.class.getSimpleName(),
-				new SinglePhaseActiveEnergyState(new ActiveEnergyStateValue()));
-		this.currentState.setState(SinglePhaseActivePowerMeasurementState.class
-				.getSimpleName(), new SinglePhaseActivePowerMeasurementState(
-				new ActivePowerStateValue()));
+				new SinglePhaseActiveEnergyState(energyStateValue));
+
+		// initialize the power state value
+		ActivePowerStateValue powerStateValue = new ActivePowerStateValue();
+		powerStateValue.setValue(DecimalMeasure.valueOf("0.0 "
+				+ SI.WATT.toString()));
+		this.currentState.setState(
+				SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
+				new SinglePhaseActivePowerMeasurementState(powerStateValue));
 
 		// get the initial state of the device
 		Runnable worker = new Runnable()
@@ -217,6 +227,12 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 		CommandClasses ccElectricityEntry = instanceNode.getCommandClasses()
 				.get(ZWaveAPI.COMMAND_CLASS_METER);
 
+		// the energy updated flag
+		boolean energyUpdated = false;
+
+		// the power updated flag
+		boolean powerUpdated = false;
+
 		// Check if it is a real new value or if it is an old one. We can use
 		// one of the cc available
 		DataElemObject instance0 = ccElectricityEntry.get("0");
@@ -228,6 +244,7 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 			// first time we only save update time, no more
 			if (lastUpdateTime == 0)
 				lastUpdateTime = updateTime;
+
 			else if (lastUpdateTime < updateTime)
 			{
 				// update last update time
@@ -238,54 +255,22 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 				DataElemObject energyEntry = ccElectricityEntry.get("0");
 				if (energyEntry != null)
 				{
-					double activeEnergy = Double.valueOf(energyEntry
-							.getDataElemValue("val").toString());
+					this.changeActiveEnergyState(Double.valueOf(energyEntry
+							.getDataElemValue("val").toString()));
+					
+					energyUpdated = true;
 
-					// build the energy measure
-					DecimalMeasure<?> value = DecimalMeasure
-							.valueOf(activeEnergy
-									+ " "
-									+ SI.KILO(SI.WATT.times(NonSI.HOUR))
-											.toString());
-
-					// update the state
-					ActiveEnergyStateValue pValue = new ActiveEnergyStateValue();
-					pValue.setValue(value);
-					currentState.setState(
-							SinglePhaseActiveEnergyState.class.getSimpleName(),
-							new SinglePhaseActiveEnergyState(pValue));
-
-					// debug
-					logger.log(LogService.LOG_DEBUG,
-							"Device " + device.getDeviceId()
-									+ " active energy " + value.toString());
-
-					this.notifyNewActiveEnergyValue(value);
 				}
 
 				// handle power data if available
 				DataElemObject powerEntry = ccElectricityEntry.get("2");
 				if (powerEntry != null)
 				{
-					double activePower = Double.valueOf(powerEntry
-							.getDataElemValue("val").toString());
+					this.changeActivePowerState(Double.valueOf(powerEntry
+							.getDataElemValue("val").toString()));
 					
-					//build the power measure
-					DecimalMeasure<?> powerValue = DecimalMeasure
-							.valueOf(activePower + " " + SI.WATT.toString());
-					
-					// update the state
-					ActivePowerStateValue pValue = new ActivePowerStateValue();
-					pValue.setValue(powerValue);
-					currentState.setState(
-							SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
-							new SinglePhaseActivePowerMeasurementState(pValue));
+					powerUpdated = true;
 
-					// debug
-					logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-							+ " active power " + powerValue.toString());
-					
-					this.notifyNewActivePowerValue(powerValue);
 				}
 			}
 
@@ -293,16 +278,76 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 			int nLevel = 0;
 			CommandClasses ccEntryOnOff = instanceNode.getCommandClasses().get(
 					ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY);
+
 			if (ccEntryOnOff != null)
 				nLevel = ccEntryOnOff.getLevelAsInt();
 
-			if (nLevel > 0)
-				this.changeCurrentState(OnOffState.ON);
-			else
-				this.changeCurrentState(OnOffState.OFF);
+			// update the on/off state
+			boolean onoffChanged = this
+					.changeOnOffState((nLevel > 0) ? OnOffState.ON
+							: OnOffState.OFF);
 
-			this.updateStatus();
+			if (onoffChanged || energyUpdated || powerUpdated)
+				this.updateStatus();
 		}
+	}
+
+	/**
+	 * Manages the power state update (only updates if the current state value
+	 * is different from the given one)
+	 * 
+	 * @param activeEnergy
+	 * @return
+	 */
+	private void changeActiveEnergyState(double activeEnergy)
+	{
+		// build the energy measure
+		DecimalMeasure<?> value = DecimalMeasure.valueOf(activeEnergy + " "
+				+ SI.KILO(SI.WATT.times(NonSI.HOUR)).toString());
+
+		// update the state
+		ActiveEnergyStateValue pValue = new ActiveEnergyStateValue();
+		pValue.setValue(value);
+		currentState.setState(
+				SinglePhaseActiveEnergyState.class.getSimpleName(),
+				new SinglePhaseActiveEnergyState(pValue));
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " active energy " + value.toString());
+
+		// notify energy change
+		this.notifyNewActiveEnergyValue(value);
+
+	}
+
+	/**
+	 * Manages the energy state update (only updates if the current state value
+	 * is different from the given one)
+	 * 
+	 * @param activePower
+	 * @return
+	 */
+	private void changeActivePowerState(double activePower)
+	{
+		// build the power measure
+		DecimalMeasure<?> powerValue = DecimalMeasure.valueOf(activePower + " "
+				+ SI.WATT.toString());
+
+		// update the state
+		ActivePowerStateValue pValue = new ActivePowerStateValue();
+		pValue.setValue(powerValue);
+		currentState.setState(
+				SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
+				new SinglePhaseActivePowerMeasurementState(pValue));
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " active power " + powerValue.toString());
+
+		// notify the state change
+		this.notifyNewActivePowerValue(powerValue);
+
 	}
 
 	/**
@@ -312,8 +357,12 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 	 * @param OnOffValue
 	 *            OnOffState.ON or OnOffState.OFF
 	 */
-	private void changeCurrentState(String OnOffValue)
+	private boolean changeOnOffState(String OnOffValue)
 	{
+		// state changed flag
+		boolean stateChanged = false;
+
+		// get the current state value
 		String currentStateValue = "";
 		State state = currentState.getState(OnOffState.class.getSimpleName());
 
@@ -343,7 +392,12 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 			// ... then set the new state for the device and throw a state
 			// changed notification
 			currentState.setState(newState.getStateName(), newState);
+
+			// state changed
+			stateChanged = true;
 		}
+
+		return stateChanged;
 	}
 
 	@Override
@@ -466,20 +520,20 @@ public class ZWaveMeteringPowerOutletInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyOn()
 	{
-		((OnOffOutput)this.device).notifyOn();
+		((OnOffOutput) this.device).notifyOn();
 
 	}
 
 	@Override
 	public void notifyOff()
 	{
-		((OnOffOutput)this.device).notifyOff();
+		((OnOffOutput) this.device).notifyOff();
 	}
 
 	@Override
 	public void updateStatus()
 	{
-		((Controllable)this.device).updateStatus();
+		((Controllable) this.device).updateStatus();
 	}
 
 }

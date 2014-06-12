@@ -123,23 +123,44 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 	 * Updates the inner state accordingly to the given State instance and
 	 * triggers a device state update
 	 * 
-	 * @param newState The new State instance to update the inner state
+	 * @param newState
+	 *            The new State instance to update the inner state
 	 */
-	private void changeState(State newState)
+	private boolean changeState(State newState)
 	{
-		// update the current state
-		this.currentState.setState(
-				DeviceAssociationState.class.getSimpleName(), newState);
+		//the state changed flag
+		boolean stateChanged = false;
+		
+		// get the current state
+		String currentStateValue = "";
+		State state = currentState.getState(DeviceAssociationState.class
+				.getSimpleName());
 
-		// debug
-		logger.log(
-				LogService.LOG_DEBUG,
-				ZWaveGatewayDriverInstance.LOG_ID + "Device "
-						+ device.getDeviceId() + " is now "
-						+ (newState).getCurrentStateValue()[0].getValue());
+		if (state != null)
+			currentStateValue = (String) state.getCurrentStateValue()[0]
+					.getValue();
 
-		// update the status
-		this.updateStatus();
+		// check that the state has changed
+		if (!currentStateValue.equals(newState.getCurrentStateValue()[0]
+				.getValue()))
+		{
+			// update the current state
+			this.currentState.setState(
+					DeviceAssociationState.class.getSimpleName(), newState);
+
+			// debug
+			logger.log(LogService.LOG_DEBUG, ZWaveGatewayDriverInstance.LOG_ID
+					+ "Device " + device.getDeviceId() + " is now "
+					+ (newState).getCurrentStateValue()[0].getValue());
+
+			// update the status
+			this.updateStatus();
+			
+			//updated the state changed flag
+			stateChanged = true;
+		}
+		
+		return stateChanged;
 	}
 
 	/**
@@ -232,8 +253,6 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 				Device newDeviceData = this.network
 						.getRawDevice(lastIncludedDeviceAtController);
 
-				// TODO: extract data for uniquely identifying the device
-
 				// build the device descriptor
 				DeviceDescriptor descriptorToAdd = this.buildDeviceDescriptor(
 						newDeviceData, lastIncludedDeviceAtController);
@@ -305,32 +324,29 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 					this.detectionEnabled = true;
 				}
 
-				this.changeState(new DeviceAssociationState(
-						new IdleStateValue()));
-				
-				//notify the current idle state
-				this.notifyIdle();
-				
+				if(this.changeState(new DeviceAssociationState(
+						new IdleStateValue())))
+					// notify the current idle state
+					this.notifyIdle();
+
 				break;
 			}
 			case 1: // associating
 			{
-				this.changeState(new DeviceAssociationState(
-						new AssociatingStateValue()));
-				
-				//notify the current associating state
-				this.notifyAssociating();
+				if(this.changeState(new DeviceAssociationState(
+						new AssociatingStateValue())))
+					// notify the current associating state
+					this.notifyAssociating();
 
 				break;
 			}
 			case 5: // disassociating
 			{
-				this.changeState(new DeviceAssociationState(
-						new DisassociatingStateValue()));
-				
-				//notify the current disassociating state
-				this.notifyDisassociating();
-				
+				if(this.changeState(new DeviceAssociationState(
+						new DisassociatingStateValue())))
+					// notify the current disassociating state
+					this.notifyDisassociating();
+
 				break;
 			}
 			default:
@@ -561,19 +577,19 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 	@Override
 	public void notifyAssociating()
 	{
-		((ZWaveGateway)this.device).notifyAssociating();
+		((ZWaveGateway) this.device).notifyAssociating();
 	}
 
 	@Override
 	public void notifyDisassociating()
 	{
-		((ZWaveGateway)this.device).notifyDisassociating();
+		((ZWaveGateway) this.device).notifyDisassociating();
 	}
-	
+
 	@Override
 	public void notifyIdle()
 	{
-		((ZWaveGateway)this.device).notifyIdle();
+		((ZWaveGateway) this.device).notifyIdle();
 	}
 
 	@Override
@@ -583,5 +599,4 @@ public class ZWaveGatewayDriverInstance extends ZWaveDriverInstance implements
 		((Controllable) this.device).updateStatus();
 	}
 
-	
 }

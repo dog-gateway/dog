@@ -100,35 +100,17 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 		this.deviceNode = deviceNode;
 
 		// Read the value associated with the right CommandClass.
-		int nLevel = 0;
 		CommandClasses ccEntry = instanceNode
 				.getCommandClass(ZWaveAPI.COMMAND_CLASS_SWITCH_BINARY);
 
 		// Check if it is a real new value or if it is an old one
 		if (ccEntry != null)
 		{
-			// update last update time
-			lastUpdateTime = ccEntry.getLevelUpdateTime();
-			nFailedUpdate = 0;
 
-			if (ccEntry != null)
-				nLevel = ccEntry.getLevelAsInt();
+			if (changeOnOffState((ccEntry.getLevelAsInt() > 0) ? OnOffState.ON
+					: OnOffState.OFF))
+				this.updateStatus();
 
-			if (nLevel > 0)
-			{
-				changeCurrentState(OnOffState.ON);
-			
-				//notify on
-				this.notifyOn();
-			}
-			else
-			{
-				changeCurrentState(OnOffState.OFF);
-				
-				//notify off
-				this.notifyOff();
-			}
-			this.updateStatus();
 		}
 	}
 
@@ -139,8 +121,12 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	 * @param OnOffValue
 	 *            OnOffState.ON or OnOffState.OFF
 	 */
-	private void changeCurrentState(String OnOffValue)
+	private boolean changeOnOffState(String OnOffValue)
 	{
+		// state changed flag
+		boolean stateChanged = false;
+
+		// get the current state
 		String currentStateValue = "";
 		State state = currentState.getState(OnOffState.class.getSimpleName());
 
@@ -156,14 +142,25 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 			if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
 			{
 				newState = new OnOffState(new OnStateValue());
+
+				// notify on
+				this.notifyOn();
 			}
 			else
 			{
 				newState = new OnOffState(new OffStateValue());
+
+				// notify off
+				this.notifyOff();
 			}
 			// ... then set the new state for the device and throw a state
 			currentState.setState(newState.getStateName(), newState);
+
+			// state changed
+			stateChanged = true;
 		}
+
+		return stateChanged;
 	}
 
 	@Override
@@ -190,8 +187,8 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	{
 		// Store the given scene id
 		this.scenes.add(sceneNumber);
-		
-		//notify
+
+		// notify
 		this.notifyStoredScene(sceneNumber);
 	}
 
@@ -200,8 +197,8 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	{
 		// Remove the given scene id
 		this.scenes.remove(sceneNumber);
-		
-		//notify
+
+		// notify
 		this.notifyDeletedScene(sceneNumber);
 	}
 
@@ -210,8 +207,8 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	{
 		// remove the given group id
 		this.groups.remove(groupID);
-		
-		//notify
+
+		// notify
 		this.notifyLeftGroup(groupID);
 	}
 
@@ -220,7 +217,7 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	{
 		// Store the given group id
 		this.groups.add(groupID);
-		
+
 		this.notifyJoinedGroup(groupID);
 	}
 
@@ -228,7 +225,7 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	public void notifyStoredScene(Integer sceneNumber)
 	{
 		// send the store scene notification
-		((OnOffOutput)this.device).notifyStoredScene(sceneNumber);
+		((OnOffOutput) this.device).notifyStoredScene(sceneNumber);
 
 	}
 
@@ -236,7 +233,7 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	public void notifyDeletedScene(Integer sceneNumber)
 	{
 		// send the delete scene notification
-		((OnOffOutput)this.device).notifyDeletedScene(sceneNumber);
+		((OnOffOutput) this.device).notifyDeletedScene(sceneNumber);
 
 	}
 
@@ -244,7 +241,7 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	public void notifyJoinedGroup(Integer groupNumber)
 	{
 		// send the joined group notification
-		((OnOffOutput)this.device).notifyJoinedGroup(groupNumber);
+		((OnOffOutput) this.device).notifyJoinedGroup(groupNumber);
 
 	}
 
@@ -252,7 +249,7 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	public void notifyLeftGroup(Integer groupNumber)
 	{
 		// send the left group notification
-		((OnOffOutput)this.device).notifyLeftGroup(groupNumber);
+		((OnOffOutput) this.device).notifyLeftGroup(groupNumber);
 
 	}
 
@@ -302,11 +299,11 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyOn()
 	{
-		if(this.device instanceof Lamp)
+		if (this.device instanceof Lamp)
 		{
 			((Lamp) this.device).notifyOn();
 		}
-		else if(this.device instanceof Buzzer)
+		else if (this.device instanceof Buzzer)
 		{
 			((Buzzer) this.device).notifyOn();
 		}
@@ -317,11 +314,11 @@ public class ZWaveOnOffDeviceDriverInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyOff()
 	{
-		if(this.device instanceof Lamp)
+		if (this.device instanceof Lamp)
 		{
 			((Lamp) this.device).notifyOff();
 		}
-		else if(this.device instanceof Buzzer)
+		else if (this.device instanceof Buzzer)
 		{
 			((Buzzer) this.device).notifyOff();
 		}

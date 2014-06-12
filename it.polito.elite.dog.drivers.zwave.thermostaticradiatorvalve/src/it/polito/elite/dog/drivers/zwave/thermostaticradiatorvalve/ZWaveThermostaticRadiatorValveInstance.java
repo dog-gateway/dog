@@ -158,7 +158,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 
 		// notify the change
 		this.notifyChangedDailyClimateSchedule(daySchedule);
-		
+
 		// update the status
 		this.updateStatus();
 
@@ -194,7 +194,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 
 		// notify the change
 		this.notifyChangedWeeklyClimateSchedule(dailySchedules);
-		
+
 		// update the status
 		this.updateStatus();
 
@@ -254,8 +254,8 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			network.write(nodeInfo.getDeviceNodeId(), instanceId,
 					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
 							+ ThermostatMode.MODE_COOL);
-		
-		//notify
+
+		// notify
 		this.notifyCool();
 
 	}
@@ -268,8 +268,8 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			network.write(nodeInfo.getDeviceNodeId(), instanceId,
 					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
 							+ ThermostatMode.MODE_OFF);
-		
-		//notify
+
+		// notify
 		this.notifyStoppedHeatingOrCooling();
 
 	}
@@ -297,8 +297,8 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			network.write(nodeInfo.getDeviceNodeId(), instanceId,
 					ZWaveAPI.COMMAND_CLASS_THERMOSTAT_MODE, ""
 							+ ThermostatMode.MODE_HEAT);
-		
-		//notify
+
+		// notify
 		this.notifyHeat();
 
 	}
@@ -334,40 +334,45 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 				{
 					// update the last update time
 					this.lastUpdateTime = globalUpdateTime;
+
+					// read the current set point
+					double setPoint = ((Number) thermostatCC
+							.getCommandClassesData().getAllData().get("1")
+							.getDataElemValue(CommandClassesData.FIELD_VAL))
+							.doubleValue();
+
+					// read the current unit of measure
+					String unitOfMeasure = (String) thermostatCC
+							.getCommandClassesData()
+							.getAllData()
+							.get("1")
+							.getDataElemValue(
+									CommandClassesData.FIELD_SCALESTRING);
+
+					// trim the scale string
+					unitOfMeasure = unitOfMeasure.replace("grd", "");
+					unitOfMeasure = unitOfMeasure.trim();
+
+					// convert to a decimal measure
+					DecimalMeasure<?> setPointTemperature = DecimalMeasure
+							.valueOf(setPoint + " " + unitOfMeasure);
+
+					TemperatureStateValue setPointStateValue = new TemperatureStateValue();
+					setPointStateValue.setValue(setPointTemperature);
+					TemperatureState setPointState = new TemperatureState(
+							setPointStateValue);
+
+					// update the inner set point state
+					this.currentState.setState(
+							TemperatureState.class.getSimpleName(),
+							setPointState);
+
+					// notify the temperature change
+					this.notifyChangedDesiredTemperatureSetting(setPointTemperature);
+
+					// notify the new state
+					this.updateStatus();
 				}
-				// read the current set point
-				double setPoint = ((Number) thermostatCC
-						.getCommandClassesData().getAllData().get("1")
-						.getDataElemValue(CommandClassesData.FIELD_VAL))
-						.doubleValue();
-
-				// read the current unit of measure
-				String unitOfMeasure = (String) thermostatCC
-						.getCommandClassesData().getAllData().get("1")
-						.getDataElemValue(CommandClassesData.FIELD_SCALESTRING);
-
-				// trim the scale string
-				unitOfMeasure = unitOfMeasure.replace("grd", "");
-				unitOfMeasure = unitOfMeasure.trim();
-
-				// convert to a decimal measure
-				DecimalMeasure<?> setPointTemperature = DecimalMeasure
-						.valueOf(setPoint + " " + unitOfMeasure);
-
-				TemperatureStateValue setPointStateValue = new TemperatureStateValue();
-				setPointStateValue.setValue(setPointTemperature);
-				TemperatureState setPointState = new TemperatureState(
-						setPointStateValue);
-
-				// update the inner set point state
-				this.currentState.setState(
-						TemperatureState.class.getSimpleName(), setPointState);
-
-				// notify the temperature change
-				this.notifyChangedDesiredTemperatureSetting(setPointTemperature);
-
-				// notify the new state
-				this.updateStatus();
 
 			}
 
