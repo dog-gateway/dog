@@ -1,5 +1,5 @@
 # [The Dog Gateway](http://dog-gateway.github.io)
-[![DOI]https://zenodo.org/badge/doi/10.5281/zenodo.10144.png](https://zenodo.org/record/10144)
+[![DOI]https://zenodo.org/record/10144](https://zenodo.org/badge/doi/10.5281/zenodo.10144.png)
 
 The Dog Gateway (Dog, for friends!) is an OSGi compliant implementation of a smart environment gateway and IoT platform featuring multi-protocol capabilities, REST-based application APIs, Uniform device representation, Rule-based activations, Realtime data elaboration (with complex event processing technologies), Xively integration (to enable social sharing of consumptions and activations), etc.
 
@@ -10,7 +10,7 @@ The Dog Gateway development team is striving to improve and enrich the gateway d
 * Read about its [usage and configuration](http://dog-gateway.github.io/useit.html)
 * Have a look at [who](http://dog-gateway.github.io/about.html) is currently using Dog
 * Fork [one or multiple](https://github.com/dog-gateway) bundle repositories and [Contribute](http://dog-gateway.github.io/develop.html) your own modifications
-* Have questions? Check out [@TheDogGateway on Twitter](http://twitter.com/TheDogGateway) or [contact us](http://dog-gateway.github.io/contact.html).
+* Have questions? Check out [@TheDogGateway](http://twitter.com/TheDogGateway)  on Twitter or [contact us](http://dog-gateway.github.io/contact.html).
 
 ## Diving In
 * [Build](http://dog-gateway.github.io/rest-api.html) applications using the Dog REST API
