@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/HermiT.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/owlapi-distribution-3.5.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/HermiT.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/it.polito.elite.dog.core.library.semantic/lib/HermiT.jar!/javadoc"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
