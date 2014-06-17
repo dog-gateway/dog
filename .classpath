@@ -1,28 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/jena/xercesImpl-2.7.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/jena-arq-2.10.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/jena-core-2.10.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/jena-iri-0.9.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/jcl-over-slf4j-1.6.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/commons-codec-1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/httpcore-4.2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/httpclient-4.2.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jgrapht/jgrapht-jdk1.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/aterm-java-1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-cli.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-core.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-datatypes.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-el.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-explanation.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-jena.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-modularity.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-pellint.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-query.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/pellet/pellet-rules.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/slf4j-api-1.6.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/slf4j-log4j12-1.6.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena/log4j-1.2.16.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/HermiT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/owlapi-distribution-3.5.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
