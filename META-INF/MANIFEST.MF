@@ -9,6 +9,8 @@ Export-Package: it.polito.elite.dog.core.library.semantic.util;version="2.0.0",
  org.semanticweb.owlapi.apibinding;version="3.5.0",
  org.semanticweb.owlapi.model;version="3.5.0",
  org.semanticweb.owlapi.reasoner;version="3.5.0",
- org.semanticweb.owlapi.util;version="3.5.0"
+ org.semanticweb.owlapi.util;version="3.5.0",
+ uk.ac.manchester.cs.owl.owlapi
 Bundle-ClassPath: .,
- lib/HermiT.jar
+ lib/HermiT.jar,
+ lib/xercesImpl-2.7.1.jar
