@@ -119,11 +119,11 @@ public class DogDishwasher extends AbstractDevice implements Dishwasher
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Dishwasher) this.driver).setStartTime(endTime, remainingTime, startTime);
+			((Dishwasher) this.driver).setStartTime(remainingTime, endTime, startTime);
 		}
 	}
 

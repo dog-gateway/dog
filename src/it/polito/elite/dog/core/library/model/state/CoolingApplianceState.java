@@ -59,8 +59,8 @@ public class CoolingApplianceState extends GenericApplianceState
 	public static final String FAILURE = "failure";
 	public static final String STANDBY = "standBy";
 	public static final String IDLE = "idle";
-	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
+	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
 	public static final String PROGRAMMED = "programmed";
 	public static final String OFF = "off";
@@ -121,20 +121,20 @@ public class CoolingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public CoolingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
+	public CoolingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{endprogrammedstatevalue});
+		super(new StateValue[]{programmedandwaitingtostartstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public CoolingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
+	public CoolingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{programmedandwaitingtostartstatevalue});
+		super(new StateValue[]{endprogrammedstatevalue});
 	}
 
 
@@ -195,8 +195,8 @@ public class CoolingApplianceState extends GenericApplianceState
 		this.old2NewMap.put(CoolingApplianceState.FAILURE, new FailureStateValue());
 		this.old2NewMap.put(CoolingApplianceState.STANDBY, new StandByStateValue());
 		this.old2NewMap.put(CoolingApplianceState.IDLE, new IdleStateValue());
-		this.old2NewMap.put(CoolingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(CoolingApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
+		this.old2NewMap.put(CoolingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(CoolingApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
 		this.old2NewMap.put(CoolingApplianceState.PROGRAMMED, new ProgrammedStateValue());
 		this.old2NewMap.put(CoolingApplianceState.OFF, new OffStateValue());

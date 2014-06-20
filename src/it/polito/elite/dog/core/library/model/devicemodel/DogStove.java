@@ -95,11 +95,11 @@ public class DogStove extends AbstractDevice implements Stove
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Stove) this.driver).setStartTime(endTime, remainingTime, startTime);
+			((Stove) this.driver).setStartTime(remainingTime, endTime, startTime);
 		}
 	}
 

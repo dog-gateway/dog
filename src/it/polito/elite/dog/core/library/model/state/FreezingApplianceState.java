@@ -59,8 +59,8 @@ public class FreezingApplianceState extends GenericApplianceState
 	public static final String STANDBY = "standBy";
 	public static final String IDLE = "idle";
 	public static final String SUPERFREEZING = "superFreezing";
-	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
+	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
 	public static final String PROGRAMMED = "programmed";
 	public static final String OFF = "off";
@@ -121,20 +121,20 @@ public class FreezingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public FreezingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
+	public FreezingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{endprogrammedstatevalue});
+		super(new StateValue[]{programmedandwaitingtostartstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public FreezingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
+	public FreezingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{programmedandwaitingtostartstatevalue});
+		super(new StateValue[]{endprogrammedstatevalue});
 	}
 
 
@@ -195,8 +195,8 @@ public class FreezingApplianceState extends GenericApplianceState
 		this.old2NewMap.put(FreezingApplianceState.STANDBY, new StandByStateValue());
 		this.old2NewMap.put(FreezingApplianceState.IDLE, new IdleStateValue());
 		this.old2NewMap.put(FreezingApplianceState.SUPERFREEZING, new SuperFreezingStateValue());
-		this.old2NewMap.put(FreezingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(FreezingApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
+		this.old2NewMap.put(FreezingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(FreezingApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
 		this.old2NewMap.put(FreezingApplianceState.PROGRAMMED, new ProgrammedStateValue());
 		this.old2NewMap.put(FreezingApplianceState.OFF, new OffStateValue());

@@ -52,10 +52,10 @@ public interface AirConditioningSystem extends HVACSystem
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
 	/*Notification: CoolNotification*/
 	public void notifyCool();
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: HeatNotification*/
 	public void notifyHeat();
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: StopHeatingCoolingNotification*/

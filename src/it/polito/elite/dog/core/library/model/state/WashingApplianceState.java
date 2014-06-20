@@ -59,8 +59,8 @@ public class WashingApplianceState extends GenericApplianceState
 	public static final String STANDBY = "standBy";
 	public static final String RINSEHOLD = "rinseHold";
 	public static final String IDLE = "idle";
-	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
+	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
 	public static final String PROGRAMMED = "programmed";
 	public static final String OFF = "off";
@@ -121,20 +121,20 @@ public class WashingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public WashingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
+	public WashingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{endprogrammedstatevalue});
+		super(new StateValue[]{programmedandwaitingtostartstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public WashingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
+	public WashingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{programmedandwaitingtostartstatevalue});
+		super(new StateValue[]{endprogrammedstatevalue});
 	}
 
 
@@ -195,8 +195,8 @@ public class WashingApplianceState extends GenericApplianceState
 		this.old2NewMap.put(WashingApplianceState.STANDBY, new StandByStateValue());
 		this.old2NewMap.put(WashingApplianceState.RINSEHOLD, new RinseHoldStateValue());
 		this.old2NewMap.put(WashingApplianceState.IDLE, new IdleStateValue());
-		this.old2NewMap.put(WashingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(WashingApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
+		this.old2NewMap.put(WashingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(WashingApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
 		this.old2NewMap.put(WashingApplianceState.PROGRAMMED, new ProgrammedStateValue());
 		this.old2NewMap.put(WashingApplianceState.OFF, new OffStateValue());
