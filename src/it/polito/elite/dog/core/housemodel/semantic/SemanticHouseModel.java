@@ -270,6 +270,11 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(XMLConfigWorker);
 		executor.shutdown();
+	}
+	
+	public void addModel(OWLOntology ontModel2, DefaultPrefixManager prefixes2)
+	{
+		// TODO Auto-generated method stub
 		
 	}
 	

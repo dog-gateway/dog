@@ -154,7 +154,7 @@ public class ThreadedModelLoader implements Runnable
 			}
 			case LOAD_MERGE:
 			{
-				// TODO fill
+				this.houseModelInstance.addModel(this.ontModel, this.prefixes);
 				break;
 			}
 			default:
