@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  * 
- * Copyright (c) 2009-2014 Dario Bonino, Luigi De Russis and Emiliano Castellina
+ * Copyright (c) 2009-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,11 @@ package it.polito.elite.dog.core.housemodel.semantic;
 
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.housemodel.semantic.api.OntologyModel;
-import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedDeviceAdder;
-import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedDeviceRemover;
+import it.polito.elite.dog.core.housemodel.semantic.loader.LoadingModes;
 import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedModelLoader;
-import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedModelLoader.LoadingModes;
-import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedModelLoader.ModelTypes;
-import it.polito.elite.dog.core.housemodel.semantic.query.SPARQLQueryWrapper;
-import it.polito.elite.dog.core.housemodel.semantic.util.DogOnt2XMLDog;
+import it.polito.elite.dog.core.housemodel.semantic.owl.model.ControllableModel;
+import it.polito.elite.dog.core.housemodel.semantic.util.DogOnt2JAXB;
+import it.polito.elite.dog.core.housemodel.semantic.util.OWLWrapper;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
 import it.polito.elite.dog.core.library.jaxb.Configparam;
@@ -46,20 +44,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
-
-import com.hp.hpl.jena.ontology.OntModel;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 /**
  * <p>
@@ -84,33 +81,25 @@ import com.hp.hpl.jena.ontology.OntModel;
  */
 public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedService
 {
-	// the private reference to the service registration object
+	// the private reference to the service registration objects
 	private ServiceRegistration<?> srHouseModel;
 	private ServiceRegistration<?> srOntModel;
 	
 	// the internal reference to the context
 	private BundleContext context;
+	// the logger
+	private LogHelper logger;
+	
 	// the DogOnt instance SVG footprint
 	private String homeSVGFootprint;
 	
-	// the current Jena model used by the bundle
+	// the OWL API models and prefixes used
 	private OntologyDescriptorSet ontoDescSet;
-	private OntModel reasonedOntModel;
-	private OntModel plainOntModel;
-	
-	// the map of currently added models
-	private HashMap<String, OntModel> modelsInUse;
-	private HashMap<String, Map<String, String>> namespacesInUse;
-	// the internal namespace map
-	private Map<String, String> namespaces;
-	// the entry point namespace for the current base model
-	private String entryPoint;
-	
-	// the query wrapper used to wrap SPARQL queries on to method calls
-	private SPARQLQueryWrapper qWrapper;
-	
-	// the logger
-	private LogHelper logger;
+	private OWLOntology ontModel;
+	private DefaultPrefixManager prefixes;
+	// an OWL wrapper to prepare needed information for extracting and managing
+	// data
+	private OWLWrapper owlwrapper;
 	
 	// the XML configuration (for external communication and for describing a
 	// device)
@@ -127,20 +116,16 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	}
 	
 	/**
-	 * Activate this component
+	 * Activate this bundle
 	 * 
 	 * @param bundleContext
-	 *            the bundle context
+	 *            the OSGi bundle context
 	 */
 	public void activate(BundleContext bundleContext)
 	{
 		// init
 		this.context = bundleContext;
 		this.logger = new LogHelper(bundleContext);
-		
-		// prepare the maps for handling modular ontology models
-		this.modelsInUse = new HashMap<String, OntModel>();
-		this.namespacesInUse = new HashMap<String, Map<String, String>>();
 		
 		this.homeSVGFootprint = "no map loaded";
 	}
@@ -150,41 +135,19 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	 */
 	public void deactivate()
 	{
-		// unregister services
-		this.unRegister();
-		
 		// set everything to null
 		this.context = null;
 		this.logger = null;
-		this.modelsInUse = null;
-		this.namespacesInUse = null;
 		this.homeSVGFootprint = null;
-		
-		this.srHouseModel = null;
-		this.srOntModel = null;
 	}
 	
-	/**
-	 * Unregister its services from OSGi framework
-	 */
-	public void unRegister()
-	{
-		if (this.srHouseModel != null)
-		{
-			this.srHouseModel.unregister();
-		}
-		
-		if (this.srOntModel != null)
-		{
-			this.srOntModel.unregister();
-		}
-	}
-	
-	/**
-	 * Listen for the configuration and start the ontology loading...
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
 	 */
 	@Override
-	public void updated(Dictionary<String, ?> properties)
+	public void updated(Dictionary<String, ?> properties) throws ConfigurationException
 	{
 		if (properties != null)
 		{
@@ -206,10 +169,12 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 				{
 					// create a new loader Thread pointing at the bundle context
 					ThreadedModelLoader loader = new ThreadedModelLoader(this);
-					loader.setModelToLoad(ontoDescSet, LoadingModes.LOAD_REPLACE, ModelTypes.REASONED_WITH_PELLET);
+					loader.setModelToLoad(ontoDescSet, LoadingModes.LOAD_REPLACE);
 					
 					// start loading data...
-					loader.start();
+					ExecutorService executor = Executors.newSingleThreadExecutor();
+					executor.execute(loader);
+					executor.shutdown();
 				}
 			}
 			
@@ -218,7 +183,6 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 				// load the SVG plan
 				this.homeSVGFootprint = this.filetoString(svgFileName);
 			}
-			
 		}
 	}
 	
@@ -240,128 +204,73 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	}
 	
 	/**
-	 * @return the SVG footprint
+	 * Unregister the bundle services from OSGi framework
 	 */
-	public String getSVGPlan()
+	public void unRegister()
 	{
-		return this.homeSVGFootprint;
+		if (this.srHouseModel != null)
+		{
+			this.srHouseModel.unregister();
+		}
+		
+		if (this.srOntModel != null)
+		{
+			this.srOntModel.unregister();
+		}
 	}
 	
 	/**
-	 * @return the logger
-	 */
-	public LogHelper getLogger()
-	{
-		return logger;
-	}
-	
-	/**
-	 * @return the namespaces
-	 */
-	public synchronized Map<String, String> getNamespaces()
-	{
-		return namespaces;
-	}
-	
-	/**
-	 * @return the qWrapper
-	 */
-	public synchronized SPARQLQueryWrapper getQWrapper()
-	{
-		return qWrapper;
-	}
-	
-	/**
-	 * @return the entryPoint
-	 */
-	public synchronized String getEntryPoint()
-	{
-		return entryPoint;
-	}
-	
-	/**
-	 * When called, stores the given Jena OntModel in the instance variable
-	 * named dogontModel and if the driver is still not registered with the
-	 * framework registers the driver as available...
+	 * Store the given {@link OWLOntology} model in the relative instance
+	 * variable, init OWL-related information, generates the JAXB representation
+	 * of the ontology (for creating {@link DeviceDescriptor}s and for external
+	 * services), and register the bundle in the OSGi framework
 	 * 
-	 * @param model
-	 *            the model on which the driver will work
+	 * @param loadedModel
+	 *            a {@link OWLOntology} to load
+	 * @param prefixManager
+	 *            a {@link DefaultPrefixManager} storing the prefixes and
+	 *            namespaces read from the Ontology Descriptor file
 	 */
-	public synchronized void setModel(OntModel plainModel, OntModel reasonedModel, Map<String, String> namespace,
-			String entrypoint)
+	public void setModel(OWLOntology loadedModel, DefaultPrefixManager prefixManager)
 	{
-		this.reasonedOntModel = reasonedModel;
-		this.plainOntModel = plainModel;
-		this.namespaces = namespace;
-		this.entryPoint = entrypoint;
+		this.ontModel = loadedModel;
+		this.prefixes = prefixManager;
+		// create the OWL wrapper that add all the needed prefixes and init the
+		// reasoner
+		this.owlwrapper = new OWLWrapper(loadedModel, prefixes);
 		
-		// create the query wrapper object
-		this.qWrapper = new SPARQLQueryWrapper(this.getNamespaces(), this.reasonedOntModel);
-		
-		this.logger.log(LogService.LOG_INFO, "Loaded the dogont ontology");
-		
-		// extract the xml-representation needed to answer queries from external
+		// extract the XML representation needed to answer queries from external
 		// applications
-		
 		Runnable XMLConfigWorker = new Runnable() {
 			
 			@Override
 			public void run()
 			{
-				try
-				{
-					logger.log(LogService.LOG_DEBUG, "Computing JAXB configuration...");
-					
-					// create the XML translator
-					DogOnt2XMLDog toXMLTranslator = new DogOnt2XMLDog(reasonedOntModel, namespaces, entryPoint);
-					// get the JAXB configuration
-					xmlConfiguration = toXMLTranslator.getJAXBXMLDog();
-					
-					// create the JAXB object representing the device list without their
-					// network-related properties
-					createSimpleDevicesRepresentation();
-					
-					// finish!
-					logger.log(LogService.LOG_DEBUG, "Generated JAXB configuration.");
-				}
-				catch (Exception e)
-				{
-					logger.log(LogService.LOG_ERROR, "Error while translating the ontology to JAXBXML ", e);
-				}
+				logger.log(LogService.LOG_DEBUG, "Computing JAXB configuration...");
+				
+				// create the XML translator
+				DogOnt2JAXB toXMLTranslator = new DogOnt2JAXB(owlwrapper);
+				// get the JAXB configuration
+				xmlConfiguration = toXMLTranslator.getJAXBXMLDog();
+				
+				// finish!
+				logger.log(LogService.LOG_DEBUG, "The JAXB configuration has been successfully generated!");
+				
+				// create the JAXB object representing the device list without
+				// their
+				// network-related properties
+				createSimpleDevicesRepresentation();
 				
 				// register the services provided by the bundle
 				registerServices();
 			}
 		};
 		
-		// start the thread worker
-		Thread threadXMLConfigWorker = new Thread(XMLConfigWorker);
-		threadXMLConfigWorker.start();
-	}
-	
-	/**
-	 * 
-	 * @param model
-	 * @param namespaces
-	 */
-	public synchronized void addModel(OntModel model, Map<String, String> namespaces, String entryPoint)
-	{
-		// really experimental implementation
-		// TODO: check if this way of working is correct and efficient... (may
-		// be not)
-		System.err.println("Entry Point " + entryPoint);
-		// ok first let's store a reference to the model in the modelsInUse
-		this.modelsInUse.put(entryPoint, model);
+		// start the thread executor
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		executor.execute(XMLConfigWorker);
+		executor.shutdown();
 		
-		// second, add the model as a sub model of the current one (do not know
-		// if it works)
-		this.plainOntModel.addSubModel(model);
-		this.reasonedOntModel.addSubModel(model); // Adding model to the reason
-													// model
-		
-		// third, add the new namespaces and keep track of them...
-		this.namespacesInUse.put(entryPoint, namespaces);
-		this.getNamespaces().putAll(namespaces);
 	}
 	
 	/**
@@ -467,101 +376,193 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		
 	}
 	
-	/*********************************************************************************
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * HouseModel service - implemented methods
-	 * 
-	 ********************************************************************************/
-	
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.semantic.api.OntologyModel#getModel()
+	 */
 	@Override
-	public Vector<DeviceDescriptor> getConfiguration()
+	public OWLOntology getModel()
 	{
-		return this.getDeviceConfig(null);
+		return this.ontModel;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.semantic.api.OntologyModel#loadAndMerge
+	 * (it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet)
+	 */
+	@Override
+	public void loadAndMerge(OntologyDescriptorSet setToLoad)
+	{
+		// TODO Check if it works
+		// set the model to merge
+		ThreadedModelLoader loader = new ThreadedModelLoader(this);
+		loader.setModelToLoad(setToLoad, LoadingModes.LOAD_MERGE);
+		
+		// start the thread executor
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		executor.execute(loader);
+		executor.shutdown();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.semantic.api.OntologyModel#remove
+	 * (java.util.Set)
+	 */
+	@Override
+	public void remove(Set<String> modelsToRemove)
+	{
+		// TODO Complete!
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#updateConfiguration
+	 * (java.util.Vector)
+	 */
+	@Override
+	public void updateConfiguration(Vector<DeviceDescriptor> updatedDescriptors)
+	{
+		for (DeviceDescriptor descriptor : updatedDescriptors)
+		{
+			this.updateConfiguration(descriptor);
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#updateConfiguration
+	 * (it.polito.elite.dog.core.library.model.DeviceDescriptor)
+	 */
+	@Override
+	public void updateConfiguration(DeviceDescriptor updatedDescriptor)
+	{
+		this.removeDeviceImpl(updatedDescriptor.getDeviceURI());
+		
+		this.addNewDeviceImpl(updatedDescriptor);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#addToConfiguration
+	 * (java.util.Vector)
+	 */
+	@Override
+	public void addToConfiguration(Vector<DeviceDescriptor> newDescriptors)
+	{
+		for (DeviceDescriptor dd : newDescriptors)
+		{
+			this.addToConfiguration(dd);
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#addToConfiguration
+	 * (it.polito.elite.dog.core.library.model.DeviceDescriptor)
+	 */
+	@Override
+	public void addToConfiguration(DeviceDescriptor newDescriptor)
+	{
+		this.addNewDeviceImpl(newDescriptor);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#removeFromConfiguration
+	 * (java.util.Set)
+	 */
+	@Override
+	public void removeFromConfiguration(Set<String> deviceURIs)
+	{
+		for (String device : deviceURIs)
+		{
+			this.removeFromConfiguration(device);
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#removeFromConfiguration
+	 * (java.lang.String)
+	 */
+	@Override
+	public void removeFromConfiguration(String deviceURI)
+	{
+		this.removeDeviceImpl(deviceURI);
 	}
 	
 	/**
-	 * <p>
-	 * Gets the device configurations in the property format defined by dog and
-	 * obtained through the {@link DogDeviceDescription} object (by calling the
-	 * {@link asDogDeviceConfigurationP()) method. Conditions might be given
-	 * restricting the set of devices for which configurations must be provided
 	 * 
-	 * 
-	 * back. They are given as an {@link Hashtable} of maximum 2 {@link HashSet}
-	 * <{@link String}>. This sets are respectively referenced by the keys:
-	 * {@link DogDeviceConstants.DEVICEURI} and
-	 * {@link DogDeviceConstants.DEVICE_CATEGORY}.
-	 * </p>
-	 * <p>
-	 * The first set includes a detailed list of devices (URIs) that must be
-	 * included in the extracted configurations, the second, instead, specifies
-	 * a list of device categories (descending from dogOnt:Controllable) whose
-	 * instances must be included in the extracted configurations. If both sets
-	 * are present at the same time, the set union between the two conditions is
-	 * performed returning the configurations of all devices listed in the first
-	 * set and of all the instances of the categories reported in the second
-	 * set, avoiding duplication.
-	 * 
-	 * @param condition
-	 *            The conditions
-	 * @return The device configurations in the DOG property format
+	 * @param deviceDescriptor
 	 */
-	private Vector<DeviceDescriptor> getDeviceConfig(Hashtable<String, HashSet<String>> condition)
+	private void addNewDeviceImpl(DeviceDescriptor deviceDescriptor)
+	{
+		// TODO Complete!
+	}
+	
+	/**
+	 * 
+	 * @param deviceURI
+	 */
+	private void removeDeviceImpl(String deviceURI)
+	{
+		// TODO Complete!
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#getConfiguration()
+	 */
+	@Override
+	public Vector<DeviceDescriptor> getConfiguration()
+	{
+		return this.getConfigDevice();
+	}
+	
+	/**
+	 * Implementation of the getConfiguration() method. It gets the list of
+	 * devices from the model to retrieve their information like a set of
+	 * {@link DeviceDescriptor}.
+	 * 
+	 * @return a list of {@link DeviceDescriptor}, containing devices
+	 *         information
+	 */
+	private Vector<DeviceDescriptor> getConfigDevice()
 	{
 		// prepare the device description object
 		Vector<DeviceDescriptor> configs = new Vector<DeviceDescriptor>();
 		
-		// the device list
-		Set<String> devList = new HashSet<String>();
-		
-		// check the condition
-		if ((condition != null) && (!condition.isEmpty()))
-		{
-			// check the directly specified URIs
-			Set<String> conditions = condition.get(DeviceCostants.DEVICEURI);
-			
-			if (conditions != null)
-			{
-				for (String cCond : conditions)
-				{
-					cCond = this.qWrapper.checkAndRepairDogOntNameSpace(cCond);
-					devList.add(cCond);
-				}
-			}
-			
-			// check the device categories
-			conditions = condition.get(DeviceCostants.DEVICE_CATEGORY);
-			
-			// if not null, must extract the set of classes descending from the
-			// given device categories
-			if (conditions != null)
-			{
-				Set<String> devices = this.qWrapper.getCategoryFilteredControllableInstances(conditions);
-				
-				// load all to the device list and convert it in short form
-				for (String devURI : devices)
-				{
-					devList.add(this.qWrapper.toShortForm(devURI));
-				}
-			}
-		}
-		else
-		{
-			// get all controllables...
-			Set<String> devices = this.qWrapper.getAllControllableInstances();
-			
-			// convert it in short form
-			for (String devURI : devices)
-			{
-				devList.add(this.qWrapper.toShortForm(devURI));
-			}
-		}
+		ControllableModel cModel = new ControllableModel(owlwrapper);
+		// get all controllables...
+		Set<String> devices = cModel.getAllControllableInstances();
 		
 		if (this.xmlConfiguration != null)
 		{
 			for (Device dev : this.xmlConfiguration.getControllables().get(0).getDevice())
 			{
-				if (devList.contains(dev.getId()))
+				if (devices.contains(dev.getId()))
 				{
 					configs.add(new DeviceDescriptor(dev));
 				}
@@ -571,79 +572,12 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		return configs;
 	}
 	
-	@Override
-	public void updateConfiguration(Vector<DeviceDescriptor> updatedDescriptors)
-	{
-		for (DeviceDescriptor descriptor : updatedDescriptors)
-		{
-			this.updateConfiguration(descriptor);
-		}
-		
-	}
-	
-	@Override
-	public void updateConfiguration(DeviceDescriptor updatedDescriptor)
-	{
-		this.removeDeviceImpl(updatedDescriptor.getDeviceURI());
-		
-		this.addNewDeviceImpl(updatedDescriptor);
-		
-	}
-	
-	@Override
-	public void addToConfiguration(Vector<DeviceDescriptor> newDescriptors)
-	{
-		for (DeviceDescriptor dd : newDescriptors)
-		{
-			this.addToConfiguration(dd);
-		}
-		
-	}
-	
-	@Override
-	public void addToConfiguration(DeviceDescriptor newDescriptor)
-	{
-		this.addNewDeviceImpl(newDescriptor);
-		
-	}
-	
-	@Override
-	public void removeFromConfiguration(Set<String> deviceURIs)
-	{
-		for (String device : deviceURIs)
-		{
-			this.removeFromConfiguration(device);
-		}
-		
-	}
-	
-	@Override
-	public void removeFromConfiguration(String deviceURI)
-	{
-		this.removeDeviceImpl(deviceURI);
-	}
-	
-	private void addNewDeviceImpl(DeviceDescriptor deviceDescriptor)
-	{
-		// log the addition request
-		this.logger.log(LogService.LOG_INFO, "Received request to add: " + deviceDescriptor.getDeviceURI());
-		
-		// create and launch the device addition thread
-		ThreadedDeviceAdder devAdder = new ThreadedDeviceAdder(deviceDescriptor, this.reasonedOntModel,
-				this.plainOntModel, this);
-		devAdder.run();
-	}
-	
-	private void removeDeviceImpl(String deviceURI)
-	{
-		this.logger.log(LogService.LOG_INFO, "Received request to remove: " + deviceURI);
-		
-		// create and launch the device removal thread
-		ThreadedDeviceRemover devRemover = new ThreadedDeviceRemover(deviceURI, this.reasonedOntModel,
-				this.plainOntModel, this);
-		devRemover.start();
-	}
-	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#getJAXBConfiguration()
+	 */
 	@Override
 	public DogHomeConfiguration getJAXBConfiguration()
 	{
@@ -652,6 +586,22 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		return this.xmlConfiguration;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.polito.elite.dog.core.housemodel.api.HouseModel#getDevices()
+	 */
+	@Override
+	public List<Controllables> getDevices()
+	{
+		return this.xmlConfiguration.getControllables();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.polito.elite.dog.core.housemodel.api.HouseModel#getJAXBDevices()
+	 */
 	@Override
 	public List<Controllables> getJAXBDevices()
 	{
@@ -667,106 +617,26 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		return devices;
 	}
 	
-	@Override
-	public List<Controllables> getDevices()
-	{
-		return this.xmlConfiguration.getControllables();
-	}
-	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.core.housemodel.api.HouseModel#getSimpleDevices()
+	 */
 	@Override
 	public List<Controllables> getSimpleDevices()
 	{
 		return this.simpleDevicesConfiguration;
 	}
 	
-	/*********************************************************************************
+	/**
+	 * Get the logger
 	 * 
-	 * OntologyModel service - implemented methods
-	 * 
-	 ********************************************************************************/
-	
-	@Override
-	public OntModel getModel()
+	 * @return the logger
+	 */
+	public LogHelper getLogger()
 	{
-		return this.reasonedOntModel;
-	}
-	
-	@Override
-	public void loadAndMerge(OntologyDescriptorSet setToLoad)
-	{
-		this.loadAndMergeImpl(setToLoad);
-	}
-	
-	@Override
-	public void remove(Set<String> modelsToRemove)
-	{
-		this.removeImpl(modelsToRemove);
-	}
-	
-	private void loadAndMergeImpl(OntologyDescriptorSet setToLoad)
-	{
-		// call a threaded model loader in merge mode
-		ThreadedModelLoader loader = new ThreadedModelLoader(this);
-		loader.setModelToLoad(setToLoad, LoadingModes.LOAD_MERGE, ModelTypes.PLAIN_IN_MEMORY); // to
-																								// check
-																								// if
-																								// plain
-																								// is
-																								// sufficient
-		
-		// start loading data...
-		loader.start();
-	}
-	
-	// TODO: if too intensive it must be moved to a separated worker thread...
-	private synchronized void removeImpl(Set<String> modelsToRemove)
-	{
-		OntModel cOntModel;
-		Map<String, String> cNamespaces;
-		
-		// first remove the model if in Use
-		for (String cModel : modelsToRemove)
-		{
-			System.err.println(cModel);
-			// get the corresponding OntModel
-			cOntModel = this.modelsInUse.get(cModel);
-			
-			// if it exists, remove it from the currently used model
-			if (cOntModel != null)
-			{
-				this.reasonedOntModel.remove(cOntModel);
-				// this.dogontModel.removeSubModel(cOntModel);
-				this.reasonedOntModel.write(System.out);
-			}
-			
-			// remove the model
-			this.modelsInUse.remove(cModel);
-			
-			// get the namespaces associated to this model and
-			cNamespaces = this.namespacesInUse.get(cModel);
-			
-			// remove them from the list of used namespaces
-			if (cNamespaces != null)
-			{
-				for (String namespace : cNamespaces.keySet())
-				{
-					this.getNamespaces().remove(namespace);
-				}
-			}
-			
-			// remove the namespace entry
-			this.namespacesInUse.remove(cModel);
-			
-		}
-		
-		// restore the list of still valid namespaces
-		for (Map<String, String> oNamespaces : this.namespacesInUse.values())
-		{
-			this.getNamespaces().putAll(oNamespaces);
-		}
-		
-		this.logger.log(LogService.LOG_INFO, "Loading the Reset Model");
-		
+		return logger;
 	}
 	
 	/*********************************************************************************

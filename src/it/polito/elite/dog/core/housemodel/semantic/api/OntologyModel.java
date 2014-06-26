@@ -19,10 +19,9 @@ package it.polito.elite.dog.core.housemodel.semantic.api;
 
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLOntology;
+
 import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
-
-import com.hp.hpl.jena.ontology.OntModel;
-
 
 /**
  * An interface defining the minimum set of functionalities required by a core
@@ -40,19 +39,20 @@ import com.hp.hpl.jena.ontology.OntModel;
 public interface OntologyModel
 {
 	/**
-	 * Provides a pointer (class reference) to the Jena OntModel kept by the
-	 * class implementing this interface, it is used to support modularity of
-	 * modeling concerns in the Semantic House Model bundles (core+extensions)
+	 * Provides a pointer (class reference) to the OWL API {@link OWLOntology} kept by
+	 * the class implementing this interface, it is used to support modularity
+	 * of modeling concerns in the Semantic House Model bundles
+	 * (core+extensions)
 	 * 
 	 */
-	public OntModel getModel();
+	public OWLOntology getModel();
 	
 	/**
 	 * Requires the class implementing this interface to update the inner model
 	 * by loading and merging the model whose location is specified in the
 	 * message parameter
 	 * 
-	 * @param 
+	 * @param
 	 */
 	public void loadAndMerge(OntologyDescriptorSet setToLoad);
 	
@@ -60,7 +60,7 @@ public interface OntologyModel
 	 * Requires the class implementing this interface to remove from the inner
 	 * model the model whose namespace is specified in the message paremeter
 	 * 
-	 * @param 
+	 * @param
 	 */
 	public void remove(Set<String> modelsToRemove);
 }
