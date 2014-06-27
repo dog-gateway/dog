@@ -21,8 +21,6 @@ import it.polito.elite.dog.drivers.zwave.model.zway.json.ZWaveModelTree;
 
 import java.io.IOException;
 
-//import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -32,26 +30,19 @@ import javax.ws.rs.core.Response.Status;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.glassfish.jersey.internal.util.Base64;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
 
-public class ConnessionManager {
+public class ConnessionManager
+{
 	// the log identifier, unique for the class
 	public static String LOG_ID = "[ZWaveConnessionManager]: ";
-
-	// the logger
-	private LogService logger;
 
 	public static final String DATA_PATH = "/ZWaveAPI/Data";
 	public static final String RUN_PATH = "/ZWaveAPI/Run";
 	private static ConnessionManager connessionManager = null;
 
 	protected String sURL;
-	protected String sUser;
-	protected String sPassword;
-	protected String authToken;
 
 	protected Client client;
 	protected WebTarget service;
@@ -69,46 +60,12 @@ public class ConnessionManager {
 	// last update
 	long lastUpdate = 0;
 
-	private ConnessionManager(String sURL, String sUser, String sPassword,
-			BundleContext bundleContext) {
+	private ConnessionManager(String sURL, BundleContext bundleContext)
+	{
 		this.sURL = sURL;
-		this.sUser = sUser;
-		this.sPassword = sPassword;
-		this.authToken = this.getAuthToken();
 
-		// SSL manage
-		/*
-		 * HostnameVerifier hv = new javax.net.ssl.HostnameVerifier() {
-		 * 
-		 * public boolean verify(String hostname, javax.net.ssl.SSLSession
-		 * sslSession) { if (hostname.equals("z-cloud.z-wave.me")) { return
-		 * true; } return false; } };
-		 */
-
-		SSLContext ctx = null;
-		try {
-			ctx = SSLContext.getInstance("SSL");
-			ctx.init(null, null, null);
-		} catch (Exception e1) {
-			logger.log(LogService.LOG_ERROR, LOG_ID, e1);
-		}
-
-		/*
-		 * ClientConfig clientConfig = new DefaultClientConfig();
-		 * //clientConfig.
-		 * getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
-		 * Boolean.TRUE);
-		 * //clientConfig.getProperties().put(ClientConfig.PROPERTY_FOLLOW_REDIRECTS
-		 * , true); clientConfig.getClasses().add(JacksonJsonProvider.class);
-		 * try { clientConfig.getProperties().put(HTTPSProperties.
-		 * PROPERTY_HTTPS_PROPERTIES, new HTTPSProperties(hv,ctx)); } catch
-		 * (Exception e) { logger.log(LogService.LOG_ERROR, LOG_ID, e); }
-		 * 
-		 * 
-		 * client = Client.create(clientConfig);
-		 */
-		client = ClientBuilder.newBuilder().sslContext(ctx)
-				.register(JacksonFeature.class).build();
+		client = ClientBuilder.newBuilder().register(JacksonFeature.class)
+				.build();
 		service = client.target(sURL);
 	}
 
@@ -117,7 +74,8 @@ public class ConnessionManager {
 	 * 
 	 * @return ConnessionManager, may be null
 	 */
-	public static ConnessionManager get() {
+	public static ConnessionManager get()
+	{
 		return connessionManager;
 	}
 
@@ -131,29 +89,16 @@ public class ConnessionManager {
 	 * @param sPassword
 	 * @return ConnessionManager
 	 */
-	public static ConnessionManager get(String sURL, String sUser,
-			String sPassword, BundleContext bundleContext) {
+	public static ConnessionManager get(String sURL, BundleContext bundleContext)
+	{
 		// create a new instance if needed, or returns the current one
 		if (connessionManager == null
-				|| !sURL.equals(connessionManager.getURL())
-				|| !sUser.equals(connessionManager.getUser())
-				|| !sPassword.equals(connessionManager.getPassword()))
-			connessionManager = new ConnessionManager(sURL, sUser, sPassword,
+				|| !sURL.equals(connessionManager.getURL()))
+
+			connessionManager = new ConnessionManager(sURL,// sUser, sPassword,
 					bundleContext);
 
 		return connessionManager;
-	}
-
-	/**
-	 * Test the current configuration with a broadcast ping. Call getLastError()
-	 * to discover causes of fail
-	 * 
-	 * @return true if succeeded, false otherwise.
-	 */
-	public boolean testConnection() {
-		// devices[255] is the broadcast
-		// return sendCommandBoolean("devices[255].SendNoOperation()");
-		return true;
 	}
 
 	/**
@@ -168,37 +113,46 @@ public class ConnessionManager {
 	 * @throws Exception
 	 * 
 	 */
-	public ZWaveModelTree updateDevices(long lSince) throws Exception {
+	public ZWaveModelTree updateDevices(long lSince) throws Exception
+	{
 		Response response = service.path(DATA_PATH)
 				.path(String.valueOf(lSince))
 				.request(MediaType.APPLICATION_JSON_TYPE)
-				.header("Authorization", "Basic " + getAuthToken()).post(null); // post
-																				// is
-																				// mandatory
+				.post(null); // post
+								// is
+								// mandatory
 
-		if (response.getStatus() == Status.OK.getStatusCode()) {
+		if (response.getStatus() == Status.OK.getStatusCode())
+		{
 			String json = response.readEntity(String.class);
 
 			// Convert JSON to Java object
-			try {
+			try
+			{
 				// in this case we process the whole data
-				if (zWaveModelTree == null || lSince == 0) {
+				if (zWaveModelTree == null || lSince == 0)
+				{
 					// System.out.println(json);//use
 					// http://jsoneditoronline.org/ for a friendly UI
 					zWaveModelTree = mapper.readValue(json,
 							ZWaveModelTree.class);
 					zWaveTree = mapper.readTree(json);
-				} else
+				}
+				else
 				// otherwise we proceed to update the tree
 				{
 					zWaveModelTree = JsonUpdate.updateModel(mapper, zWaveTree,
 							json);// devices.26.instances.0.commandClasses.49.data.1.val
 				}
-			} catch (IOException e) {
+			}
+			catch (IOException e)
+			{
 				e.printStackTrace();
 				throw e;
 			}
-		} else {
+		}
+		else
+		{
 			throw new Exception("Can't read json from Z-Way server: "
 					+ response.toString());
 		}
@@ -213,7 +167,8 @@ public class ConnessionManager {
 	 * @return ZWaveModelTree representing the full system
 	 * @throws Exception
 	 */
-	public ZWaveModelTree updateDevices() throws Exception {
+	public ZWaveModelTree updateDevices() throws Exception
+	{
 		updateDevices(lastUpdate);
 		// Update time of the last update
 		lastUpdate = zWaveModelTree.getUpdateTime();
@@ -227,12 +182,16 @@ public class ConnessionManager {
 	 * @return if client response status is ok returns true, otherwise false.
 	 *         Call getLastError() to discover causes of fail
 	 */
-	protected boolean sendCommandBoolean(String sCommand) {
+	protected boolean sendCommandBoolean(String sCommand)
+	{
 		boolean bSuccess = true;
 
-		try {
+		try
+		{
 			sendCommand(sCommand);
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			bSuccess = false;
 			sLastError = e.getMessage();
 		}
@@ -240,49 +199,39 @@ public class ConnessionManager {
 		return bSuccess;
 	}
 
-	public String sendCommand(String sCommand) throws Exception {
+	public String sendCommand(String sCommand) throws Exception
+	{
 		String jsonResponse = null;
 
 		Response response = service.path(RUN_PATH).path(sCommand)
-				//
-				.request(MediaType.APPLICATION_JSON_TYPE)
-				.header("Authorization", "Basic " + this.authToken).post(null); // post
-																				// obbligatoria
+		//
+				.request(MediaType.APPLICATION_JSON_TYPE).post(null); // post
 
-		if (response.getStatus() == Status.OK.getStatusCode()) {
+		if (response.getStatus() == Status.OK.getStatusCode())
+		{
 			jsonResponse = response.readEntity(String.class);
-		} else {
-			throw new Exception(
-					"Can't read json from Z-Way server: " + response.toString());
+		}
+		else
+		{
+			throw new Exception("Can't read json from Z-Way server: "
+					+ response.toString());
 		}
 
 		return jsonResponse;
 	}
 
-	public String pingDevice(String sNodeId) throws Exception {
+	public String pingDevice(String sNodeId) throws Exception
+	{
 		return sendCommand("devices[" + sNodeId + "].SendNoOperation()");
 	}
 
-	// TODO: metodo di autenticazione debole. Non esistono alternative?
-	private String getAuthToken() {
-		byte[] btToken = Base64.encode((this.getUser() + ":" + getPassword())
-				.getBytes());
-		return new String(btToken);
-	}
-
-	public String getURL() {
+	public String getURL()
+	{
 		return sURL;
 	}
 
-	public String getUser() {
-		return sUser;
-	}
-
-	public String getPassword() {
-		return sPassword;
-	}
-
-	public String getLastError() {
+	public String getLastError()
+	{
 		return sLastError;
 	}
 }
