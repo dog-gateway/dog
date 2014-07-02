@@ -56,10 +56,10 @@ public interface EnergyMeteringPowerOutlet extends SinglePhaseEnergyMeter, Mains
 	public void notifyDeletedScene(Integer sceneNumber);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: SinglePhaseReactiveEnergyMeasurementNotification*/
 	public void notifyNewReactiveEnergyValue(Measure<?,?>  value);
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: SinglePhaseActiveEnergyMeasurementNotification*/
 	public void notifyNewActiveEnergyValue(Measure<?,?>  value);
 	/*Notification: OffNotification*/

@@ -95,11 +95,11 @@ public class DogWhiteGoods extends AbstractDevice implements WhiteGoods
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((WhiteGoods) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((WhiteGoods) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 

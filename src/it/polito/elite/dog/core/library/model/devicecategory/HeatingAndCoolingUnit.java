@@ -82,10 +82,10 @@ public interface HeatingAndCoolingUnit extends Control, HVACSystem
 	public void notifyStoredScene(Integer sceneNumber);
 	/*Notification: SpeedStepDownNotification*/
 	public void notifySpeedDown();
-	/*Notification: HeatNotification*/
-	public void notifyHeat();
 	/*Notification: OnNotification*/
 	public void notifyOn();
+	/*Notification: HeatNotification*/
+	public void notifyHeat();
 	/*Notification: SpeedControlNotification*/
 	public void notifyChangedSpeed(Measure<?,?>  newSpeed);
 	/*Notification: StopHeatingCoolingNotification*/
