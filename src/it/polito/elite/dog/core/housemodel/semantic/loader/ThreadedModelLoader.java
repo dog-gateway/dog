@@ -18,8 +18,8 @@
 package it.polito.elite.dog.core.housemodel.semantic.loader;
 
 import it.polito.elite.dog.core.housemodel.semantic.SemanticHouseModel;
-import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptor;
-import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
+import it.polito.elite.dog.core.library.semantic.Ontologies;
+import it.polito.elite.dog.core.library.semantic.Ontology;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.File;
@@ -83,45 +83,46 @@ public class ThreadedModelLoader implements Runnable
 	 * @param loadingMode
 	 *            the requested loading mode
 	 */
-	public synchronized void setModelToLoad(OntologyDescriptorSet models, LoadingModes loadingMode)
+	public synchronized void setModelToLoad(Ontologies models, LoadingModes loadingMode)
 	{
 		this.loadingMode = loadingMode;
 		
-		// get the entry point, i.e., the ontology that imports all the other
-		// ontologies in the set
-		OntologyDescriptor entryDesc = models.getEntryPoint();
+		// get the entry point, i.e., the ontology that imports all the
+		// other ontologies in the set
+		Ontology entryDesc = models.getEntryPoint();
 		
 		// the file object to check that the local copies actually exist
 		File fCheck = null;
 		
-		for (OntologyDescriptor model : models)
+		for (Ontology model : models.getOntology())
 		{
-			if (!model.getLocalCopy().isEmpty())
+			if (!model.getSrc().isEmpty())
 			{
 				// local copy
-				fCheck = new File(model.getLocalCopy());
+				fCheck = new File(model.getSrc());
 				if (!fCheck.isAbsolute())
-					fCheck = new File(System.getProperty("configFolder", ".") + "/" + model.getLocalCopy());
+					fCheck = new File(System.getProperty("configFolder", ".") + "/" + model.getSrc());
 				
 				// check the file existence
 				if (fCheck.exists())
 				{
 					// use the local copy
-					this.manager.addIRIMapper(new SimpleIRIMapper(IRI.create(model.getURL()), IRI.create(fCheck)));
+					this.manager.addIRIMapper(new SimpleIRIMapper(IRI.create(model.getHref()), IRI.create(fCheck)));
 					
 					// debug
 					logger.log(LogService.LOG_DEBUG,
-							"loaded: " + model.getURL() + "\n\tfrom local copy " + model.getLocalCopy()
-									+ "\n\twith namespace " + model.getNamespacePrefix());
+							"loaded: " + model.getHref() + "\n\tfrom local copy " + model.getSrc()
+									+ "\n\twith namespace " + model.getNamespace());
 				}
 			}
 			
 			// store all the ontologies prefixes and namespaces
-			this.prefixes.setPrefix(model.getNamespacePrefix().toLowerCase() + ":", model.getURL() + "#");
+			this.prefixes.setPrefix(model.getNamespace().toLowerCase() + ":", model.getHref() + "#");
 		}
 		
 		// set the entry point ontology URI
-		this.modelToLoad = entryDesc.getURL();
+		this.modelToLoad = entryDesc.getHref();
+		
 	}
 	
 	@Override

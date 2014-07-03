@@ -35,10 +35,11 @@ import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
-import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
+import it.polito.elite.dog.core.library.semantic.Ontologies;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -50,13 +51,24 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
+import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
+import org.semanticweb.owlapi.util.OWLOntologyMerger;
 
 /**
  * <p>
@@ -94,25 +106,25 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	private String homeSVGFootprint;
 	
 	// the OWL API models and prefixes used
-	private OntologyDescriptorSet ontoDescSet;
+	private Ontologies ontoDescSet;
 	private OWLOntology ontModel;
 	private DefaultPrefixManager prefixes;
 	// an OWL wrapper to prepare needed information for extracting and managing
 	// data
-	private OWLWrapper owlwrapper;
+	private OWLWrapper owlWrapper;
 	
 	// the XML configuration (for external communication and for describing a
 	// device)
 	private DogHomeConfiguration xmlConfiguration;
 	// the JAXB representation of the devices without network-related info
 	private List<Controllables> simpleDevicesConfiguration;
+	private JAXBContext jaxbContext;
 	
 	/**
 	 * Default (empty) constructor
 	 */
 	public SemanticHouseModel()
 	{
-		
 	}
 	
 	/**
@@ -159,13 +171,27 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 				// log the update data received
 				this.logger.log(LogService.LOG_INFO, "Received ontology configuration...");
 				
-				// get the XMLString representing the model set to load
-				String ontoDescSetAsString = this.filetoString(ontologyFileName);
+				try
+				{
+					this.jaxbContext = JAXBContext.newInstance(Ontologies.class.getPackage().getName());
+					
+					Unmarshaller unmarshaller = this.jaxbContext.createUnmarshaller();
+					
+					// check absolute vs relative
+					File xmlFile = new File(ontologyFileName);
+					if (!xmlFile.isAbsolute())
+						ontologyFileName = System.getProperty("configFolder") + "/" + ontologyFileName;
+					
+					// unmarshall
+					this.ontoDescSet = (unmarshaller.unmarshal(new StreamSource(ontologyFileName), Ontologies.class))
+							.getValue();	
+				}
+				catch (JAXBException e)
+				{
+					this.logger.log(LogService.LOG_ERROR, "JAXB Error", e);
+				}
 				
-				// parse the set
-				this.ontoDescSet = OntologyDescriptorSet.parse(ontoDescSetAsString);
-				
-				if ((ontoDescSet != null) && (!ontoDescSet.isEmpty()))
+				if ((ontoDescSet != null) && (!ontoDescSet.getOntology().isEmpty()))
 				{
 					// create a new loader Thread pointing at the bundle context
 					ThreadedModelLoader loader = new ThreadedModelLoader(this);
@@ -234,10 +260,11 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	public void setModel(OWLOntology loadedModel, DefaultPrefixManager prefixManager)
 	{
 		this.ontModel = loadedModel;
-		this.prefixes = prefixManager;
 		// create the OWL wrapper that add all the needed prefixes and init the
 		// reasoner
-		this.owlwrapper = new OWLWrapper(loadedModel, prefixes);
+		this.owlWrapper = new OWLWrapper(loadedModel, prefixManager);
+		// get the complete prefixes
+		this.prefixes = this.owlWrapper.getPrefixManager();
 		
 		// extract the XML representation needed to answer queries from external
 		// applications
@@ -249,7 +276,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 				logger.log(LogService.LOG_DEBUG, "Computing JAXB configuration...");
 				
 				// create the XML translator
-				DogOnt2JAXB toXMLTranslator = new DogOnt2JAXB(owlwrapper);
+				DogOnt2JAXB toXMLTranslator = new DogOnt2JAXB(owlWrapper);
 				// get the JAXB configuration
 				xmlConfiguration = toXMLTranslator.getJAXBXMLDog();
 				
@@ -272,10 +299,42 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		executor.shutdown();
 	}
 	
-	public void addModel(OWLOntology ontModel2, DefaultPrefixManager prefixes2)
+	// TODO Check if it is needed to merge or it is sufficient to replace
+	// simplehome, since the new ontology imports simplehome
+	public void addModel(OWLOntology modelToAdd, DefaultPrefixManager prefixesToAdd)
 	{
-		// TODO Auto-generated method stub
-		
+		OWLOntologyManager man = this.ontModel.getOWLOntologyManager();
+		try
+		{
+			man.loadOntology(modelToAdd.getOntologyID().getOntologyIRI());
+			
+			OWLOntologyMerger merger = new OWLOntologyMerger(man);
+			
+			// TODO Check how to revert in case of exceptions
+			this.ontModel = merger.createMergedOntology(man,
+					IRI.create("http://elite.polito.it/ontologies/mergedOntologies"));
+			this.owlWrapper = new OWLWrapper(ontModel, prefixesToAdd);
+			this.prefixes = this.owlWrapper.getPrefixManager();
+			
+		}
+		catch (OWLOntologyCreationException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.logger.log(LogService.LOG_INFO, "Merged ontology: "
+				+ this.ontModel.getOntologyID().getDefaultDocumentIRI() + " [" + this.ontModel.getAxiomCount()
+				+ " axioms]");
+		try
+		{
+			man.saveOntology(this.ontModel, new RDFXMLOntologyFormat(),
+					IRI.create("file:/home/luigi/Desktop/mergedont.owl"));
+		}
+		catch (OWLOntologyStorageException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -401,7 +460,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	 * (it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet)
 	 */
 	@Override
-	public void loadAndMerge(OntologyDescriptorSet setToLoad)
+	public void loadAndMerge(Ontologies setToLoad)
 	{
 		// TODO Check if it works
 		// set the model to merge
@@ -559,7 +618,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		// prepare the device description object
 		Vector<DeviceDescriptor> configs = new Vector<DeviceDescriptor>();
 		
-		ControllableModel cModel = new ControllableModel(owlwrapper);
+		ControllableModel cModel = new ControllableModel(owlWrapper);
 		// get all controllables...
 		Set<String> devices = cModel.getAllControllableInstances();
 		

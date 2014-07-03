@@ -27,6 +27,7 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
+
 /**
  * The OWL Wrapper class init all the needed structures and build all the needed
  * information to successfully handle DogOnt-related ontologies.

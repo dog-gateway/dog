@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import it.polito.elite.dog.core.library.semantic.util.OntologyDescriptorSet;
+import it.polito.elite.dog.core.library.semantic.Ontologies;
 
 /**
  * An interface defining the minimum set of functionalities required by a core
@@ -54,7 +54,7 @@ public interface OntologyModel
 	 * 
 	 * @param
 	 */
-	public void loadAndMerge(OntologyDescriptorSet setToLoad);
+	public void loadAndMerge(Ontologies setToLoad);
 	
 	/**
 	 * Requires the class implementing this interface to remove from the inner
