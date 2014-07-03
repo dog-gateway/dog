@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://elite.polito.it/ontologyDescriptorSet" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ontdesc="http://elite.polito.it/ontologyDescriptorSet">
+
+    <complexType name="ontology">
+    	<attribute name="namespace" type="ID"></attribute>
+    	<attribute name="href" type="anyURI"></attribute>
+    	<attribute name="src" type="anyURI"></attribute>
+    </complexType>
+
+    <complexType name="ontologies">
+    	<sequence>
+    		<element name="ontology" type="ontdesc:ontology" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    	<attribute name="entryPoint" type="IDREF"></attribute>
+    </complexType>
+
+    <element name="ontologies" type="ontdesc:ontologies"></element>
+</schema>
