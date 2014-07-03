@@ -35,7 +35,7 @@ import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
-import it.polito.elite.dog.core.library.semantic.Ontologies;
+import it.polito.elite.dog.core.library.semantic.xml.Ontologies;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.BufferedReader;

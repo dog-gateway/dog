@@ -18,8 +18,8 @@
 package it.polito.elite.dog.core.housemodel.semantic.loader;
 
 import it.polito.elite.dog.core.housemodel.semantic.SemanticHouseModel;
-import it.polito.elite.dog.core.library.semantic.Ontologies;
-import it.polito.elite.dog.core.library.semantic.Ontology;
+import it.polito.elite.dog.core.library.semantic.xml.Ontologies;
+import it.polito.elite.dog.core.library.semantic.xml.Ontology;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.io.File;

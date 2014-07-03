@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import it.polito.elite.dog.core.library.semantic.Ontologies;
+import it.polito.elite.dog.core.library.semantic.xml.Ontologies;
 
 /**
  * An interface defining the minimum set of functionalities required by a core
