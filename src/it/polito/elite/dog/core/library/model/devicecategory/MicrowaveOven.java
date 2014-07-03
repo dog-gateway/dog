@@ -41,7 +41,7 @@ public interface MicrowaveOven extends Oven
 	public Measure<?,?>  getEndTime();
 	public void on();
 	public void stopSuperHeating();
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
 	public void off();
 	public Measure<?,?>  getRemainingTime();
 	public void startSuperHeating();
@@ -69,24 +69,24 @@ public interface MicrowaveOven extends Oven
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop();
 	/*Notification: StoppedSuperHeatingNotification*/
 	public void notifyStoppedSuperHeating();
-	/*Notification: StartTimeChangedNotification*/
-	public void notifyChangedStartTime(Measure<?,?>  startTime);
 	/*Notification: EmittingMicrowavesNotification*/
 	public void notifyEmittingMicrowaves();
 	/*Notification: NotEmittingMicrowavesNotification*/
 	public void notifyNotEmittingMicrowaves();
+	/*Notification: StartTimeChangedNotification*/
+	public void notifyChangedStartTime(Measure<?,?>  startTime);
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause();
 	/*Notification: StartedSuperHeatingNotification*/
 	public void notifyStartedSuperHeating();
 	public void updateStatus();

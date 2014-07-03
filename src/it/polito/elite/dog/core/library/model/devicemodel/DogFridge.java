@@ -93,11 +93,11 @@ public class DogFridge extends AbstractDevice implements Fridge
 		}
 	}
 
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Fridge) this.driver).setStartTime(endTime, remainingTime, startTime);
+			((Fridge) this.driver).setStartTime(remainingTime, endTime, startTime);
 		}
 	}
 
@@ -250,13 +250,6 @@ public class DogFridge extends AbstractDevice implements Fridge
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: HeatNotification*/
-	public void notifyHeat(){
-		HeatNotification notificationEvent=new HeatNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: OnNotification*/
 	public void notifyOn(){
 		OnNotification notificationEvent=new OnNotification();
@@ -264,9 +257,9 @@ public class DogFridge extends AbstractDevice implements Fridge
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StartedSuperCoolingNotification*/
-	public void notifyStartedSuperCooling(){
-		StartedSuperCoolingNotification notificationEvent=new StartedSuperCoolingNotification();
+	/*Notification: HeatNotification*/
+	public void notifyHeat(){
+		HeatNotification notificationEvent=new HeatNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -274,6 +267,13 @@ public class DogFridge extends AbstractDevice implements Fridge
 	/*Notification: StandByNotification*/
 	public void notifyStandby(){
 		StandByNotification notificationEvent=new StandByNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: StartedSuperCoolingNotification*/
+	public void notifyStartedSuperCooling(){
+		StartedSuperCoolingNotification notificationEvent=new StartedSuperCoolingNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

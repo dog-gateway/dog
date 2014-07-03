@@ -183,16 +183,16 @@ public class DogDvd extends AbstractDevice implements Dvd
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OnNotification*/
-	public void notifyOn(){
-		OnNotification notificationEvent=new OnNotification();
+	/*Notification: PausePlaybackNotification*/
+	public void notifyPause(){
+		PausePlaybackNotification notificationEvent=new PausePlaybackNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: PausePlaybackNotification*/
-	public void notifyPause(){
-		PausePlaybackNotification notificationEvent=new PausePlaybackNotification();
+	/*Notification: OnNotification*/
+	public void notifyOn(){
+		OnNotification notificationEvent=new OnNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

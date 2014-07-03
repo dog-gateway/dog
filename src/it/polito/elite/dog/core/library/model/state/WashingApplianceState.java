@@ -22,10 +22,12 @@
 package it.polito.elite.dog.core.library.model.state;
 
 
+import it.polito.elite.dog.core.library.model.statevalue.HeatingStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.RinseHoldStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 
 
+import it.polito.elite.dog.core.library.model.statevalue.WashRinseStateValue;
 
 
 
@@ -44,6 +46,8 @@ public class WashingApplianceState extends GenericApplianceState
 	private static final long serialVersionUID = 1L;
 
 	public static final String RINSEHOLD = "rinseHold";
+	public static final String WASHORRINSE = "washOrRinse";
+	public static final String HEATING = "heating";
 
 
 	/**
@@ -55,10 +59,32 @@ public class WashingApplianceState extends GenericApplianceState
 		super(new StateValue[]{rinseholdstatevalue});
 	}
 
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public WashingApplianceState(WashRinseStateValue washrinsestatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{washrinsestatevalue});
+	}
+
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public WashingApplianceState(HeatingStateValue heatingstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{heatingstatevalue});
+	}
+
 	@Deprecated
 	private void initCommon()
 	{
 		this.old2NewMap.put(WashingApplianceState.RINSEHOLD, new RinseHoldStateValue());
+		this.old2NewMap.put(WashingApplianceState.WASHORRINSE, new WashRinseStateValue());
+		this.old2NewMap.put(WashingApplianceState.HEATING, new HeatingStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

@@ -58,10 +58,10 @@ public interface Dvd extends Entertainment
 
 	/*Notification: PlayNotification*/
 	public void notifyPlay();
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: PausePlaybackNotification*/
 	public void notifyPause();
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: ForwardNotification*/
 	public void notifyFwd();
 	/*Notification: LevelControlNotification*/

@@ -64,22 +64,24 @@ public interface HiFi extends Entertainment
 
 	/*Notification: PlayNotification*/
 	public void notifyPlay();
+	/*Notification: LevelControlNotification*/
+	public void notifyChangedLevel(Measure<?,?>  newLevel);
+	/*Notification: OffNotification*/
+	public void notifyOff();
+	/*Notification: TrackControlNotification*/
+	public void notifyChangedTrack(String trackId);
 	/*Notification: SourceSelectionNotification*/
 	public void notifyChangedSource(String sourceId);
 	/*Notification: TuningStepDownNotification*/
 	public void notifyChannelStepUp();
-	/*Notification: PausePlaybackNotification*/
-	public void notifyPause();
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: ForwardNotification*/
-	public void notifyFwd();
-	/*Notification: LevelControlNotification*/
-	public void notifyChangedLevel(Measure<?,?>  newLevel);
+	/*Notification: PausePlaybackNotification*/
+	public void notifyPause();
 	/*Notification: TuningStepUpNotification*/
 	public void notifyChannelStepDown();
-	/*Notification: OffNotification*/
-	public void notifyOff();
+	/*Notification: ForwardNotification*/
+	public void notifyFwd();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
 	/*Notification: RewindNotification*/
@@ -88,7 +90,5 @@ public interface HiFi extends Entertainment
 	public void notifyStop();
 	/*Notification: ChannelControlNotification*/
 	public void notifyChangedChannel(String channelId);
-	/*Notification: TrackControlNotification*/
-	public void notifyChangedTrack(String trackId);
 	public void updateStatus();
 }
