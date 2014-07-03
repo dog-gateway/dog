@@ -23,5 +23,5 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://elite.polito.it/ontologyDescriptorSet", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED, xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "ont", namespaceURI = "http://elite.polito.it/ontologyDescriptorSet") })
-package it.polito.elite.dog.core.library.semantic;
+package it.polito.elite.dog.core.library.semantic.xml;
 

@@ -22,7 +22,7 @@
 // Generated on: 2014.07.03 at 05:05:17 PM CEST 
 //
 
-package it.polito.elite.dog.core.library.semantic;
+package it.polito.elite.dog.core.library.semantic.xml;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
