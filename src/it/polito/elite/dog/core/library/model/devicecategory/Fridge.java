@@ -42,7 +42,7 @@ public interface Fridge extends WhiteGoods
 	public Measure<?,?>  getEndTime();
 	public void on();
 	public void stopHeatingOrCooling();
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
 	public void off();
 	public Measure<?,?>  getRemainingTime();
 	public void startSuperCooling();
@@ -57,10 +57,10 @@ public interface Fridge extends WhiteGoods
 
 	/*Notification: MultipleEventNotification*/
 	public void notifyNewEventSet(Object[] events);
-	/*Notification: EventNotification*/
-	public void notifyNewEvent(Object event);
 	/*Notification: MultipleAlertNotification*/
 	public void notifyNewAlertSet(Object[] alerts);
+	/*Notification: EventNotification*/
+	public void notifyNewEvent(Object event);
 	/*Notification: ChangedDesiredTemperatureNotification*/
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
 	/*Notification: AlertNotification*/
@@ -81,9 +81,9 @@ public interface Fridge extends WhiteGoods
 	public void notifyOn();
 	/*Notification: StartedSuperCoolingNotification*/
 	public void notifyStartedSuperCooling();
-	/*Notification: StopHeatingCoolingNotification*/
-	public void notifyStoppedHeatingOrCooling();
 	/*Notification: StoppedSuperCoolingNotification*/
 	public void notifyStoppedSuperCooling();
+	/*Notification: StopHeatingCoolingNotification*/
+	public void notifyStoppedHeatingOrCooling();
 	public void updateStatus();
 }

@@ -135,11 +135,11 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((MicrowaveOven) this.driver).setStartTime(endTime, remainingTime, startTime);
+			((MicrowaveOven) this.driver).setStartTime(remainingTime, endTime, startTime);
 		}
 	}
 
@@ -178,16 +178,16 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: EventNotification*/
-	public void notifyNewEvent(Object event){
-		EventNotification notificationEvent=new EventNotification(event );
+	/*Notification: MultipleAlertNotification*/
+	public void notifyNewAlertSet(Object[] alerts){
+		MultipleAlertNotification notificationEvent=new MultipleAlertNotification(alerts );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: MultipleAlertNotification*/
-	public void notifyNewAlertSet(Object[] alerts){
-		MultipleAlertNotification notificationEvent=new MultipleAlertNotification(alerts );
+	/*Notification: EventNotification*/
+	public void notifyNewEvent(Object event){
+		EventNotification notificationEvent=new EventNotification(event );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -234,16 +234,16 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: EmittingMicrowavesNotification*/
-	public void notifyEmittingMicrowaves(){
-		EmittingMicrowavesNotification notificationEvent=new EmittingMicrowavesNotification();
+	/*Notification: NotEmittingMicrowavesNotification*/
+	public void notifyNotEmittingMicrowaves(){
+		NotEmittingMicrowavesNotification notificationEvent=new NotEmittingMicrowavesNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: NotEmittingMicrowavesNotification*/
-	public void notifyNotEmittingMicrowaves(){
-		NotEmittingMicrowavesNotification notificationEvent=new NotEmittingMicrowavesNotification();
+	/*Notification: EmittingMicrowavesNotification*/
+	public void notifyEmittingMicrowaves(){
+		EmittingMicrowavesNotification notificationEvent=new EmittingMicrowavesNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

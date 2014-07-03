@@ -22,8 +22,8 @@
 package it.polito.elite.dog.core.library.model.state;
 
 
-import it.polito.elite.dog.core.library.model.statevalue.NotEmittingMicrowavesStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.EmittingMicrowavesStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.NotEmittingMicrowavesStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 
 
@@ -44,18 +44,8 @@ public class MicrowaveEmissionState extends DoubleValuedState
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String EMITTINGMICROWAVES = "emittingMicrowaves";
 	public static final String NOTEMITTINGMICROWAVES = "notEmittingMicrowaves";
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public MicrowaveEmissionState(EmittingMicrowavesStateValue emittingmicrowavesstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{emittingmicrowavesstatevalue});
-	}
+	public static final String EMITTINGMICROWAVES = "emittingMicrowaves";
 
 
 	/**
@@ -67,11 +57,21 @@ public class MicrowaveEmissionState extends DoubleValuedState
 		super(new StateValue[]{notemittingmicrowavesstatevalue});
 	}
 
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public MicrowaveEmissionState(EmittingMicrowavesStateValue emittingmicrowavesstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{emittingmicrowavesstatevalue});
+	}
+
 	@Deprecated
 	private void initCommon()
 	{
-		this.old2NewMap.put(MicrowaveEmissionState.EMITTINGMICROWAVES, new EmittingMicrowavesStateValue());
 		this.old2NewMap.put(MicrowaveEmissionState.NOTEMITTINGMICROWAVES, new NotEmittingMicrowavesStateValue());
+		this.old2NewMap.put(MicrowaveEmissionState.EMITTINGMICROWAVES, new EmittingMicrowavesStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

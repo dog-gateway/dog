@@ -102,16 +102,16 @@ public class DogStepShutterActuator extends AbstractDevice implements StepShutte
 
 	/*Generated Notifications*/
 
-	/*Notification: RestDownNotification*/
-	public void notifyRestingDown(){
-		RestDownNotification notificationEvent=new RestDownNotification();
+	/*Notification: RestNotification*/
+	public void notifyResting(){
+		RestNotification notificationEvent=new RestNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: RestNotification*/
-	public void notifyResting(){
-		RestNotification notificationEvent=new RestNotification();
+	/*Notification: RestDownNotification*/
+	public void notifyRestingDown(){
+		RestDownNotification notificationEvent=new RestDownNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

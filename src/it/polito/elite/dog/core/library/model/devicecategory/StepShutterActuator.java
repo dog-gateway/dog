@@ -45,10 +45,10 @@ public interface StepShutterActuator extends ShutterActuator
 
 	/*Generated Notifications*/
 
-	/*Notification: RestDownNotification*/
-	public void notifyRestingDown();
 	/*Notification: RestNotification*/
 	public void notifyResting();
+	/*Notification: RestDownNotification*/
+	public void notifyRestingDown();
 	/*Notification: RestUpNotification*/
 	public void notifyRestingUp();
 	/*Notification: MovingDownNotification*/
