@@ -31,6 +31,7 @@ import it.polito.elite.dog.core.library.model.statevalue.RunningStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgrammedStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgrammedAndWaitingToStartStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.IdleStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 
@@ -57,6 +58,7 @@ public class GenericApplianceState extends DiscreteState
 	public static final String FAILURE = "failure";
 	public static final String STANDBY = "standBy";
 	public static final String IDLE = "idle";
+	public static final String ON = "on";
 	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
 	public static final String ENDPROGRAMMED = "endProgrammed";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
@@ -103,6 +105,16 @@ public class GenericApplianceState extends DiscreteState
 	{
 		//call the super class constructor
 		super(new StateValue[]{idlestatevalue});
+	}
+
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public GenericApplianceState(OnStateValue onstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{onstatevalue});
 	}
 
 
@@ -182,6 +194,7 @@ public class GenericApplianceState extends DiscreteState
 		this.old2NewMap.put(GenericApplianceState.FAILURE, new FailureStateValue());
 		this.old2NewMap.put(GenericApplianceState.STANDBY, new StandByStateValue());
 		this.old2NewMap.put(GenericApplianceState.IDLE, new IdleStateValue());
+		this.old2NewMap.put(GenericApplianceState.ON, new OnStateValue());
 		this.old2NewMap.put(GenericApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
 		this.old2NewMap.put(GenericApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
 		this.old2NewMap.put(GenericApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
