@@ -51,7 +51,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -217,8 +216,8 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 					this.configurationPath = System.getProperty("configFolder") + "/" + this.configurationPath;
 				
 				// unmarshall
-				this.xmlConfiguration = (DogHomeConfiguration) ((JAXBElement<DogHomeConfiguration>) unmarshaller
-						.unmarshal(new StreamSource(this.configurationPath), DogHomeConfiguration.class)).getValue();
+				this.xmlConfiguration = (unmarshaller.unmarshal(new StreamSource(this.configurationPath),
+						DogHomeConfiguration.class)).getValue();
 			}
 			
 		}
