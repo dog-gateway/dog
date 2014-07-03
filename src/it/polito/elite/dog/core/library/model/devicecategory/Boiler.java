@@ -44,7 +44,8 @@ public interface Boiler extends WhiteGoods
 	public void on();
 	public void stopSuperHeating();
 	public Object[] getEventsAndAlerts();
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
+	public void standBy();
 	public void off();
 	public Measure<?,?>  getStartTime();
 
@@ -71,6 +72,8 @@ public interface Boiler extends WhiteGoods
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	/*Notification: StartedSuperHeatingNotification*/
 	public void notifyStartedSuperHeating();
 	public void updateStatus();

@@ -95,11 +95,19 @@ public class DogHotplate extends AbstractDevice implements Hotplate
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Hotplate) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((Hotplate) this.driver).setStartTime(endTime, remainingTime, startTime);
+		}
+	}
+
+	public void standBy()
+	{
+		if(this.driver!=null)
+		{
+			((Hotplate) this.driver).standBy();
 		}
 	}
 
@@ -183,6 +191,13 @@ public class DogHotplate extends AbstractDevice implements Hotplate
 	/*Notification: OffNotification*/
 	public void notifyOff(){
 		OffNotification notificationEvent=new OffNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: StandByNotification*/
+	public void notifyStandby(){
+		StandByNotification notificationEvent=new StandByNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

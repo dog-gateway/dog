@@ -45,7 +45,8 @@ public interface WashingMachine extends WhiteGoods
 	public void start();
 	public void pause();
 	public Object[] getEventsAndAlerts();
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
+	public void standBy();
 	public void off();
 	public Measure<?,?>  getStartTime();
 
@@ -72,9 +73,11 @@ public interface WashingMachine extends WhiteGoods
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	/*Notification: PauseApplianceNotification*/
 	public void notifyPause();
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop();
 	public void updateStatus();
 }

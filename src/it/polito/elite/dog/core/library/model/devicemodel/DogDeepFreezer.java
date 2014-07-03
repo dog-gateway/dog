@@ -103,11 +103,11 @@ public class DogDeepFreezer extends AbstractDevice implements DeepFreezer
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((DeepFreezer) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((DeepFreezer) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 
@@ -116,6 +116,14 @@ public class DogDeepFreezer extends AbstractDevice implements DeepFreezer
 		if(this.driver!=null)
 		{
 			((DeepFreezer) this.driver).startSuperFreezing();
+		}
+	}
+
+	public void standBy()
+	{
+		if(this.driver!=null)
+		{
+			((DeepFreezer) this.driver).standBy();
 		}
 	}
 
@@ -206,6 +214,13 @@ public class DogDeepFreezer extends AbstractDevice implements DeepFreezer
 	/*Notification: OffNotification*/
 	public void notifyOff(){
 		OffNotification notificationEvent=new OffNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: StandByNotification*/
+	public void notifyStandby(){
+		StandByNotification notificationEvent=new StandByNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

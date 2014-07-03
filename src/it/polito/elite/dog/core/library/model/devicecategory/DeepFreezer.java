@@ -43,8 +43,9 @@ public interface DeepFreezer extends WhiteGoods
 	public Measure<?,?>  getEndTime();
 	public void on();
 	public Object[] getEventsAndAlerts();
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
 	public void startSuperFreezing();
+	public void standBy();
 	public void off();
 	public Measure<?,?>  getStartTime();
 
@@ -71,6 +72,8 @@ public interface DeepFreezer extends WhiteGoods
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	/*Notification: StoppedSuperFreezingNotification*/
 	public void notifyStoppedSuperFreezing();
 	public void updateStatus();

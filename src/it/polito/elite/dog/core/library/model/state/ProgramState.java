@@ -22,6 +22,7 @@
 package it.polito.elite.dog.core.library.model.state;
 
 
+import it.polito.elite.dog.core.library.model.statevalue.NotProgrammedStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgramInterruptedStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgrammedStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ProgrammedAndWaitingToStartStateValue;
@@ -48,8 +49,9 @@ public class ProgramState extends DiscreteState
 
 	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
 	public static final String ENDPROGRAMMED = "endProgrammed";
-	public static final String PROGRAMMED = "programmed";
 	public static final String PROGRAMINTERRUPTED = "programInterrupted";
+	public static final String PROGRAMMED = "programmed";
+	public static final String NOTPROGRAMMED = "notProgrammed";
 
 
 	/**
@@ -75,6 +77,16 @@ public class ProgramState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
+	public ProgramState(ProgramInterruptedStateValue programinterruptedstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{programinterruptedstatevalue});
+	}
+
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
 	public ProgramState(ProgrammedStateValue programmedstatevalue)
 	{
 		//call the super class constructor
@@ -85,10 +97,10 @@ public class ProgramState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public ProgramState(ProgramInterruptedStateValue programinterruptedstatevalue)
+	public ProgramState(NotProgrammedStateValue notprogrammedstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{programinterruptedstatevalue});
+		super(new StateValue[]{notprogrammedstatevalue});
 	}
 
 	@Deprecated
@@ -96,8 +108,9 @@ public class ProgramState extends DiscreteState
 	{
 		this.old2NewMap.put(ProgramState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
 		this.old2NewMap.put(ProgramState.ENDPROGRAMMED, new EndProgrammedStateValue());
-		this.old2NewMap.put(ProgramState.PROGRAMMED, new ProgrammedStateValue());
 		this.old2NewMap.put(ProgramState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
+		this.old2NewMap.put(ProgramState.PROGRAMMED, new ProgrammedStateValue());
+		this.old2NewMap.put(ProgramState.NOTPROGRAMMED, new NotProgrammedStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

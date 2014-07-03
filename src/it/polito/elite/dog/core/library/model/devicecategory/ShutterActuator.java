@@ -43,10 +43,10 @@ public interface ShutterActuator extends Actuator
 
 	/*Generated Notifications*/
 
-	/*Notification: RestNotification*/
-	public void notifyResting();
 	/*Notification: RestDownNotification*/
 	public void notifyRestingDown();
+	/*Notification: RestNotification*/
+	public void notifyResting();
 	/*Notification: MovingDownNotification*/
 	public void notifyMovingDown();
 	/*Notification: RestUpNotification*/

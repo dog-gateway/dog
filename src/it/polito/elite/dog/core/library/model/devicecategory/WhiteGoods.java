@@ -42,7 +42,8 @@ public interface WhiteGoods extends Appliances
 	public Measure<?,?>  getEndTime();
 	public void on();
 	public Object[] getEventsAndAlerts();
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
+	public void standBy();
 	public void off();
 	public Measure<?,?>  getStartTime();
 
@@ -67,5 +68,7 @@ public interface WhiteGoods extends Appliances
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	public void updateStatus();
 }

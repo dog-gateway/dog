@@ -103,11 +103,19 @@ public class DogGasCooker extends AbstractDevice implements GasCooker
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((GasCooker) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((GasCooker) this.driver).setStartTime(endTime, remainingTime, startTime);
+		}
+	}
+
+	public void standBy()
+	{
+		if(this.driver!=null)
+		{
+			((GasCooker) this.driver).standBy();
 		}
 	}
 
@@ -191,6 +199,13 @@ public class DogGasCooker extends AbstractDevice implements GasCooker
 	/*Notification: OffNotification*/
 	public void notifyOff(){
 		OffNotification notificationEvent=new OffNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: StandByNotification*/
+	public void notifyStandby(){
+		StandByNotification notificationEvent=new StandByNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
