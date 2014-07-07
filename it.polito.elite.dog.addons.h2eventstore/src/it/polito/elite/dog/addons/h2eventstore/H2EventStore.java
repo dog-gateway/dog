@@ -1,7 +1,7 @@
 /*
  * Dog - Addons
  * 
- * Copyright (c) 2013-2014 Claudio Degioanni, Luigi De Russis
+ * Copyright (c) 2013-2014 Claudio Degioanni, Luigi De Russis, Dario Bonino
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,27 @@
  */
 package it.polito.elite.dog.addons.h2eventstore;
 
-import it.polito.elite.dog.addons.h2eventstore.dao.MeasureDao;
-import it.polito.elite.dog.addons.h2eventstore.dao.MeasureDaoImp;
-import it.polito.elite.dog.core.library.model.notification.EventNotification;
+import it.polito.elite.dog.addons.h2eventstore.dao.EventDaoImpl;
+import it.polito.elite.dog.addons.storage.EventDao;
+import it.polito.elite.dog.addons.storage.EventStore;
+import it.polito.elite.dog.addons.storage.EventStoreInfo;
+import it.polito.elite.dog.core.library.model.notification.Notification;
 import it.polito.elite.dog.core.library.model.notification.ParametricNotification;
+import it.polito.elite.dog.core.library.model.notification.annotation.NotificationParam;
 import it.polito.elite.dog.core.library.util.LogHelper;
-import it.polito.elite.stream.processing.addon.event.source.dog.xmlrpc.SensorDescriptor;
-import it.polito.elite.stream.processing.addon.event.source.dog.xmlrpc.xml.SensorCollectionType;
-import it.polito.elite.stream.processing.addon.event.source.dog.xmlrpc.xml.SensorData;
-import it.polito.elite.stream.processing.addon.event.source.dog.xmlrpc.xml.SourceToDeviceMappingSpecification;
-import it.polito.elite.stream.processing.events.GenericEvent;
 
-import java.io.File;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
 import javax.measure.quantity.Quantity;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.Event;
@@ -48,205 +45,337 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 
+/**
+ * <p>
+ * A class implementing a simple event store for the dog gateway. It uses a very
+ * simple event persistence schema and can either work as full or temporary
+ * storage. It also offers facilities for being loaded with historical data, and
+ * for extracting sets of stored events on demand. Data query can either be
+ * performed in read mode or in extraction mode. In read mode, data is simply
+ * read and no modification is carried on the data repository. Instead in
+ * extraction mode, data is read and extracted from the persistent repository
+ * (deleted permanently). This second mode is typically used to limit the
+ * database size on resource constrained installations.
+ * </p>
+ * 
+ * <p>
+ * Limits expressed in total number of measures can also be set, to avoid
+ * filling up available disk space in resource constrained installations.
+ * </p>
+ * 
+ * <pre>
+ * +-----------------+         generatesReal       +---------------------+
+ * |    RealEvent    +-----------------------------|        Device       |
+ * +-----------------+                             +---------------------+
+ * -id                                              -id
+ * -timestamp                                       -class
+ * -unit                                            -name
+ * -value
+ * -name
+ * -params
+ * 
+ * +-----------------+         generates           +---------------------+
+ * |      Event      +-----------------------------|        Device       |
+ * +-----------------+                             +---------------------+
+ * -id                                              -id
+ * -timestamp                                       -class
+ * -value                                            -name
+ * -name
+ * </pre>
+ * 
+ * <pre>
+ * Event(**id**,timestamp, value, name, idDevice)
+ * RealEvent(**id**,timestamp, value, name, params, idDevice)
+ * Device(**id**,class,name)
+ * </pre>
+ * 
+ * @author <a href="mailto:claudiodegio@gmail.com">Claudio Degioanni</a> (first
+ *         version)
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a> (minor
+ *         editing)
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a> (second
+ *         version)
+ * 
+ * 
+ */
 public class H2EventStore implements EventHandler, ManagedService
 {
 	// the logger
 	private LogHelper logger;
 
-	// the dao
-	private MeasureDao dao;
+	// the data access object
+	private EventDao eventDao;
 
-	// the OSGi context
+	// the OSGi bundle context used for service registration
 	private BundleContext context;
 
-	// the source definitions
-	private Hashtable<String, SensorDescriptor> sourceDefinitions;
+	// the service registration object to publish services offered by this
+	// bundle
+	private ServiceRegistration<H2EventStore> h2StorageService;
+
+	// the data store limit expressed as number of rows, initially unlimited
+	// (-1)
+	private int maxSize;
+
+	// the event retention mode: replace, drops old events in favor of newer
+	// events, drop drops incoming events.
+	private DataRetentionMode dataRetention;
+
+	// the event handling mode
+	private boolean eventHandlingEnabled;
 
 	/**
-	 * The class constructor, creates an instance of the {@link H2EventStore}
+	 * The class constructor, creates an instance of the {@link H2EventStore}.
 	 * 
 	 */
 	public H2EventStore()
 	{
-		// init everything
-		this.dao = null;
+		// initialize the inner data structures
 
-		this.sourceDefinitions = new Hashtable<String, SensorDescriptor>();
+		// default data retention mode
+		this.dataRetention = DataRetentionMode.DROP;
+
+		// default persistent storage size
+		this.maxSize = EventStoreInfo.UNLIMITED_SIZE;
+
+		// default event handling
+		this.eventHandlingEnabled = true;
 	}
 
+	/**
+	 * Code performed when the bundle is activated, attaches the log service and
+	 * performs the needed OSGi service house keeping.
+	 * 
+	 * @param context
+	 */
 	public void activate(BundleContext context)
 	{
-		// init the logger
+		// initialize the logger
 		this.logger = new LogHelper(context);
 
 		// store the context
 		this.context = context;
 
-		this.logger.log(LogService.LOG_INFO, "Activate H2 Event Store...");
-	}
-
-	public void deactivate()
-	{
-		this.logger.log(LogService.LOG_INFO, "Deactivate H2 Event Store...");
-
-		this.logger = null;
-	}
-
-	private void initDao(String databaseLocation)
-	{
-		try
-		{
-			// init the dao
-			this.dao = new MeasureDaoImp("jdbc:h2:" + databaseLocation, "dog",
-					"", this.context);
-		}
-		catch (SQLException e)
-		{
-			this.logger.log(LogService.LOG_ERROR,
-					"Impossible to create the DAO", e);
-		}
+		// log the activation
+		this.logger.log(LogService.LOG_DEBUG,
+				"H2 Event Store has been activated...");
 	}
 
 	/**
-	 * 
-	 * @param sourceMappingFile
+	 * Code performed when the bundle is deactivated, detaches the log service
+	 * and performs the needed OSGi service house keeping.
 	 */
-	private void initSources(File sourceMappingFile)
+	public void deactivate()
 	{
-		// parse the mapping file
-		SensorCollectionType mappingSpec = SourceToDeviceMappingSpecification
-				.parseXMLSpecification(sourceMappingFile);
+		// log the deativation
+		this.logger.log(LogService.LOG_DEBUG,
+				"H2 Event Store has been deactivated...");
 
-		// generate and store sensor descriptors
-		for (SensorData sData : mappingSpec.getSensor())
-		{
-			// create a sensor descriptor object
-			SensorDescriptor desc = new SensorDescriptor(sData.getSensorURI(),
-					sData.getSensorQFunctionality(), sData.getSensorQFParams(),
-					sData.getUid());
+		// deregister the service
+		this.unRegisterService();
 
-			// store the sensor descriptor
-			this.sourceDefinitions.put(desc.getIUUID(), desc);
-		}
-
+		// detach the logger
+		this.logger = null;
 	}
 
 	@Override
+	/**
+	 * Handles configuration properties
+	 */
 	public void updated(Dictionary<String, ?> properties)
 			throws ConfigurationException
 	{
-		if (properties != null)
+		// check that provided properties are not null or empty
+		if ((properties != null) && (!properties.isEmpty()))
 		{
-			File sourceMappingFile = new File(
-					System.getProperty("configFolder") + "/"
-							+ (String) properties.get(Constants.MAPPING_FILE));
+			// get the persistent store location
 			String databaseLocation = (String) properties
-					.get(Constants.DB_LOCATION);
+					.get(EventStoreInfo.DB_LOCATION);
 
+			// handle the persistent store initialization
 			if ((databaseLocation != null) && (!databaseLocation.isEmpty()))
 			{
-				// create the DAO
+				// create the event DAO
 				this.initDao(databaseLocation);
 			}
 			else
 			{
+				// log the error
 				this.logger.log(LogService.LOG_ERROR,
-						"Missing configuration param " + Constants.DB_LOCATION);
+						"Missing configuration param "
+								+ EventStoreInfo.DB_LOCATION);
 			}
 
-			if (!sourceMappingFile.isFile())
+			// get optional parameters
+			String retentionModeAsString = (String) properties
+					.get(EventStoreInfo.DB_RETENTION_MODE);
+
+			// check not null
+			if ((retentionModeAsString != null)
+					&& (!retentionModeAsString.isEmpty()))
 			{
-				this.logger
-						.log(LogService.LOG_ERROR,
-								"Missing configuration param "
-										+ Constants.MAPPING_FILE);
+				try
+				{
+					this.dataRetention = DataRetentionMode
+							.valueOf(retentionModeAsString);
+				}
+				catch (IllegalArgumentException | NullPointerException e)
+				{
+					// use the default
+					this.dataRetention = DataRetentionMode.DROP;
+
+					// log the error
+					this.logger.log(LogService.LOG_WARNING,
+							"DataRetentionMode not supported, using: "
+									+ this.dataRetention.name());
+
+				}
 			}
-			else
+
+			// get optional parameters
+			String maxSizeAsString = (String) properties
+					.get(EventStoreInfo.DB_MAX_SIZE);
+
+			// check not null
+			if ((maxSizeAsString != null) && (!maxSizeAsString.isEmpty()))
 			{
-				// load mapping file
-				initSources(sourceMappingFile);
+				try
+				{
+					this.maxSize = Integer.valueOf(maxSizeAsString);
+				}
+				catch (IllegalArgumentException | NullPointerException e)
+				{
+					// use the default
+					this.maxSize = EventStoreInfo.UNLIMITED_SIZE;
+
+					// log the error
+					this.logger.log(LogService.LOG_WARNING,
+							"Max size not supported, using: " + this.maxSize);
+				}
 			}
+
+			// get optional parameters
+			String autoEventHandlingAsString = (String) properties
+					.get(EventStoreInfo.DB_MAX_SIZE);
+			// check not null
+			if ((autoEventHandlingAsString != null)
+					&& (!autoEventHandlingAsString.isEmpty()))
+			{
+				try
+				{
+					this.eventHandlingEnabled = Boolean
+							.valueOf(autoEventHandlingAsString);
+				}
+				catch (IllegalArgumentException | NullPointerException e)
+				{
+					// use the default
+					this.eventHandlingEnabled = true;
+
+					// log the error
+					this.logger.log(LogService.LOG_WARNING,
+							"Auto event handling not supported, using: "
+									+ this.eventHandlingEnabled);
+				}
+			}
+
+			// if everything has been accomplished, register the service
+			if (this.eventDao != null)
+				this.registerService();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void registerService()
+	{
+		// register the driver service if not already registered
+		if (this.h2StorageService == null)
+			this.h2StorageService = (ServiceRegistration<H2EventStore>) this.context
+					.registerService(EventStore.class.getName(), this, null);
+	}
+
+	/**
+	 * Unregisters the H2StorageService from the OSGi registry
+	 */
+	private void unRegisterService()
+	{
+		if (this.h2StorageService != null)
+			this.h2StorageService.unregister();
+	}
+
+	/**
+	 * Creates the EventDao used by this {@link H2EventStore} instance to handle
+	 * event data persistence.
+	 * 
+	 * @param databaseLocation
+	 */
+	private void initDao(String databaseLocation)
+	{
+		try
+		{
+			// initialize the dao
+			this.eventDao = new EventDaoImpl("jdbc:h2:" + databaseLocation,
+					"dog", "", this.context);
+		}
+		catch (SQLException e)
+		{
+			// log the error
+			this.logger.log(LogService.LOG_ERROR,
+					"Impossible to create the EventStore DAO", e);
 		}
 	}
 
 	@Override
 	public void handleEvent(Event event)
 	{
-		// handle Notification
-		Object eventContent = event.getProperty(EventConstants.EVENT);
-
-		if (this.dao != null && eventContent instanceof ParametricNotification)
+		if (this.eventHandlingEnabled)
 		{
-			// store the received notification
-			ParametricNotification receivedNotification = (ParametricNotification) eventContent;
+			// handle Notification
+			Object eventContent = event.getProperty(EventConstants.EVENT);
 
-			// the device uri
-			String deviceURI = receivedNotification.getDeviceUri();
-
-			// the notification measure
-			Measure<?, ?> value = null;
-			Date timestamp = new Date();
-
-			// get the notification name from the topic
-			String topic = event.getTopic();
-			String notification = topic.substring(topic.lastIndexOf('/') + 1);
-
-			// GetQFPARAM
-			String qfParams = getNotificationQFParams(receivedNotification);
-
-			// handle spChains notifications
-			if ((eventContent instanceof EventNotification)
-					&& (event
-							.containsProperty(EventConstants.BUNDLE_SYMBOLICNAME) && ((String) event
-							.getProperty(EventConstants.BUNDLE_SYMBOLICNAME))
-							.equalsIgnoreCase("SpChainsOSGi")))
+			// handle parametric notifications
+			if (this.eventDao != null
+					&& eventContent instanceof ParametricNotification)
 			{
-				// handle the generic event
-				GenericEvent gEvt = (GenericEvent) ((EventNotification) eventContent)
-						.getEvent();
+				// get the received notification
+				ParametricNotification receivedNotification = (ParametricNotification) eventContent;
 
-				// handle cases where the event value is null, typically due to
-				// window sizes equal or lower than the sampling period
-				if (gEvt.getValue() != null)
-				{
-					value = gEvt.getValueAsMeasure();
-					timestamp = gEvt.getTimestamp().getTime();
-				}
-			}
-			else
-			{
+				// get the device uri
+				String deviceURI = receivedNotification.getDeviceUri();
+
+				// prepare the notification measure
+				DecimalMeasure<?> eventValue = null;
+				// generate the notification timestamp
+				Date eventTimestamp = new Date();
+
+				// get the notification name from the topic
+				String topic = receivedNotification.getNotificationTopic();
+				String notificationName = topic.substring(topic
+						.lastIndexOf('/') + 1);
+
+				// Get notification parameters, to use for distinguishing same
+				// typed notifications referred to different parameter values.
+				String notificationParams = getNotificationParams(receivedNotification);
+
+				// log the error
+				this.logger.log(LogService.LOG_DEBUG, "Notification parameters"
+						+ notificationParams);
+
 				// handle all low-level events
-				value = this.getNotificationValue(receivedNotification);
-			}
+				eventValue = this.getNotificationValue(receivedNotification);
 
-			// debug
-			logger.log(LogService.LOG_DEBUG, "Notification " + notification
-					+ " and deviceURI-> " + deviceURI + " QFParams-> "
-					+ qfParams);
+				// debug
+				logger.log(LogService.LOG_DEBUG, "Notification "
+						+ notificationName + " and deviceURI-> " + deviceURI
+						+ " params-> " + notificationParams);
 
-			// do nothing for null values
-			if ((value != null) && (deviceURI != null)
-					&& (!deviceURI.isEmpty()))
-			{
-				// Here "raw" and "virtual devices" must be extracted while all
-				// other spChains-generated events shall be discarded
-
-				String iuuid = SensorDescriptor.generateInnerUUID(deviceURI,
-						notification, qfParams);
-
-				if (sourceDefinitions.containsKey(iuuid))
+				// do nothing for null values
+				if ((eventValue != null) && (deviceURI != null)
+						&& (!deviceURI.isEmpty()))
 				{
-					SensorDescriptor desc = sourceDefinitions.get(iuuid);
-					try
-					{
-						this.dao.insert(desc.getUid(), value, timestamp);
-					}
-					catch (SQLException e)
-					{
-						this.logger.log(LogService.LOG_ERROR,
-								"Error in inserting the value " + value
-										+ "in the DB", e);
-					}
+					// insert the event
+					this.eventDao.insertRealEvent(deviceURI, eventTimestamp, eventValue,
+							Notification.class.getSimpleName(),
+							notificationName, notificationParams);
 				}
 			}
 		}
@@ -285,13 +414,11 @@ public class H2EventStore implements EventHandler, ManagedService
 		return value;
 	}
 
-	private String getNotificationQFParams(
+	private String getNotificationParams(
 			ParametricNotification receivedNotification)
 	{
-
-		// get all the notification methods
-		Field[] notificationFields = receivedNotification.getClass()
-				.getDeclaredFields();
+		// get all notfication getters
+		Method[] methods = receivedNotification.getClass().getMethods();
 
 		// prepare the buffer for parameters
 		StringBuffer qfParams = new StringBuffer();
@@ -299,44 +426,39 @@ public class H2EventStore implements EventHandler, ManagedService
 		// the first flag
 		boolean first = true;
 
-		// extract the parameter values...
-		for (Field currentField : notificationFields)
+		for (Method currentMethod : methods)
 		{
-			// check the current field to be different from deviceURI and from
-			// measure
-			if ((!currentField.getName().equals("deviceUri"))
-					&& (!currentField.getName().equals("notificationName"))
-					&& (!currentField.getName().equals("notificationTopic"))
-					&& (!(currentField.getType()
-							.isAssignableFrom(Measure.class)))
-					&& (currentField.getType().isAssignableFrom(String.class)))
+			// get only the properly annotated methods
+			if (currentMethod.isAnnotationPresent(NotificationParam.class))
 			{
+
 				try
 				{
-					// append a quote
-					if (first)
-						first = false;
-					else
-						qfParams.append(",");
+					// get the param value
+					String methodReturnValue = currentMethod.invoke(
+							receivedNotification, (Object[]) null).toString();
+					// get the annotation value, i.e., the param name
+					String annotationValue = currentMethod.getAnnotation(
+							NotificationParam.class).value();
 
-					// suppress access control
-					currentField.setAccessible(true);
-
-					// get the value
-					qfParams.append(currentField.get(receivedNotification));
-
-					// reset access control
-					currentField.setAccessible(false);
-
+					// concate the params
+					if (!first)
+						qfParams.append("&");
+					qfParams.append(annotationValue + "=" + methodReturnValue);
 				}
-				catch (Exception e)
+				catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e)
 				{
-					this.logger.log(LogService.LOG_ERROR,
-							"Error in getting notification QF value", e);
+					// log the error
+					this.logger.log(
+							LogService.LOG_ERROR,
+							"Unable to extract notification parameters for "
+									+ receivedNotification
+											.getNotificationTopic(), e);
 				}
 			}
-
 		}
+
 		return qfParams.toString();
 	}
 

@@ -1,7 +1,7 @@
 /*
  * Dog - Addons
  * 
- * Copyright (c) 2013-2014 Claudio Degioanni, Luigi De Russis
+ * Copyright (c) 2013-2014 Claudio Degioanni, Luigi De Russis, Dario Bonino
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package it.polito.elite.dog.addons.h2eventstore;
+package it.polito.elite.dog.addons.storage;
 
-public class Constants {
-	final static String MAPPING_FILE = "dao.h2.source.mapping";
-	final static String DB_LOCATION = "DATABASE";
+public class EventStoreInfo
+{
+	// the database location
+	public final static String DB_LOCATION = "database.location";
+	public final static String DB_RETENTION_MODE = "database.retentionmode";
+	public final static String DB_MAX_SIZE = "database.maxsize";
+	
+	// the event store event managemet policy
+	public final static String EVENT_ATTACHMENT = "eventhandling.auto";
+	
+	// the default persistent storage size
+	public final static int UNLIMITED_SIZE = -1;
 }
