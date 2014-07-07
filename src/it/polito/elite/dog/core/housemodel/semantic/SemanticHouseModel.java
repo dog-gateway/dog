@@ -46,8 +46,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -61,14 +63,8 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
-import org.semanticweb.owlapi.util.OWLOntologyMerger;
 
 /**
  * <p>
@@ -108,7 +104,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	// the OWL API models and prefixes used
 	private Ontologies ontoDescSet;
 	private OWLOntology ontModel;
-	private DefaultPrefixManager prefixes;
+	private Map<String, OWLWrapper> subModels;
 	// an OWL wrapper to prepare needed information for extracting and managing
 	// data
 	private OWLWrapper owlWrapper;
@@ -125,6 +121,8 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	 */
 	public SemanticHouseModel()
 	{
+		// init data structures
+		this.subModels = new ConcurrentHashMap<String, OWLWrapper>();
 	}
 	
 	/**
@@ -184,7 +182,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 					
 					// unmarshall
 					this.ontoDescSet = (unmarshaller.unmarshal(new StreamSource(ontologyFileName), Ontologies.class))
-							.getValue();	
+							.getValue();
 				}
 				catch (JAXBException e)
 				{
@@ -260,11 +258,10 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	public void setModel(OWLOntology loadedModel, DefaultPrefixManager prefixManager)
 	{
 		this.ontModel = loadedModel;
+		
 		// create the OWL wrapper that add all the needed prefixes and init the
 		// reasoner
 		this.owlWrapper = new OWLWrapper(loadedModel, prefixManager);
-		// get the complete prefixes
-		this.prefixes = this.owlWrapper.getPrefixManager();
 		
 		// extract the XML representation needed to answer queries from external
 		// applications
@@ -273,19 +270,24 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 			@Override
 			public void run()
 			{
-				logger.log(LogService.LOG_DEBUG, "Computing JAXB configuration...");
+				// start time
+				long time = System.currentTimeMillis();
+				
+				// debug
+				logger.log(LogService.LOG_DEBUG, "Reasoning and computing JAXB configuration...");
 				
 				// create the XML translator
 				DogOnt2JAXB toXMLTranslator = new DogOnt2JAXB(owlWrapper);
+				
 				// get the JAXB configuration
 				xmlConfiguration = toXMLTranslator.getJAXBXMLDog();
 				
 				// finish!
-				logger.log(LogService.LOG_DEBUG, "The JAXB configuration has been successfully generated!");
+				logger.log(LogService.LOG_DEBUG, "The JAXB configuration has been successfully generated in "
+						+ ((float) (System.currentTimeMillis() - time) / 1000) + " seconds!");
 				
 				// create the JAXB object representing the device list without
-				// their
-				// network-related properties
+				// their network-related properties
 				createSimpleDevicesRepresentation();
 				
 				// register the services provided by the bundle
@@ -299,41 +301,20 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		executor.shutdown();
 	}
 	
-	// TODO Check if it is needed to merge or it is sufficient to replace
-	// simplehome, since the new ontology imports simplehome
-	public void addModel(OWLOntology modelToAdd, DefaultPrefixManager prefixesToAdd)
+	// TODO Try!
+	public void addModel(String modelIRI, OWLOntology modelToAdd, DefaultPrefixManager prefixesToAdd)
 	{
-		OWLOntologyManager man = this.ontModel.getOWLOntologyManager();
-		try
+		if (modelToAdd.getImports().contains(this.ontModel))
 		{
-			man.loadOntology(modelToAdd.getOntologyID().getOntologyIRI());
-			
-			OWLOntologyMerger merger = new OWLOntologyMerger(man);
-			
-			// TODO Check how to revert in case of exceptions
-			this.ontModel = merger.createMergedOntology(man,
-					IRI.create("http://elite.polito.it/ontologies/mergedOntologies"));
-			this.owlWrapper = new OWLWrapper(ontModel, prefixesToAdd);
-			this.prefixes = this.owlWrapper.getPrefixManager();
-			
+			// ok, it includes the current entry point ontology
+			// update the references and store the submodel properties
+			this.ontModel = modelToAdd;
+			this.owlWrapper = new OWLWrapper(modelToAdd, prefixesToAdd);
+			this.subModels.put(modelIRI, this.owlWrapper);
 		}
-		catch (OWLOntologyCreationException e)
+		else
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.logger.log(LogService.LOG_INFO, "Merged ontology: "
-				+ this.ontModel.getOntologyID().getDefaultDocumentIRI() + " [" + this.ontModel.getAxiomCount()
-				+ " axioms]");
-		try
-		{
-			man.saveOntology(this.ontModel, new RDFXMLOntologyFormat(),
-					IRI.create("file:/home/luigi/Desktop/mergedont.owl"));
-		}
-		catch (OWLOntologyStorageException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// TODO handle the error!
 		}
 	}
 	
@@ -447,9 +428,9 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	 * it.polito.elite.dog.core.housemodel.semantic.api.OntologyModel#getModel()
 	 */
 	@Override
-	public OWLOntology getModel()
+	public OWLWrapper getSubModel(String ontologyIRI)
 	{
-		return this.ontModel;
+		return this.subModels.get(ontologyIRI);
 	}
 	
 	/*
@@ -462,7 +443,6 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	@Override
 	public void loadAndMerge(Ontologies setToLoad)
 	{
-		// TODO Check if it works
 		// set the model to merge
 		ThreadedModelLoader loader = new ThreadedModelLoader(this);
 		loader.setModelToLoad(setToLoad, LoadingModes.LOAD_MERGE);

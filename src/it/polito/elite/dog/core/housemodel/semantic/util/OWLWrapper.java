@@ -17,13 +17,12 @@
  */
 package it.polito.elite.dog.core.housemodel.semantic.util;
 
+import org.semanticweb.HermiT.Configuration;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.ConsoleProgressMonitor;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
@@ -73,13 +72,17 @@ public class OWLWrapper
 	 *            the {@link OWLOntology} instance for which a reasoner will be
 	 *            created
 	 * @return a {@link OWLReasoner} instance
+	 * @throws InterruptedException 
 	 */
 	private OWLReasoner setReasoner(OWLOntology model)
 	{
 		// get a reasoner (hermit)
 		OWLReasonerFactory reasonerFactory = new Reasoner.ReasonerFactory();
 		ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
-		OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
+		// set some properties (like in Protégé)
+		Configuration config = new Configuration();
+		config.ignoreUnsupportedDatatypes = true;
+		config.reasonerProgressMonitor = progressMonitor;
 		
 		// create the reasoner instance
 		return reasonerFactory.createReasoner(model, config);

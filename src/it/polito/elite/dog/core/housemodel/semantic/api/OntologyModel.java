@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import it.polito.elite.dog.core.housemodel.semantic.util.OWLWrapper;
 import it.polito.elite.dog.core.library.semantic.xml.Ontologies;
 
 /**
@@ -45,7 +46,7 @@ public interface OntologyModel
 	 * (core+extensions)
 	 * 
 	 */
-	public OWLOntology getModel();
+	public OWLWrapper getSubModel(String OntologyIRI);
 	
 	/**
 	 * Requires the class implementing this interface to update the inner model

@@ -17,6 +17,8 @@
  */
 package it.polito.elite.dog.core.housemodel.semantic.util;
 
+import org.semanticweb.owlapi.reasoner.InferenceType;
+
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
 
@@ -46,6 +48,9 @@ public class DogOnt2JAXB
 		// init
 		this.eBuilder = new EnvironmentBuilder(owlWrapper);
 		this.cBuilder = new ControllablesBuilder(owlWrapper);
+		
+		// precompute all the possible inferences
+		owlWrapper.getReasoner().precomputeInferences(InferenceType.values());
 	}
 	
 	/**
