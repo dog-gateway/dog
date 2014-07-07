@@ -5,9 +5,9 @@
 			gateway="$gateway">
 			<dhc:description>$description</dhc:description>
 			<dhc:isIn>$location</dhc:isIn>
-			<dhc:param value="$nodeId" name="NodeID" type="network" />
+			<dhc:param value="$nodeId" name="nodeId" type="network" />
 			#foreach( $instanceId in $instanceIds )
-			<dhc:param value="$instanceId" name="InstanceID" type="network" />
+			<dhc:param value="$instanceId" name="instanceId" type="network" />
 			#end
 			<dhc:controlFunctionality class="OnOffFunctionality">
 				<dhc:commands>
