@@ -34,6 +34,7 @@ public class MovingDownNotification implements MovementNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/MovingDownNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

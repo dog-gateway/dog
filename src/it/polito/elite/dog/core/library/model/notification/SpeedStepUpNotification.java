@@ -34,6 +34,7 @@ public class SpeedStepUpNotification implements NonParametricLevelNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/SpeedStepUpNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

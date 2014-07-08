@@ -34,6 +34,7 @@ public class StoppedSuperFreezingNotification implements SuperFreezingNotificati
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/StoppedSuperFreezingNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

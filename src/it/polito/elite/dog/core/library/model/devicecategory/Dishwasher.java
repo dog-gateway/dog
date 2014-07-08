@@ -57,10 +57,10 @@ public interface Dishwasher extends WhiteGoods
 	public void notifyStart();
 	/*Notification: MultipleEventNotification*/
 	public void notifyNewEventSet(Object[] events);
-	/*Notification: EventNotification*/
-	public void notifyNewEvent(Object event);
 	/*Notification: MultipleAlertNotification*/
 	public void notifyNewAlertSet(Object[] alerts);
+	/*Notification: EventNotification*/
+	public void notifyNewEvent(Object event);
 	/*Notification: AlertNotification*/
 	public void notifyNewAlert(Object alert);
 	/*Notification: StartTimeChangedNotification*/
@@ -75,9 +75,9 @@ public interface Dishwasher extends WhiteGoods
 	public void notifyOff();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause();
 	/*Notification: StopApplianceNotification*/
 	public void notifyStop();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause();
 	public void updateStatus();
 }

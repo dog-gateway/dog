@@ -34,6 +34,7 @@ public class EmittingMicrowavesNotification implements NonParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/EmittingMicrowavesNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

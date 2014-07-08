@@ -29,6 +29,7 @@ package it.polito.elite.dog.core.library.model.notification;
 
 import javax.measure.Measure;
 
+import it.polito.elite.dog.core.library.model.notification.annotation.NotificationParam;
 public class TemperatureMeasurementMNotification implements ParametricNotification
 {
 	public static String notificationName = "changedTemperatureAt";
@@ -36,6 +37,7 @@ public class TemperatureMeasurementMNotification implements ParametricNotificati
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/TemperatureMeasurementMNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;
@@ -60,6 +62,7 @@ public class TemperatureMeasurementMNotification implements ParametricNotificati
 	public Measure<?,?>  getTemperatureValue(){
 		return this.temperatureValue;
 }
+	@NotificationParam("sensorID")
 	public String getSensorID(){
 		return this.sensorID;
 }

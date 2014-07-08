@@ -34,6 +34,7 @@ public class StoppedSuperHeatingNotification implements SuperHeatingNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/StoppedSuperHeatingNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

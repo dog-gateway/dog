@@ -52,10 +52,10 @@ public interface Cooker extends WhiteGoods
 
 	/*Notification: MultipleEventNotification*/
 	public void notifyNewEventSet(Object[] events);
-	/*Notification: EventNotification*/
-	public void notifyNewEvent(Object event);
 	/*Notification: MultipleAlertNotification*/
 	public void notifyNewAlertSet(Object[] alerts);
+	/*Notification: EventNotification*/
+	public void notifyNewEvent(Object event);
 	/*Notification: AlertNotification*/
 	public void notifyNewAlert(Object alert);
 	/*Notification: StartTimeChangedNotification*/

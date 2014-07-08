@@ -36,6 +36,7 @@ public class SinglePhaseReactiveEnergyMeasurementNotification implements Paramet
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/SinglePhaseReactiveEnergyMeasurementNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

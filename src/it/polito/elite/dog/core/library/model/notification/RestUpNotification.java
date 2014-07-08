@@ -34,6 +34,7 @@ public class RestUpNotification implements NoMovementNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/RestUpNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

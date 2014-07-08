@@ -34,6 +34,7 @@ public class PushLinkAuthenticationIdleNotification implements HueNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/PushLinkAuthenticationIdleNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

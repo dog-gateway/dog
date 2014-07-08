@@ -34,6 +34,7 @@ public class StartedWashingNotification implements WashingNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/StartedWashingNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

@@ -35,6 +35,7 @@ public class ColorHSBNotification implements ParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/ColorHSBNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

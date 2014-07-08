@@ -36,6 +36,7 @@ public class WeeklyClimateScheduleNotification implements ClimateScheduleNotific
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/WeeklyClimateScheduleNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

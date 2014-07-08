@@ -36,6 +36,7 @@ public class ChangedDesiredTemperatureNotification implements ParametricNotifica
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/ChangedDesiredTemperatureNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

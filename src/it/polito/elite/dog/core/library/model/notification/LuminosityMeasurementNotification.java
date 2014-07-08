@@ -36,6 +36,7 @@ public class LuminosityMeasurementNotification implements ParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/LuminosityMeasurementNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

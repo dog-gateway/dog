@@ -171,16 +171,16 @@ public class DogShadeActuator extends AbstractDevice implements ShadeActuator
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: LevelControlNotification*/
-	public void notifyChangedLevel(Measure<?,?>  newLevel){
-		LevelControlNotification notificationEvent=new LevelControlNotification(newLevel );
+	/*Notification: SimpleMovementNotification*/
+	public void notifyStartedMovement(){
+		SimpleMovementNotification notificationEvent=new SimpleMovementNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SimpleMovementNotification*/
-	public void notifyStartedMovement(){
-		SimpleMovementNotification notificationEvent=new SimpleMovementNotification();
+	/*Notification: LevelControlNotification*/
+	public void notifyChangedLevel(Measure<?,?>  newLevel){
+		LevelControlNotification notificationEvent=new LevelControlNotification(newLevel );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

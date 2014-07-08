@@ -34,6 +34,7 @@ public class StopPlaybackNotification implements PlaybackNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/StopPlaybackNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

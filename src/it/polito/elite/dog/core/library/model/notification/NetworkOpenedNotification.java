@@ -34,6 +34,7 @@ public class NetworkOpenedNotification implements ZigBeeNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/NetworkOpenedNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

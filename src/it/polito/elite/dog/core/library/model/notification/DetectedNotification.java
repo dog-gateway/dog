@@ -34,6 +34,7 @@ public class DetectedNotification implements NonParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/DetectedNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

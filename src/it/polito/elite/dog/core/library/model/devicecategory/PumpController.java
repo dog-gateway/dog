@@ -48,20 +48,20 @@ public interface PumpController extends HVACSystem, Control
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
 	/*Notification: LevelStepUpNotification*/
 	public void notifyStepUp();
-	/*Notification: FlowRateMeasurementNotification*/
-	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue);
 	/*Notification: IdentifyNotification*/
 	public void notifyIdentifyMe();
+	/*Notification: FlowRateMeasurementNotification*/
+	public void notifyChangedFlowRateValue(Measure<?,?>  flowRateValue);
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: LevelStepDownNotification*/
 	public void notifyStepDown();
-	/*Notification: OffNotification*/
-	public void notifyOff();
 	/*Notification: PressureMeasurementNotification*/
 	public void notifyNewPressureValue(Measure<?,?>  pressureValue);
+	/*Notification: OffNotification*/
+	public void notifyOff();
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber);
 	/*Notification: StoreSceneNotification*/
