@@ -19,9 +19,11 @@ package it.polito.elite.dog.addons.h2eventstore;
 
 import it.polito.elite.dog.addons.h2eventstore.dao.EventDaoImpl;
 import it.polito.elite.dog.addons.storage.EventDao;
+import it.polito.elite.dog.addons.storage.EventDataStream;
+import it.polito.elite.dog.addons.storage.EventDataStreamSet;
 import it.polito.elite.dog.addons.storage.EventStore;
 import it.polito.elite.dog.addons.storage.EventStoreInfo;
-import it.polito.elite.dog.core.library.model.notification.Notification;
+import it.polito.elite.dog.core.library.model.notification.NonParametricNotification;
 import it.polito.elite.dog.core.library.model.notification.ParametricNotification;
 import it.polito.elite.dog.core.library.model.notification.annotation.NotificationParam;
 import it.polito.elite.dog.core.library.util.LogHelper;
@@ -32,11 +34,11 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.Dictionary;
 
-import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
-import javax.measure.quantity.Quantity;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -44,6 +46,8 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
+import org.osgi.util.tracker.BundleTracker;
+import org.osgi.util.tracker.BundleTrackerCustomizer;
 
 /**
  * <p>
@@ -98,7 +102,8 @@ import org.osgi.service.log.LogService;
  * 
  * 
  */
-public class H2EventStore implements EventHandler, ManagedService
+public class H2EventStore implements EventHandler, ManagedService,
+		BundleTrackerCustomizer<Object>, EventStore
 {
 	// the logger
 	private LogHelper logger;
@@ -123,6 +128,9 @@ public class H2EventStore implements EventHandler, ManagedService
 
 	// the event handling mode
 	private boolean eventHandlingEnabled;
+
+	// the database location
+	private String databaseLocation;
 
 	/**
 	 * The class constructor, creates an instance of the {@link H2EventStore}.
@@ -159,6 +167,13 @@ public class H2EventStore implements EventHandler, ManagedService
 		// log the activation
 		this.logger.log(LogService.LOG_DEBUG,
 				"H2 Event Store has been activated...");
+
+		// open a bundle tracker for waiting h2 to start, this could be avoided
+		// when using OSGI enterprise.
+		BundleTracker<?> bundleTracker = new BundleTracker<>(this.context,
+				Bundle.ACTIVE, this);
+
+		bundleTracker.open();
 	}
 
 	/**
@@ -173,6 +188,9 @@ public class H2EventStore implements EventHandler, ManagedService
 
 		// deregister the service
 		this.unRegisterService();
+
+		// close data access
+		this.eventDao.close();
 
 		// detach the logger
 		this.logger = null;
@@ -189,14 +207,18 @@ public class H2EventStore implements EventHandler, ManagedService
 		if ((properties != null) && (!properties.isEmpty()))
 		{
 			// get the persistent store location
-			String databaseLocation = (String) properties
+			String databaseLocationAsString = (String) properties
 					.get(EventStoreInfo.DB_LOCATION);
 
 			// handle the persistent store initialization
-			if ((databaseLocation != null) && (!databaseLocation.isEmpty()))
+			if ((databaseLocationAsString != null)
+					&& (!databaseLocationAsString.isEmpty()))
 			{
 				// create the event DAO
-				this.initDao(databaseLocation);
+				this.databaseLocation = databaseLocationAsString;
+
+				// try to init the dao
+				initDao(databaseLocation);
 			}
 			else
 			{
@@ -279,7 +301,7 @@ public class H2EventStore implements EventHandler, ManagedService
 			}
 
 			// if everything has been accomplished, register the service
-			if (this.eventDao != null)
+			if ((this.eventDao != null) && (h2StorageService == null))
 				this.registerService();
 		}
 	}
@@ -333,60 +355,116 @@ public class H2EventStore implements EventHandler, ManagedService
 			Object eventContent = event.getProperty(EventConstants.EVENT);
 
 			// handle parametric notifications
-			if (this.eventDao != null
-					&& eventContent instanceof ParametricNotification)
+			if (this.eventDao != null)
 			{
-				// get the received notification
-				ParametricNotification receivedNotification = (ParametricNotification) eventContent;
-
-				// get the device uri
-				String deviceURI = receivedNotification.getDeviceUri();
-
-				// prepare the notification measure
-				DecimalMeasure<?> eventValue = null;
-				// generate the notification timestamp
-				Date eventTimestamp = new Date();
-
-				// get the notification name from the topic
-				String topic = receivedNotification.getNotificationTopic();
-				String notificationName = topic.substring(topic
-						.lastIndexOf('/') + 1);
-
-				// Get notification parameters, to use for distinguishing same
-				// typed notifications referred to different parameter values.
-				String notificationParams = getNotificationParams(receivedNotification);
-
-				// log the error
-				this.logger.log(LogService.LOG_DEBUG, "Notification parameters"
-						+ notificationParams);
-
-				// handle all low-level events
-				eventValue = this.getNotificationValue(receivedNotification);
-
-				// debug
-				logger.log(LogService.LOG_DEBUG, "Notification "
-						+ notificationName + " and deviceURI-> " + deviceURI
-						+ " params-> " + notificationParams);
-
-				// do nothing for null values
-				if ((eventValue != null) && (deviceURI != null)
-						&& (!deviceURI.isEmpty()))
+				if (eventContent instanceof ParametricNotification)
 				{
-					// insert the event
-					this.eventDao.insertRealEvent(deviceURI, eventTimestamp, eventValue,
-							Notification.class.getSimpleName(),
-							notificationName, notificationParams);
+					// get the received notification
+					ParametricNotification receivedNotification = (ParametricNotification) eventContent;
+
+					// get the device uri
+					String deviceURI = receivedNotification.getDeviceUri();
+
+					// prepare the notification measure
+					Measure<?, ?> eventValue = null;
+					// generate the notification timestamp
+					Date eventTimestamp = new Date();
+
+					// get the notification name from the topic
+					String topic = receivedNotification.getNotificationTopic();
+					String notificationName = topic.substring(topic
+							.lastIndexOf('/') + 1);
+
+					// Get notification parameters, to use for distinguishing
+					// same
+					// typed notifications referred to different parameter
+					// values.
+					String notificationParams = getNotificationParams(receivedNotification);
+
+					// log the error
+					this.logger.log(LogService.LOG_DEBUG,
+							"Notification parameters" + notificationParams);
+
+					// handle all low-level events
+					eventValue = this
+							.getParametricNotificationValue(receivedNotification);
+
+					// debug
+					logger.log(LogService.LOG_DEBUG, "Notification "
+							+ notificationName + " and deviceURI-> "
+							+ deviceURI + " params-> " + notificationParams);
+
+					// do nothing for null values
+					if ((eventValue != null) && (deviceURI != null)
+							&& (!deviceURI.isEmpty()))
+					{
+						// insert the event
+						this.eventDao.insertRealEvent(deviceURI,
+								eventTimestamp, eventValue, notificationName,
+								notificationParams);
+					}
+				}
+				else if (eventContent instanceof NonParametricNotification)
+				{
+					// get the non parametric notification
+					NonParametricNotification receivedNotification = (NonParametricNotification) eventContent;
+
+					// get the device uri
+					String deviceURI = receivedNotification.getDeviceUri();
+
+					// generate the notification timestamp
+					Date eventTimestamp = new Date();
+
+					// get the notification name from the topic
+					String topic = receivedNotification.getNotificationTopic();
+					String notificationName = topic.substring(topic
+							.lastIndexOf('/') + 1);
+
+					String notificationValue = this
+							.getNonParametricNotificationValue(receivedNotification);
+
+					// debug
+					logger.log(LogService.LOG_DEBUG, "Notification "
+							+ notificationName + " and deviceURI-> "
+							+ deviceURI);
+
+					// do nothing for null values
+					if ((notificationValue != null) && (deviceURI != null)
+							&& (!deviceURI.isEmpty()))
+					{
+						// insert the event
+						this.eventDao.insertEvent(deviceURI, eventTimestamp,
+								notificationValue, notificationName);
+					}
 				}
 			}
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private DecimalMeasure<Quantity> getNotificationValue(
+	private String getNonParametricNotificationValue(
+			NonParametricNotification receivedNotification)
+	{
+		String value = "";
+		try
+		{
+			value = (String) receivedNotification.getClass().getField("notificationName")
+					.get(null);
+		}
+		catch (NoSuchFieldException | SecurityException
+				| IllegalArgumentException | IllegalAccessException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return value.isEmpty() ? null : value;
+	}
+
+	private Measure<?, ?> getParametricNotificationValue(
 			ParametricNotification receivedNotification)
 	{
 		// the value, initially null
-		DecimalMeasure<Quantity> value = null;
+		Measure<?, ?> value = null;
 
 		// get all the notification methods
 		Method[] notificationMethods = receivedNotification.getClass()
@@ -400,7 +478,7 @@ public class H2EventStore implements EventHandler, ManagedService
 				try
 				{
 					// read the value
-					value = (DecimalMeasure<Quantity>) currentMethod.invoke(
+					value = (Measure<?, ?>) currentMethod.invoke(
 							receivedNotification, new Object[] {});
 					break;
 				}
@@ -460,6 +538,124 @@ public class H2EventStore implements EventHandler, ManagedService
 		}
 
 		return qfParams.toString();
+	}
+
+	// ----------------- Bundle tracker customizer --------
+	// used to attach the h2 bundle even if not available when the updated
+	// method
+	// is called, this is useless if using the osgi enterprise specification
+
+	@Override
+	public Object addingBundle(Bundle bundle, BundleEvent event)
+	{
+		if ((bundle.getSymbolicName().equals("org.h2"))
+				&& (this.eventDao == null) && (this.databaseLocation != null)
+				&& (!this.databaseLocation.isEmpty()))
+		{
+			this.logger.log(LogService.LOG_INFO, "Activated H2");
+			Runnable initAndRegister = new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					initDao(databaseLocation);
+
+					// if everything has been accomplished, register the service
+					if ((eventDao != null) && (h2StorageService == null))
+						registerService();
+
+				}
+			};
+
+			Thread executor = new Thread(initAndRegister);
+			executor.start();
+
+		}
+		return null;
+	}
+
+	@Override
+	public void modifiedBundle(Bundle bundle, BundleEvent event, Object object)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removedBundle(Bundle bundle, BundleEvent event, Object object)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	// -------------------------- EventStore implementation -------------
+
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+			Date startDate, Date endDate)
+	{
+		return this.getAllDeviceEvents(deviceURI, startDate, endDate, 0, -1);
+	}
+
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+			Date startDate, Date endDate, int startCount, int nResults)
+	{
+		return this.eventDao.getAllDeviceEvents(deviceURI, startDate, endDate,
+				startCount, nResults);
+	}
+
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+			Date startDate)
+	{
+		return this.getAllDeviceEvents(deviceURI, startDate, new Date(), 0, -1);
+	}
+
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+			Date startDate, int startCount, int nResults)
+	{
+		return this.getAllDeviceEvents(deviceURI, startDate, new Date(),
+				startCount, nResults);
+	}
+
+	@Override
+	public EventDataStream getDeviceEvents(String deviceURI,
+			String notificationName, String notificationParams, Date startDate,
+			Date endDate)
+	{
+		return this.getDeviceEvents(deviceURI, notificationName,
+				notificationParams, startDate, endDate, 0, -1);
+	}
+
+	@Override
+	public EventDataStream getDeviceEvents(String deviceURI,
+			String notificationName, String notificationParams, Date startDate,
+			Date endDate, int startCount, int nResults)
+	{
+		return this.eventDao.getDeviceEvents(deviceURI, notificationName,
+				notificationParams, startDate, endDate, startCount, nResults);
+	}
+
+	@Override
+	public EventDataStream getDeviceEvents(String deviceURI,
+			String notificationName, String notificationParams, Date startDate)
+	{
+		return this.getDeviceEvents(deviceURI, notificationName,
+				notificationParams, startDate, new Date(), 0, -1);
+	}
+
+	@Override
+	public EventDataStream getDeviceEvents(String deviceURI,
+			String notificationName, String notificationParams, Date startDate,
+			int startCount, int nResults)
+	{
+		return this
+				.getDeviceEvents(deviceURI, notificationName,
+						notificationParams, startDate, new Date(), startCount,
+						nResults);
 	}
 
 }
