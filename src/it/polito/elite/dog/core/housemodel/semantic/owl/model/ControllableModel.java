@@ -17,7 +17,7 @@
  */
 package it.polito.elite.dog.core.housemodel.semantic.owl.model;
 
-import it.polito.elite.dog.core.housemodel.semantic.util.OWLWrapper;
+import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +35,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLDataExactCardinalityImpl;
@@ -47,8 +48,11 @@ import uk.ac.manchester.cs.owl.owlapi.OWLDataHasValueImpl;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class ControllableModel extends OWLLibrary
+public class ControllableModel
 {
+	// the OWL Wrapper
+	private OWLWrapper owlWrapper;
+	
 	/**
 	 * Default constructor
 	 * 
@@ -58,7 +62,7 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public ControllableModel(OWLWrapper owlWrapper)
 	{
-		super(owlWrapper);
+		this.owlWrapper = owlWrapper;
 	}
 	
 	/**
@@ -68,7 +72,7 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public Set<String> getAllControllableInstances()
 	{
-		return this.getAllIndividual("Controllable");
+		return this.owlWrapper.getAllIndividual("Controllable");
 	}
 	
 	/**
@@ -80,8 +84,8 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getNetworkComponent(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
-		return this.getSpecificType(individual, "NetworkComponent", false);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
+		return this.owlWrapper.getSpecificType(individual, "NetworkComponent", false);
 	}
 	
 	/**
@@ -93,11 +97,11 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getDeviceType(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
-		String deviceType = this.getSpecificType(individual, "NetworkComponent", true);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
+		String deviceType = this.owlWrapper.getSpecificType(individual, "NetworkComponent", true);
 		// it is a gateway
 		if (deviceType.isEmpty())
-			deviceType = this.getSpecificType(individual, "NetworkComponent", false);
+			deviceType = this.owlWrapper.getSpecificType(individual, "NetworkComponent", false);
 		
 		return deviceType;
 	}
@@ -111,11 +115,11 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getIsIn(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual isIn = this.getSingleObjectProperty(individual, "isIn");
+		OWLIndividual isIn = this.owlWrapper.getSingleObjectProperty(individual, "isIn");
 		if (isIn != null)
-			return this.getShortFormWithoutPrefix((OWLEntity) isIn);
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) isIn);
 		else
 			return null;
 	}
@@ -129,11 +133,11 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getHasGateway(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual hasGateway = this.getSingleObjectProperty(individual, "hasGateway");
+		OWLIndividual hasGateway = this.owlWrapper.getSingleObjectProperty(individual, "hasGateway");
 		if (hasGateway != null)
-			return this.getShortFormWithoutPrefix((OWLEntity) hasGateway);
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) hasGateway);
 		else
 			return null;
 	}
@@ -147,11 +151,11 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getHasMeter(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual hasMeter = this.getSingleObjectProperty(individual, "hasMeter");
+		OWLIndividual hasMeter = this.owlWrapper.getSingleObjectProperty(individual, "hasMeter");
 		if (hasMeter != null)
-			return this.getShortFormWithoutPrefix((OWLEntity) hasMeter);
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) hasMeter);
 		else
 			return null;
 	}
@@ -165,11 +169,11 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getSensorOf(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual sensorOf = this.getSingleObjectProperty(individual, "sensorOf");
+		OWLIndividual sensorOf = this.owlWrapper.getSingleObjectProperty(individual, "sensorOf");
 		if (sensorOf != null)
-			return this.getShortFormWithoutPrefix((OWLEntity) sensorOf);
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) sensorOf);
 		else
 			return null;
 	}
@@ -183,11 +187,11 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getPluggedIn(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual pluggedIn = this.getSingleObjectProperty(individual, "pluggedIn");
+		OWLIndividual pluggedIn = this.owlWrapper.getSingleObjectProperty(individual, "pluggedIn");
 		if (pluggedIn != null)
-			return this.getShortFormWithoutPrefix((OWLEntity) pluggedIn);
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) pluggedIn);
 		else
 			return null;
 	}
@@ -201,11 +205,11 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getActuatorOf(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual actuatorOf = this.getSingleObjectProperty(individual, "actuatorOf");
+		OWLIndividual actuatorOf = this.owlWrapper.getSingleObjectProperty(individual, "actuatorOf");
 		if (actuatorOf != null)
-			return this.getShortFormWithoutPrefix((OWLEntity) actuatorOf);
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) actuatorOf);
 		else
 			return null;
 	}
@@ -219,15 +223,15 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public Set<String> getMeterOf(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> meterOfValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> meterOf = this.getMultipleObjectProperties(individual, "meterOf");
+		Set<OWLNamedIndividual> meterOf = this.owlWrapper.getMultipleObjectProperties(individual, "meterOf");
 		if (meterOf != null)
 		{
 			for (OWLNamedIndividual singleProp : meterOf)
 			{
-				meterOfValues.add(this.getShortFormWithoutPrefix((OWLEntity) singleProp));
+				meterOfValues.add(this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleProp));
 			}
 		}
 		
@@ -243,15 +247,15 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public Set<String> getControlledObject(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> controlledObjectValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> controlledObject = this.getMultipleObjectProperties(individual, "controlledObject");
+		Set<OWLNamedIndividual> controlledObject = this.owlWrapper.getMultipleObjectProperties(individual, "controlledObject");
 		if (controlledObject != null)
 		{
 			for (OWLNamedIndividual singleProp : controlledObject)
 			{
-				controlledObjectValues.add(this.getShortFormWithoutPrefix((OWLEntity) singleProp));
+				controlledObjectValues.add(this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleProp));
 			}
 		}
 		
@@ -267,17 +271,17 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public Map<String, String> getAllStates(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Map<String, String> states = new HashMap<String, String>();
 		
-		Set<OWLNamedIndividual> hasState = this.getMultipleObjectProperties(individual, "hasState");
+		Set<OWLNamedIndividual> hasState = this.owlWrapper.getMultipleObjectProperties(individual, "hasState");
 		if (hasState != null)
 		{
 			for (OWLNamedIndividual singleState : hasState)
 			{
-				String stateClass = this.getShortFormWithoutPrefix((OWLEntity) singleState.getTypes(this.ontModel)
+				String stateClass = this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleState.getTypes(this.owlWrapper.getOntModel())
 						.iterator().next());
-				String stateIRI = this.getShortFormWithoutPrefix((OWLEntity) singleState);
+				String stateIRI = this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleState);
 				states.put(stateClass, stateIRI);
 			}
 		}
@@ -295,20 +299,19 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public Map<String, String> getAllStateValues(String stateName)
 	{
-		OWLNamedIndividual state = this.getOWLIndividual(stateName);
+		OWLNamedIndividual state = this.owlWrapper.getOWLIndividual(stateName);
 		Map<String, String> allStateValues = new HashMap<String, String>();
 		
 		if (state != null)
 		{
 			// get state values
-			Set<OWLNamedIndividual> hasStateValue = this.getMultipleObjectProperties(state, "hasStateValue");
+			Set<OWLNamedIndividual> hasStateValue = this.owlWrapper.getMultipleObjectProperties(state, "hasStateValue");
 			for (OWLIndividual stateValue : hasStateValue)
 			{
-				OWLClass stateValueClass = stateValue.getTypes(ontModel).iterator().next().asOWLClass();
+				OWLClass stateValueClass = stateValue.getTypes(this.owlWrapper.getOntModel()).iterator().next().asOWLClass();
 				
 				OWLDataHasValueImpl realStateValue = null;
-				Set<OWLClassExpression> superc = stateValueClass.getSuperClasses(this.manager
-						.getDirectImports(ontModel));
+				Set<OWLClassExpression> superc = stateValueClass.getSuperClasses(this.owlWrapper.getOntModel().getDirectImports());
 				for (OWLClassExpression restriction : superc)
 				{
 					if (restriction instanceof OWLDataHasValue)
@@ -320,7 +323,7 @@ public class ControllableModel extends OWLLibrary
 				if (realStateValue != null)
 					stateValueName = realStateValue.getValue().getLiteral();
 				
-				allStateValues.put(this.getShortFormWithoutPrefix(stateValueClass), stateValueName);
+				allStateValues.put(this.owlWrapper.getShortFormWithoutPrefix(stateValueClass), stateValueName);
 			}
 			
 		}
@@ -369,23 +372,23 @@ public class ControllableModel extends OWLLibrary
 	 */
 	private Map<String, Set<String>> getFunctionalities(String individualName, String suffix, boolean isCommand)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Map<String, Set<String>> functionalities = new HashMap<String, Set<String>>();
 		
-		Set<OWLNamedIndividual> hasFunctionality = this.getMultipleObjectProperties(individual, "hasFunctionality");
+		Set<OWLNamedIndividual> hasFunctionality = this.owlWrapper.getMultipleObjectProperties(individual, "hasFunctionality");
 		if (hasFunctionality != null)
 		{
 			for (OWLNamedIndividual singleFunc : hasFunctionality)
 			{
-				String functionalityClass = this.getSpecificType(singleFunc, "NotificationFunctionality", isCommand);
+				String functionalityClass = this.owlWrapper.getSpecificType(singleFunc, "NotificationFunctionality", isCommand);
 				
 				Set<String> names = new HashSet<String>();
-				Set<OWLNamedIndividual> hasSomething = this.getMultipleObjectProperties(singleFunc, suffix);
+				Set<OWLNamedIndividual> hasSomething = this.owlWrapper.getMultipleObjectProperties(singleFunc, suffix);
 				if (hasSomething != null && !hasSomething.isEmpty())
 				{
 					for (OWLIndividual something : hasSomething)
 					{
-						names.add(this.getShortFormWithoutPrefix((OWLEntity) something));
+						names.add(this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) something));
 					}
 					
 				}
@@ -405,8 +408,8 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getDeviceDescription(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName).asOWLNamedIndividual();
-		OWLAnnotation devDescription = this.getSingleAnnotation(individual);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName).asOWLNamedIndividual();
+		OWLAnnotation devDescription = this.owlWrapper.getSingleAnnotation(individual);
 		if (devDescription != null)
 			return devDescription.toString();
 		else
@@ -422,8 +425,8 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public Map<String, Set<String>> getDeviceParameters(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName).asOWLNamedIndividual();
-		return this.getDataPropertyValues(individual);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName).asOWLNamedIndividual();
+		return this.owlWrapper.getDataPropertyValues(individual);
 	}
 	
 	/**
@@ -435,8 +438,8 @@ public class ControllableModel extends OWLLibrary
 	 */
 	public String getSubFunctionalityClass(String name)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(name);
-		return this.getSpecificType(individual, "NetworkSpecificNotification", true);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(name);
+		return this.owlWrapper.getSpecificType(individual, "NetworkSpecificNotification", true);
 	}
 	
 	/**
@@ -451,14 +454,14 @@ public class ControllableModel extends OWLLibrary
 	public Map<String, Set<String>> getParameters(String individualName, String individualClass)
 	{
 		// init
-		OWLIndividual individual = this.getOWLIndividual(individualName);
+		OWLIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Map<OWLDataPropertyExpression, Set<OWLLiteral>> properties = new HashMap<OWLDataPropertyExpression, Set<OWLLiteral>>();
 		Set<OWLDataHasValueImpl> hasValueRestrictions = new HashSet<OWLDataHasValueImpl>();
 		Set<OWLDataExactCardinalityImpl> exactCardinalityRestrictions = new HashSet<OWLDataExactCardinalityImpl>();
-		OWLClass parameterClass = new OWLClassImpl(IRI.create(this.prefixManager.getDefaultPrefix() + individualClass));
-		
+		OWLClass parameterClass = new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager().getDefaultPrefix() + individualClass));
+		OWLOntology ontModel = this.owlWrapper.getOntModel();
 		// get all the superclasses from all the direct import (dogont)
-		Set<OWLClassExpression> superc = parameterClass.getSuperClasses(this.manager.getDirectImports(this.ontModel));
+		Set<OWLClassExpression> superc = parameterClass.getSuperClasses(ontModel.getDirectImports());
 		for (OWLClassExpression clazz : superc)
 		{
 			// look for a hasValue restriction
@@ -470,7 +473,7 @@ public class ControllableModel extends OWLLibrary
 			{
 				// look for a exactCardinality restriction
 				for (OWLClassExpression ancestorClass : clazz.asOWLClass().getSuperClasses(
-						this.manager.getDirectImports(this.ontModel)))
+						this.owlWrapper.getOntModel().getDirectImports()))
 				{
 					if (ancestorClass instanceof OWLDataExactCardinality)
 					{
@@ -495,14 +498,14 @@ public class ControllableModel extends OWLLibrary
 			for (OWLDataExactCardinalityImpl exactCardinalityRestriction : exactCardinalityRestrictions)
 			{
 				Set<OWLLiteral> literalSet = new HashSet<OWLLiteral>();
-				literalSet.add(this.manager.getOWLDataFactory().getOWLLiteral(
+				literalSet.add(ontModel.getOWLOntologyManager().getOWLDataFactory().getOWLLiteral(
 						exactCardinalityRestriction.getCardinality()));
 				properties.put(exactCardinalityRestriction.getProperty().asOWLDataProperty(), literalSet);
 			}
 		}
 		
 		// get the parameters from the entry ontology
-		properties.putAll(individual.getDataPropertyValues(this.ontModel));
+		properties.putAll(individual.getDataPropertyValues(ontModel));
 		
 		// return only the needed values in the proper format
 		HashMap<String, Set<String>> parameters = new HashMap<String, Set<String>>();
@@ -513,7 +516,7 @@ public class ControllableModel extends OWLLibrary
 			{
 				paramValue.add(propertyValue.getLiteral());
 			}
-			parameters.put(this.getShortFormWithoutPrefix(property.asOWLDataProperty()), paramValue);
+			parameters.put(this.owlWrapper.getShortFormWithoutPrefix(property.asOWLDataProperty()), paramValue);
 		}
 		
 		return parameters;

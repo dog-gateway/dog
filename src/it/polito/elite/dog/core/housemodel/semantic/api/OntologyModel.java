@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import it.polito.elite.dog.core.housemodel.semantic.util.OWLWrapper;
+import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 import it.polito.elite.dog.core.library.semantic.xml.Ontologies;
 
 /**

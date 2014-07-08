@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package it.polito.elite.dog.core.housemodel.semantic.util;
+package it.polito.elite.dog.core.housemodel.semantic.jaxb;
 
 import it.polito.elite.dog.core.housemodel.semantic.owl.model.BuildingModel;
 import it.polito.elite.dog.core.library.jaxb.Building;
@@ -30,6 +30,7 @@ import it.polito.elite.dog.core.library.jaxb.Room;
 import it.polito.elite.dog.core.library.jaxb.Storey;
 import it.polito.elite.dog.core.library.jaxb.Wall;
 import it.polito.elite.dog.core.library.jaxb.WallOpening;
+import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 
 import java.util.Map;
 import java.util.Set;

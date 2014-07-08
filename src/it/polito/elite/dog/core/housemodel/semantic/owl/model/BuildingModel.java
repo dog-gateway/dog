@@ -17,7 +17,7 @@
  */
 package it.polito.elite.dog.core.housemodel.semantic.owl.model;
 
-import it.polito.elite.dog.core.housemodel.semantic.util.OWLWrapper;
+import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -34,8 +34,11 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class BuildingModel extends OWLLibrary
+public class BuildingModel
 {
+	// the OWL Wrapper
+	private OWLWrapper owlWrapper;
+	
 	/**
 	 * Default constructor
 	 * 
@@ -45,7 +48,7 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public BuildingModel(OWLWrapper owlWrapper)
 	{
-		super(owlWrapper);
+		this.owlWrapper = owlWrapper;
 	}
 	
 	/**
@@ -55,7 +58,7 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public Set<String> getAllBuildingInstances()
 	{
-		return this.getAllIndividual("Building");
+		return this.owlWrapper.getAllIndividual("Building");
 	}
 	
 	/**
@@ -67,15 +70,15 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public Set<String> getContainedInstances(String buildingId)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(buildingId);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(buildingId);
 		Set<String> containedInstances = new HashSet<String>();
-		Set<OWLNamedIndividual> contains = this.getMultipleObjectProperties(individual, "contains");
+		Set<OWLNamedIndividual> contains = this.owlWrapper.getMultipleObjectProperties(individual, "contains");
 		
 		if (contains != null)
 		{
 			for (OWLIndividual singleProp : contains)
 			{
-				containedInstances.add(this.getShortFormWithoutPrefix((OWLEntity) singleProp));
+				containedInstances.add(this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleProp));
 			}
 		}
 		
@@ -91,8 +94,8 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public String getBuildingContentType(String buildingId)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(buildingId);
-		return this.getSpecificType(individual, "Room", true);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(buildingId);
+		return this.owlWrapper.getSpecificType(individual, "Room", true);
 	}
 	
 	/**
@@ -104,8 +107,8 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public Map<String, Set<String>> getSVGName(String flatId)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(flatId).asOWLNamedIndividual();
-		return this.getDataPropertyValues(individual);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(flatId).asOWLNamedIndividual();
+		return this.owlWrapper.getDataPropertyValues(individual);
 	}
 	
 	/**
@@ -117,8 +120,8 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public String getRoomType(String roomId)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(roomId);
-		return this.getSpecificType(individual, "Room", false);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(roomId);
+		return this.owlWrapper.getSpecificType(individual, "Room", false);
 	}
 	
 	/**
@@ -130,11 +133,11 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public String getHasCeiling(String roomId)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(roomId);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(roomId);
 		
-		OWLIndividual hasCeiling = this.getSingleObjectProperty(individual, "hasCeiling");
+		OWLIndividual hasCeiling = this.owlWrapper.getSingleObjectProperty(individual, "hasCeiling");
 		if (hasCeiling != null)
-			return this.getShortFormWithoutPrefix((OWLEntity) hasCeiling);
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) hasCeiling);
 		else
 			return null;
 	}
@@ -148,8 +151,8 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public String getArchitecturalType(String architecturalElement)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(architecturalElement);
-		return this.getSpecificType(individual, "Architectural", false);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(architecturalElement);
+		return this.owlWrapper.getSpecificType(individual, "Architectural", false);
 	}
 	
 	/**
@@ -161,11 +164,11 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public String getHasFloor(String roomId)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(roomId);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(roomId);
 		
-		OWLIndividual hasFloor = this.getSingleObjectProperty(individual, "hasFloor");
+		OWLIndividual hasFloor = this.owlWrapper.getSingleObjectProperty(individual, "hasFloor");
 		if (hasFloor != null)
-			return this.getShortFormWithoutPrefix((OWLEntity) hasFloor);
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) hasFloor);
 		else
 			return null;
 	}
@@ -179,15 +182,15 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public Set<String> getHasWall(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> hasWallValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> hasWall = this.getMultipleObjectProperties(individual, "hasWall");
+		Set<OWLNamedIndividual> hasWall = this.owlWrapper.getMultipleObjectProperties(individual, "hasWall");
 		if (hasWall != null)
 		{
 			for (OWLIndividual singleProp : hasWall)
 			{
-				hasWallValues.add(this.getShortFormWithoutPrefix((OWLEntity) singleProp));
+				hasWallValues.add(this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleProp));
 			}
 		}
 		
@@ -203,15 +206,15 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public Set<String> getHasWallOpening(String individualName)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(individualName);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> hasWallOpeningValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> hasWallOpening = this.getMultipleObjectProperties(individual, "hasWallOpening");
+		Set<OWLNamedIndividual> hasWallOpening = this.owlWrapper.getMultipleObjectProperties(individual, "hasWallOpening");
 		if (hasWallOpening != null)
 		{
 			for (OWLIndividual singleProp : hasWallOpening)
 			{
-				hasWallOpeningValues.add(this.getShortFormWithoutPrefix((OWLEntity) singleProp));
+				hasWallOpeningValues.add(this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleProp));
 			}
 		}
 		
@@ -227,8 +230,8 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public Map<String, Set<String>> getlevelFromGround(String storeyId)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(storeyId).asOWLNamedIndividual();
-		return this.getDataPropertyValues(individual);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(storeyId).asOWLNamedIndividual();
+		return this.owlWrapper.getDataPropertyValues(individual);
 	}
 	
 	/**
@@ -241,10 +244,10 @@ public class BuildingModel extends OWLLibrary
 	 */
 	public String getStoreyContentType(String innerId)
 	{
-		OWLNamedIndividual individual = this.getOWLIndividual(innerId);
-		String type = this.getSpecificType(individual, "Room", true);
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(innerId);
+		String type = this.owlWrapper.getSpecificType(individual, "Room", true);
 		if (type.isEmpty())
-			type = this.getSpecificType(individual, "Flat", true);
+			type = this.owlWrapper.getSpecificType(individual, "Flat", true);
 		
 		return type;
 		

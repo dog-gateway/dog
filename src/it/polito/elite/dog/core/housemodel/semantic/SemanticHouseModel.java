@@ -19,11 +19,10 @@ package it.polito.elite.dog.core.housemodel.semantic;
 
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.housemodel.semantic.api.OntologyModel;
+import it.polito.elite.dog.core.housemodel.semantic.jaxb.DogOnt2JAXB;
 import it.polito.elite.dog.core.housemodel.semantic.loader.LoadingModes;
 import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedModelLoader;
 import it.polito.elite.dog.core.housemodel.semantic.owl.model.ControllableModel;
-import it.polito.elite.dog.core.housemodel.semantic.util.DogOnt2JAXB;
-import it.polito.elite.dog.core.housemodel.semantic.util.OWLWrapper;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
 import it.polito.elite.dog.core.library.jaxb.Configparam;
@@ -35,6 +34,7 @@ import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.jaxb.NotificationFunctionality;
 import it.polito.elite.dog.core.library.model.DeviceCostants;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
+import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 import it.polito.elite.dog.core.library.semantic.xml.Ontologies;
 import it.polito.elite.dog.core.library.util.LogHelper;
 

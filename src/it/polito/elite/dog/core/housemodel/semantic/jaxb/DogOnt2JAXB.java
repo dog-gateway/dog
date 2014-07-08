@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package it.polito.elite.dog.core.housemodel.semantic.util;
+package it.polito.elite.dog.core.housemodel.semantic.jaxb;
 
 import org.semanticweb.owlapi.reasoner.InferenceType;
 
 import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
 import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
+import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 
 /**
  * Translate an ontology containing instances of DogOnt classes into the JAXB

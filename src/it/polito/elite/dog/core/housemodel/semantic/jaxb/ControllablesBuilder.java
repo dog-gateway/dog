@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package it.polito.elite.dog.core.housemodel.semantic.util;
+package it.polito.elite.dog.core.housemodel.semantic.jaxb;
 
 import it.polito.elite.dog.core.housemodel.semantic.owl.model.ControllableModel;
 import it.polito.elite.dog.core.library.jaxb.Commands;
@@ -31,6 +31,7 @@ import it.polito.elite.dog.core.library.jaxb.Notifications;
 import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
 import it.polito.elite.dog.core.library.jaxb.Statevalue;
 import it.polito.elite.dog.core.library.jaxb.Statevalues;
+import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 
 import java.util.Map;
 import java.util.Set;
