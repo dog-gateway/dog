@@ -72,7 +72,7 @@ public class ControllableModel
 	 */
 	public Set<String> getAllControllableInstances()
 	{
-		return this.owlWrapper.getAllIndividual("Controllable");
+		return this.owlWrapper.getAllIndividual(":", "Controllable");
 	}
 	
 	/**
@@ -85,7 +85,7 @@ public class ControllableModel
 	public String getNetworkComponent(String individualName)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
-		return this.owlWrapper.getSpecificType(individual, "NetworkComponent", false);
+		return this.owlWrapper.getSpecificType(individual, ":", "NetworkComponent", false);
 	}
 	
 	/**
@@ -98,10 +98,10 @@ public class ControllableModel
 	public String getDeviceType(String individualName)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
-		String deviceType = this.owlWrapper.getSpecificType(individual, "NetworkComponent", true);
+		String deviceType = this.owlWrapper.getSpecificType(individual, ":", "NetworkComponent", true);
 		// it is a gateway
 		if (deviceType.isEmpty())
-			deviceType = this.owlWrapper.getSpecificType(individual, "NetworkComponent", false);
+			deviceType = this.owlWrapper.getSpecificType(individual, ":", "NetworkComponent", false);
 		
 		return deviceType;
 	}
@@ -117,7 +117,7 @@ public class ControllableModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual isIn = this.owlWrapper.getSingleObjectProperty(individual, "isIn");
+		OWLIndividual isIn = this.owlWrapper.getSingleObjectProperty(individual, ":", "isIn");
 		if (isIn != null)
 			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) isIn);
 		else
@@ -135,7 +135,7 @@ public class ControllableModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual hasGateway = this.owlWrapper.getSingleObjectProperty(individual, "hasGateway");
+		OWLIndividual hasGateway = this.owlWrapper.getSingleObjectProperty(individual, ":", "hasGateway");
 		if (hasGateway != null)
 			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) hasGateway);
 		else
@@ -153,7 +153,7 @@ public class ControllableModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual hasMeter = this.owlWrapper.getSingleObjectProperty(individual, "hasMeter");
+		OWLIndividual hasMeter = this.owlWrapper.getSingleObjectProperty(individual, ":", "hasMeter");
 		if (hasMeter != null)
 			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) hasMeter);
 		else
@@ -171,7 +171,7 @@ public class ControllableModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual sensorOf = this.owlWrapper.getSingleObjectProperty(individual, "sensorOf");
+		OWLIndividual sensorOf = this.owlWrapper.getSingleObjectProperty(individual, ":", "sensorOf");
 		if (sensorOf != null)
 			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) sensorOf);
 		else
@@ -189,7 +189,7 @@ public class ControllableModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual pluggedIn = this.owlWrapper.getSingleObjectProperty(individual, "pluggedIn");
+		OWLIndividual pluggedIn = this.owlWrapper.getSingleObjectProperty(individual, ":", "pluggedIn");
 		if (pluggedIn != null)
 			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) pluggedIn);
 		else
@@ -207,7 +207,7 @@ public class ControllableModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		
-		OWLIndividual actuatorOf = this.owlWrapper.getSingleObjectProperty(individual, "actuatorOf");
+		OWLIndividual actuatorOf = this.owlWrapper.getSingleObjectProperty(individual, ":", "actuatorOf");
 		if (actuatorOf != null)
 			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) actuatorOf);
 		else
@@ -226,7 +226,7 @@ public class ControllableModel
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> meterOfValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> meterOf = this.owlWrapper.getMultipleObjectProperties(individual, "meterOf");
+		Set<OWLNamedIndividual> meterOf = this.owlWrapper.getMultipleObjectProperties(individual, ":", "meterOf");
 		if (meterOf != null)
 		{
 			for (OWLNamedIndividual singleProp : meterOf)
@@ -250,7 +250,7 @@ public class ControllableModel
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> controlledObjectValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> controlledObject = this.owlWrapper.getMultipleObjectProperties(individual, "controlledObject");
+		Set<OWLNamedIndividual> controlledObject = this.owlWrapper.getMultipleObjectProperties(individual, ":", "controlledObject");
 		if (controlledObject != null)
 		{
 			for (OWLNamedIndividual singleProp : controlledObject)
@@ -274,7 +274,7 @@ public class ControllableModel
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Map<String, String> states = new HashMap<String, String>();
 		
-		Set<OWLNamedIndividual> hasState = this.owlWrapper.getMultipleObjectProperties(individual, "hasState");
+		Set<OWLNamedIndividual> hasState = this.owlWrapper.getMultipleObjectProperties(individual, ":", "hasState");
 		if (hasState != null)
 		{
 			for (OWLNamedIndividual singleState : hasState)
@@ -305,7 +305,7 @@ public class ControllableModel
 		if (state != null)
 		{
 			// get state values
-			Set<OWLNamedIndividual> hasStateValue = this.owlWrapper.getMultipleObjectProperties(state, "hasStateValue");
+			Set<OWLNamedIndividual> hasStateValue = this.owlWrapper.getMultipleObjectProperties(state, ":", "hasStateValue");
 			for (OWLIndividual stateValue : hasStateValue)
 			{
 				OWLClass stateValueClass = stateValue.getTypes(this.owlWrapper.getOntModel()).iterator().next().asOWLClass();
@@ -341,7 +341,7 @@ public class ControllableModel
 	 */
 	public Map<String, Set<String>> getAllControlQueryFunctionalities(String individualName)
 	{
-		return this.getFunctionalities(individualName, "hasCommand", true);
+		return this.getFunctionalities(individualName, ":", "hasCommand", true);
 	}
 	
 	/**
@@ -354,7 +354,7 @@ public class ControllableModel
 	 */
 	public Map<String, Set<String>> getAllNotificationFunctionalities(String individualName)
 	{
-		return this.getFunctionalities(individualName, "hasNotification", false);
+		return this.getFunctionalities(individualName, ":", "hasNotification", false);
 	}
 	
 	/**
@@ -363,6 +363,8 @@ public class ControllableModel
 	 * 
 	 * @param individualName
 	 *            the short name of a {@link OWLIndividual}
+	 * @param prefixName
+	 *            the prefixName of a object property
 	 * @param suffix
 	 *            the suffix of a object property
 	 * @param isCommand
@@ -370,20 +372,20 @@ public class ControllableModel
 	 * @return a {@link Map} with all the requested functionalities class and
 	 *         sub-functionalities names
 	 */
-	private Map<String, Set<String>> getFunctionalities(String individualName, String suffix, boolean isCommand)
+	private Map<String, Set<String>> getFunctionalities(String individualName, String prefixName, String suffix, boolean isCommand)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Map<String, Set<String>> functionalities = new HashMap<String, Set<String>>();
 		
-		Set<OWLNamedIndividual> hasFunctionality = this.owlWrapper.getMultipleObjectProperties(individual, "hasFunctionality");
+		Set<OWLNamedIndividual> hasFunctionality = this.owlWrapper.getMultipleObjectProperties(individual, prefixName, "hasFunctionality");
 		if (hasFunctionality != null)
 		{
 			for (OWLNamedIndividual singleFunc : hasFunctionality)
 			{
-				String functionalityClass = this.owlWrapper.getSpecificType(singleFunc, "NotificationFunctionality", isCommand);
+				String functionalityClass = this.owlWrapper.getSpecificType(singleFunc, prefixName, "NotificationFunctionality", isCommand);
 				
 				Set<String> names = new HashSet<String>();
-				Set<OWLNamedIndividual> hasSomething = this.owlWrapper.getMultipleObjectProperties(singleFunc, suffix);
+				Set<OWLNamedIndividual> hasSomething = this.owlWrapper.getMultipleObjectProperties(singleFunc, prefixName, suffix);
 				if (hasSomething != null && !hasSomething.isEmpty())
 				{
 					for (OWLIndividual something : hasSomething)
@@ -439,7 +441,7 @@ public class ControllableModel
 	public String getSubFunctionalityClass(String name)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(name);
-		return this.owlWrapper.getSpecificType(individual, "NetworkSpecificNotification", true);
+		return this.owlWrapper.getSpecificType(individual, ":", "NetworkSpecificNotification", true);
 	}
 	
 	/**

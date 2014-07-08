@@ -58,7 +58,7 @@ public class BuildingModel
 	 */
 	public Set<String> getAllBuildingInstances()
 	{
-		return this.owlWrapper.getAllIndividual("Building");
+		return this.owlWrapper.getAllIndividual(":", "Building");
 	}
 	
 	/**
@@ -72,7 +72,7 @@ public class BuildingModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(buildingId);
 		Set<String> containedInstances = new HashSet<String>();
-		Set<OWLNamedIndividual> contains = this.owlWrapper.getMultipleObjectProperties(individual, "contains");
+		Set<OWLNamedIndividual> contains = this.owlWrapper.getMultipleObjectProperties(individual, ":", "contains");
 		
 		if (contains != null)
 		{
@@ -95,7 +95,7 @@ public class BuildingModel
 	public String getBuildingContentType(String buildingId)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(buildingId);
-		return this.owlWrapper.getSpecificType(individual, "Room", true);
+		return this.owlWrapper.getSpecificType(individual, ":", "Room", true);
 	}
 	
 	/**
@@ -121,7 +121,7 @@ public class BuildingModel
 	public String getRoomType(String roomId)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(roomId);
-		return this.owlWrapper.getSpecificType(individual, "Room", false);
+		return this.owlWrapper.getSpecificType(individual, ":", "Room", false);
 	}
 	
 	/**
@@ -135,7 +135,7 @@ public class BuildingModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(roomId);
 		
-		OWLIndividual hasCeiling = this.owlWrapper.getSingleObjectProperty(individual, "hasCeiling");
+		OWLIndividual hasCeiling = this.owlWrapper.getSingleObjectProperty(individual, ":", "hasCeiling");
 		if (hasCeiling != null)
 			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) hasCeiling);
 		else
@@ -152,7 +152,7 @@ public class BuildingModel
 	public String getArchitecturalType(String architecturalElement)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(architecturalElement);
-		return this.owlWrapper.getSpecificType(individual, "Architectural", false);
+		return this.owlWrapper.getSpecificType(individual, ":", "Architectural", false);
 	}
 	
 	/**
@@ -166,7 +166,7 @@ public class BuildingModel
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(roomId);
 		
-		OWLIndividual hasFloor = this.owlWrapper.getSingleObjectProperty(individual, "hasFloor");
+		OWLIndividual hasFloor = this.owlWrapper.getSingleObjectProperty(individual, ":", "hasFloor");
 		if (hasFloor != null)
 			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) hasFloor);
 		else
@@ -185,7 +185,7 @@ public class BuildingModel
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> hasWallValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> hasWall = this.owlWrapper.getMultipleObjectProperties(individual, "hasWall");
+		Set<OWLNamedIndividual> hasWall = this.owlWrapper.getMultipleObjectProperties(individual, ":", "hasWall");
 		if (hasWall != null)
 		{
 			for (OWLIndividual singleProp : hasWall)
@@ -209,7 +209,7 @@ public class BuildingModel
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> hasWallOpeningValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> hasWallOpening = this.owlWrapper.getMultipleObjectProperties(individual, "hasWallOpening");
+		Set<OWLNamedIndividual> hasWallOpening = this.owlWrapper.getMultipleObjectProperties(individual, ":", "hasWallOpening");
 		if (hasWallOpening != null)
 		{
 			for (OWLIndividual singleProp : hasWallOpening)
@@ -245,9 +245,9 @@ public class BuildingModel
 	public String getStoreyContentType(String innerId)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(innerId);
-		String type = this.owlWrapper.getSpecificType(individual, "Room", true);
+		String type = this.owlWrapper.getSpecificType(individual, ":", "Room", true);
 		if (type.isEmpty())
-			type = this.owlWrapper.getSpecificType(individual, "Flat", true);
+			type = this.owlWrapper.getSpecificType(individual, ":", "Flat", true);
 		
 		return type;
 		
