@@ -47,7 +47,7 @@ public class EventDaoImpl implements EventDao
 	private Connection connection;
 
 	// --------- commonly used statements ------------
-	private PreparedStatement insertRealEventStmt;
+	private PreparedStatement insertMeasureStmt;
 	private PreparedStatement insertEventStmt;
 	private PreparedStatement insertDeviceStmt;
 	private PreparedStatement selectDeviceStmt;
@@ -55,7 +55,7 @@ public class EventDaoImpl implements EventDao
 	// --------- commonly used queries ---------------
 
 	// ---- INSERTION -----------
-	private final String insertRealEventQuery = "INSERT INTO RealEvent(timestamp, unit, value, name, params, deviceuri) VALUES (?,?,?,?,?,?)";
+	private final String insertMeasureQuery = "INSERT INTO Measure(timestamp, unit, value, name, params, deviceuri) VALUES (?,?,?,?,?,?)";
 	private final String insertEventQuery = "INSERT INTO Event(timestamp, value, name, deviceuri) VALUES (?,?,?,?);";
 	private final String insertDeviceQuery = "INSERT INTO Device(uri, class, name) VALUES (?,?,?);";
 
@@ -64,9 +64,18 @@ public class EventDaoImpl implements EventDao
 	private final String selectDeviceQuery = "SELECT * FROM Device WHERE Device.uri = ?;";
 
 	// ---- TABLE STRUCTURE
-	private final String realEventTable = "CREATE TABLE RealEvent(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, unit VARCHAR(5), value DOUBLE, name VARCHAR(100), params varchar(255), deviceuri VARCHAR(255), PRIMARY KEY(id), FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
-	private final String eventTable = "CREATE TABLE Event(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, value VARCHAR(100), name VARCHAR(100), deviceuri VARCHAR(255), PRIMARY KEY(id), FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
-	private final String deviceTable = "CREATE TABLE Device(uri VARCHAR(255), name VARCHAR(100), class varchar(255), PRIMARY KEY(uri));";
+	private final String measuresTableName = "Measure";
+	private final String eventTableName = "Event";
+	private final String deviceTableName = "Device";
+	private final String measuresTableCreateQuery = "CREATE TABLE "
+			+ this.measuresTableName
+			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, unit VARCHAR(5), value DOUBLE, name VARCHAR(100), params VARCHAR(255), deviceuri VARCHAR(255), PRIMARY KEY(id), FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
+	private final String eventTableCreateQuery = "CREATE TABLE "
+			+ this.eventTableName
+			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, value VARCHAR(100), name VARCHAR(100), deviceuri VARCHAR(255), PRIMARY KEY(id), FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
+	private final String deviceTableCreateQuery = "CREATE TABLE "
+			+ this.deviceTableName
+			+ "e(uri VARCHAR(255), name VARCHAR(100), class varchar(255), PRIMARY KEY(uri));";
 
 	public EventDaoImpl(final String url, final String user,
 			final String password, final BundleContext context)
@@ -94,12 +103,13 @@ public class EventDaoImpl implements EventDao
 		{
 			// check if the Device table exist
 			ResultSet tableSet = connection.getMetaData().getTables(
-					connection.getCatalog(), null, "DEVICE", null);
+					connection.getCatalog(), null,
+					this.deviceTableName.toUpperCase(), null);
 
 			if (!tableSet.next())
 			{
 				// missing event table: create it
-				this.connection.prepareStatement(this.deviceTable)
+				this.connection.prepareStatement(this.deviceTableCreateQuery)
 						.executeUpdate();
 				this.logger.log(LogService.LOG_INFO,
 						"Schema creation has been successful!");
@@ -109,12 +119,13 @@ public class EventDaoImpl implements EventDao
 
 			// check if the Event table exist
 			tableSet = connection.getMetaData().getTables(
-					connection.getCatalog(), null, "EVENT", null);
+					connection.getCatalog(), null,
+					this.eventTableName.toUpperCase(), null);
 
 			if (!tableSet.next())
 			{
 				// missing event table: create it
-				this.connection.prepareStatement(this.eventTable)
+				this.connection.prepareStatement(this.eventTableCreateQuery)
 						.executeUpdate();
 				this.logger.log(LogService.LOG_INFO,
 						"Schema creation has been successful!");
@@ -124,12 +135,13 @@ public class EventDaoImpl implements EventDao
 
 			// check if the RealEvent table exist
 			tableSet = connection.getMetaData().getTables(
-					connection.getCatalog(), null, "REALEVENT", null);
+					connection.getCatalog(), null,
+					this.measuresTableName.toUpperCase(), null);
 
 			if (!tableSet.next())
 			{
 				// missing event table: create it
-				this.connection.prepareStatement(this.realEventTable)
+				this.connection.prepareStatement(this.measuresTableCreateQuery)
 						.executeUpdate();
 				this.logger.log(LogService.LOG_INFO,
 						"Schema creation has been successful!");
@@ -156,8 +168,8 @@ public class EventDaoImpl implements EventDao
 		// performance
 		try
 		{
-			this.insertRealEventStmt = this.connection
-					.prepareStatement(this.insertRealEventQuery);
+			this.insertMeasureStmt = this.connection
+					.prepareStatement(this.insertMeasureQuery);
 
 			this.insertEventStmt = this.connection
 					.prepareStatement(this.insertEventQuery);
@@ -184,7 +196,7 @@ public class EventDaoImpl implements EventDao
 		{
 			this.insertDeviceStmt.close();
 			this.insertEventStmt.close();
-			this.insertRealEventStmt.close();
+			this.insertMeasureStmt.close();
 			this.selectDeviceStmt.close();
 
 			this.connection.close();
@@ -200,9 +212,9 @@ public class EventDaoImpl implements EventDao
 	}
 
 	@Override
-	public boolean insertRealEvent(String deviceURI, Date eventTimestamp,
-			Measure<?,?> eventValue, 
-			String notificationName, String notificationParams)
+	public boolean insertMeasure(String deviceURI, Date eventTimestamp,
+			Measure<?, ?> eventValue, String notificationName,
+			String notificationParams)
 	{
 		boolean inserted = false;
 
@@ -233,18 +245,20 @@ public class EventDaoImpl implements EventDao
 			// Insert the real event in the right table
 
 			// fill the prepared statement
-			this.insertRealEventStmt.setTimestamp(1, new Timestamp(
-					eventTimestamp.getTime()));
-			DecimalMeasure<? extends Quantity> measure = DecimalMeasure.valueOf(eventValue.toString());
-			this.insertRealEventStmt.setString(2, eventValue.getUnit()
-					.toString());
-			this.insertRealEventStmt.setDouble(3, measure.getValue().doubleValue());
-			this.insertRealEventStmt.setString(4, notificationName);
-			this.insertRealEventStmt.setString(5, notificationParams);
-			this.insertRealEventStmt.setString(6, deviceURI);
+			this.insertMeasureStmt.setTimestamp(1,
+					new Timestamp(eventTimestamp.getTime()));
+			DecimalMeasure<? extends Quantity> measure = DecimalMeasure
+					.valueOf(eventValue.toString());
+			this.insertMeasureStmt
+					.setString(2, eventValue.getUnit().toString());
+			this.insertMeasureStmt.setDouble(3, measure.getValue()
+					.doubleValue());
+			this.insertMeasureStmt.setString(4, notificationName);
+			this.insertMeasureStmt.setString(5, notificationParams);
+			this.insertMeasureStmt.setString(6, deviceURI);
 
 			// execute the insert query
-			this.insertRealEventStmt.executeUpdate();
+			this.insertMeasureStmt.executeUpdate();
 			this.connection.commit();
 
 			// turn the insertion flag to true
@@ -285,7 +299,7 @@ public class EventDaoImpl implements EventDao
 				this.insertDeviceStmt.setString(1, deviceURI);
 				this.insertDeviceStmt.setString(2, "");
 				this.insertDeviceStmt.setString(3, "");
-				
+
 				this.insertDeviceStmt.executeUpdate();
 				this.connection.commit();
 			}
@@ -316,9 +330,9 @@ public class EventDaoImpl implements EventDao
 		return inserted;
 	}
 
-	@Override
-	/**Gets all the events generated by a given device in the time frame between
-	 * startDate and endDate using pagination
+	/**
+	 * Gets all the events carrying a measure generated by a given device in the
+	 * time frame between startDate and endDate using pagination
 	 * 
 	 * @param deviceURI
 	 *            the deviceURI as a{@link String}
@@ -330,45 +344,18 @@ public class EventDaoImpl implements EventDao
 	 *            the starting count
 	 * @param nResults
 	 *            the number of results to provide back
-	 */            
-	public EventDataStreamSet getAllDeviceEvents(String deviceUri,
+	 */
+	@Override
+	public EventDataStreamSet getAllDeviceMeasures(String deviceUri,
 			Date startDate, Date endDate, int startCount, int nResults)
 	{
 		// the event data stream set to return
-		EventDataStreamSet streamSet = new EventDataStreamSet(deviceUri);
-
-		// get real events
-		this.getAllDeviceMeasures(deviceUri, startDate, endDate, startCount,
-				nResults, streamSet);
-
-		// get events
-		this.getAllDeviceEvents(deviceUri, startDate, endDate, startCount,
-				nResults, streamSet);
-
-		return streamSet;
-	}
-
-	/**Gets all the events carrying a measure generated by a given device in the time frame between
-	 * startDate and endDate using pagination
-	 * 
-	 * @param deviceURI
-	 *            the deviceURI as a{@link String}
-	 * @param startDate
-	 *            the start date
-	 * @param endDate
-	 *            the end date
-	 * @param startCount
-	 *            the starting count
-	 * @param nResults
-	 *            the number of results to provide back
-	 */ 
-	private void getAllDeviceMeasures(String deviceUri, Date startDate,
-			Date endDate, int startCount, int nResults,
-			EventDataStreamSet streamSet)
-	{
+		EventDataStreamSet streamSet = new EventDataStreamSet();
 
 		// the select query
-		String allRealEventsQuery = "SELECT * FROM RealEvent WHERE deviceuri=? AND timestamp>=? and timestamp<=? ORDER BY name,params ASC LIMIT ? OFFSET ?;";
+		String allRealEventsQuery = "SELECT * FROM "
+				+ this.measuresTableName
+				+ " WHERE deviceuri=? AND timestamp>=? and timestamp<=? ORDER BY name,params ASC LIMIT ? OFFSET ?;";
 
 		// the select statement
 		try
@@ -414,8 +401,8 @@ public class EventDaoImpl implements EventDao
 
 					// add the stream to the event set
 					streamSet.addEventDataStream(currentStream);
-					
-					//update the previous values
+
+					// update the previous values
 					previousName = currentName;
 					previousParams = currentParams;
 				}
@@ -436,10 +423,13 @@ public class EventDaoImpl implements EventDao
 					"Unable to retrieve sensor events carrying measures", e);
 		}
 
+		return streamSet;
+
 	}
 
-	/**Gets all the events carrying a discrete value generated by a given device in the time frame between
-	 * startDate and endDate using pagination
+	/**
+	 * Gets all the events carrying a discrete value generated by a given device
+	 * in the time frame between startDate and endDate using pagination
 	 * 
 	 * @param deviceURI
 	 *            the deviceURI as a{@link String}
@@ -451,14 +441,22 @@ public class EventDaoImpl implements EventDao
 	 *            the starting count
 	 * @param nResults
 	 *            the number of results to provide back
-	 */ 
-	private void getAllDeviceEvents(String deviceUri, Date startDate,
-			Date endDate, int startCount, int nResults,
-			EventDataStreamSet streamSet)
+	 */
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceUri,
+			Date startDate, Date endDate, int startCount, int nResults,
+			boolean aggregated)
 	{
 
+		// the event data stream set to return
+		EventDataStreamSet streamSet = new EventDataStreamSet();
+
 		// the select query
-		String allRealEventsQuery = "SELECT * FROM Event WHERE deviceuri=? AND timestamp>=? and timestamp<=? ORDER BY name LIMIT ? OFFSET ?;";
+		String allRealEventsQuery = "SELECT * FROM Event WHERE deviceuri=? AND timestamp>=? and timestamp<=?";
+		if(aggregated)
+			allRealEventsQuery = allRealEventsQuery +" ORDER BY timestamp ASC LIMIT ? OFFSET ?;";
+		else
+			allRealEventsQuery = allRealEventsQuery +" ORDER BY name,timestamp ASC LIMIT ? OFFSET ?;";
 
 		// the select statement
 		try
@@ -488,7 +486,10 @@ public class EventDaoImpl implements EventDao
 
 			while (result.next())
 			{
-				currentName = result.getString("name");
+				if(aggregated)
+					currentName = "events";
+				else
+					currentName = result.getString("name");
 
 				// check if a new event stream should be created
 				if (!currentName.equals(previousName))
@@ -499,8 +500,8 @@ public class EventDaoImpl implements EventDao
 
 					// add the stream to the event set
 					streamSet.addEventDataStream(currentStream);
-					
-					//update the previous values
+
+					// update the previous values only if not aggregated
 					previousName = currentName;
 				}
 
@@ -519,14 +520,14 @@ public class EventDaoImpl implements EventDao
 					"Unable to retrieve sensor events", e);
 		}
 
+		return streamSet;
+
 	}
 
-	
-	@Override
 	/**
-	 * Gets all the events corresponding to the given notification (including
-	 * any restricting parameter, e.g., phaseId=1) in the time frame between
-	 * startDate and endDate, using pagination.
+	 * Gets all the events corresponding to the given notification (continuous)
+	 * including any restricting parameter, e.g., phaseId=1, in the time frame
+	 * between startDate and endDate, using pagination.
 	 * 
 	 * @param deviceURI
 	 *            The deviceURI as a{@link String}
@@ -546,47 +547,7 @@ public class EventDaoImpl implements EventDao
 	 * @param nResults
 	 *            The number of results to provide back
 	 */
-	public EventDataStream getDeviceEvents(String deviceURI,
-			String notificationName, String notificationParams, Date startDate,
-			Date endDate, int startCount, int nResults)
-	{
-		if ((notificationParams != null) && (!notificationParams.isEmpty()))
-		{
-			return this.getDeviceMeasures(deviceURI, notificationName,
-					notificationParams, startDate, endDate, startCount,
-					nResults);
-		}
-		else
-		{
-			return this.getDeviceEvents(deviceURI, notificationName, startDate,
-					endDate, startCount, nResults);
-		}
-	}
-
-	/**
-	 * Gets all the events corresponding to the given notification (continuous) including
-	 * any restricting parameter, e.g., phaseId=1, in the time frame between
-	 * startDate and endDate, using pagination.
-	 * 
-	 * @param deviceURI
-	 *            The deviceURI as a{@link String}
-	 * @param notificationName
-	 *            The name of the notification for which events must be
-	 *            retrieved
-	 * @param notificationParams
-	 *            The parameter values needed to further specify which
-	 *            notification must be matched, in a post-like encoding
-	 *            <code>name1=value1&name2=value2&...</code>;
-	 * @param startDate
-	 *            The start date.
-	 * @param endDate
-	 *            The end date.
-	 * @param startCount
-	 *            The starting count
-	 * @param nResults
-	 *            The number of results to provide back
-	 */
-	private EventDataStream getDeviceMeasures(String deviceURI,
+	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
 			String notificationName, String notificationParams, Date startDate,
 			Date endDate, int startCount, int nResults)
 	{
@@ -643,8 +604,9 @@ public class EventDaoImpl implements EventDao
 	}
 
 	/**
-	 * Gets all the events corresponding to the given notification (discrete) with no parameters in the time frame between
-	 * startDate and endDate, using pagination.
+	 * Gets all the events corresponding to the given notification (discrete)
+	 * with no parameters in the time frame between startDate and endDate, using
+	 * pagination.
 	 * 
 	 * @param deviceURI
 	 *            The deviceURI as a{@link String}

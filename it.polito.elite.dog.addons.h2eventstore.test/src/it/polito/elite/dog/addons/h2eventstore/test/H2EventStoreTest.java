@@ -134,12 +134,19 @@ public class H2EventStoreTest
 
 						if (device instanceof ControllableDevice)
 						{
-							EventDataStreamSet streamSet = store.getAllDeviceEvents(
+							EventDataStreamSet measures = store.getAllDeviceMeasures(
 									((ControllableDevice) device).getDeviceId(),
 									this.creationDate);
 							
 							//dump
-							this.logger.log(LogService.LOG_DEBUG, "StreamSet: "+streamSet);
+							this.logger.log(LogService.LOG_DEBUG, "Measures: "+measures);
+							
+							EventDataStreamSet events = store.getAllDeviceEvents(
+									((ControllableDevice) device).getDeviceId(),
+									this.creationDate,true);
+							
+							//dump
+							this.logger.log(LogService.LOG_DEBUG, "Events: "+events);
 						}
 
 						this.context.ungetService(deviceService[0]);

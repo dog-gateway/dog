@@ -399,7 +399,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 							&& (!deviceURI.isEmpty()))
 					{
 						// insert the event
-						this.eventDao.insertRealEvent(deviceURI,
+						this.eventDao.insertMeasure(deviceURI,
 								eventTimestamp, eventValue, notificationName,
 								notificationParams);
 					}
@@ -592,68 +592,111 @@ public class H2EventStore implements EventHandler, ManagedService,
 	// -------------------------- EventStore implementation -------------
 
 	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
 			Date startDate, Date endDate)
 	{
-		return this.getAllDeviceEvents(deviceURI, startDate, endDate, 0, -1);
+		return this.getAllDeviceMeasures(deviceURI, startDate, endDate, 0, -1);
 	}
 
 	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
 			Date startDate, Date endDate, int startCount, int nResults)
 	{
-		return this.eventDao.getAllDeviceEvents(deviceURI, startDate, endDate,
+		return this.eventDao.getAllDeviceMeasures(deviceURI, startDate, endDate,
 				startCount, nResults);
 	}
 
 	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
 			Date startDate)
 	{
-		return this.getAllDeviceEvents(deviceURI, startDate, new Date(), 0, -1);
+		return this.getAllDeviceMeasures(deviceURI, startDate, new Date(), 0, -1);
 	}
 
 	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
 			Date startDate, int startCount, int nResults)
 	{
-		return this.getAllDeviceEvents(deviceURI, startDate, new Date(),
+		return this.getAllDeviceMeasures(deviceURI, startDate, new Date(),
 				startCount, nResults);
+	}
+	
+	/* (non-Javadoc)
+	 * @see it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java.lang.String, java.util.Date, java.util.Date, boolean)
+	 */
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+			Date startDate, Date endDate, boolean aggregated)
+	{
+		return this.getAllDeviceEvents(deviceURI, startDate, endDate, 0, -1, aggregated);
+	}
+
+	/* (non-Javadoc)
+	 * @see it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java.lang.String, java.util.Date, java.util.Date, int, int, boolean)
+	 */
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+			Date startDate, Date endDate, int startCount, int nResults,
+			boolean aggregated)
+	{
+		return this.eventDao.getAllDeviceEvents(deviceURI, startDate, endDate,
+				startCount, nResults,aggregated);
+	}
+
+	/* (non-Javadoc)
+	 * @see it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java.lang.String, java.util.Date, boolean)
+	 */
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+			Date startDate, boolean aggregated)
+	{
+		return this.getAllDeviceEvents(deviceURI, startDate, new Date(), 0, -1, aggregated);
+	}
+
+	/* (non-Javadoc)
+	 * @see it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java.lang.String, java.util.Date, int, int, boolean)
+	 */
+	@Override
+	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+			Date startDate, int startCount, int nResults, boolean aggregated)
+	{
+		return this.getAllDeviceEvents(deviceURI, startDate, new Date(),
+				startCount, nResults, aggregated);
 	}
 
 	@Override
-	public EventDataStream getDeviceEvents(String deviceURI,
+	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
 			String notificationName, String notificationParams, Date startDate,
 			Date endDate)
 	{
-		return this.getDeviceEvents(deviceURI, notificationName,
+		return this.getSpecificDeviceMeasure(deviceURI, notificationName,
 				notificationParams, startDate, endDate, 0, -1);
 	}
 
 	@Override
-	public EventDataStream getDeviceEvents(String deviceURI,
+	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
 			String notificationName, String notificationParams, Date startDate,
 			Date endDate, int startCount, int nResults)
 	{
-		return this.eventDao.getDeviceEvents(deviceURI, notificationName,
+		return this.eventDao.getSpecificDeviceMeasure(deviceURI, notificationName,
 				notificationParams, startDate, endDate, startCount, nResults);
 	}
 
 	@Override
-	public EventDataStream getDeviceEvents(String deviceURI,
+	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
 			String notificationName, String notificationParams, Date startDate)
 	{
-		return this.getDeviceEvents(deviceURI, notificationName,
+		return this.getSpecificDeviceMeasure(deviceURI, notificationName,
 				notificationParams, startDate, new Date(), 0, -1);
 	}
 
 	@Override
-	public EventDataStream getDeviceEvents(String deviceURI,
+	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
 			String notificationName, String notificationParams, Date startDate,
 			int startCount, int nResults)
 	{
 		return this
-				.getDeviceEvents(deviceURI, notificationName,
+				.getSpecificDeviceMeasure(deviceURI, notificationName,
 						notificationParams, startDate, new Date(), startCount,
 						nResults);
 	}

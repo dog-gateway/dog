@@ -21,35 +21,35 @@ import java.util.HashSet;
 
 /**
  * @author bonino
- *
+ * 
  */
 public class EventDataStreamSet
 {
-	private String deviceUri;
-	
 	private HashSet<EventDataStream> eventDataStreams;
-	
+
 	/**
-	 * The class constructor, creates an {@link EventDataStreamSet} instance associated to the given device
+	 * The class constructor, creates an {@link EventDataStreamSet} instance
+	 * associated to the given device
+	 * 
 	 * @param deviceUri
 	 */
 	public EventDataStreamSet(String deviceUri)
 	{
-		this.deviceUri = deviceUri;
-		
 		this.eventDataStreams = new HashSet<>();
 	}
-	
+
 	/**
-	 * The class constructor, creates an unbounded {@link EventDataStreamSet} instance.
+	 * The class constructor, creates an unbounded {@link EventDataStreamSet}
+	 * instance.
 	 */
 	public EventDataStreamSet()
-	{	
+	{
 		this.eventDataStreams = new HashSet<>();
 	}
-	
+
 	/**
 	 * Add an event data stream to this set.
+	 * 
 	 * @param stream
 	 */
 	public void addEventDataStream(EventDataStream stream)
@@ -58,25 +58,8 @@ public class EventDataStreamSet
 	}
 
 	/**
-	 * Get the uri of the device generating this set of event data streams
-	 * @return
-	 */
-	public String getDeviceUri()
-	{
-		return this.deviceUri;
-	}
-
-	/**
-	 * Set the uri of the device generating this set of event data streams
-	 * @param deviceUri
-	 */
-	public void setDeviceUri(String deviceUri)
-	{
-		this.deviceUri = deviceUri;
-	}
-
-	/**
 	 * Get the live reference to all the event data streams stored in this set
+	 * 
 	 * @return
 	 */
 	public HashSet<EventDataStream> getEventDataStreams()
@@ -88,18 +71,20 @@ public class EventDataStreamSet
 	public String toString()
 	{
 		StringBuffer asStringBuffer = new StringBuffer();
-		
-		asStringBuffer.append("[Device URI:"+this.deviceUri+" , ");
-		for(EventDataStream stream : this.eventDataStreams)
+		asStringBuffer.append("[");
+		boolean first = true;
+		for (EventDataStream stream : this.eventDataStreams)
 		{
-			asStringBuffer.append("{");
+			if (!first)
+				asStringBuffer.append(",");
+			else
+				first = false;
+
 			asStringBuffer.append(stream.toString());
-			asStringBuffer.append("}");
+
 		}
 		asStringBuffer.append("]");
 		return asStringBuffer.toString();
 	}
-	
-	
 
 }

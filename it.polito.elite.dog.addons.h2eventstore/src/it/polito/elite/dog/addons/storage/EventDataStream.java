@@ -28,13 +28,17 @@ public class EventDataStream
 	// the stream metadata
 
 	// the notification name associated to the stream
-	private String notificationName;
+	private String name;
 
 	// the notification parameter associated to the stream
-	private String notificationParameters;
+	private String additionalParameters;
 
 	// the uri of the device generating the stream
 	private String deviceUri;
+
+	// the uid of the data stream as url-like concatenation of name and
+	// additional parameters
+	private String uid;
 
 	// the data points
 	private ArrayList<EventDataPoint> datapoints;
@@ -66,9 +70,11 @@ public class EventDataStream
 			String notificationParameters, String deviceUri)
 	{
 		super();
-		this.notificationName = notificationName;
-		this.notificationParameters = notificationParameters;
+		this.name = notificationName;
+		this.additionalParameters = notificationParameters;
 		this.deviceUri = deviceUri;
+		this.uid = this.deviceUri + "/" + name + "?"
+				+ this.additionalParameters;
 		this.datapoints = new ArrayList<>();
 	}
 
@@ -106,9 +112,11 @@ public class EventDataStream
 			String notificationParameters, String deviceUri, int initialSize)
 	{
 		super();
-		this.notificationName = notificationName;
-		this.notificationParameters = notificationParameters;
+		this.name = notificationName;
+		this.additionalParameters = notificationParameters;
 		this.deviceUri = deviceUri;
+		this.uid = this.deviceUri + "/" + name + "?"
+				+ this.additionalParameters;
 		this.datapoints = new ArrayList<>(initialSize);
 	}
 
@@ -120,7 +128,7 @@ public class EventDataStream
 	 */
 	public String getNotificationName()
 	{
-		return this.notificationName;
+		return this.name;
 	}
 
 	/**
@@ -131,29 +139,41 @@ public class EventDataStream
 	 */
 	public void setNotificationName(String notificationName)
 	{
-		this.notificationName = notificationName;
+		this.name = notificationName;
+		this.uid = this.deviceUri + "/" + name + "?"
+				+ this.additionalParameters;
 	}
 
 	/**
-	 * Get the parameters needed to better identify the notification generating this event stream
-	 * @return The parameters encoded in a post-like manner, e.g., name1=value1&name2=value2&...
+	 * Get the parameters needed to better identify the notification generating
+	 * this event stream
+	 * 
+	 * @return The parameters encoded in a post-like manner, e.g.,
+	 *         name1=value1&name2=value2&...
 	 */
 	public String getNotificationParameters()
 	{
-		return this.notificationParameters;
+		return this.additionalParameters;
 	}
 
 	/**
-	 * Set the parameters needed to better identify the notification generating this event stream
-	 * @param notificationParameters The parameters encoded in a post-like manner, e.g., name1=value1&name2=value2&...
+	 * Set the parameters needed to better identify the notification generating
+	 * this event stream
+	 * 
+	 * @param notificationParameters
+	 *            The parameters encoded in a post-like manner, e.g.,
+	 *            name1=value1&name2=value2&...
 	 */
 	public void setNotificationParameters(String notificationParameters)
 	{
-		this.notificationParameters = notificationParameters;
+		this.additionalParameters = notificationParameters;
+		this.uid = this.deviceUri + "/" + name + "?"
+				+ this.additionalParameters;
 	}
 
 	/**
 	 * Get the URI of the device generating this stream
+	 * 
 	 * @return
 	 */
 	public String getDeviceUri()
@@ -163,15 +183,29 @@ public class EventDataStream
 
 	/**
 	 * Set the URI of the device generating this stream
+	 * 
 	 * @param deviceUri
 	 */
 	public void setDeviceUri(String deviceUri)
 	{
 		this.deviceUri = deviceUri;
+		this.uid = this.deviceUri + "/" + name + "?"
+				+ this.additionalParameters;
+	}
+
+	/**
+	 * Gets the uid associated to this event stream
+	 * 
+	 * @return the uid
+	 */
+	public String getUid()
+	{
+		return uid;
 	}
 
 	/**
 	 * Get the list of {@link EventDataPoint}s composing this stream
+	 * 
 	 * @return
 	 */
 	public ArrayList<EventDataPoint> getDatapoints()
@@ -180,17 +214,20 @@ public class EventDataStream
 	}
 
 	/**
-	 * Sets  the list of {@link EventDataPoint}s composing this stream
+	 * Sets the list of {@link EventDataPoint}s composing this stream
+	 * 
 	 * @param datapoints
 	 */
 	public void setDatapoints(ArrayList<EventDataPoint> datapoints)
 	{
 		this.datapoints = datapoints;
 	}
-	
+
 	/**
 	 * Adds the given data point to this stream
-	 * @param datapoint The data point to add
+	 * 
+	 * @param datapoint
+	 *            The data point to add
 	 * @return true if successfully added, false otherwise
 	 */
 	public boolean addDatapoint(EventDataPoint datapoint)
@@ -202,18 +239,23 @@ public class EventDataStream
 	public String toString()
 	{
 		StringBuffer asStringBuffer = new StringBuffer();
-		
-		asStringBuffer.append(" [Notification Name: "+this.notificationName);
-		asStringBuffer.append(" , Notification Params: "+this.notificationParameters+", ");
-		for(EventDataPoint datapoint : this.datapoints)
+
+		asStringBuffer.append(" {'uid':'" + this.uid + "', 'deviceuri':'"
+				+ this.deviceUri + "', 'name':'" + this.name + "', ");
+		asStringBuffer.append("'additionalparams':'"
+				+ this.additionalParameters + "', 'datapoints':'[");
+		boolean first = true;
+		for (EventDataPoint datapoint : this.datapoints)
 		{
-			asStringBuffer.append("{");
+			if (!first)
+				asStringBuffer.append(",");
+			else
+				first = false;
+
 			asStringBuffer.append(datapoint.toString());
-			asStringBuffer.append("}");
 		}
-		asStringBuffer.append("]");
+		asStringBuffer.append("]}");
 		return asStringBuffer.toString();
 	}
 
-	
 }
