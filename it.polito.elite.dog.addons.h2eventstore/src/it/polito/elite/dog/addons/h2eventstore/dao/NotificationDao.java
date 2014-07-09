@@ -1,35 +1,15 @@
-/*
- * Dog - Addons
+/**
  * 
- * Copyright (c) 2013-2014 Claudio Degioanni, Luigi De Russis, Dario Bonino
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License
  */
 package it.polito.elite.dog.addons.h2eventstore.dao;
 
-import it.polito.elite.dog.addons.storage.EventDao;
-import it.polito.elite.dog.addons.storage.EventDataPoint;
-import it.polito.elite.dog.addons.storage.EventDataStream;
-import it.polito.elite.dog.addons.storage.EventDataStreamSet;
-import it.polito.elite.dog.core.library.util.LogHelper;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
@@ -38,54 +18,70 @@ import javax.measure.quantity.Quantity;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class EventDaoImpl implements EventDao
+import it.polito.elite.dog.addons.h2eventstore.db.H2Storage;
+import it.polito.elite.dog.addons.storage.EventDataPoint;
+import it.polito.elite.dog.addons.storage.EventDataStream;
+import it.polito.elite.dog.addons.storage.EventDataStreamSet;
+import it.polito.elite.dog.core.library.util.LogHelper;
+
+/**
+ * @author bonino
+ * 
+ */
+public class NotificationDao
 {
+
 	// OSGi logger
 	private LogHelper logger;
 
-	// database connection
-	private Connection connection;
+	// the device dao
+	private DeviceDao devDao;
+
+	// The storage layer
+	private H2Storage storage;
+
+	// ---- TABLE NAMES
+	private final String continuousNotificationTableName = "ContinuousNotification";
+	private final String discreteNotificationTableName = "DiscreteNotification";
+
+	// ---- TABLE CREATION QUERIES
+	private final String continuousNotificationTableCreateQuery = "CREATE TABLE "
+			+ this.continuousNotificationTableName
+			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, unit VARCHAR(5), "
+			+ "value DOUBLE, name VARCHAR(100), params VARCHAR(255), deviceuri VARCHAR(255), "
+			+ "PRIMARY KEY(id), FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
+	private final String discreteNotificationTableCreateQuery = "CREATE TABLE "
+			+ this.discreteNotificationTableName
+			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, value VARCHAR(100), "
+			+ "name VARCHAR(100), deviceuri VARCHAR(255), PRIMARY KEY(id), "
+			+ "FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
 
 	// --------- commonly used statements ------------
-	private PreparedStatement insertMeasureStmt;
-	private PreparedStatement insertEventStmt;
-	private PreparedStatement insertDeviceStmt;
-	private PreparedStatement selectDeviceStmt;
+	private PreparedStatement insertContinuousNotificationStmt;
+	private PreparedStatement insertDiscreteNotificationStmt;
 
-	// --------- commonly used queries ---------------
+	// ---- INSERTION QUERIES
+	private final String insertContinuousNotificationQuery = "INSERT INTO "
+			+ this.continuousNotificationTableName
+			+ "(timestamp, unit, value, name, params, deviceuri) VALUES (?,?,?,?,?,?)";
+	private final String insertDiscreteNotificationsQuery = "INSERT INTO "
+			+ this.discreteNotificationTableName
+			+ "(timestamp, value, name, deviceuri) VALUES (?,?,?,?);";
 
-	// ---- INSERTION -----------
-	private final String insertMeasureQuery = "INSERT INTO Measure(timestamp, unit, value, name, params, deviceuri) VALUES (?,?,?,?,?,?)";
-	private final String insertEventQuery = "INSERT INTO Event(timestamp, value, name, deviceuri) VALUES (?,?,?,?);";
-	private final String insertDeviceQuery = "INSERT INTO Device(uri, class, name) VALUES (?,?,?);";
-
-	// ---- DELETION ------------
-
-	private final String selectDeviceQuery = "SELECT * FROM Device WHERE Device.uri = ?;";
-
-	// ---- TABLE STRUCTURE
-	private final String measuresTableName = "Measure";
-	private final String eventTableName = "Event";
-	private final String deviceTableName = "Device";
-	private final String measuresTableCreateQuery = "CREATE TABLE "
-			+ this.measuresTableName
-			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, unit VARCHAR(5), value DOUBLE, name VARCHAR(100), params VARCHAR(255), deviceuri VARCHAR(255), PRIMARY KEY(id), FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
-	private final String eventTableCreateQuery = "CREATE TABLE "
-			+ this.eventTableName
-			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, value VARCHAR(100), name VARCHAR(100), deviceuri VARCHAR(255), PRIMARY KEY(id), FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
-	private final String deviceTableCreateQuery = "CREATE TABLE "
-			+ this.deviceTableName
-			+ "e(uri VARCHAR(255), name VARCHAR(100), class varchar(255), PRIMARY KEY(uri));";
-
-	public EventDaoImpl(final String url, final String user,
-			final String password, final BundleContext context)
-			throws SQLException
+	/**
+	 * 
+	 */
+	public NotificationDao(final DeviceDao devDao, final H2Storage storage,
+			final BundleContext context)
 	{
 		// init logger
 		this.logger = new LogHelper(context);
 
-		// open database connection
-		this.connection = DriverManager.getConnection(url, user, password);
+		// store the connection
+		this.storage = storage;
+
+		// store the device DAO instance
+		this.devDao = devDao;
 
 		// check and create tables if needed
 		this.checkAndCreateTables();
@@ -94,38 +90,25 @@ public class EventDaoImpl implements EventDao
 		this.prepareCommonStatements();
 	}
 
-	/**
-	 * Checks if the needed tables exist and if not creates them.
-	 */
 	private void checkAndCreateTables()
 	{
 		try
 		{
-			// check if the Device table exist
-			ResultSet tableSet = connection.getMetaData().getTables(
-					connection.getCatalog(), null,
-					this.deviceTableName.toUpperCase(), null);
-
-			if (!tableSet.next())
-			{
-				// missing event table: create it
-				this.connection.prepareStatement(this.deviceTableCreateQuery)
-						.executeUpdate();
-				this.logger.log(LogService.LOG_INFO,
-						"Schema creation has been successful!");
-			}
-
-			tableSet.close();
-
 			// check if the Event table exist
-			tableSet = connection.getMetaData().getTables(
-					connection.getCatalog(), null,
-					this.eventTableName.toUpperCase(), null);
+			ResultSet tableSet = this.storage
+					.getConnection()
+					.getMetaData()
+					.getTables(this.storage.getConnection().getCatalog(), null,
+							this.discreteNotificationTableName.toUpperCase(),
+							null);
 
 			if (!tableSet.next())
 			{
 				// missing event table: create it
-				this.connection.prepareStatement(this.eventTableCreateQuery)
+				this.storage
+						.getConnection()
+						.prepareStatement(
+								this.discreteNotificationTableCreateQuery)
 						.executeUpdate();
 				this.logger.log(LogService.LOG_INFO,
 						"Schema creation has been successful!");
@@ -134,29 +117,33 @@ public class EventDaoImpl implements EventDao
 			tableSet.close();
 
 			// check if the RealEvent table exist
-			tableSet = connection.getMetaData().getTables(
-					connection.getCatalog(), null,
-					this.measuresTableName.toUpperCase(), null);
+			tableSet = this.storage
+					.getConnection()
+					.getMetaData()
+					.getTables(this.storage.getConnection().getCatalog(), null,
+							this.continuousNotificationTableName.toUpperCase(),
+							null);
 
 			if (!tableSet.next())
 			{
 				// missing event table: create it
-				this.connection.prepareStatement(this.measuresTableCreateQuery)
+				this.storage
+						.getConnection()
+						.prepareStatement(
+								this.continuousNotificationTableCreateQuery)
 						.executeUpdate();
 				this.logger.log(LogService.LOG_INFO,
 						"Schema creation has been successful!");
 			}
 
 			tableSet.close();
-
 		}
 		catch (SQLException e)
 		{
 			// Log the error
 			this.logger.log(LogService.LOG_ERROR,
-					"Unable to check / create db tables");
+					"Unable to check / create state db tables");
 		}
-
 	}
 
 	/**
@@ -168,15 +155,13 @@ public class EventDaoImpl implements EventDao
 		// performance
 		try
 		{
-			this.insertMeasureStmt = this.connection
-					.prepareStatement(this.insertMeasureQuery);
+			this.insertContinuousNotificationStmt = this.storage
+					.getConnection().prepareStatement(
+							this.insertContinuousNotificationQuery);
 
-			this.insertEventStmt = this.connection
-					.prepareStatement(this.insertEventQuery);
-			this.insertDeviceStmt = this.connection
-					.prepareStatement(this.insertDeviceQuery);
-			this.selectDeviceStmt = this.connection
-					.prepareStatement(selectDeviceQuery);
+			this.insertDiscreteNotificationStmt = this.storage.getConnection()
+					.prepareStatement(this.insertDiscreteNotificationsQuery);
+
 		}
 		catch (SQLException e)
 		{
@@ -186,20 +171,15 @@ public class EventDaoImpl implements EventDao
 		}
 
 	}
-
-	@Override
+	
 	public boolean close()
 	{
 		boolean isClosed = false;
 		// close db connection
 		try
 		{
-			this.insertDeviceStmt.close();
-			this.insertEventStmt.close();
-			this.insertMeasureStmt.close();
-			this.selectDeviceStmt.close();
-
-			this.connection.close();
+			this.insertDiscreteNotificationStmt.close();
+			this.insertContinuousNotificationStmt.close();
 			isClosed = true;
 		}
 		catch (SQLException e)
@@ -211,8 +191,8 @@ public class EventDaoImpl implements EventDao
 		return isClosed;
 	}
 
-	@Override
-	public boolean insertMeasure(String deviceURI, Date eventTimestamp,
+
+	public boolean insertParametricNotification(String deviceURI, Date eventTimestamp,
 			Measure<?, ?> eventValue, String notificationName,
 			String notificationParams)
 	{
@@ -220,46 +200,29 @@ public class EventDaoImpl implements EventDao
 
 		try
 		{
-			// check if the device is already available
-			this.selectDeviceStmt.setString(1, deviceURI);
+			
 
-			// exec the query
-			ResultSet result = this.selectDeviceStmt.executeQuery();
-
-			if (result.next())
-			{
-				// device exists
-				// do nothing
-			}
-			else
-			{
-				// create the device
-				this.insertDeviceStmt.setString(1, deviceURI);
-				this.insertDeviceStmt.setString(2, "");
-				this.insertDeviceStmt.setString(3, "");
-
-				this.insertDeviceStmt.executeUpdate();
-				this.connection.commit();
-			}
+			if (!this.devDao.isDevicePresent(deviceURI))
+				this.devDao.insertDevice(deviceURI);
 
 			// Insert the real event in the right table
 
 			// fill the prepared statement
-			this.insertMeasureStmt.setTimestamp(1,
+			this.insertContinuousNotificationStmt.setTimestamp(1,
 					new Timestamp(eventTimestamp.getTime()));
 			DecimalMeasure<? extends Quantity> measure = DecimalMeasure
 					.valueOf(eventValue.toString());
-			this.insertMeasureStmt
+			this.insertContinuousNotificationStmt
 					.setString(2, eventValue.getUnit().toString());
-			this.insertMeasureStmt.setDouble(3, measure.getValue()
+			this.insertContinuousNotificationStmt.setDouble(3, measure.getValue()
 					.doubleValue());
-			this.insertMeasureStmt.setString(4, notificationName);
-			this.insertMeasureStmt.setString(5, notificationParams);
-			this.insertMeasureStmt.setString(6, deviceURI);
+			this.insertContinuousNotificationStmt.setString(4, notificationName);
+			this.insertContinuousNotificationStmt.setString(5, notificationParams);
+			this.insertContinuousNotificationStmt.setString(6, deviceURI);
 
 			// execute the insert query
-			this.insertMeasureStmt.executeUpdate();
-			this.connection.commit();
+			this.insertContinuousNotificationStmt.executeUpdate();
+			this.storage.getConnection().commit();
 
 			// turn the insertion flag to true
 			inserted = true;
@@ -274,8 +237,8 @@ public class EventDaoImpl implements EventDao
 		return inserted;
 	}
 
-	@Override
-	public boolean insertEvent(String deviceURI, Date eventTimestamp,
+
+	public boolean insertNonParametricNotification(String deviceURI, Date eventTimestamp,
 			String eventValue, String name)
 	{
 		boolean inserted = false;
@@ -283,39 +246,21 @@ public class EventDaoImpl implements EventDao
 		try
 		{
 			// check if the device is already available
-			this.selectDeviceStmt.setString(1, deviceURI);
-
-			// exec the query
-			ResultSet result = this.selectDeviceStmt.executeQuery();
-
-			if (result.next())
-			{
-				// device exists
-				// do nothing
-			}
-			else
-			{
-				// create the device
-				this.insertDeviceStmt.setString(1, deviceURI);
-				this.insertDeviceStmt.setString(2, "");
-				this.insertDeviceStmt.setString(3, "");
-
-				this.insertDeviceStmt.executeUpdate();
-				this.connection.commit();
-			}
+			if (!this.devDao.isDevicePresent(deviceURI))
+				this.devDao.insertDevice(deviceURI);
 
 			// Insert the real event in the right table
 
 			// fill the prepared statement
-			this.insertEventStmt.setTimestamp(1,
+			this.insertDiscreteNotificationStmt.setTimestamp(1,
 					new Timestamp(eventTimestamp.getTime()));
-			this.insertEventStmt.setString(2, eventValue);
-			this.insertEventStmt.setString(3, name);
-			this.insertEventStmt.setString(4, deviceURI);
+			this.insertDiscreteNotificationStmt.setString(2, eventValue);
+			this.insertDiscreteNotificationStmt.setString(3, name);
+			this.insertDiscreteNotificationStmt.setString(4, deviceURI);
 
 			// execute the insert query
-			this.insertEventStmt.executeUpdate();
-			this.connection.commit();
+			this.insertDiscreteNotificationStmt.executeUpdate();
+			this.storage.getConnection().commit();
 
 			// turn the insertion flag to true
 			inserted = true;
@@ -345,23 +290,24 @@ public class EventDaoImpl implements EventDao
 	 * @param nResults
 	 *            the number of results to provide back
 	 */
-	@Override
-	public EventDataStreamSet getAllDeviceMeasures(String deviceUri,
-			Date startDate, Date endDate, int startCount, int nResults)
+
+	public EventDataStreamSet getAllDeviceContinuousNotifications(
+			String deviceUri, Date startDate, Date endDate, int startCount,
+			int nResults)
 	{
 		// the event data stream set to return
 		EventDataStreamSet streamSet = new EventDataStreamSet();
 
 		// the select query
 		String allRealEventsQuery = "SELECT * FROM "
-				+ this.measuresTableName
+				+ this.continuousNotificationTableName
 				+ " WHERE deviceuri=? AND timestamp>=? and timestamp<=? ORDER BY name,params ASC LIMIT ? OFFSET ?;";
 
 		// the select statement
 		try
 		{
 			// prepare the select statement
-			PreparedStatement allRealEventsStmt = this.connection
+			PreparedStatement allRealEventsStmt = this.storage.getConnection()
 					.prepareStatement(allRealEventsQuery);
 
 			// fill the statement data
@@ -408,7 +354,8 @@ public class EventDaoImpl implements EventDao
 				}
 
 				// create the single event data
-				currentPoint = new EventDataPoint(result.getDate("timestamp"),
+				currentPoint = new EventDataPoint(new Date(result.getTimestamp(
+						"timestamp").getTime()),
 						"" + result.getDouble("value"),
 						result.getString("unit"));
 
@@ -442,27 +389,29 @@ public class EventDaoImpl implements EventDao
 	 * @param nResults
 	 *            the number of results to provide back
 	 */
-	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceUri,
-			Date startDate, Date endDate, int startCount, int nResults,
-			boolean aggregated)
+
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(
+			String deviceUri, Date startDate, Date endDate, int startCount,
+			int nResults, boolean aggregated)
 	{
 
 		// the event data stream set to return
 		EventDataStreamSet streamSet = new EventDataStreamSet();
 
 		// the select query
-		String allRealEventsQuery = "SELECT * FROM Event WHERE deviceuri=? AND timestamp>=? and timestamp<=?";
-		if(aggregated)
-			allRealEventsQuery = allRealEventsQuery +" ORDER BY timestamp ASC LIMIT ? OFFSET ?;";
+		String allRealEventsQuery = "SELECT * FROM "+this.discreteNotificationTableName+" WHERE deviceuri=? AND timestamp>=? and timestamp<=?";
+		if (aggregated)
+			allRealEventsQuery = allRealEventsQuery
+					+ " ORDER BY timestamp ASC LIMIT ? OFFSET ?;";
 		else
-			allRealEventsQuery = allRealEventsQuery +" ORDER BY name,timestamp ASC LIMIT ? OFFSET ?;";
+			allRealEventsQuery = allRealEventsQuery
+					+ " ORDER BY name,timestamp ASC LIMIT ? OFFSET ?;";
 
 		// the select statement
 		try
 		{
 			// prepare the select statement
-			PreparedStatement allRealEventsStmt = this.connection
+			PreparedStatement allRealEventsStmt = this.storage.getConnection()
 					.prepareStatement(allRealEventsQuery);
 
 			// fill the statement data
@@ -486,7 +435,7 @@ public class EventDaoImpl implements EventDao
 
 			while (result.next())
 			{
-				if(aggregated)
+				if (aggregated)
 					currentName = "events";
 				else
 					currentName = result.getString("name");
@@ -506,8 +455,8 @@ public class EventDaoImpl implements EventDao
 				}
 
 				// create the single event data
-				currentPoint = new EventDataPoint(result.getDate("timestamp"),
-						result.getString("value"), "");
+				currentPoint = new EventDataPoint(new Date(result.getTimestamp(
+						"timestamp").getTime()), result.getString("value"), "");
 
 				// store the event data
 				currentStream.addDatapoint(currentPoint);
@@ -547,9 +496,11 @@ public class EventDaoImpl implements EventDao
 	 * @param nResults
 	 *            The number of results to provide back
 	 */
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
-			String notificationName, String notificationParams, Date startDate,
-			Date endDate, int startCount, int nResults)
+
+	public EventDataStream getSpecificDeviceContinuousNotifications(
+			String deviceURI, String notificationName,
+			String notificationParams, Date startDate, Date endDate,
+			int startCount, int nResults)
 	{
 		// The event stream to return
 		EventDataStream stream = new EventDataStream(notificationName,
@@ -557,13 +508,13 @@ public class EventDaoImpl implements EventDao
 
 		// the select query
 		// the select query
-		String realEventsQuery = "SELECT * FROM RealEvent WHERE deviceuri=? AND name=? AND params=? AND timestamp>=? and timestamp<=? ORDER BY name,params LIMIT ? OFFSET ?;";
+		String realEventsQuery = "SELECT * FROM "+this.continuousNotificationTableName+" WHERE deviceuri=? AND name=? AND params=? AND timestamp>=? and timestamp<=? ORDER BY name,params LIMIT ? OFFSET ?;";
 
 		// the select statement
 		try
 		{
 			// prepare the select statement
-			PreparedStatement realEventsStmt = this.connection
+			PreparedStatement realEventsStmt = this.storage.getConnection()
 					.prepareStatement(realEventsQuery);
 
 			// fill the statement data
@@ -585,7 +536,8 @@ public class EventDaoImpl implements EventDao
 
 			while (result.next())
 			{
-				currentPoint = new EventDataPoint(result.getDate("timestamp"),
+				currentPoint = new EventDataPoint(new Date(result.getTimestamp(
+						"timestamp").getTime()),
 						"" + result.getDouble("value"),
 						result.getString("unit"));
 
@@ -626,22 +578,23 @@ public class EventDaoImpl implements EventDao
 	 * @param nResults
 	 *            The number of results to provide back
 	 */
-	private EventDataStream getDeviceEvents(String deviceURI,
-			String notificationName, Date startDate, Date endDate,
-			int startCount, int nResults)
+
+	public EventDataStream getSpecificDeviceDiscreteNotifications(
+			String deviceURI, String notificationName, Date startDate,
+			Date endDate, int startCount, int nResults)
 	{
 		EventDataStream stream = new EventDataStream(notificationName, "",
 				deviceURI);
 
 		// the select query
 		// the select query
-		String realEventsQuery = "SELECT * FROM Event WHERE deviceuri=? AND name=? AND timestamp>=? and timestamp<=? ORDER BY name LIMIT ? OFFSET ?;";
+		String realEventsQuery = "SELECT * FROM "+this.discreteNotificationTableName+" WHERE deviceuri=? AND name=? AND timestamp>=? and timestamp<=? ORDER BY name LIMIT ? OFFSET ?;";
 
 		// the select statement
 		try
 		{
 			// prepare the select statement
-			PreparedStatement realEventsStmt = this.connection
+			PreparedStatement realEventsStmt = this.storage.getConnection()
 					.prepareStatement(realEventsQuery);
 
 			// fill the statement data
@@ -662,8 +615,8 @@ public class EventDaoImpl implements EventDao
 
 			while (result.next())
 			{
-				currentPoint = new EventDataPoint(result.getDate("timestamp"),
-						result.getString("value"), "");
+				currentPoint = new EventDataPoint(new Date(result.getTimestamp(
+						"timestamp").getTime()), result.getString("value"), "");
 
 				stream.addDatapoint(currentPoint);
 			}
@@ -679,4 +632,102 @@ public class EventDaoImpl implements EventDao
 		return stream;
 	}
 
+
+	public EventDataStream getSpecificDeviceDiscreteNotifications(
+			String deviceURI, Set<String> notificationNames,
+			String eventStreamName, Date startDate, Date endDate,
+			int startCount, int nResults)
+	{
+		EventDataStream stream = new EventDataStream(eventStreamName, "",
+				deviceURI);
+
+		// the select query
+		// the select query
+		StringBuffer realEventsQueryBuffer = new StringBuffer();
+		realEventsQueryBuffer
+				.append("SELECT * FROM "+this.discreteNotificationTableName+" WHERE deviceuri=? AND name IN (");
+
+		boolean first = true;
+		for (int i = 0; i < notificationNames.size(); i++)
+		{
+			if (!first)
+				realEventsQueryBuffer.append(",");
+			else
+				first = false;
+
+			realEventsQueryBuffer.append("?");
+		}
+		realEventsQueryBuffer
+				.append(") AND timestamp>=? and timestamp<=? ORDER BY name LIMIT ? OFFSET ?;");
+
+		String realEventsQuery = realEventsQueryBuffer.toString();
+
+		// the select statement
+		try
+		{
+			// prepare the select statement
+			PreparedStatement realEventsStmt = this.storage.getConnection()
+					.prepareStatement(realEventsQuery);
+
+			int i = 1;
+			// fill the statement data
+			realEventsStmt.setString(i++, deviceURI);
+
+			// compose the stream name sequence
+			for (String notificationName : notificationNames)
+			{
+				realEventsStmt.setString(i, notificationName);
+				i++;
+			}
+
+			Timestamp startTimestamp = new Timestamp(startDate.getTime());
+			realEventsStmt.setTimestamp(i++, startTimestamp);
+			Timestamp endTimestamp = new Timestamp(endDate.getTime());
+			realEventsStmt.setTimestamp(i++, endTimestamp);
+			realEventsStmt.setInt(i++, nResults);
+			realEventsStmt.setInt(i++, startCount);
+
+			// exec the query
+			ResultSet result = realEventsStmt.executeQuery();
+
+			// the current data point
+			EventDataPoint currentPoint = null;
+
+			while (result.next())
+			{
+				currentPoint = new EventDataPoint(new Date(result.getTimestamp(
+						"timestamp").getTime()), result.getString("value"), "");
+
+				stream.addDatapoint(currentPoint);
+			}
+
+		}
+		catch (SQLException e)
+		{
+			// log the error
+			this.logger.log(LogService.LOG_ERROR,
+					"Unable to retrieve sensor data", e);
+		}
+
+		return stream;
+	}
+
+
+	public EventDataStreamSet getSpecificDeviceDiscreteNotifications(
+			String deviceURI, Map<String, Set<String>> notificationNames,
+			Date startDate, Date endDate, int startCount, int nResults)
+	{
+		// the data stream set to create
+		EventDataStreamSet streamSet = new EventDataStreamSet(deviceURI);
+
+		// iterate over all streams
+		for (String streamName : notificationNames.keySet())
+		{
+			streamSet.addEventDataStream(this
+					.getSpecificDeviceDiscreteNotifications(deviceURI,
+							notificationNames.get(streamName), streamName,
+							startDate, endDate, startCount, nResults));
+		}
+		return streamSet;
+	}
 }

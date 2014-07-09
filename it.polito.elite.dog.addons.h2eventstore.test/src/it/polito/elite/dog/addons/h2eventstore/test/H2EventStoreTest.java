@@ -3,9 +3,19 @@ package it.polito.elite.dog.addons.h2eventstore.test;
 import it.polito.elite.dog.addons.storage.EventDataStreamSet;
 import it.polito.elite.dog.addons.storage.EventStore;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.devicecategory.PelletHeater;
+import it.polito.elite.dog.core.library.model.notification.CoolNotification;
+import it.polito.elite.dog.core.library.model.notification.FiringUpNotification;
+import it.polito.elite.dog.core.library.model.notification.HeatNotification;
+import it.polito.elite.dog.core.library.model.notification.OffNotification;
+import it.polito.elite.dog.core.library.model.notification.OnNotification;
+import it.polito.elite.dog.core.library.model.notification.StandByNotification;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.util.Date;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
@@ -134,19 +144,65 @@ public class H2EventStoreTest
 
 						if (device instanceof ControllableDevice)
 						{
-							EventDataStreamSet measures = store.getAllDeviceMeasures(
-									((ControllableDevice) device).getDeviceId(),
-									this.creationDate);
-							
-							//dump
-							this.logger.log(LogService.LOG_DEBUG, "Measures: "+measures);
-							
-							EventDataStreamSet events = store.getAllDeviceEvents(
-									((ControllableDevice) device).getDeviceId(),
-									this.creationDate,true);
-							
-							//dump
-							this.logger.log(LogService.LOG_DEBUG, "Events: "+events);
+							EventDataStreamSet measures = store
+									.getAllDeviceContinuousNotifications(
+											((ControllableDevice) device)
+													.getDeviceId(),
+											this.creationDate);
+
+							// dump
+							this.logger.log(LogService.LOG_DEBUG, "Measures: "
+									+ measures);
+
+							EventDataStreamSet events = store
+									.getAllDeviceDiscreteNotifications(
+											((ControllableDevice) device)
+													.getDeviceId(),
+											this.creationDate, true);
+
+							// dump
+							this.logger.log(LogService.LOG_DEBUG, "Events: "
+									+ events);
+
+							if (device instanceof PelletHeater)
+							{
+								// get the notifications grouped by
+								// functionality
+								HashSet<String> fireHeatCool = new HashSet<>();
+								fireHeatCool.add(CoolNotification.class
+										.getSimpleName());
+								fireHeatCool.add(FiringUpNotification.class
+										.getSimpleName());
+								fireHeatCool.add(HeatNotification.class
+										.getSimpleName());
+
+								HashSet<String> onOffStandby = new HashSet<>();
+								onOffStandby.add(OffNotification.class
+										.getSimpleName());
+								onOffStandby.add(OnNotification.class
+										.getSimpleName());
+								onOffStandby.add(StandByNotification.class
+										.getSimpleName());
+
+								Hashtable<String, Set<String>> notificationNames = new Hashtable<>();
+
+								notificationNames.put("fireHeatCool",
+										fireHeatCool);
+								notificationNames.put("onOffStandby",
+										onOffStandby);
+
+								EventDataStreamSet groupedEvents = store
+										.getSpecificDeviceDiscreteNotifications(
+												((ControllableDevice) device)
+														.getDeviceId(),
+												notificationNames,
+												this.creationDate, new Date(),
+												0, -1);
+								
+								// dump
+								this.logger.log(LogService.LOG_DEBUG, "Grouped Events: "
+										+ groupedEvents);
+							}
 						}
 
 						this.context.ungetService(deviceService[0]);

@@ -4,6 +4,8 @@
 package it.polito.elite.dog.addons.storage;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author bonino
@@ -22,7 +24,7 @@ public interface EventStore
 	 * @param endDate
 	 *            the end date
 	 */
-	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
+	public EventDataStreamSet getAllDeviceContinuousNotifications(String deviceURI,
 			Date startDate, Date endDate);
 
 	/**
@@ -40,7 +42,7 @@ public interface EventStore
 	 * @param nResults
 	 *            the number of results to provide back
 	 */
-	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
+	public EventDataStreamSet getAllDeviceContinuousNotifications(String deviceURI,
 			Date startDate, Date endDate, int startCount, int nResults);
 
 	/**
@@ -52,7 +54,7 @@ public interface EventStore
 	 * @param startDate
 	 *            the start date
 	 */
-	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
+	public EventDataStreamSet getAllDeviceContinuousNotifications(String deviceURI,
 			Date startDate);
 
 	/**
@@ -69,7 +71,7 @@ public interface EventStore
 	 * @param nResults
 	 *            the number of results to provide back
 	 */
-	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
+	public EventDataStreamSet getAllDeviceContinuousNotifications(String deviceURI,
 			Date startDate, int startCount, int nResults);
 
 	/**
@@ -87,7 +89,7 @@ public interface EventStore
 	 *            false to get one event stream for each notification type           
 	 *      
 	 */
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(String deviceURI,
 			Date startDate, Date endDate, boolean aggregated);
 
 	/**
@@ -108,7 +110,7 @@ public interface EventStore
 	 *            true if events should be aggregated in a single event stream,
 	 *            false to get one event stream for each notification type
 	 */
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(String deviceURI,
 			Date startDate, Date endDate, int startCount, int nResults,
 			boolean aggregated);
 
@@ -124,7 +126,7 @@ public interface EventStore
 	 *            true if events should be aggregated in a single event stream,
 	 *            false to get one event stream for each notification type
 	 */
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(String deviceURI,
 			Date startDate, boolean aggregated);
 
 	/**
@@ -143,7 +145,7 @@ public interface EventStore
 	 *            true if events should be aggregated in a single event stream,
 	 *            false to get one event stream for each notification type
 	 */
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(String deviceURI,
 			Date startDate, int startCount, int nResults, boolean aggregated);
 
 	/**
@@ -165,7 +167,7 @@ public interface EventStore
 	 * @param endDate
 	 *            The end date.
 	 */
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
+	public EventDataStream getSpecificDeviceContinuousNotifications(String deviceURI,
 			String notificationName, String notificationParams, Date startDate,
 			Date endDate);
 
@@ -192,7 +194,7 @@ public interface EventStore
 	 * @param nResults
 	 *            The number of results to provide back
 	 */
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
+	public EventDataStream getSpecificDeviceContinuousNotifications(String deviceURI,
 			String notificationName, String notificationParams, Date startDate,
 			Date endDate, int startCount, int nResults);
 
@@ -213,7 +215,7 @@ public interface EventStore
 	 * @param startDate
 	 *            The start date.
 	 */
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
+	public EventDataStream getSpecificDeviceContinuousNotifications(String deviceURI,
 			String notificationName, String notificationParams, Date startDate);
 
 	/**
@@ -238,8 +240,135 @@ public interface EventStore
 	 * @param nResults
 	 *            The number of results to provide back
 	 */
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
+	public EventDataStream getSpecificDeviceContinuousNotifications(String deviceURI,
 			String notificationName, String notificationParams, Date startDate,
+			int startCount, int nResults);
+	
+	/**
+	 * Gets all the events corresponding to the given notification in the time frame between
+	 * startDate and endDate.
+	 * 
+	 * @param deviceURI
+	 *            The deviceURI as a{@link String}
+	 * @param notificationName
+	 *            The name of the notification for which measures must be
+	 *            retrieved
+	 * @param notificationParams
+	 *            The parameter values needed to further specify which
+	 *            notification must be matched, in a post-like encoding
+	 *            <code>name1=value1&name2=value2&...</code>;
+	 * @param startDate
+	 *            The start date.
+	 * @param endDate
+	 *            The end date.
+	 */
+	public EventDataStream getSpecificDeviceDiscreteNotifications(String deviceURI,
+			String notificationName, Date startDate,
+			Date endDate);
+
+	/**
+	 * Gets all the events corresponding to the given notification in the time frame between
+	 * startDate and endDate, using pagination.
+	 * 
+	 * @param deviceURI
+	 *            The deviceURI as a{@link String}
+	 * @param notificationName
+	 *            The name of the notification for which measures must be
+	 *            retrieved
+	 * @param notificationParams
+	 *            The parameter values needed to further specify which
+	 *            notification must be matched, in a post-like encoding
+	 *            <code>name1=value1&name2=value2&...</code>;
+	 * @param startDate
+	 *            The start date.
+	 * @param endDate
+	 *            The end date.
+	 * @param startCount
+	 *            The starting count
+	 * @param nResults
+	 *            The number of results to provide back
+	 */
+	public EventDataStream getSpecificDeviceDiscreteNotifications(String deviceURI,
+			String notificationName, Date startDate,
+			Date endDate, int startCount, int nResults);
+
+	/**
+	 * Gets all the measures corresponding to the given notification in the time frame between
+	 * startDate and the instant in which the method is called.
+	 * 
+	 * @param deviceURI
+	 *            The deviceURI as a{@link String}
+	 * @param notificationName
+	 *            The name of the notification for which measures must be
+	 *            retrieved
+	 * @param notificationParams
+	 *            The parameter values needed to further specify which
+	 *            notification must be matched, in a post-like encoding
+	 *            <code>name1=value1&name2=value2&...</code>
+	 * @param startDate
+	 *            The start date.
+	 */
+	public EventDataStream getSpecificDeviceDiscreteNotifications(String deviceURI,
+			String notificationName, Date startDate);
+
+	/**
+	 * Gets all the measures corresponding to the given notification in the time frame between
+	 * startDate and the instant in which the method is called, using
+	 * pagination.
+	 * 
+	 * @param deviceURI
+	 *            The deviceURI as a{@link String}
+	 * @param notificationName
+	 *            The name of the notification for which measures must be
+	 *            retrieved
+	 * @param notificationParams
+	 *            The parameter values needed to further specify which
+	 *            notification must be matched, in a post-like encoding
+	 *            <code>name1=value1&name2=value2&...</code>
+	 * @param startDate
+	 *            The start date.
+	 * @param startCount
+	 *            The starting count
+	 * @param nResults
+	 *            The number of results to provide back
+	 */
+	public EventDataStream getSpecificDeviceDiscreteNotifications(String deviceURI,
+			String notificationName, Date startDate,
+			int startCount, int nResults);
+	
+	
+	/**
+	 * Gets all the events corresponding to the given set of notifications,
+	 * aggregated as a single event stream, in the time frame between startDate
+	 * and endDate, using pagination.
+	 * 
+	 * @param deviceURI  The deviceURI as a{@link String}
+	 * @param notificationNames The names of the notifications for which events must be
+	 *            retrieved
+	 * @param startDate The start date.
+	 * @param endDate The end date.
+	 * @param startCount The starting count.
+	 * @param nResults The number of results to provide back.
+	 * @return
+	 */
+	public EventDataStream getSpecificDeviceDiscreteNotifications(String deviceURI,
+			Set<String> notificationNames, String eventStreamName, Date startDate, Date endDate,
+			int startCount, int nResults);
+	
+	/**
+	 * Gets all the events corresponding to the each set of notifications in the given map,
+	 * aggregated as a single event stream, in the time frame between startDate
+	 * and endDate, using pagination
+	 * @param deviceURI
+	 * @param notificationNames
+	 * @param startDate
+	 * @param endDate
+	 * @param startCount
+	 * @param nResults
+	 * @return
+	 */
+	public EventDataStreamSet getSpecificDeviceDiscreteNotifications(String deviceURI,
+			Map<String,Set<String>> notificationNames, Date startDate, Date endDate,
 			int startCount, int nResults);
 
 }

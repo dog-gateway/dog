@@ -5,6 +5,8 @@ Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: it.polito.elite.dog.addons.storage,
  it.polito.elite.dog.core.library.model;specification-version="1.1.0",
+ it.polito.elite.dog.core.library.model.devicecategory;specification-version="1.1.0",
+ it.polito.elite.dog.core.library.model.notification;specification-version="1.1.0",
  it.polito.elite.dog.core.library.util;specification-version="1.1.0",
  org.osgi.framework;specification-version="1.7.0",
  org.osgi.service.device;specification-version="1.1.0",

@@ -17,8 +17,10 @@
  */
 package it.polito.elite.dog.addons.h2eventstore;
 
-import it.polito.elite.dog.addons.h2eventstore.dao.EventDaoImpl;
-import it.polito.elite.dog.addons.storage.EventDao;
+import it.polito.elite.dog.addons.h2eventstore.dao.DeviceDao;
+import it.polito.elite.dog.addons.h2eventstore.dao.NotificationDao;
+import it.polito.elite.dog.addons.h2eventstore.dao.StateDao;
+import it.polito.elite.dog.addons.h2eventstore.db.H2Storage;
 import it.polito.elite.dog.addons.storage.EventDataStream;
 import it.polito.elite.dog.addons.storage.EventDataStreamSet;
 import it.polito.elite.dog.addons.storage.EventStore;
@@ -33,6 +35,8 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.Map;
+import java.util.Set;
 
 import javax.measure.Measure;
 
@@ -108,8 +112,11 @@ public class H2EventStore implements EventHandler, ManagedService,
 	// the logger
 	private LogHelper logger;
 
-	// the data access object
-	private EventDao eventDao;
+	// the data access objects
+	private H2Storage h2Storage;
+	private DeviceDao devDao;
+	private NotificationDao notifDao;
+	private StateDao stateDao;
 
 	// the OSGi bundle context used for service registration
 	private BundleContext context;
@@ -190,7 +197,22 @@ public class H2EventStore implements EventHandler, ManagedService,
 		this.unRegisterService();
 
 		// close data access
-		this.eventDao.close();
+		if (this.devDao != null)
+			this.devDao.close();
+		if (this.notifDao != null)
+			this.notifDao.close();
+		if (this.stateDao != null)
+			this.stateDao.close();
+		try
+		{
+			if (this.h2Storage != null)
+				this.h2Storage.close();
+		}
+		catch (SQLException e)
+		{
+			this.logger.log(LogService.LOG_ERROR,
+					"Unable to close the db connection", e);
+		}
 
 		// detach the logger
 		this.logger = null;
@@ -301,7 +323,9 @@ public class H2EventStore implements EventHandler, ManagedService,
 			}
 
 			// if everything has been accomplished, register the service
-			if ((this.eventDao != null) && (h2StorageService == null))
+			if ((this.h2Storage != null) && (this.devDao != null)
+					&& (this.notifDao != null) && (this.stateDao != null)
+					&& (h2StorageService == null))
 				this.registerService();
 		}
 	}
@@ -334,9 +358,14 @@ public class H2EventStore implements EventHandler, ManagedService,
 	{
 		try
 		{
-			// initialize the dao
-			this.eventDao = new EventDaoImpl("jdbc:h2:" + databaseLocation,
-					"dog", "", this.context);
+			// initialize the h2 storage layer
+			this.h2Storage = new H2Storage("jdbc:h2:" + databaseLocation,
+					"dog", "");
+			this.devDao = new DeviceDao(this.h2Storage, this.context);
+			this.notifDao = new NotificationDao(this.devDao, this.h2Storage,
+					this.context);
+			this.stateDao = new StateDao(this.devDao, this.h2Storage,
+					this.context);
 		}
 		catch (SQLException e)
 		{
@@ -355,7 +384,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 			Object eventContent = event.getProperty(EventConstants.EVENT);
 
 			// handle parametric notifications
-			if (this.eventDao != null)
+			if (this.notifDao != null)
 			{
 				if (eventContent instanceof ParametricNotification)
 				{
@@ -399,8 +428,8 @@ public class H2EventStore implements EventHandler, ManagedService,
 							&& (!deviceURI.isEmpty()))
 					{
 						// insert the event
-						this.eventDao.insertMeasure(deviceURI,
-								eventTimestamp, eventValue, notificationName,
+						this.notifDao.insertParametricNotification(deviceURI, eventTimestamp,
+								eventValue, notificationName,
 								notificationParams);
 					}
 				}
@@ -433,7 +462,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 							&& (!deviceURI.isEmpty()))
 					{
 						// insert the event
-						this.eventDao.insertEvent(deviceURI, eventTimestamp,
+						this.notifDao.insertNonParametricNotification(deviceURI, eventTimestamp,
 								notificationValue, notificationName);
 					}
 				}
@@ -447,8 +476,8 @@ public class H2EventStore implements EventHandler, ManagedService,
 		String value = "";
 		try
 		{
-			value = (String) receivedNotification.getClass().getField("notificationName")
-					.get(null);
+			value = (String) receivedNotification.getClass()
+					.getField("notificationName").get(null);
 		}
 		catch (NoSuchFieldException | SecurityException
 				| IllegalArgumentException | IllegalAccessException e)
@@ -549,7 +578,9 @@ public class H2EventStore implements EventHandler, ManagedService,
 	public Object addingBundle(Bundle bundle, BundleEvent event)
 	{
 		if ((bundle.getSymbolicName().equals("org.h2"))
-				&& (this.eventDao == null) && (this.databaseLocation != null)
+				&& ((h2Storage == null) || (devDao == null)
+						|| (notifDao == null) || (stateDao == null))
+				&& (this.databaseLocation != null)
 				&& (!this.databaseLocation.isEmpty()))
 		{
 			this.logger.log(LogService.LOG_INFO, "Activated H2");
@@ -562,7 +593,10 @@ public class H2EventStore implements EventHandler, ManagedService,
 					initDao(databaseLocation);
 
 					// if everything has been accomplished, register the service
-					if ((eventDao != null) && (h2StorageService == null))
+					// if everything has been accomplished, register the service
+					if ((h2Storage != null) && (devDao != null)
+							&& (notifDao != null) && (stateDao != null)
+							&& (h2StorageService == null))
 						registerService();
 
 				}
@@ -592,113 +626,196 @@ public class H2EventStore implements EventHandler, ManagedService,
 	// -------------------------- EventStore implementation -------------
 
 	@Override
-	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
-			Date startDate, Date endDate)
+	public EventDataStreamSet getAllDeviceContinuousNotifications(
+			String deviceURI, Date startDate, Date endDate)
 	{
-		return this.getAllDeviceMeasures(deviceURI, startDate, endDate, 0, -1);
+		return this.getAllDeviceContinuousNotifications(deviceURI, startDate,
+				endDate, 0, -1);
 	}
 
 	@Override
-	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
-			Date startDate, Date endDate, int startCount, int nResults)
+	public EventDataStreamSet getAllDeviceContinuousNotifications(
+			String deviceURI, Date startDate, Date endDate, int startCount,
+			int nResults)
 	{
-		return this.eventDao.getAllDeviceMeasures(deviceURI, startDate, endDate,
-				startCount, nResults);
+		return this.notifDao.getAllDeviceContinuousNotifications(deviceURI,
+				startDate, endDate, startCount, nResults);
 	}
 
 	@Override
-	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
-			Date startDate)
+	public EventDataStreamSet getAllDeviceContinuousNotifications(
+			String deviceURI, Date startDate)
 	{
-		return this.getAllDeviceMeasures(deviceURI, startDate, new Date(), 0, -1);
+		return this.getAllDeviceContinuousNotifications(deviceURI, startDate,
+				new Date(), 0, -1);
 	}
 
 	@Override
-	public EventDataStreamSet getAllDeviceMeasures(String deviceURI,
-			Date startDate, int startCount, int nResults)
+	public EventDataStreamSet getAllDeviceContinuousNotifications(
+			String deviceURI, Date startDate, int startCount, int nResults)
 	{
-		return this.getAllDeviceMeasures(deviceURI, startDate, new Date(),
-				startCount, nResults);
+		return this.getAllDeviceContinuousNotifications(deviceURI, startDate,
+				new Date(), startCount, nResults);
 	}
-	
-	/* (non-Javadoc)
-	 * @see it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java.lang.String, java.util.Date, java.util.Date, boolean)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java
+	 * .lang.String, java.util.Date, java.util.Date, boolean)
 	 */
 	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
-			Date startDate, Date endDate, boolean aggregated)
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(
+			String deviceURI, Date startDate, Date endDate, boolean aggregated)
 	{
-		return this.getAllDeviceEvents(deviceURI, startDate, endDate, 0, -1, aggregated);
+		return this.getAllDeviceDiscreteNotifications(deviceURI, startDate,
+				endDate, 0, -1, aggregated);
 	}
 
-	/* (non-Javadoc)
-	 * @see it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java.lang.String, java.util.Date, java.util.Date, int, int, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java
+	 * .lang.String, java.util.Date, java.util.Date, int, int, boolean)
 	 */
 	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
-			Date startDate, Date endDate, int startCount, int nResults,
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(
+			String deviceURI, Date startDate, Date endDate, int startCount,
+			int nResults, boolean aggregated)
+	{
+		return this.notifDao.getAllDeviceDiscreteNotifications(deviceURI,
+				startDate, endDate, startCount, nResults, aggregated);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java
+	 * .lang.String, java.util.Date, boolean)
+	 */
+	@Override
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(
+			String deviceURI, Date startDate, boolean aggregated)
+	{
+		return this.getAllDeviceDiscreteNotifications(deviceURI, startDate,
+				new Date(), 0, -1, aggregated);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java
+	 * .lang.String, java.util.Date, int, int, boolean)
+	 */
+	@Override
+	public EventDataStreamSet getAllDeviceDiscreteNotifications(
+			String deviceURI, Date startDate, int startCount, int nResults,
 			boolean aggregated)
 	{
-		return this.eventDao.getAllDeviceEvents(deviceURI, startDate, endDate,
-				startCount, nResults,aggregated);
-	}
-
-	/* (non-Javadoc)
-	 * @see it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java.lang.String, java.util.Date, boolean)
-	 */
-	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
-			Date startDate, boolean aggregated)
-	{
-		return this.getAllDeviceEvents(deviceURI, startDate, new Date(), 0, -1, aggregated);
-	}
-
-	/* (non-Javadoc)
-	 * @see it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java.lang.String, java.util.Date, int, int, boolean)
-	 */
-	@Override
-	public EventDataStreamSet getAllDeviceEvents(String deviceURI,
-			Date startDate, int startCount, int nResults, boolean aggregated)
-	{
-		return this.getAllDeviceEvents(deviceURI, startDate, new Date(),
-				startCount, nResults, aggregated);
+		return this.getAllDeviceDiscreteNotifications(deviceURI, startDate,
+				new Date(), startCount, nResults, aggregated);
 	}
 
 	@Override
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
-			String notificationName, String notificationParams, Date startDate,
-			Date endDate)
-	{
-		return this.getSpecificDeviceMeasure(deviceURI, notificationName,
-				notificationParams, startDate, endDate, 0, -1);
-	}
-
-	@Override
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
-			String notificationName, String notificationParams, Date startDate,
-			Date endDate, int startCount, int nResults)
-	{
-		return this.eventDao.getSpecificDeviceMeasure(deviceURI, notificationName,
-				notificationParams, startDate, endDate, startCount, nResults);
-	}
-
-	@Override
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
-			String notificationName, String notificationParams, Date startDate)
-	{
-		return this.getSpecificDeviceMeasure(deviceURI, notificationName,
-				notificationParams, startDate, new Date(), 0, -1);
-	}
-
-	@Override
-	public EventDataStream getSpecificDeviceMeasure(String deviceURI,
-			String notificationName, String notificationParams, Date startDate,
-			int startCount, int nResults)
+	public EventDataStream getSpecificDeviceContinuousNotifications(
+			String deviceURI, String notificationName,
+			String notificationParams, Date startDate, Date endDate)
 	{
 		return this
-				.getSpecificDeviceMeasure(deviceURI, notificationName,
-						notificationParams, startDate, new Date(), startCount,
-						nResults);
+				.getSpecificDeviceContinuousNotifications(deviceURI,
+						notificationName, notificationParams, startDate,
+						endDate, 0, -1);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceContinuousNotifications(
+			String deviceURI, String notificationName,
+			String notificationParams, Date startDate, Date endDate,
+			int startCount, int nResults)
+	{
+		return this.notifDao.getSpecificDeviceContinuousNotifications(
+				deviceURI, notificationName, notificationParams, startDate,
+				endDate, startCount, nResults);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceContinuousNotifications(
+			String deviceURI, String notificationName,
+			String notificationParams, Date startDate)
+	{
+		return this.getSpecificDeviceContinuousNotifications(deviceURI,
+				notificationName, notificationParams, startDate, new Date(), 0,
+				-1);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceContinuousNotifications(
+			String deviceURI, String notificationName,
+			String notificationParams, Date startDate, int startCount,
+			int nResults)
+	{
+		return this.getSpecificDeviceContinuousNotifications(deviceURI,
+				notificationName, notificationParams, startDate, new Date(),
+				startCount, nResults);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceDiscreteNotifications(
+			String deviceURI, String notificationName, Date startDate,
+			Date endDate)
+	{
+		return this.getSpecificDeviceDiscreteNotifications(deviceURI,
+				notificationName, startDate, endDate, 0, -1);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceDiscreteNotifications(
+			String deviceURI, String notificationName, Date startDate,
+			Date endDate, int startCount, int nResults)
+	{
+		return this.notifDao.getSpecificDeviceDiscreteNotifications(deviceURI,
+				notificationName, startDate, endDate, startCount, nResults);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceDiscreteNotifications(
+			String deviceURI, String notificationName, Date startDate)
+	{
+		return this.getSpecificDeviceDiscreteNotifications(deviceURI,
+				notificationName, startDate, new Date(), 0, -1);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceDiscreteNotifications(
+			String deviceURI, String notificationName, Date startDate,
+			int startCount, int nResults)
+	{
+		return this.getSpecificDeviceDiscreteNotifications(deviceURI,
+				notificationName, startDate, new Date(), startCount, nResults);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceDiscreteNotifications(
+			String deviceURI, Set<String> notificationNames,
+			String eventStreamName, Date startDate, Date endDate,
+			int startCount, int nResults)
+	{
+		return this.notifDao.getSpecificDeviceDiscreteNotifications(deviceURI,
+				notificationNames, eventStreamName, startDate, endDate,
+				startCount, nResults);
+	}
+
+	@Override
+	public EventDataStreamSet getSpecificDeviceDiscreteNotifications(
+			String deviceURI, Map<String, Set<String>> notificationNames,
+			Date startDate, Date endDate, int startCount, int nResults)
+	{
+		return this.notifDao.getSpecificDeviceDiscreteNotifications(deviceURI,
+				notificationNames, startDate, endDate, startCount, nResults);
 	}
 
 }

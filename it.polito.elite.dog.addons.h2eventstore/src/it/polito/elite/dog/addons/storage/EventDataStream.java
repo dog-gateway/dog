@@ -73,8 +73,11 @@ public class EventDataStream
 		this.name = notificationName;
 		this.additionalParameters = notificationParameters;
 		this.deviceUri = deviceUri;
-		this.uid = this.deviceUri + "/" + name + "?"
-				+ this.additionalParameters;
+		this.uid = this.deviceUri
+				+ "/"
+				+ name
+				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
+						: "");
 		this.datapoints = new ArrayList<>();
 	}
 
@@ -115,8 +118,11 @@ public class EventDataStream
 		this.name = notificationName;
 		this.additionalParameters = notificationParameters;
 		this.deviceUri = deviceUri;
-		this.uid = this.deviceUri + "/" + name + "?"
-				+ this.additionalParameters;
+		this.uid = this.deviceUri
+				+ "/"
+				+ name
+				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
+						: "");
 		this.datapoints = new ArrayList<>(initialSize);
 	}
 
@@ -140,8 +146,11 @@ public class EventDataStream
 	public void setNotificationName(String notificationName)
 	{
 		this.name = notificationName;
-		this.uid = this.deviceUri + "/" + name + "?"
-				+ this.additionalParameters;
+		this.uid = this.deviceUri
+				+ "/"
+				+ name
+				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
+						: "");
 	}
 
 	/**
@@ -167,8 +176,11 @@ public class EventDataStream
 	public void setNotificationParameters(String notificationParameters)
 	{
 		this.additionalParameters = notificationParameters;
-		this.uid = this.deviceUri + "/" + name + "?"
-				+ this.additionalParameters;
+		this.uid = this.deviceUri
+				+ "/"
+				+ name
+				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
+						: "");
 	}
 
 	/**
@@ -189,8 +201,11 @@ public class EventDataStream
 	public void setDeviceUri(String deviceUri)
 	{
 		this.deviceUri = deviceUri;
-		this.uid = this.deviceUri + "/" + name + "?"
-				+ this.additionalParameters;
+		this.uid = this.deviceUri
+				+ "/"
+				+ name
+				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
+						: "");
 	}
 
 	/**

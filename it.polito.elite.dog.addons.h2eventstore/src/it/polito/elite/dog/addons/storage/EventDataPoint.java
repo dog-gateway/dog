@@ -130,11 +130,11 @@ public class EventDataPoint
 	public String toString()
 	{
 		// format the timestamp
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SSSZ");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		StringBuffer asStringBuffer = new StringBuffer();
-		asStringBuffer.append("{at:" + sdf.format(this.at));
-		asStringBuffer.append(" , value:" + this.value);
-		asStringBuffer.append(" , unit:" + this.unit + "}");
+		asStringBuffer.append("{'at':'" + sdf.format(this.at)+"',");
+		asStringBuffer.append(" 'value':" + this.value+"',");
+		asStringBuffer.append(" 'unit':" + this.unit + "'}");
 		return asStringBuffer.toString();
 	}
 
