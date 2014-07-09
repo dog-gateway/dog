@@ -17,8 +17,6 @@ Import-Package: it.polito.elite.dog.core.library.model.notification;version="1.1
  org.osgi.service.log;version="1.3.0",
  org.osgi.util.tracker;version="1.5.1"
 Service-Component: OSGI-INF/*.xml
-Bundle-ClassPath: .,
- lib/spchains-addon.jar,
- lib/h2-1.3.175.jar
+Bundle-ClassPath: .
 Bundle-Vendor: it.polito.elite
 Export-Package: it.polito.elite.dog.addons.storage
