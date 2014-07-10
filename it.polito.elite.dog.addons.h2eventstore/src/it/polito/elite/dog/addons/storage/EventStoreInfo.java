@@ -23,6 +23,8 @@ public class EventStoreInfo
 	public final static String DB_LOCATION = "database.location";
 	public final static String DB_RETENTION_MODE = "database.retentionmode";
 	public final static String DB_MAX_SIZE = "database.maxsize";
+	public final static String NOTIFICATIONS_ENABLED = "enablenotifications";
+	public final static String STATES_ENABLED = "enablestates";
 	
 	// the event store event managemet policy
 	public final static String EVENT_ATTACHMENT = "eventhandling.auto";

@@ -162,6 +162,12 @@ public class H2EventStore implements EventHandler, ManagedService,
 	// the event handling mode
 	private boolean eventHandlingEnabled;
 
+	// the notifications storage flag
+	private boolean storeNotifications;
+
+	// the states storage flag
+	private boolean storeStates;
+
 	// the database location
 	private String databaseLocation;
 
@@ -172,6 +178,10 @@ public class H2EventStore implements EventHandler, ManagedService,
 	public H2EventStore()
 	{
 		// initialize the inner data structures
+
+		// by default store neither notifications nor states
+		this.storeNotifications = false;
+		this.storeStates = false;
 
 		// default data retention mode
 		this.dataRetention = DataRetentionMode.DROP;
@@ -274,6 +284,42 @@ public class H2EventStore implements EventHandler, ManagedService,
 				this.logger.log(LogService.LOG_ERROR,
 						"Missing configuration param "
 								+ EventStoreInfo.DB_LOCATION);
+			}
+
+			// get the persistent store location
+			String storeNotificationsAsString = (String) properties
+					.get(EventStoreInfo.NOTIFICATIONS_ENABLED);
+
+			if ((storeNotificationsAsString != null)
+					&& (!storeNotificationsAsString.isEmpty()))
+			{
+				this.storeNotifications = Boolean
+						.valueOf(storeNotificationsAsString);
+			}
+
+			else
+			{
+				// log the error
+				this.logger.log(LogService.LOG_ERROR,
+						"Missing configuration param "
+								+ EventStoreInfo.NOTIFICATIONS_ENABLED);
+			}
+
+			// get the persistent store location
+			String storeStatesAsString = (String) properties
+					.get(EventStoreInfo.STATES_ENABLED);
+
+			if ((storeStatesAsString != null)
+					&& (!storeStatesAsString.isEmpty()))
+			{
+				this.storeStates = Boolean.valueOf(storeStatesAsString);
+			}
+			else
+			{
+				// log the error
+				this.logger.log(LogService.LOG_ERROR,
+						"Missing configuration param "
+								+ EventStoreInfo.STATES_ENABLED);
 			}
 
 			// get optional parameters
@@ -423,8 +469,9 @@ public class H2EventStore implements EventHandler, ManagedService,
 			this.logger.log(LogService.LOG_DEBUG, "TOPIC: " + event.getTopic());
 
 			// check if the event is a status update
-			if (event.getTopic()
+			if ((event.getTopic()
 					.equals("org/osgi/service/monitor/MonitorEvent"))
+					&& (this.storeStates))
 			{
 				if (event.getProperty("mon.listener.id") == null)
 				{
@@ -452,7 +499,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 					}
 				}
 			}
-			else
+			else if (this.storeNotifications)
 			{
 				// handle Notification
 				Object eventContent = event.getProperty(EventConstants.EVENT);
@@ -873,7 +920,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String deviceURI, Date startDate, Date endDate, int startCount,
 			int nResults)
 	{
-		return this.notifDao.getAllDeviceContinuousNotifications(deviceURI,
+		return this.notifDao.getAllDeviceParametricNotifications(deviceURI,
 				startDate, endDate, startCount, nResults);
 	}
 
@@ -889,7 +936,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String deviceURI, Date startDate, Date endDate, int startCount,
 			int nResults, boolean aggregated)
 	{
-		return this.notifDao.getAllDeviceDiscreteNotifications(deviceURI,
+		return this.notifDao.getAllDeviceNonParametricNotifications(deviceURI,
 				startDate, endDate, startCount, nResults, aggregated);
 	}
 
@@ -899,7 +946,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String notificationParams, Date startDate, Date endDate,
 			int startCount, int nResults)
 	{
-		return this.notifDao.getSpecificDeviceContinuousNotifications(
+		return this.notifDao.getSpecificDeviceParametricNotifications(
 				deviceURI, notificationName, notificationParams, startDate,
 				endDate, startCount, nResults);
 	}
@@ -909,7 +956,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String deviceURI, String notificationName, Date startDate,
 			Date endDate, int startCount, int nResults)
 	{
-		return this.notifDao.getSpecificDeviceDiscreteNotifications(deviceURI,
+		return this.notifDao.getSpecificDeviceNonParametricNotifications(deviceURI,
 				notificationName, startDate, endDate, startCount, nResults);
 	}
 
@@ -919,7 +966,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String eventStreamName, Date startDate, Date endDate,
 			int startCount, int nResults)
 	{
-		return this.notifDao.getSpecificDeviceDiscreteNotifications(deviceURI,
+		return this.notifDao.getSpecificDeviceNonParametricNotifications(deviceURI,
 				notificationNames, eventStreamName, startDate, endDate,
 				startCount, nResults);
 	}
@@ -929,7 +976,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String deviceURI, Map<String, Set<String>> notificationNames,
 			Date startDate, Date endDate, int startCount, int nResults)
 	{
-		return this.notifDao.getSpecificDeviceDiscreteNotifications(deviceURI,
+		return this.notifDao.getSpecificDeviceNonParametricNotifications(deviceURI,
 				notificationNames, startDate, endDate, startCount, nResults);
 	}
 
@@ -977,7 +1024,8 @@ public class H2EventStore implements EventHandler, ManagedService,
 	}
 
 	@Override
-	public void insertNonParametricNotifications(EventDataStreamSet notificationSet)
+	public void insertNonParametricNotifications(
+			EventDataStreamSet notificationSet)
 	{
 		this.notifDao.insertNonParametricNotifications(notificationSet);
 	}

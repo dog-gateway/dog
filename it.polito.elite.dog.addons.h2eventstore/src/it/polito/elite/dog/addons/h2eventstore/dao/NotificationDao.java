@@ -293,7 +293,7 @@ public class NotificationDao
 	 *            the number of results to provide back
 	 */
 
-	public EventDataStreamSet getAllDeviceContinuousNotifications(
+	public EventDataStreamSet getAllDeviceParametricNotifications(
 			String deviceUri, Date startDate, Date endDate, int startCount,
 			int nResults)
 	{
@@ -392,7 +392,7 @@ public class NotificationDao
 	 *            the number of results to provide back
 	 */
 
-	public EventDataStreamSet getAllDeviceDiscreteNotifications(
+	public EventDataStreamSet getAllDeviceNonParametricNotifications(
 			String deviceUri, Date startDate, Date endDate, int startCount,
 			int nResults, boolean aggregated)
 	{
@@ -501,7 +501,7 @@ public class NotificationDao
 	 *            The number of results to provide back
 	 */
 
-	public EventDataStream getSpecificDeviceContinuousNotifications(
+	public EventDataStream getSpecificDeviceParametricNotifications(
 			String deviceURI, String notificationName,
 			String notificationParams, Date startDate, Date endDate,
 			int startCount, int nResults)
@@ -585,7 +585,7 @@ public class NotificationDao
 	 *            The number of results to provide back
 	 */
 
-	public EventDataStream getSpecificDeviceDiscreteNotifications(
+	public EventDataStream getSpecificDeviceNonParametricNotifications(
 			String deviceURI, String notificationName, Date startDate,
 			Date endDate, int startCount, int nResults)
 	{
@@ -640,7 +640,7 @@ public class NotificationDao
 		return stream;
 	}
 
-	public EventDataStream getSpecificDeviceDiscreteNotifications(
+	public EventDataStream getSpecificDeviceNonParametricNotifications(
 			String deviceURI, Set<String> notificationNames,
 			String eventStreamName, Date startDate, Date endDate,
 			int startCount, int nResults)
@@ -720,7 +720,7 @@ public class NotificationDao
 		return stream;
 	}
 
-	public EventDataStreamSet getSpecificDeviceDiscreteNotifications(
+	public EventDataStreamSet getSpecificDeviceNonParametricNotifications(
 			String deviceURI, Map<String, Set<String>> notificationNames,
 			Date startDate, Date endDate, int startCount, int nResults)
 	{
@@ -731,7 +731,7 @@ public class NotificationDao
 		for (String streamName : notificationNames.keySet())
 		{
 			streamSet.addEventDataStream(this
-					.getSpecificDeviceDiscreteNotifications(deviceURI,
+					.getSpecificDeviceNonParametricNotifications(deviceURI,
 							notificationNames.get(streamName), streamName,
 							startDate, endDate, startCount, nResults));
 		}
