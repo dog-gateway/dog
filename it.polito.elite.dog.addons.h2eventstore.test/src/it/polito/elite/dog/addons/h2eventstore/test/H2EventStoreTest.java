@@ -2,6 +2,7 @@ package it.polito.elite.dog.addons.h2eventstore.test;
 
 import it.polito.elite.dog.addons.storage.EventDataStreamSet;
 import it.polito.elite.dog.addons.storage.EventStore;
+import it.polito.elite.dog.addons.storage.EventStoreInfo;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
 import it.polito.elite.dog.core.library.model.devicecategory.PelletHeater;
 import it.polito.elite.dog.core.library.model.notification.CoolNotification;
@@ -47,7 +48,7 @@ public class H2EventStoreTest
 	public H2EventStoreTest()
 	{
 		// initialize the creation date
-		this.creationDate = new Date();
+		this.creationDate = new Date(0);
 
 		// intialize the atomic reference
 		this.theStore = new AtomicReference<>();
@@ -148,7 +149,7 @@ public class H2EventStoreTest
 									.getAllDeviceContinuousNotifications(
 											((ControllableDevice) device)
 													.getDeviceId(),
-											this.creationDate);
+											this.creationDate, new Date(),0,EventStoreInfo.UNLIMITED_SIZE);
 
 							// dump
 							this.logger.log(LogService.LOG_DEBUG, "Measures: "
@@ -158,7 +159,7 @@ public class H2EventStoreTest
 									.getAllDeviceDiscreteNotifications(
 											((ControllableDevice) device)
 													.getDeviceId(),
-											this.creationDate, true);
+											this.creationDate, new Date(),0,EventStoreInfo.UNLIMITED_SIZE,true);
 
 							// dump
 							this.logger.log(LogService.LOG_DEBUG, "Events: "
@@ -197,7 +198,7 @@ public class H2EventStoreTest
 														.getDeviceId(),
 												notificationNames,
 												this.creationDate, new Date(),
-												0, -1);
+												0, EventStoreInfo.UNLIMITED_SIZE);
 								
 								// dump
 								this.logger.log(LogService.LOG_DEBUG, "Grouped Events: "

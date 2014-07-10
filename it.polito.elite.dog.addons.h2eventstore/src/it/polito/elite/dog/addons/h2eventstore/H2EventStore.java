@@ -25,9 +25,13 @@ import it.polito.elite.dog.addons.storage.EventDataStream;
 import it.polito.elite.dog.addons.storage.EventDataStreamSet;
 import it.polito.elite.dog.addons.storage.EventStore;
 import it.polito.elite.dog.addons.storage.EventStoreInfo;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.notification.NonParametricNotification;
 import it.polito.elite.dog.core.library.model.notification.ParametricNotification;
 import it.polito.elite.dog.core.library.model.notification.annotation.NotificationParam;
+import it.polito.elite.dog.core.library.model.state.ContinuousState;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -35,6 +39,8 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -123,7 +129,8 @@ public class H2EventStore implements EventHandler, ManagedService,
 
 	// the service registration object to publish services offered by this
 	// bundle
-	private ServiceRegistration<H2EventStore> h2StorageService;
+	private ServiceRegistration<EventStore> storageService;
+	private ServiceRegistration<EventHandler> eventHandler;
 
 	// the data store limit expressed as number of rows, initially unlimited
 	// (-1)
@@ -325,7 +332,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 			// if everything has been accomplished, register the service
 			if ((this.h2Storage != null) && (this.devDao != null)
 					&& (this.notifDao != null) && (this.stateDao != null)
-					&& (h2StorageService == null))
+					&& (storageService == null))
 				this.registerService();
 		}
 	}
@@ -334,9 +341,20 @@ public class H2EventStore implements EventHandler, ManagedService,
 	private void registerService()
 	{
 		// register the driver service if not already registered
-		if (this.h2StorageService == null)
-			this.h2StorageService = (ServiceRegistration<H2EventStore>) this.context
+		if (this.storageService == null)
+			this.storageService = (ServiceRegistration<EventStore>) this.context
 					.registerService(EventStore.class.getName(), this, null);
+
+		// register the EventHandler service
+		Hashtable<String, Object> p = new Hashtable<String, Object>();
+
+		// Add this bundle as a listener of the MonitorAdmin events and of all
+		// notifications
+		p.put(EventConstants.EVENT_TOPIC, new String[] {
+				"org/osgi/service/monitor/MonitorEvent",
+				"it/polito/elite/dog/core/library/model/notification/*" });
+		this.eventHandler = (ServiceRegistration<EventHandler>) this.context
+				.registerService(EventHandler.class.getName(), this, p);
 	}
 
 	/**
@@ -344,8 +362,10 @@ public class H2EventStore implements EventHandler, ManagedService,
 	 */
 	private void unRegisterService()
 	{
-		if (this.h2StorageService != null)
-			this.h2StorageService.unregister();
+		if (this.storageService != null)
+			this.storageService.unregister();
+		if (this.eventHandler != null)
+			this.eventHandler.unregister();
 	}
 
 	/**
@@ -380,93 +400,219 @@ public class H2EventStore implements EventHandler, ManagedService,
 	{
 		if (this.eventHandlingEnabled)
 		{
-			// handle Notification
-			Object eventContent = event.getProperty(EventConstants.EVENT);
+			// debug logging
+			this.logger.log(LogService.LOG_DEBUG, "TOPIC: " + event.getTopic());
 
-			// handle parametric notifications
-			if (this.notifDao != null)
+			// check if the event is a status update
+			if (event.getTopic()
+					.equals("org/osgi/service/monitor/MonitorEvent"))
 			{
-				if (eventContent instanceof ParametricNotification)
+				if (event.getProperty("mon.listener.id") == null)
 				{
-					// get the received notification
-					ParametricNotification receivedNotification = (ParametricNotification) eventContent;
-
-					// get the device uri
-					String deviceURI = receivedNotification.getDeviceUri();
-
-					// prepare the notification measure
-					Measure<?, ?> eventValue = null;
-					// generate the notification timestamp
-					Date eventTimestamp = new Date();
-
-					// get the notification name from the topic
-					String topic = receivedNotification.getNotificationTopic();
-					String notificationName = topic.substring(topic
-							.lastIndexOf('/') + 1);
-
-					// Get notification parameters, to use for distinguishing
-					// same
-					// typed notifications referred to different parameter
-					// values.
-					String notificationParams = getNotificationParams(receivedNotification);
-
-					// log the error
-					this.logger.log(LogService.LOG_DEBUG,
-							"Notification parameters" + notificationParams);
-
-					// handle all low-level events
-					eventValue = this
-							.getParametricNotificationValue(receivedNotification);
-
-					// debug
-					logger.log(LogService.LOG_DEBUG, "Notification "
-							+ notificationName + " and deviceURI-> "
-							+ deviceURI + " params-> " + notificationParams);
-
-					// do nothing for null values
-					if ((eventValue != null) && (deviceURI != null)
-							&& (!deviceURI.isEmpty()))
+					// handle states
+					if (this.stateDao != null)
 					{
-						// insert the event
-						this.notifDao.insertParametricNotification(deviceURI, eventTimestamp,
-								eventValue, notificationName,
-								notificationParams);
-					}
-				}
-				else if (eventContent instanceof NonParametricNotification)
-				{
-					// get the non parametric notification
-					NonParametricNotification receivedNotification = (NonParametricNotification) eventContent;
+						DeviceStatus currentDeviceState = null;
+						try
+						{
+							// Try the deserialization of the DeviceStatus
+							// (property mon.statusvariable.value)
+							currentDeviceState = DeviceStatus
+									.deserializeFromString((String) event
+											.getProperty("mon.statusvariable.value"));
+						}
+						catch (Exception e)
+						{
+							this.logger.log(LogService.LOG_ERROR,
+									"Device status deserialization error "
+											+ e.getClass().getSimpleName());
+						}
 
-					// get the device uri
-					String deviceURI = receivedNotification.getDeviceUri();
-
-					// generate the notification timestamp
-					Date eventTimestamp = new Date();
-
-					// get the notification name from the topic
-					String topic = receivedNotification.getNotificationTopic();
-					String notificationName = topic.substring(topic
-							.lastIndexOf('/') + 1);
-
-					String notificationValue = this
-							.getNonParametricNotificationValue(receivedNotification);
-
-					// debug
-					logger.log(LogService.LOG_DEBUG, "Notification "
-							+ notificationName + " and deviceURI-> "
-							+ deviceURI);
-
-					// do nothing for null values
-					if ((notificationValue != null) && (deviceURI != null)
-							&& (!deviceURI.isEmpty()))
-					{
-						// insert the event
-						this.notifDao.insertNonParametricNotification(deviceURI, eventTimestamp,
-								notificationValue, notificationName);
+						// handle
+						this.handleStates(currentDeviceState);
 					}
 				}
 			}
+			else
+			{
+				// handle Notification
+				Object eventContent = event.getProperty(EventConstants.EVENT);
+
+				// check if the corresponding dao exists
+				if (this.notifDao != null)
+				{
+					// handle parametric notifications
+
+					if (eventContent instanceof ParametricNotification)
+					{
+						// get the received notification
+						ParametricNotification receivedNotification = (ParametricNotification) eventContent;
+
+						// get the device uri
+						String deviceURI = receivedNotification.getDeviceUri();
+
+						// prepare the notification measure
+						Measure<?, ?> eventValue = null;
+						// generate the notification timestamp
+						Date eventTimestamp = new Date();
+
+						// get the notification name from the topic
+						String topic = receivedNotification
+								.getNotificationTopic();
+						String notificationName = topic.substring(topic
+								.lastIndexOf('/') + 1);
+
+						// Get notification parameters, to use for
+						// distinguishing
+						// same
+						// typed notifications referred to different parameter
+						// values.
+						String notificationParams = getNotificationParams(receivedNotification);
+
+						// log the error
+						this.logger.log(LogService.LOG_DEBUG,
+								"Notification parameters" + notificationParams);
+
+						// handle all low-level events
+						eventValue = this
+								.getParametricNotificationValue(receivedNotification);
+
+						// debug
+						logger.log(LogService.LOG_DEBUG, "Notification "
+								+ notificationName + " and deviceURI-> "
+								+ deviceURI + " params-> " + notificationParams);
+
+						// do nothing for null values
+						if ((eventValue != null) && (deviceURI != null)
+								&& (!deviceURI.isEmpty()))
+						{
+							// insert the event
+							this.notifDao.insertParametricNotification(
+									deviceURI, eventTimestamp, eventValue,
+									notificationName, notificationParams);
+						}
+					}
+					else if (eventContent instanceof NonParametricNotification)
+					{
+						// get the non parametric notification
+						NonParametricNotification receivedNotification = (NonParametricNotification) eventContent;
+
+						// get the device uri
+						String deviceURI = receivedNotification.getDeviceUri();
+
+						// generate the notification timestamp
+						Date eventTimestamp = new Date();
+
+						// get the notification name from the topic
+						String topic = receivedNotification
+								.getNotificationTopic();
+						String notificationName = topic.substring(topic
+								.lastIndexOf('/') + 1);
+
+						String notificationValue = this
+								.getNonParametricNotificationValue(receivedNotification);
+
+						// debug
+						logger.log(LogService.LOG_DEBUG, "Notification "
+								+ notificationName + " and deviceURI-> "
+								+ deviceURI);
+
+						// do nothing for null values
+						if ((notificationValue != null) && (deviceURI != null)
+								&& (!deviceURI.isEmpty()))
+						{
+							// insert the event
+							this.notifDao.insertNonParametricNotification(
+									deviceURI, eventTimestamp,
+									notificationValue, notificationName);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void handleStates(DeviceStatus currentDeviceState)
+	{
+		// If the deserialization works
+		if (currentDeviceState != null)
+		{
+			Map<String, State> allStates = currentDeviceState.getStates();
+			for (String stateName : allStates.keySet())
+			{
+				// handle each different state
+				State stateInstance = allStates.get(stateName);
+
+				// check the state type
+				if (stateInstance instanceof ContinuousState)
+				{
+					this.handleContinuousStates(stateName, stateInstance,
+							currentDeviceState.getDeviceURI());
+				}
+				else
+				{
+					this.handleDiscreteStates(stateName, stateInstance,
+							currentDeviceState.getDeviceURI());
+				}
+			}
+		}
+	}
+
+	private void handleContinuousStates(String stateName, State stateInstance,
+			String deviceUri)
+	{
+		// handle continuous state values
+		StateValue[] currentStateValue = stateInstance.getCurrentStateValue();
+
+		// insert all values
+		for (int i = 0; i < currentStateValue.length; i++)
+		{
+			// get the state value
+			Object value = currentStateValue[i].getValue();
+
+			// check value type
+			if (value instanceof Measure<?, ?>)
+			{
+				// get the features and compose the additional parameters, if
+				// needed
+				HashMap<String, Object> features = currentStateValue[i]
+						.getFeatures();
+
+				StringBuffer stateParams = new StringBuffer();
+				boolean first = true;
+				for (String featureName : features.keySet())
+				{
+					if (!first)
+						stateParams.append("&");
+					else
+						first = false;
+
+					stateParams.append(featureName + "="
+							+ features.get(featureName));
+				}
+
+				this.stateDao.insertContinuousState(deviceUri, new Date(),
+						(Measure<?, ?>) value, stateName,
+						stateParams.toString());
+			}
+		}
+	}
+
+	private void handleDiscreteStates(String stateName, State stateInstance,
+			String deviceUri)
+	{
+		// handle continuous state values
+		StateValue[] currentStateValue = stateInstance.getCurrentStateValue();
+
+		// insert all values
+		for (int i = 0; i < currentStateValue.length; i++)
+		{
+			// get the state value
+			Object value = currentStateValue[i].getValue();
+
+			this.stateDao.insertDiscreteState(deviceUri, new Date(),
+					value.toString(), stateName);
+
 		}
 	}
 
@@ -596,7 +742,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 					// if everything has been accomplished, register the service
 					if ((h2Storage != null) && (devDao != null)
 							&& (notifDao != null) && (stateDao != null)
-							&& (h2StorageService == null))
+							&& (storageService == null))
 						registerService();
 
 				}
@@ -627,50 +773,11 @@ public class H2EventStore implements EventHandler, ManagedService,
 
 	@Override
 	public EventDataStreamSet getAllDeviceContinuousNotifications(
-			String deviceURI, Date startDate, Date endDate)
-	{
-		return this.getAllDeviceContinuousNotifications(deviceURI, startDate,
-				endDate, 0, -1);
-	}
-
-	@Override
-	public EventDataStreamSet getAllDeviceContinuousNotifications(
 			String deviceURI, Date startDate, Date endDate, int startCount,
 			int nResults)
 	{
 		return this.notifDao.getAllDeviceContinuousNotifications(deviceURI,
 				startDate, endDate, startCount, nResults);
-	}
-
-	@Override
-	public EventDataStreamSet getAllDeviceContinuousNotifications(
-			String deviceURI, Date startDate)
-	{
-		return this.getAllDeviceContinuousNotifications(deviceURI, startDate,
-				new Date(), 0, -1);
-	}
-
-	@Override
-	public EventDataStreamSet getAllDeviceContinuousNotifications(
-			String deviceURI, Date startDate, int startCount, int nResults)
-	{
-		return this.getAllDeviceContinuousNotifications(deviceURI, startDate,
-				new Date(), startCount, nResults);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java
-	 * .lang.String, java.util.Date, java.util.Date, boolean)
-	 */
-	@Override
-	public EventDataStreamSet getAllDeviceDiscreteNotifications(
-			String deviceURI, Date startDate, Date endDate, boolean aggregated)
-	{
-		return this.getAllDeviceDiscreteNotifications(deviceURI, startDate,
-				endDate, 0, -1, aggregated);
 	}
 
 	/*
@@ -689,48 +796,6 @@ public class H2EventStore implements EventHandler, ManagedService,
 				startDate, endDate, startCount, nResults, aggregated);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java
-	 * .lang.String, java.util.Date, boolean)
-	 */
-	@Override
-	public EventDataStreamSet getAllDeviceDiscreteNotifications(
-			String deviceURI, Date startDate, boolean aggregated)
-	{
-		return this.getAllDeviceDiscreteNotifications(deviceURI, startDate,
-				new Date(), 0, -1, aggregated);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * it.polito.elite.dog.addons.storage.EventStore#getAllDeviceEvents(java
-	 * .lang.String, java.util.Date, int, int, boolean)
-	 */
-	@Override
-	public EventDataStreamSet getAllDeviceDiscreteNotifications(
-			String deviceURI, Date startDate, int startCount, int nResults,
-			boolean aggregated)
-	{
-		return this.getAllDeviceDiscreteNotifications(deviceURI, startDate,
-				new Date(), startCount, nResults, aggregated);
-	}
-
-	@Override
-	public EventDataStream getSpecificDeviceContinuousNotifications(
-			String deviceURI, String notificationName,
-			String notificationParams, Date startDate, Date endDate)
-	{
-		return this
-				.getSpecificDeviceContinuousNotifications(deviceURI,
-						notificationName, notificationParams, startDate,
-						endDate, 0, -1);
-	}
-
 	@Override
 	public EventDataStream getSpecificDeviceContinuousNotifications(
 			String deviceURI, String notificationName,
@@ -743,59 +808,12 @@ public class H2EventStore implements EventHandler, ManagedService,
 	}
 
 	@Override
-	public EventDataStream getSpecificDeviceContinuousNotifications(
-			String deviceURI, String notificationName,
-			String notificationParams, Date startDate)
-	{
-		return this.getSpecificDeviceContinuousNotifications(deviceURI,
-				notificationName, notificationParams, startDate, new Date(), 0,
-				-1);
-	}
-
-	@Override
-	public EventDataStream getSpecificDeviceContinuousNotifications(
-			String deviceURI, String notificationName,
-			String notificationParams, Date startDate, int startCount,
-			int nResults)
-	{
-		return this.getSpecificDeviceContinuousNotifications(deviceURI,
-				notificationName, notificationParams, startDate, new Date(),
-				startCount, nResults);
-	}
-
-	@Override
-	public EventDataStream getSpecificDeviceDiscreteNotifications(
-			String deviceURI, String notificationName, Date startDate,
-			Date endDate)
-	{
-		return this.getSpecificDeviceDiscreteNotifications(deviceURI,
-				notificationName, startDate, endDate, 0, -1);
-	}
-
-	@Override
 	public EventDataStream getSpecificDeviceDiscreteNotifications(
 			String deviceURI, String notificationName, Date startDate,
 			Date endDate, int startCount, int nResults)
 	{
 		return this.notifDao.getSpecificDeviceDiscreteNotifications(deviceURI,
 				notificationName, startDate, endDate, startCount, nResults);
-	}
-
-	@Override
-	public EventDataStream getSpecificDeviceDiscreteNotifications(
-			String deviceURI, String notificationName, Date startDate)
-	{
-		return this.getSpecificDeviceDiscreteNotifications(deviceURI,
-				notificationName, startDate, new Date(), 0, -1);
-	}
-
-	@Override
-	public EventDataStream getSpecificDeviceDiscreteNotifications(
-			String deviceURI, String notificationName, Date startDate,
-			int startCount, int nResults)
-	{
-		return this.getSpecificDeviceDiscreteNotifications(deviceURI,
-				notificationName, startDate, new Date(), startCount, nResults);
 	}
 
 	@Override
@@ -816,6 +834,42 @@ public class H2EventStore implements EventHandler, ManagedService,
 	{
 		return this.notifDao.getSpecificDeviceDiscreteNotifications(deviceURI,
 				notificationNames, startDate, endDate, startCount, nResults);
+	}
+
+	@Override
+	public EventDataStreamSet getAllDeviceContinuousStates(String deviceUri,
+			Date startDate, Date endDate, int startCount, int nResults)
+	{
+		return this.stateDao.getAllDeviceContinuousStates(deviceUri, startDate,
+				endDate, startCount, nResults);
+	}
+
+	@Override
+	public EventDataStreamSet getAllDeviceDiscreteStates(String deviceUri,
+			Date startDate, Date endDate, int startCount, int nResults,
+			boolean aggregated)
+	{
+		return this.stateDao.getAllDeviceDiscreteStates(deviceUri, startDate,
+				endDate, startCount, nResults, aggregated);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceContinuousStates(String deviceURI,
+			String notificationName, String notificationParams, Date startDate,
+			Date endDate, int startCount, int nResults)
+	{
+		return this.stateDao.getSpecificDeviceContinuousStates(deviceURI,
+				notificationName, notificationParams, startDate, endDate,
+				startCount, nResults);
+	}
+
+	@Override
+	public EventDataStream getSpecificDeviceDiscreteStates(String deviceURI,
+			String stateName, Date startDate, Date endDate, int startCount,
+			int nResults)
+	{
+		return this.stateDao.getSpecificDeviceDiscreteStates(deviceURI,
+				stateName, startDate, endDate, startCount, nResults);
 	}
 
 }
