@@ -146,7 +146,7 @@ public class H2EventStoreTest
 						if (device instanceof ControllableDevice)
 						{
 							EventDataStreamSet measures = store
-									.getAllDeviceContinuousNotifications(
+									.getAllDeviceParametricNotifications(
 											((ControllableDevice) device)
 													.getDeviceId(),
 											this.creationDate, new Date(), 0,
@@ -157,7 +157,7 @@ public class H2EventStoreTest
 									+ measures);
 
 							EventDataStreamSet events = store
-									.getAllDeviceDiscreteNotifications(
+									.getAllDeviceNonParametricNotifications(
 											((ControllableDevice) device)
 													.getDeviceId(),
 											this.creationDate, new Date(), 0,
@@ -195,7 +195,7 @@ public class H2EventStoreTest
 										onOffStandby);
 
 								EventDataStreamSet groupedEvents = store
-										.getSpecificDeviceDiscreteNotifications(
+										.getSpecificDeviceNonParametricNotifications(
 												((ControllableDevice) device)
 														.getDeviceId(),
 												notificationNames,

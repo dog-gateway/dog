@@ -174,9 +174,8 @@ public class StateDao
 		return isClosed;
 	}
 
-	public boolean insertContinuousState(String deviceURI,
-			Date eventTimestamp, Measure<?, ?> eventValue, String stateName,
-			String stateParams)
+	public boolean insertContinuousState(String deviceURI, Date eventTimestamp,
+			Measure<?, ?> eventValue, String stateName, String stateParams)
 	{
 		boolean inserted = false;
 
@@ -615,4 +614,131 @@ public class StateDao
 		return stream;
 	}
 
+	public void insertContinuousStates(EventDataStreamSet stateSet)
+	{
+		// iterate over the stream sets
+		for (EventDataStream currentStream : stateSet.getEventDataStreams())
+		{
+			try
+			{
+				// the insert counter
+				int i = 0;
+
+				// iterate over the data points
+				for (EventDataPoint currentDataPoint : currentStream
+						.getDatapoints())
+				{
+					if (i % H2Storage.MAX_BATCH_SIZE == 0)
+					{
+						// exclude the first time
+						if (i > 0)
+						{
+							// execute the insertion batch
+							// TODO: check if synchronization is required
+							// (should be carried by the db)
+							this.storage.getConnection().setAutoCommit(false);
+							this.insertContinuousStateStmt.executeBatch();
+							this.storage.getConnection().setAutoCommit(true);
+						}
+					}
+
+					// add the notification to the batch
+					// fill the prepared statement
+					this.insertContinuousStateStmt.setTimestamp(1,
+							new Timestamp(currentDataPoint.getAt().getTime()));
+					this.insertContinuousStateStmt.setString(2,
+							currentDataPoint.getUnit());
+					this.insertContinuousStateStmt.setDouble(3,
+							Double.valueOf(currentDataPoint.getValue()));
+					this.insertContinuousStateStmt.setString(4,
+							currentStream.getName());
+					this.insertContinuousStateStmt.setString(5,
+							currentStream.getParameters());
+					this.insertContinuousStateStmt.setString(6,
+							currentStream.getDeviceUri());
+
+					// execute the insert query
+					this.insertContinuousStateStmt.addBatch();
+					// increments the insert counter
+					i++;
+				}
+
+				// execute the remaining batch
+				if (i % H2Storage.MAX_BATCH_SIZE > 0)
+				{
+					this.storage.getConnection().setAutoCommit(false);
+					this.insertContinuousStateStmt.executeBatch();
+					this.storage.getConnection().setAutoCommit(true);
+				}
+			}
+			catch (SQLException e)
+			{
+				this.logger.log(LogService.LOG_ERROR,
+						"Unable to store event stream of parametric notifications for the device: "
+								+ currentStream.getDeviceUri(), e);
+			}
+		}
+	}
+
+	public void insertDiscreteStates(EventDataStreamSet stateSet)
+	{
+		// iterate over the stream sets
+		for (EventDataStream currentStream : stateSet.getEventDataStreams())
+		{
+			try
+			{
+				// the insert counter
+				int i = 0;
+
+				// iterate over the data points
+				for (EventDataPoint currentDataPoint : currentStream
+						.getDatapoints())
+				{
+					if (i % H2Storage.MAX_BATCH_SIZE == 0)
+					{
+						// exclude the first time
+						if (i > 0)
+						{
+							// execute the insertion batch
+							// TODO: check if synchronization is required
+							// (should be carried by the db)
+							this.storage.getConnection().setAutoCommit(false);
+							this.insertDiscreteStateStmt.executeBatch();
+							this.storage.getConnection().setAutoCommit(true);
+						}
+					}
+
+					// add the notification to the batch
+					// fill the prepared statement
+					this.insertDiscreteStateStmt.setTimestamp(1, new Timestamp(
+							currentDataPoint.getAt().getTime()));
+					this.insertDiscreteStateStmt.setString(2,
+							currentDataPoint.getValue());
+					this.insertDiscreteStateStmt.setString(3,
+							currentStream.getName());
+					this.insertDiscreteStateStmt.setString(4,
+							currentStream.getDeviceUri());
+
+					// execute the insert query
+					this.insertDiscreteStateStmt.addBatch();
+					// increments the insert counter
+					i++;
+				}
+
+				// execute the remaining batch
+				if (i % H2Storage.MAX_BATCH_SIZE > 0)
+				{
+					this.storage.getConnection().setAutoCommit(false);
+					this.insertDiscreteStateStmt.executeBatch();
+					this.storage.getConnection().setAutoCommit(true);
+				}
+			}
+			catch (SQLException e)
+			{
+				this.logger.log(LogService.LOG_ERROR,
+						"Unable to store event stream of non parametric notifications for the device: "
+								+ currentStream.getDeviceUri(), e);
+			}
+		}
+	}
 }

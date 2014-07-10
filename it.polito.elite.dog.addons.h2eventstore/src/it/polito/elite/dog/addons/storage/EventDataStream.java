@@ -132,7 +132,7 @@ public class EventDataStream
 	 * 
 	 * @return
 	 */
-	public String getNotificationName()
+	public String getName()
 	{
 		return this.name;
 	}
@@ -143,7 +143,7 @@ public class EventDataStream
 	 * 
 	 * @param notificationName
 	 */
-	public void setNotificationName(String notificationName)
+	public void setName(String notificationName)
 	{
 		this.name = notificationName;
 		this.uid = this.deviceUri
@@ -160,7 +160,7 @@ public class EventDataStream
 	 * @return The parameters encoded in a post-like manner, e.g.,
 	 *         name1=value1&name2=value2&...
 	 */
-	public String getNotificationParameters()
+	public String getParameters()
 	{
 		return this.additionalParameters;
 	}
@@ -173,7 +173,7 @@ public class EventDataStream
 	 *            The parameters encoded in a post-like manner, e.g.,
 	 *            name1=value1&name2=value2&...
 	 */
-	public void setNotificationParameters(String notificationParameters)
+	public void setParameters(String notificationParameters)
 	{
 		this.additionalParameters = notificationParameters;
 		this.uid = this.deviceUri

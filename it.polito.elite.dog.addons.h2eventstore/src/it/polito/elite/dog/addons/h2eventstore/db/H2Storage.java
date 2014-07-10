@@ -28,6 +28,9 @@ import java.sql.SQLException;
 public class H2Storage
 {
 
+	// ---- The max insertion batch size
+	public static final int MAX_BATCH_SIZE = 10000;
+
 	// the jdbc connection object
 	private Connection connection;
 

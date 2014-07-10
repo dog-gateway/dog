@@ -475,6 +475,13 @@ public class H2EventStore implements EventHandler, ManagedService,
 		}
 	}
 
+	/**
+	 * Handles events received through the monitor admin bundle and representing
+	 * the last snapshot of a device state.
+	 * 
+	 * @param currentDeviceState
+	 *            The last state snapshot.
+	 */
 	private void handleStates(DeviceStatus currentDeviceState)
 	{
 		// If the deserialization works
@@ -506,6 +513,17 @@ public class H2EventStore implements EventHandler, ManagedService,
 		}
 	}
 
+	/**
+	 * Handles updates for {@link ContinuousState}s, store the state value in
+	 * the continuous state db table.
+	 * 
+	 * @param stateName
+	 *            The name of the state.
+	 * @param stateInstance
+	 *            The Instance of {@link State} representing the state.
+	 * @param deviceUri
+	 *            The device URI.
+	 */
 	private void handleContinuousStates(String stateName, State stateInstance,
 			String deviceUri)
 	{
@@ -549,6 +567,17 @@ public class H2EventStore implements EventHandler, ManagedService,
 		}
 	}
 
+	/**
+	 * Handles updates for {@link DiscreteState}s, store the state value in the
+	 * discrete state db table.
+	 * 
+	 * @param stateName
+	 *            The name of the state.
+	 * @param stateInstance
+	 *            The Instance of {@link State} representing the state.
+	 * @param deviceUri
+	 *            The device URI.
+	 */
 	private void handleDiscreteStates(String stateName, State stateInstance,
 			String deviceUri)
 	{
@@ -567,7 +596,16 @@ public class H2EventStore implements EventHandler, ManagedService,
 		}
 	}
 
-	private void handleParametricNotification(ParametricNotification receivedNotification)
+	/**
+	 * Handles {@link ParametricNotification}s, store the notification value in
+	 * the parametric notification db table.
+	 * 
+	 * @param receivedNotification
+	 *            The notification to handle.
+	 * 
+	 */
+	private void handleParametricNotification(
+			ParametricNotification receivedNotification)
 	{
 		// get the device uri
 		String deviceURI = receivedNotification.getDeviceUri();
@@ -611,7 +649,16 @@ public class H2EventStore implements EventHandler, ManagedService,
 		}
 	}
 
-	private void handleNonParametricNotification(NonParametricNotification receivedNotification)
+	/**
+	 * Handles {@link NonParametricNotification}s, store the notification value
+	 * in the non parametric notification db table.
+	 * 
+	 * @param receivedNotification
+	 *            The notification to handle.
+	 * 
+	 */
+	private void handleNonParametricNotification(
+			NonParametricNotification receivedNotification)
 	{
 		// get the device uri
 		String deviceURI = receivedNotification.getDeviceUri();
@@ -620,29 +667,33 @@ public class H2EventStore implements EventHandler, ManagedService,
 		Date eventTimestamp = new Date();
 
 		// get the notification name from the topic
-		String topic = receivedNotification
-				.getNotificationTopic();
-		String notificationName = topic.substring(topic
-				.lastIndexOf('/') + 1);
+		String topic = receivedNotification.getNotificationTopic();
+		String notificationName = topic.substring(topic.lastIndexOf('/') + 1);
 
 		String notificationValue = this
 				.getNonParametricNotificationValue(receivedNotification);
 
 		// debug
-		logger.log(LogService.LOG_DEBUG, "Notification "
-				+ notificationName + " and deviceURI-> "
-				+ deviceURI);
+		logger.log(LogService.LOG_DEBUG, "Notification " + notificationName
+				+ " and deviceURI-> " + deviceURI);
 
 		// do nothing for null values
 		if ((notificationValue != null) && (deviceURI != null)
 				&& (!deviceURI.isEmpty()))
 		{
 			// insert the event
-			this.notifDao.insertNonParametricNotification(
-					deviceURI, eventTimestamp,
-					notificationValue, notificationName);
+			this.notifDao.insertNonParametricNotification(deviceURI,
+					eventTimestamp, notificationValue, notificationName);
 		}
 	}
+
+	/**
+	 * Get the value of a {@link NonParametricNotification}
+	 * 
+	 * @param receivedNotification
+	 *            The notification from which the value must be extracted.
+	 * @return The notification value as a {@link String}.
+	 */
 	private String getNonParametricNotificationValue(
 			NonParametricNotification receivedNotification)
 	{
@@ -662,6 +713,13 @@ public class H2EventStore implements EventHandler, ManagedService,
 		return value.isEmpty() ? null : value;
 	}
 
+	/**
+	 * Get the value of a {@link ParametricNotification}
+	 * 
+	 * @param receivedNotification
+	 *            The notification from which the value must be extracted.
+	 * @return The notification value as a {@link Measure}
+	 */
 	private Measure<?, ?> getParametricNotificationValue(
 			ParametricNotification receivedNotification)
 	{
@@ -694,6 +752,18 @@ public class H2EventStore implements EventHandler, ManagedService,
 		return value;
 	}
 
+	/**
+	 * <p>
+	 * Gets the parameters of a notification, encoded in a post-like manner:
+	 * </p>
+	 * <p>
+	 * <code>paramname1=paramvalue1&amp;paramname2=paramvalue2&...</code>
+	 * </p>
+	 * 
+	 * @param receivedNotification
+	 *            The notification from which the parameters must be extracted.
+	 * @return The parameters encoded as a post-like string.
+	 */
 	private String getNotificationParams(
 			ParametricNotification receivedNotification)
 	{
@@ -799,7 +869,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 	// -------------------------- EventStore implementation -------------
 
 	@Override
-	public EventDataStreamSet getAllDeviceContinuousNotifications(
+	public EventDataStreamSet getAllDeviceParametricNotifications(
 			String deviceURI, Date startDate, Date endDate, int startCount,
 			int nResults)
 	{
@@ -815,7 +885,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 	 * .lang.String, java.util.Date, java.util.Date, int, int, boolean)
 	 */
 	@Override
-	public EventDataStreamSet getAllDeviceDiscreteNotifications(
+	public EventDataStreamSet getAllDeviceNonParametricNotifications(
 			String deviceURI, Date startDate, Date endDate, int startCount,
 			int nResults, boolean aggregated)
 	{
@@ -824,7 +894,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 	}
 
 	@Override
-	public EventDataStream getSpecificDeviceContinuousNotifications(
+	public EventDataStream getSpecificDeviceParametricNotifications(
 			String deviceURI, String notificationName,
 			String notificationParams, Date startDate, Date endDate,
 			int startCount, int nResults)
@@ -835,7 +905,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 	}
 
 	@Override
-	public EventDataStream getSpecificDeviceDiscreteNotifications(
+	public EventDataStream getSpecificDeviceNonParametricNotifications(
 			String deviceURI, String notificationName, Date startDate,
 			Date endDate, int startCount, int nResults)
 	{
@@ -844,7 +914,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 	}
 
 	@Override
-	public EventDataStream getSpecificDeviceDiscreteNotifications(
+	public EventDataStream getSpecificDeviceNonParametricNotifications(
 			String deviceURI, Set<String> notificationNames,
 			String eventStreamName, Date startDate, Date endDate,
 			int startCount, int nResults)
@@ -855,7 +925,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 	}
 
 	@Override
-	public EventDataStreamSet getSpecificDeviceDiscreteNotifications(
+	public EventDataStreamSet getSpecificDeviceNonParametricNotifications(
 			String deviceURI, Map<String, Set<String>> notificationNames,
 			Date startDate, Date endDate, int startCount, int nResults)
 	{
@@ -897,6 +967,31 @@ public class H2EventStore implements EventHandler, ManagedService,
 	{
 		return this.stateDao.getSpecificDeviceDiscreteStates(deviceURI,
 				stateName, startDate, endDate, startCount, nResults);
+	}
+
+	@Override
+	public void insertParametricNotifications(
+			EventDataStreamSet notificationsSet)
+	{
+		this.notifDao.insertParametricNotifications(notificationsSet);
+	}
+
+	@Override
+	public void insertNonParametricNotifications(EventDataStreamSet notificationSet)
+	{
+		this.notifDao.insertNonParametricNotifications(notificationSet);
+	}
+
+	@Override
+	public void insertContinuousStates(EventDataStreamSet stateSet)
+	{
+		this.stateDao.insertContinuousStates(stateSet);
+	}
+
+	@Override
+	public void insertDiscreteStates(EventDataStreamSet stateSet)
+	{
+		this.stateDao.insertDiscreteStates(stateSet);
 	}
 
 }

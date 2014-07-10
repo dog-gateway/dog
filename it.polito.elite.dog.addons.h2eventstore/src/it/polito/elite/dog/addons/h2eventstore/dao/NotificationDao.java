@@ -41,31 +41,31 @@ public class NotificationDao
 	private H2Storage storage;
 
 	// ---- TABLE NAMES
-	private final String continuousNotificationTableName = "ContinuousNotification";
-	private final String discreteNotificationTableName = "DiscreteNotification";
+	private final String parametricNotificationTableName = "ParametricNotification";
+	private final String nonParametricNotificationTableName = "NonParametricNotification";
 
 	// ---- TABLE CREATION QUERIES
-	private final String continuousNotificationTableCreateQuery = "CREATE TABLE "
-			+ this.continuousNotificationTableName
+	private final String parametricNotificationTableCreateQuery = "CREATE TABLE "
+			+ this.parametricNotificationTableName
 			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, unit VARCHAR(5), "
 			+ "value DOUBLE, name VARCHAR(100), params VARCHAR(255), deviceuri VARCHAR(255), "
 			+ "PRIMARY KEY(id), FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
-	private final String discreteNotificationTableCreateQuery = "CREATE TABLE "
-			+ this.discreteNotificationTableName
+	private final String nonParametricNotificationTableCreateQuery = "CREATE TABLE "
+			+ this.nonParametricNotificationTableName
 			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, value VARCHAR(100), "
 			+ "name VARCHAR(100), deviceuri VARCHAR(255), PRIMARY KEY(id), "
 			+ "FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
 
 	// --------- commonly used statements ------------
-	private PreparedStatement insertContinuousNotificationStmt;
-	private PreparedStatement insertDiscreteNotificationStmt;
+	private PreparedStatement insertParametricNotificationStmt;
+	private PreparedStatement insertNonParametricNotificationStmt;
 
 	// ---- INSERTION QUERIES
-	private final String insertContinuousNotificationQuery = "INSERT INTO "
-			+ this.continuousNotificationTableName
+	private final String insertParametricNotificationQuery = "INSERT INTO "
+			+ this.parametricNotificationTableName
 			+ "(timestamp, unit, value, name, params, deviceuri) VALUES (?,?,?,?,?,?)";
-	private final String insertDiscreteNotificationsQuery = "INSERT INTO "
-			+ this.discreteNotificationTableName
+	private final String insertNonParametricNotificationsQuery = "INSERT INTO "
+			+ this.nonParametricNotificationTableName
 			+ "(timestamp, value, name, deviceuri) VALUES (?,?,?,?);";
 
 	/**
@@ -98,9 +98,11 @@ public class NotificationDao
 			ResultSet tableSet = this.storage
 					.getConnection()
 					.getMetaData()
-					.getTables(this.storage.getConnection().getCatalog(), null,
-							this.discreteNotificationTableName.toUpperCase(),
-							null);
+					.getTables(
+							this.storage.getConnection().getCatalog(),
+							null,
+							this.nonParametricNotificationTableName
+									.toUpperCase(), null);
 
 			if (!tableSet.next())
 			{
@@ -108,7 +110,7 @@ public class NotificationDao
 				this.storage
 						.getConnection()
 						.prepareStatement(
-								this.discreteNotificationTableCreateQuery)
+								this.nonParametricNotificationTableCreateQuery)
 						.executeUpdate();
 				this.logger.log(LogService.LOG_INFO,
 						"Schema creation has been successful!");
@@ -121,7 +123,7 @@ public class NotificationDao
 					.getConnection()
 					.getMetaData()
 					.getTables(this.storage.getConnection().getCatalog(), null,
-							this.continuousNotificationTableName.toUpperCase(),
+							this.parametricNotificationTableName.toUpperCase(),
 							null);
 
 			if (!tableSet.next())
@@ -130,7 +132,7 @@ public class NotificationDao
 				this.storage
 						.getConnection()
 						.prepareStatement(
-								this.continuousNotificationTableCreateQuery)
+								this.parametricNotificationTableCreateQuery)
 						.executeUpdate();
 				this.logger.log(LogService.LOG_INFO,
 						"Schema creation has been successful!");
@@ -155,12 +157,13 @@ public class NotificationDao
 		// performance
 		try
 		{
-			this.insertContinuousNotificationStmt = this.storage
+			this.insertParametricNotificationStmt = this.storage
 					.getConnection().prepareStatement(
-							this.insertContinuousNotificationQuery);
+							this.insertParametricNotificationQuery);
 
-			this.insertDiscreteNotificationStmt = this.storage.getConnection()
-					.prepareStatement(this.insertDiscreteNotificationsQuery);
+			this.insertNonParametricNotificationStmt = this.storage
+					.getConnection().prepareStatement(
+							this.insertNonParametricNotificationsQuery);
 
 		}
 		catch (SQLException e)
@@ -171,15 +174,15 @@ public class NotificationDao
 		}
 
 	}
-	
+
 	public boolean close()
 	{
 		boolean isClosed = false;
 		// close db connection
 		try
 		{
-			this.insertDiscreteNotificationStmt.close();
-			this.insertContinuousNotificationStmt.close();
+			this.insertNonParametricNotificationStmt.close();
+			this.insertParametricNotificationStmt.close();
 			isClosed = true;
 		}
 		catch (SQLException e)
@@ -191,16 +194,14 @@ public class NotificationDao
 		return isClosed;
 	}
 
-
-	public boolean insertParametricNotification(String deviceURI, Date eventTimestamp,
-			Measure<?, ?> eventValue, String notificationName,
-			String notificationParams)
+	public boolean insertParametricNotification(String deviceURI,
+			Date eventTimestamp, Measure<?, ?> eventValue,
+			String notificationName, String notificationParams)
 	{
 		boolean inserted = false;
 
 		try
 		{
-			
 
 			if (!this.devDao.isDevicePresent(deviceURI))
 				this.devDao.insertDevice(deviceURI);
@@ -208,20 +209,22 @@ public class NotificationDao
 			// Insert the real event in the right table
 
 			// fill the prepared statement
-			this.insertContinuousNotificationStmt.setTimestamp(1,
+			this.insertParametricNotificationStmt.setTimestamp(1,
 					new Timestamp(eventTimestamp.getTime()));
 			DecimalMeasure<? extends Quantity> measure = DecimalMeasure
 					.valueOf(eventValue.toString());
-			this.insertContinuousNotificationStmt
-					.setString(2, eventValue.getUnit().toString());
-			this.insertContinuousNotificationStmt.setDouble(3, measure.getValue()
-					.doubleValue());
-			this.insertContinuousNotificationStmt.setString(4, notificationName);
-			this.insertContinuousNotificationStmt.setString(5, notificationParams);
-			this.insertContinuousNotificationStmt.setString(6, deviceURI);
+			this.insertParametricNotificationStmt.setString(2, eventValue
+					.getUnit().toString());
+			this.insertParametricNotificationStmt.setDouble(3, measure
+					.getValue().doubleValue());
+			this.insertParametricNotificationStmt
+					.setString(4, notificationName);
+			this.insertParametricNotificationStmt.setString(5,
+					notificationParams);
+			this.insertParametricNotificationStmt.setString(6, deviceURI);
 
 			// execute the insert query
-			this.insertContinuousNotificationStmt.executeUpdate();
+			this.insertParametricNotificationStmt.executeUpdate();
 			this.storage.getConnection().commit();
 
 			// turn the insertion flag to true
@@ -237,9 +240,8 @@ public class NotificationDao
 		return inserted;
 	}
 
-
-	public boolean insertNonParametricNotification(String deviceURI, Date eventTimestamp,
-			String eventValue, String name)
+	public boolean insertNonParametricNotification(String deviceURI,
+			Date eventTimestamp, String eventValue, String name)
 	{
 		boolean inserted = false;
 
@@ -252,14 +254,14 @@ public class NotificationDao
 			// Insert the real event in the right table
 
 			// fill the prepared statement
-			this.insertDiscreteNotificationStmt.setTimestamp(1,
+			this.insertNonParametricNotificationStmt.setTimestamp(1,
 					new Timestamp(eventTimestamp.getTime()));
-			this.insertDiscreteNotificationStmt.setString(2, eventValue);
-			this.insertDiscreteNotificationStmt.setString(3, name);
-			this.insertDiscreteNotificationStmt.setString(4, deviceURI);
+			this.insertNonParametricNotificationStmt.setString(2, eventValue);
+			this.insertNonParametricNotificationStmt.setString(3, name);
+			this.insertNonParametricNotificationStmt.setString(4, deviceURI);
 
 			// execute the insert query
-			this.insertDiscreteNotificationStmt.executeUpdate();
+			this.insertNonParametricNotificationStmt.executeUpdate();
 			this.storage.getConnection().commit();
 
 			// turn the insertion flag to true
@@ -300,7 +302,7 @@ public class NotificationDao
 
 		// the select query
 		String allRealEventsQuery = "SELECT * FROM "
-				+ this.continuousNotificationTableName
+				+ this.parametricNotificationTableName
 				+ " WHERE deviceuri=? AND timestamp>=? and timestamp<=? ORDER BY name,params ASC LIMIT ? OFFSET ?;";
 
 		// the select statement
@@ -399,7 +401,9 @@ public class NotificationDao
 		EventDataStreamSet streamSet = new EventDataStreamSet();
 
 		// the select query
-		String allRealEventsQuery = "SELECT * FROM "+this.discreteNotificationTableName+" WHERE deviceuri=? AND timestamp>=? and timestamp<=?";
+		String allRealEventsQuery = "SELECT * FROM "
+				+ this.nonParametricNotificationTableName
+				+ " WHERE deviceuri=? AND timestamp>=? and timestamp<=?";
 		if (aggregated)
 			allRealEventsQuery = allRealEventsQuery
 					+ " ORDER BY timestamp ASC LIMIT ? OFFSET ?;";
@@ -508,7 +512,9 @@ public class NotificationDao
 
 		// the select query
 		// the select query
-		String realEventsQuery = "SELECT * FROM "+this.continuousNotificationTableName+" WHERE deviceuri=? AND name=? AND params=? AND timestamp>=? and timestamp<=? ORDER BY name,params LIMIT ? OFFSET ?;";
+		String realEventsQuery = "SELECT * FROM "
+				+ this.parametricNotificationTableName
+				+ " WHERE deviceuri=? AND name=? AND params=? AND timestamp>=? and timestamp<=? ORDER BY name,params LIMIT ? OFFSET ?;";
 
 		// the select statement
 		try
@@ -588,7 +594,9 @@ public class NotificationDao
 
 		// the select query
 		// the select query
-		String realEventsQuery = "SELECT * FROM "+this.discreteNotificationTableName+" WHERE deviceuri=? AND name=? AND timestamp>=? and timestamp<=? ORDER BY name LIMIT ? OFFSET ?;";
+		String realEventsQuery = "SELECT * FROM "
+				+ this.nonParametricNotificationTableName
+				+ " WHERE deviceuri=? AND name=? AND timestamp>=? and timestamp<=? ORDER BY name LIMIT ? OFFSET ?;";
 
 		// the select statement
 		try
@@ -632,7 +640,6 @@ public class NotificationDao
 		return stream;
 	}
 
-
 	public EventDataStream getSpecificDeviceDiscreteNotifications(
 			String deviceURI, Set<String> notificationNames,
 			String eventStreamName, Date startDate, Date endDate,
@@ -644,8 +651,9 @@ public class NotificationDao
 		// the select query
 		// the select query
 		StringBuffer realEventsQueryBuffer = new StringBuffer();
-		realEventsQueryBuffer
-				.append("SELECT * FROM "+this.discreteNotificationTableName+" WHERE deviceuri=? AND name IN (");
+		realEventsQueryBuffer.append("SELECT * FROM "
+				+ this.nonParametricNotificationTableName
+				+ " WHERE deviceuri=? AND name IN (");
 
 		boolean first = true;
 		for (int i = 0; i < notificationNames.size(); i++)
@@ -712,7 +720,6 @@ public class NotificationDao
 		return stream;
 	}
 
-
 	public EventDataStreamSet getSpecificDeviceDiscreteNotifications(
 			String deviceURI, Map<String, Set<String>> notificationNames,
 			Date startDate, Date endDate, int startCount, int nResults)
@@ -729,5 +736,138 @@ public class NotificationDao
 							startDate, endDate, startCount, nResults));
 		}
 		return streamSet;
+	}
+
+	public void insertParametricNotifications(EventDataStreamSet notificationSet)
+	{
+		// iterate over the stream sets
+		for (EventDataStream currentStream : notificationSet
+				.getEventDataStreams())
+		{
+			try
+			{
+				// the insert counter
+				int i = 0;
+
+				// iterate over the data points
+				for (EventDataPoint currentDataPoint : currentStream
+						.getDatapoints())
+				{
+					if (i % H2Storage.MAX_BATCH_SIZE == 0)
+					{
+						// exclude the first time
+						if (i > 0)
+						{
+							// execute the insertion batch
+							// TODO: check if synchronization is required
+							// (should be carried by the db)
+							this.storage.getConnection().setAutoCommit(false);
+							this.insertParametricNotificationStmt
+									.executeBatch();
+							this.storage.getConnection().setAutoCommit(true);
+						}
+					}
+
+					// add the notification to the batch
+					// fill the prepared statement
+					this.insertParametricNotificationStmt.setTimestamp(1,
+							new Timestamp(currentDataPoint.getAt().getTime()));
+					this.insertParametricNotificationStmt.setString(2,
+							currentDataPoint.getUnit());
+					this.insertParametricNotificationStmt.setDouble(3,
+							Double.valueOf(currentDataPoint.getValue()));
+					this.insertParametricNotificationStmt.setString(4,
+							currentStream.getName());
+					this.insertParametricNotificationStmt.setString(5,
+							currentStream.getParameters());
+					this.insertParametricNotificationStmt.setString(6,
+							currentStream.getDeviceUri());
+
+					// execute the insert query
+					this.insertParametricNotificationStmt.addBatch();
+					// increments the insert counter
+					i++;
+				}
+
+				// execute the remaining batch
+				if (i % H2Storage.MAX_BATCH_SIZE > 0)
+				{
+					this.storage.getConnection().setAutoCommit(false);
+					this.insertParametricNotificationStmt.executeBatch();
+					this.storage.getConnection().setAutoCommit(true);
+				}
+			}
+			catch (SQLException e)
+			{
+				this.logger.log(LogService.LOG_ERROR,
+						"Unable to store event stream of parametric notifications for the device: "
+								+ currentStream.getDeviceUri(), e);
+			}
+		}
+	}
+
+	public void insertNonParametricNotifications(
+			EventDataStreamSet notificationSet)
+	{
+		// iterate over the stream sets
+		for (EventDataStream currentStream : notificationSet
+				.getEventDataStreams())
+		{
+			try
+			{
+				// the insert counter
+				int i = 0;
+
+				// iterate over the data points
+				for (EventDataPoint currentDataPoint : currentStream
+						.getDatapoints())
+				{
+					if (i % H2Storage.MAX_BATCH_SIZE == 0)
+					{
+						// exclude the first time
+						if (i > 0)
+						{
+							// execute the insertion batch
+							// TODO: check if synchronization is required
+							// (should be carried by the db)
+							this.storage.getConnection().setAutoCommit(false);
+							this.insertNonParametricNotificationStmt
+									.executeBatch();
+							this.storage.getConnection().setAutoCommit(true);
+						}
+					}
+
+					// add the notification to the batch
+					// fill the prepared statement
+					this.insertNonParametricNotificationStmt.setTimestamp(1,
+							new Timestamp(currentDataPoint.getAt().getTime()));
+					this.insertNonParametricNotificationStmt.setString(2,
+							currentDataPoint.getValue());
+					this.insertNonParametricNotificationStmt.setString(3,
+							currentStream.getName());
+					this.insertNonParametricNotificationStmt.setString(4,
+							currentStream.getDeviceUri());
+
+					// execute the insert query
+					this.insertNonParametricNotificationStmt.addBatch();
+					// increments the insert counter
+					i++;
+				}
+
+				// execute the remaining batch
+				if (i % H2Storage.MAX_BATCH_SIZE > 0)
+				{
+					this.storage.getConnection().setAutoCommit(false);
+					this.insertNonParametricNotificationStmt.executeBatch();
+					this.storage.getConnection().setAutoCommit(true);
+				}
+			}
+			catch (SQLException e)
+			{
+				this.logger.log(LogService.LOG_ERROR,
+						"Unable to store event stream of non parametric notifications for the device: "
+								+ currentStream.getDeviceUri(), e);
+			}
+		}
 	}
 }
