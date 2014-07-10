@@ -24,6 +24,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 import it.polito.elite.dog.core.library.semantic.xml.Ontologies;
 
+// FIXME update JavaDocs
 /**
  * An interface defining the minimum set of functionalities required by a core
  * semantic house model (or by other equivalent bundles) to support the runtime
