@@ -66,8 +66,8 @@ public interface EventStore
 	 *            retrieved
 	 * @param notificationParams
 	 *            The parameter values needed to further specify which
-	 *            notification must be matched, in a post-like encoding
-	 *            <code>name1=value1&name2=value2&...</code>;
+	 *            notification must be matched,
+	 *            <code>paramname1-paramvalue1/paramname2-paramvalue2/</code>;
 	 * @param startDate
 	 *            The start date.
 	 * @param endDate
@@ -93,8 +93,8 @@ public interface EventStore
 	 *            retrieved
 	 * @param notificationParams
 	 *            The parameter values needed to further specify which
-	 *            notification must be matched, in a post-like encoding
-	 *            <code>name1=value1&name2=value2&...</code>;
+	 *            notification must be matched, 
+	 *            <code>paramname1-paramvalue1/paramname2-paramvalue2/</code>;
 	 * @param startDate
 	 *            The start date.
 	 * @param endDate
@@ -201,8 +201,8 @@ public interface EventStore
 	 *            retrieved
 	 * @param notificationParams
 	 *            The parameter values needed to further specify which
-	 *            notification must be matched, in a post-like encoding
-	 *            <code>name1=value1&name2=value2&...</code>;
+	 *            notification must be matched, 
+	 *            <code>paramname1-paramvalue1/paramname2-paramvalue2/</code>;
 	 * @param startDate
 	 *            The start date.
 	 * @param endDate
@@ -229,8 +229,8 @@ public interface EventStore
 	 *            retrieved
 	 * @param notificationParams
 	 *            The parameter values needed to further specify which
-	 *            notification must be matched, in a post-like encoding
-	 *            <code>name1=value1&name2=value2&...</code>;
+	 *            notification must be matched, 
+	 *            <code>paramname1-paramvalue1/paramname2-paramvalue2/</code>;
 	 * @param startDate
 	 *            The start date.
 	 * @param endDate

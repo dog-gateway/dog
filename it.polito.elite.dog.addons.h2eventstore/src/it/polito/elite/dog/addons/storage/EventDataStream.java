@@ -121,7 +121,7 @@ public class EventDataStream
 		this.uid = this.deviceUri
 				+ "/"
 				+ name
-				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
+				+ ((!this.additionalParameters.isEmpty()) ? ("/" + this.additionalParameters)
 						: "");
 		this.datapoints = new ArrayList<>(initialSize);
 	}
@@ -179,7 +179,7 @@ public class EventDataStream
 		this.uid = this.deviceUri
 				+ "/"
 				+ name
-				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
+				+ ((!this.additionalParameters.isEmpty()) ? ("/" + this.additionalParameters)
 						: "");
 	}
 
@@ -204,7 +204,7 @@ public class EventDataStream
 		this.uid = this.deviceUri
 				+ "/"
 				+ name
-				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
+				+ ((!this.additionalParameters.isEmpty()) ? ("/" + this.additionalParameters)
 						: "");
 	}
 

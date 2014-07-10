@@ -597,13 +597,19 @@ public class H2EventStore implements EventHandler, ManagedService,
 				{
 					if (!featureName.equals("realStateValue"))
 					{
-						if (!first)
-							stateParams.append("&");
-						else
-							first = false;
+						if ((!featureName.isEmpty())
+								&& (features.get(featureName) != null)
+								&& (!features.get(featureName).toString()
+										.isEmpty()))
+						{
+							if (!first)
+								stateParams.append("+");
+							else
+								first = false;
 
-						stateParams.append(featureName + "="
-								+ features.get(featureName));
+							stateParams.append(featureName + "-"
+									+ features.get(featureName));
+						}
 					}
 				}
 
@@ -804,12 +810,12 @@ public class H2EventStore implements EventHandler, ManagedService,
 	 * Gets the parameters of a notification, encoded in a post-like manner:
 	 * </p>
 	 * <p>
-	 * <code>paramname1=paramvalue1&amp;paramname2=paramvalue2&...</code>
+	 * <code>paramname1-paramvalue1/paramname2-paramvalue2/...</code>
 	 * </p>
 	 * 
 	 * @param receivedNotification
 	 *            The notification from which the parameters must be extracted.
-	 * @return The parameters encoded as a post-like string.
+	 * @return The parameters.
 	 */
 	private String getNotificationParams(
 			ParametricNotification receivedNotification)
@@ -838,10 +844,17 @@ public class H2EventStore implements EventHandler, ManagedService,
 					String annotationValue = currentMethod.getAnnotation(
 							NotificationParam.class).value();
 
-					// concate the params
-					if (!first)
-						qfParams.append("&");
-					qfParams.append(annotationValue + "=" + methodReturnValue);
+					if ((annotationValue != null)
+							&& (!annotationValue.isEmpty())
+							&& (methodReturnValue != null)
+							&& (!methodReturnValue.isEmpty()))
+					{
+						// concate the params
+						if (!first)
+							qfParams.append("+");
+						qfParams.append(annotationValue + "-"
+								+ methodReturnValue);
+					}
 				}
 				catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e)
@@ -956,8 +969,9 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String deviceURI, String notificationName, Date startDate,
 			Date endDate, int startCount, int nResults)
 	{
-		return this.notifDao.getSpecificDeviceNonParametricNotifications(deviceURI,
-				notificationName, startDate, endDate, startCount, nResults);
+		return this.notifDao.getSpecificDeviceNonParametricNotifications(
+				deviceURI, notificationName, startDate, endDate, startCount,
+				nResults);
 	}
 
 	@Override
@@ -966,9 +980,9 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String eventStreamName, Date startDate, Date endDate,
 			int startCount, int nResults)
 	{
-		return this.notifDao.getSpecificDeviceNonParametricNotifications(deviceURI,
-				notificationNames, eventStreamName, startDate, endDate,
-				startCount, nResults);
+		return this.notifDao.getSpecificDeviceNonParametricNotifications(
+				deviceURI, notificationNames, eventStreamName, startDate,
+				endDate, startCount, nResults);
 	}
 
 	@Override
@@ -976,8 +990,9 @@ public class H2EventStore implements EventHandler, ManagedService,
 			String deviceURI, Map<String, Set<String>> notificationNames,
 			Date startDate, Date endDate, int startCount, int nResults)
 	{
-		return this.notifDao.getSpecificDeviceNonParametricNotifications(deviceURI,
-				notificationNames, startDate, endDate, startCount, nResults);
+		return this.notifDao.getSpecificDeviceNonParametricNotifications(
+				deviceURI, notificationNames, startDate, endDate, startCount,
+				nResults);
 	}
 
 	@Override
