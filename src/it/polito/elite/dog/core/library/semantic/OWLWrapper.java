@@ -43,6 +43,7 @@ import org.semanticweb.owlapi.util.DefaultPrefixManager;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
+import uk.ac.manchester.cs.owl.owlapi.OWLDataPropertyImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectPropertyImpl;
 
 /**
@@ -175,22 +176,24 @@ public class OWLWrapper
 	}
 	
 	/**
-	 * Get all the individuals with a given suffix class.
+	 * Get all the individuals with a given IRI.
 	 * 
+	 * @param prefixName
+	 *            the name of the prefix representing the OWL individual class
 	 * @param suffix
 	 *            the suffix representing the OWL individual class
 	 * @return a set of {@link String} with all the individual names
 	 */
-	public Set<String> getAllIndividual(String suffix)
+	public Set<String> getAllIndividual(String prefixName, String suffix)
 	{
 		// init
 		Set<String> individuals = new HashSet<String>();
 		// get the OWL data factory
 		OWLDataFactory fac = this.manager.getOWLDataFactory();
-		// get a OWL class given the default prefix and the suffix
-		OWLClass owlControllables = fac.getOWLClass(IRI.create(this.prefixManager.getDefaultPrefix() + suffix));
+		// get a OWL class given the prefix and the suffix
+		OWLClass owlIndividualClass = fac.getOWLClass(IRI.create(this.prefixManager.getPrefix(prefixName) + suffix));
 		// get all the instances from the reasoner
-		NodeSet<OWLNamedIndividual> individualsNodeSet = this.reasoner.getInstances(owlControllables, false);
+		NodeSet<OWLNamedIndividual> individualsNodeSet = this.reasoner.getInstances(owlIndividualClass, false);
 		Set<OWLNamedIndividual> owlIndividuals = individualsNodeSet.getFlattened();
 		
 		for (OWLNamedIndividual ind : owlIndividuals)
@@ -207,6 +210,8 @@ public class OWLWrapper
 	 * 
 	 * @param individual
 	 *            the {@link OWLNamedIndividual} to get the specific type
+	 * @param prefixName
+	 *            the name of the prefix representing the OWL individual class
 	 * @param suffix
 	 *            the suffix representing the OWL individual class
 	 * @param inverse
@@ -214,7 +219,7 @@ public class OWLWrapper
 	 *            represented by the suffix or not
 	 * @return the specific type as a {@link String}
 	 */
-	public String getSpecificType(OWLNamedIndividual individual, String suffix, boolean inverse)
+	public String getSpecificType(OWLNamedIndividual individual, String prefixName, String suffix, boolean inverse)
 	{
 		String specificType = "";
 		
@@ -227,14 +232,14 @@ public class OWLWrapper
 			Set<OWLClass> superc = this.reasoner.getSuperClasses(type, false).getFlattened();
 			if (inverse)
 			{
-				if (!superc.contains(new OWLClassImpl(IRI.create(this.prefixManager.getDefaultPrefix() + suffix))))
+				if (!superc.contains(new OWLClassImpl(IRI.create(this.prefixManager.getPrefix(prefixName) + suffix))))
 				{
 					return this.getShortFormWithoutPrefix(type.asOWLClass());
 				}
 			}
 			else
 			{
-				if (superc.contains(new OWLClassImpl(IRI.create(this.prefixManager.getDefaultPrefix() + suffix))))
+				if (superc.contains(new OWLClassImpl(IRI.create(this.prefixManager.getPrefix(prefixName) + suffix))))
 				{
 					return this.getShortFormWithoutPrefix(type.asOWLClass());
 				}
@@ -250,13 +255,15 @@ public class OWLWrapper
 	 * 
 	 * @param individual
 	 *            the {@link OWLNamedIndividual} to get the object property
+	 * @param prefixName
+	 *            the name of the prefix for the given property
 	 * @param property
 	 *            the property name
 	 * @return the ObjectProperty as a {@link OWLNamedIndividual}
 	 */
-	public OWLNamedIndividual getSingleObjectProperty(OWLNamedIndividual individual, String property)
+	public OWLNamedIndividual getSingleObjectProperty(OWLNamedIndividual individual, String prefixName, String property)
 	{
-		Set<OWLNamedIndividual> multipleProperties = this.getMultipleObjectProperties(individual, property);
+		Set<OWLNamedIndividual> multipleProperties = this.getMultipleObjectProperties(individual, prefixName, property);
 		if (multipleProperties != null && !multipleProperties.isEmpty())
 			return multipleProperties.iterator().next();
 		else
@@ -269,14 +276,17 @@ public class OWLWrapper
 	 * 
 	 * @param individual
 	 *            the {@link OWLNamedIndividual} to get the object property
+	 * @param prefixName
+	 *            the name of the prefix for the given property
 	 * @param property
 	 *            the property name
 	 * @return the ObjectProperty as a set of {@link OWLNamedIndividual}
 	 */
-	public Set<OWLNamedIndividual> getMultipleObjectProperties(OWLNamedIndividual individual, String property)
+	public Set<OWLNamedIndividual> getMultipleObjectProperties(OWLNamedIndividual individual, String prefixName,
+			String property)
 	{
-		OWLObjectPropertyImpl objProperty = new OWLObjectPropertyImpl(IRI.create(this.prefixManager.getDefaultPrefix()
-				+ property));
+		OWLObjectPropertyImpl objProperty = new OWLObjectPropertyImpl(IRI.create(this.prefixManager
+				.getPrefix(prefixName) + property));
 		return this.reasoner.getObjectPropertyValues(individual, objProperty).getFlattened();
 	}
 	
@@ -341,6 +351,26 @@ public class OWLWrapper
 			}
 		}
 		return params;
+	}
+	
+	/**
+	 * Get the data property values of a specific {@link OWLNamedIndividual} and
+	 * a given property IRI. This method uses the reasoner for getting the
+	 * needed information.
+	 * 
+	 * @param individual
+	 *            the {@link OWLNamedIndividual} to ask for the data property
+	 * @param prefixName
+	 *            the name of the prefix for the given property
+	 * @param property
+	 *            the property name
+	 * @return a set of {@link OWLLiteral} with all the retrieved values
+	 */
+	public Set<OWLLiteral> getSpecificDataPropertyValues(OWLNamedIndividual individual, String prefixName,
+			String property)
+	{
+		return this.reasoner.getDataPropertyValues(individual,
+				new OWLDataPropertyImpl(IRI.create(prefixName + property)));
 	}
 	
 	/**
