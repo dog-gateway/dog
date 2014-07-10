@@ -87,7 +87,7 @@ public class H2EventStoreTest
 		Timer testTimer = new Timer();
 
 		// run the test after 1 minute
-		testTimer.schedule(getDataTestTask, 30000);
+		testTimer.schedule(getDataTestTask, 30000, 30000);
 	}
 
 	/**
@@ -149,7 +149,8 @@ public class H2EventStoreTest
 									.getAllDeviceContinuousNotifications(
 											((ControllableDevice) device)
 													.getDeviceId(),
-											this.creationDate, new Date(),0,EventStoreInfo.UNLIMITED_SIZE);
+											this.creationDate, new Date(), 0,
+											EventStoreInfo.UNLIMITED_SIZE);
 
 							// dump
 							this.logger.log(LogService.LOG_DEBUG, "Measures: "
@@ -159,7 +160,8 @@ public class H2EventStoreTest
 									.getAllDeviceDiscreteNotifications(
 											((ControllableDevice) device)
 													.getDeviceId(),
-											this.creationDate, new Date(),0,EventStoreInfo.UNLIMITED_SIZE,true);
+											this.creationDate, new Date(), 0,
+											EventStoreInfo.UNLIMITED_SIZE, true);
 
 							// dump
 							this.logger.log(LogService.LOG_DEBUG, "Events: "
@@ -198,12 +200,36 @@ public class H2EventStoreTest
 														.getDeviceId(),
 												notificationNames,
 												this.creationDate, new Date(),
-												0, EventStoreInfo.UNLIMITED_SIZE);
-								
+												0,
+												EventStoreInfo.UNLIMITED_SIZE);
+
 								// dump
-								this.logger.log(LogService.LOG_DEBUG, "Grouped Events: "
-										+ groupedEvents);
+								this.logger.log(LogService.LOG_DEBUG,
+										"Grouped Events: " + groupedEvents);
 							}
+							
+							EventDataStreamSet continuousStates = store
+									.getAllDeviceContinuousStates(
+											((ControllableDevice) device)
+													.getDeviceId(),
+											this.creationDate, new Date(), 0,
+											EventStoreInfo.UNLIMITED_SIZE);
+
+							// dump
+							this.logger.log(LogService.LOG_DEBUG,
+									"Continuous States: " + continuousStates);
+
+							EventDataStreamSet discreteStates = store
+									.getAllDeviceDiscreteStates(
+											((ControllableDevice) device)
+													.getDeviceId(),
+											this.creationDate, new Date(), 0,
+											EventStoreInfo.UNLIMITED_SIZE, true);
+
+							// dump
+							this.logger.log(LogService.LOG_DEBUG,
+									"Discrete States: " + discreteStates);
+
 						}
 
 						this.context.ungetService(deviceService[0]);

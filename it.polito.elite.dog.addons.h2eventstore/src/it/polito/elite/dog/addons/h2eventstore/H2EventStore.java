@@ -222,7 +222,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 		}
 
 		// detach the logger
-		this.logger = null;
+		// this.logger = null;
 	}
 
 	@Override
@@ -362,10 +362,10 @@ public class H2EventStore implements EventHandler, ManagedService,
 	 */
 	private void unRegisterService()
 	{
-		if (this.storageService != null)
-			this.storageService.unregister();
 		if (this.eventHandler != null)
 			this.eventHandler.unregister();
+		if (this.storageService != null)
+			this.storageService.unregister();
 	}
 
 	/**
@@ -554,6 +554,11 @@ public class H2EventStore implements EventHandler, ManagedService,
 					this.handleDiscreteStates(stateName, stateInstance,
 							currentDeviceState.getDeviceURI());
 				}
+
+				// debug
+				logger.log(LogService.LOG_DEBUG,
+						"State " + stateName + " and deviceURI-> "
+								+ currentDeviceState.getDeviceURI());
 			}
 		}
 	}
@@ -582,13 +587,16 @@ public class H2EventStore implements EventHandler, ManagedService,
 				boolean first = true;
 				for (String featureName : features.keySet())
 				{
-					if (!first)
-						stateParams.append("&");
-					else
-						first = false;
+					if (!featureName.equals("realStateValue"))
+					{
+						if (!first)
+							stateParams.append("&");
+						else
+							first = false;
 
-					stateParams.append(featureName + "="
-							+ features.get(featureName));
+						stateParams.append(featureName + "="
+								+ features.get(featureName));
+					}
 				}
 
 				this.stateDao.insertContinuousState(deviceUri, new Date(),
