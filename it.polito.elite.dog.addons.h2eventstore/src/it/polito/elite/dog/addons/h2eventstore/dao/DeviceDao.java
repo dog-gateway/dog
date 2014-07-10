@@ -1,16 +1,14 @@
 package it.polito.elite.dog.addons.h2eventstore.dao;
 
-import java.sql.Connection;
+import it.polito.elite.dog.addons.h2eventstore.db.H2Storage;
+import it.polito.elite.dog.core.library.util.LogHelper;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
-
-import it.polito.elite.dog.addons.h2eventstore.H2EventStore;
-import it.polito.elite.dog.addons.h2eventstore.db.H2Storage;
-import it.polito.elite.dog.core.library.util.LogHelper;
 
 public class DeviceDao
 {
