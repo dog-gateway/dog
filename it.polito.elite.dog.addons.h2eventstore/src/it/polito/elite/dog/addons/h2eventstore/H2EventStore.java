@@ -78,22 +78,41 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  * </p>
  * 
  * <pre>
- * +-----------------+         generatesReal       +---------------------+
- * |    RealEvent    +-----------------------------|        Device       |
- * +-----------------+                             +---------------------+
- * -id                                              -id
- * -timestamp                                       -class
- * -unit                                            -name
+ * +--------------------------+         generates           +---------------------+
+ * | Continuous Notification  +-----------------------------|        Device       |
+ * +--------------------------+                             +---------------------+
+ * -id                                                     -id
+ * -timestamp                                              -class
+ * -unit                                                   -name
  * -value
  * -name
  * -params
  * 
- * +-----------------+         generates           +---------------------+
- * |      Event      +-----------------------------|        Device       |
- * +-----------------+                             +---------------------+
- * -id                                              -id
- * -timestamp                                       -class
- * -value                                            -name
+ * +-------------------------+         generates           +---------------------+
+ * |  Discrete Notification  +-----------------------------|        Device       |
+ * +-------------------------+                             +---------------------+
+ * -id                                                     -id
+ * -timestamp                                              -class
+ * -value                                                  -name
+ * -name
+ * 
+ * 
+ * +--------------------------+         generates           +---------------------+
+ * | Continuous State         +-----------------------------|        Device       |
+ * +--------------------------+                             +---------------------+
+ * -id                                                     -id
+ * -timestamp                                              -class
+ * -unit                                                   -name
+ * -value
+ * -name
+ * -params
+ * 
+ * +-------------------------+         generates           +---------------------+
+ * |  Discrete State         +-----------------------------|        Device       |
+ * +-------------------------+                             +---------------------+
+ * -id                                                     -id
+ * -timestamp                                              -class
+ * -value                                                  -name
  * -name
  * </pre>
  * 
@@ -445,87 +464,11 @@ public class H2EventStore implements EventHandler, ManagedService,
 
 					if (eventContent instanceof ParametricNotification)
 					{
-						// get the received notification
-						ParametricNotification receivedNotification = (ParametricNotification) eventContent;
-
-						// get the device uri
-						String deviceURI = receivedNotification.getDeviceUri();
-
-						// prepare the notification measure
-						Measure<?, ?> eventValue = null;
-						// generate the notification timestamp
-						Date eventTimestamp = new Date();
-
-						// get the notification name from the topic
-						String topic = receivedNotification
-								.getNotificationTopic();
-						String notificationName = topic.substring(topic
-								.lastIndexOf('/') + 1);
-
-						// Get notification parameters, to use for
-						// distinguishing
-						// same
-						// typed notifications referred to different parameter
-						// values.
-						String notificationParams = getNotificationParams(receivedNotification);
-
-						// log the error
-						this.logger.log(LogService.LOG_DEBUG,
-								"Notification parameters" + notificationParams);
-
-						// handle all low-level events
-						eventValue = this
-								.getParametricNotificationValue(receivedNotification);
-
-						// debug
-						logger.log(LogService.LOG_DEBUG, "Notification "
-								+ notificationName + " and deviceURI-> "
-								+ deviceURI + " params-> " + notificationParams);
-
-						// do nothing for null values
-						if ((eventValue != null) && (deviceURI != null)
-								&& (!deviceURI.isEmpty()))
-						{
-							// insert the event
-							this.notifDao.insertParametricNotification(
-									deviceURI, eventTimestamp, eventValue,
-									notificationName, notificationParams);
-						}
+						this.handleParametricNotification((ParametricNotification) eventContent);
 					}
 					else if (eventContent instanceof NonParametricNotification)
 					{
-						// get the non parametric notification
-						NonParametricNotification receivedNotification = (NonParametricNotification) eventContent;
-
-						// get the device uri
-						String deviceURI = receivedNotification.getDeviceUri();
-
-						// generate the notification timestamp
-						Date eventTimestamp = new Date();
-
-						// get the notification name from the topic
-						String topic = receivedNotification
-								.getNotificationTopic();
-						String notificationName = topic.substring(topic
-								.lastIndexOf('/') + 1);
-
-						String notificationValue = this
-								.getNonParametricNotificationValue(receivedNotification);
-
-						// debug
-						logger.log(LogService.LOG_DEBUG, "Notification "
-								+ notificationName + " and deviceURI-> "
-								+ deviceURI);
-
-						// do nothing for null values
-						if ((notificationValue != null) && (deviceURI != null)
-								&& (!deviceURI.isEmpty()))
-						{
-							// insert the event
-							this.notifDao.insertNonParametricNotification(
-									deviceURI, eventTimestamp,
-									notificationValue, notificationName);
-						}
+						this.handleNonParametricNotification((NonParametricNotification) eventContent);
 					}
 				}
 			}
@@ -624,6 +567,82 @@ public class H2EventStore implements EventHandler, ManagedService,
 		}
 	}
 
+	private void handleParametricNotification(ParametricNotification receivedNotification)
+	{
+		// get the device uri
+		String deviceURI = receivedNotification.getDeviceUri();
+
+		// prepare the notification measure
+		Measure<?, ?> eventValue = null;
+		// generate the notification timestamp
+		Date eventTimestamp = new Date();
+
+		// get the notification name from the topic
+		String topic = receivedNotification.getNotificationTopic();
+		String notificationName = topic.substring(topic.lastIndexOf('/') + 1);
+
+		// Get notification parameters, to use for
+		// distinguishing
+		// same
+		// typed notifications referred to different parameter
+		// values.
+		String notificationParams = getNotificationParams(receivedNotification);
+
+		// log the error
+		this.logger.log(LogService.LOG_DEBUG, "Notification parameters"
+				+ notificationParams);
+
+		// handle all low-level events
+		eventValue = this.getParametricNotificationValue(receivedNotification);
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Notification " + notificationName
+				+ " and deviceURI-> " + deviceURI + " params-> "
+				+ notificationParams);
+
+		// do nothing for null values
+		if ((eventValue != null) && (deviceURI != null)
+				&& (!deviceURI.isEmpty()))
+		{
+			// insert the event
+			this.notifDao.insertParametricNotification(deviceURI,
+					eventTimestamp, eventValue, notificationName,
+					notificationParams);
+		}
+	}
+
+	private void handleNonParametricNotification(NonParametricNotification receivedNotification)
+	{
+		// get the device uri
+		String deviceURI = receivedNotification.getDeviceUri();
+
+		// generate the notification timestamp
+		Date eventTimestamp = new Date();
+
+		// get the notification name from the topic
+		String topic = receivedNotification
+				.getNotificationTopic();
+		String notificationName = topic.substring(topic
+				.lastIndexOf('/') + 1);
+
+		String notificationValue = this
+				.getNonParametricNotificationValue(receivedNotification);
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Notification "
+				+ notificationName + " and deviceURI-> "
+				+ deviceURI);
+
+		// do nothing for null values
+		if ((notificationValue != null) && (deviceURI != null)
+				&& (!deviceURI.isEmpty()))
+		{
+			// insert the event
+			this.notifDao.insertNonParametricNotification(
+					deviceURI, eventTimestamp,
+					notificationValue, notificationName);
+		}
+	}
 	private String getNonParametricNotificationValue(
 			NonParametricNotification receivedNotification)
 	{
