@@ -21,7 +21,7 @@ import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.housemodel.semantic.api.OntologyModel;
 import it.polito.elite.dog.core.housemodel.semantic.jaxb.DogOnt2JAXB;
 import it.polito.elite.dog.core.housemodel.semantic.loader.LoadingModes;
-import it.polito.elite.dog.core.housemodel.semantic.loader.ThreadedModelLoader;
+import it.polito.elite.dog.core.housemodel.semantic.loader.ModelLoader;
 import it.polito.elite.dog.core.housemodel.semantic.owl.model.ControllableModel;
 import it.polito.elite.dog.core.library.jaxb.Configcommand;
 import it.polito.elite.dog.core.library.jaxb.Confignotification;
@@ -168,7 +168,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 			{
 				// log the update data received
 				this.logger.log(LogService.LOG_INFO, "Received ontology configuration...");
-				
+				System.err.println("sono qui" + this.logger);
 				try
 				{
 					this.jaxbContext = JAXBContext.newInstance(Ontologies.class.getPackage().getName());
@@ -186,19 +186,15 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 				}
 				catch (JAXBException e)
 				{
-					this.logger.log(LogService.LOG_ERROR, "JAXB Error", e);
+					this.logger.log(LogService.LOG_ERROR, "JAXB error in reading the ontology descriptor", e);
 				}
 				
 				if ((ontoDescSet != null) && (!ontoDescSet.getOntology().isEmpty()))
 				{
-					// create a new loader Thread pointing at the bundle context
-					ThreadedModelLoader loader = new ThreadedModelLoader(this);
-					loader.setModelToLoad(ontoDescSet, LoadingModes.LOAD_REPLACE);
-					
-					// start loading data...
-					ExecutorService executor = Executors.newSingleThreadExecutor();
-					executor.execute(loader);
-					executor.shutdown();
+					// create a new model loader pointing at the bundle
+					ModelLoader loader = new ModelLoader(this);
+					// load the model
+					loader.loadModel(ontoDescSet, LoadingModes.LOAD_REPLACE);
 				}
 			}
 			
@@ -301,20 +297,32 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 		executor.shutdown();
 	}
 	
-	// TODO Try!
+	/**
+	 * Add a (sub)model to the HouseModel running ontology model
+	 * 
+	 * @param modelIRI
+	 *            the IRI of the ontology
+	 * @param modelToAdd
+	 *            the ontology to add as a submodel
+	 * @param prefixesToAdd
+	 *            the prefixes of the ontology to add as a submodel
+	 */
 	public void addModel(String modelIRI, OWLOntology modelToAdd, DefaultPrefixManager prefixesToAdd)
 	{
+		// check if the sub-model imports the current instance of the HouseModel
 		if (modelToAdd.getImports().contains(this.ontModel))
 		{
-			// ok, it includes the current entry point ontology
-			// update the references and store the submodel properties
-			this.ontModel = modelToAdd;
-			this.owlWrapper = new OWLWrapper(modelToAdd, prefixesToAdd);
-			this.subModels.put(modelIRI, this.owlWrapper);
+			// ok, it includes the current entry point ontology:
+			// do not modify the current model, just add the new model to the
+			// submodel list
+			// TODO Check if it is ok, or if it is better to update the
+			// HouseModel ontology, too
+			this.subModels.put(modelIRI, new OWLWrapper(modelToAdd, prefixesToAdd));
 		}
 		else
 		{
-			// TODO handle the error!
+			this.logger.log(LogService.LOG_ERROR, "Impossible to add the submodel " + modelIRI
+					+ "to the HouseModel since it does not include the running model.");
 		}
 	}
 	
@@ -444,13 +452,9 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	public void loadAndMerge(Ontologies setToLoad)
 	{
 		// set the model to merge
-		ThreadedModelLoader loader = new ThreadedModelLoader(this);
-		loader.setModelToLoad(setToLoad, LoadingModes.LOAD_MERGE);
-		
-		// start the thread executor
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		executor.execute(loader);
-		executor.shutdown();
+		ModelLoader loader = new ModelLoader(this);
+		// load the model
+		loader.loadModel(setToLoad, LoadingModes.LOAD_MERGE);
 	}
 	
 	/*
@@ -680,7 +684,17 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 	 */
 	public LogHelper getLogger()
 	{
-		return logger;
+		return this.logger;
+	}
+	
+	/**
+	 * Get the SVG house plan
+	 * 
+	 * @return the SVG as a {@link String}
+	 */
+	public String getSVGMap()
+	{
+		return this.homeSVGFootprint;
 	}
 	
 	/*********************************************************************************

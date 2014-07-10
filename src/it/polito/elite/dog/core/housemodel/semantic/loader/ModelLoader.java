@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  * 
- * Copyright (c) 2009-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2014 Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,11 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
 /**
  * Open and load the requested set of {@link OWLOntology} objects.
  * 
- * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
  * 
  */
-public class ThreadedModelLoader implements Runnable
+public class ModelLoader
 {
 	// the HouseModel instance
 	private SemanticHouseModel houseModelInstance;
@@ -51,8 +50,6 @@ public class ThreadedModelLoader implements Runnable
 	private OWLOntologyManager manager;
 	// available loading modes
 	private LoadingModes loadingMode;
-	// the name of the model to load
-	private String modelToLoad;
 	// the ontology to load
 	private OWLOntology ontModel;
 	// OWL prefix manager
@@ -64,18 +61,19 @@ public class ThreadedModelLoader implements Runnable
 	 * @param houseModel
 	 *            the {@link SemanticHouseModel} instance to use
 	 */
-	public ThreadedModelLoader(SemanticHouseModel houseModel)
+	public ModelLoader(SemanticHouseModel houseModel)
 	{
 		this.houseModelInstance = houseModel;
 		this.logger = houseModel.getLogger();
 		this.manager = OWLManager.createOWLOntologyManager();
+		
 		// default loading mode: replace the current model (if any)
 		this.loadingMode = LoadingModes.LOAD_REPLACE;
 		this.prefixes = new DefaultPrefixManager();
 	}
 	
 	/**
-	 * Set the models to load.
+	 * Set the models to load and load the entry point
 	 * 
 	 * @param models
 	 *            an {@link OntologyDescriptorSet} containing the references to
@@ -83,8 +81,9 @@ public class ThreadedModelLoader implements Runnable
 	 * @param loadingMode
 	 *            the requested loading mode
 	 */
-	public synchronized void setModelToLoad(Ontologies models, LoadingModes loadingMode)
+	public void loadModel(Ontologies models, LoadingModes loadingMode)
 	{
+		// get the requested loading mode
 		this.loadingMode = loadingMode;
 		
 		// get the entry point, i.e., the ontology that imports all the
@@ -110,7 +109,7 @@ public class ThreadedModelLoader implements Runnable
 					this.manager.addIRIMapper(new SimpleIRIMapper(IRI.create(model.getHref()), IRI.create(fCheck)));
 					
 					// debug
-					logger.log(LogService.LOG_DEBUG,
+					this.logger.log(LogService.LOG_DEBUG,
 							"loaded: " + model.getHref() + "\n\tfrom local copy " + model.getSrc()
 									+ "\n\twith namespace " + model.getNamespace());
 				}
@@ -121,17 +120,12 @@ public class ThreadedModelLoader implements Runnable
 		}
 		
 		// set the entry point ontology URI
-		this.modelToLoad = entryDesc.getHref();
+		String modelToLoad = entryDesc.getHref();
 		
-	}
-	
-	@Override
-	public void run()
-	{
+		// load the ontology
 		try
 		{
-			// load the ontology
-			this.ontModel = this.manager.loadOntology(IRI.create(this.modelToLoad));
+			this.ontModel = this.manager.loadOntology(IRI.create(modelToLoad));
 			
 			this.logger.log(
 					LogService.LOG_INFO,
@@ -155,7 +149,7 @@ public class ThreadedModelLoader implements Runnable
 			}
 			case LOAD_MERGE:
 			{
-				this.houseModelInstance.addModel(this.modelToLoad, this.ontModel, this.prefixes);
+				this.houseModelInstance.addModel(modelToLoad, this.ontModel, this.prefixes);
 				break;
 			}
 			default:
