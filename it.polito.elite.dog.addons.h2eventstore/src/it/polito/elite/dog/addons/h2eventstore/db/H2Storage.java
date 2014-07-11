@@ -20,6 +20,7 @@ package it.polito.elite.dog.addons.h2eventstore.db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author bonino
@@ -29,7 +30,7 @@ public class H2Storage
 {
 
 	// ---- The max insertion batch size
-	public static final int MAX_BATCH_SIZE = 10000;
+	public static final int MAX_BATCH_SIZE = 1000;
 
 	// the jdbc connection object
 	private Connection connection;
@@ -49,7 +50,11 @@ public class H2Storage
 
 	public void close() throws SQLException
 	{
-		this.connection.close();
+		Statement query = this.connection.createStatement();
+		query.execute("SHUTDOWN COMPACT");
+		
+		if(!this.connection.isClosed())
+			this.connection.close();
 	}
 
 }

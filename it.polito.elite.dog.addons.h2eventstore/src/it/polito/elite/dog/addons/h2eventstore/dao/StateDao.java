@@ -182,30 +182,30 @@ public class StateDao
 		try
 		{
 
-			if (!this.devDao.isDevicePresent(deviceURI))
-				this.devDao.insertDevice(deviceURI);
+			if (this.devDao.isDevicePresent(deviceURI))
+			{
+				// Insert the real event in the right table
 
-			// Insert the real event in the right table
+				// fill the prepared statement
+				this.insertContinuousStateStmt.setTimestamp(1, new Timestamp(
+						eventTimestamp.getTime()));
+				DecimalMeasure<? extends Quantity> measure = DecimalMeasure
+						.valueOf(eventValue.toString());
+				this.insertContinuousStateStmt.setString(2, eventValue
+						.getUnit().toString());
+				this.insertContinuousStateStmt.setDouble(3, measure.getValue()
+						.doubleValue());
+				this.insertContinuousStateStmt.setString(4, stateName);
+				this.insertContinuousStateStmt.setString(5, stateParams);
+				this.insertContinuousStateStmt.setString(6, deviceURI);
 
-			// fill the prepared statement
-			this.insertContinuousStateStmt.setTimestamp(1, new Timestamp(
-					eventTimestamp.getTime()));
-			DecimalMeasure<? extends Quantity> measure = DecimalMeasure
-					.valueOf(eventValue.toString());
-			this.insertContinuousStateStmt.setString(2, eventValue.getUnit()
-					.toString());
-			this.insertContinuousStateStmt.setDouble(3, measure.getValue()
-					.doubleValue());
-			this.insertContinuousStateStmt.setString(4, stateName);
-			this.insertContinuousStateStmt.setString(5, stateParams);
-			this.insertContinuousStateStmt.setString(6, deviceURI);
+				// execute the insert query
+				this.insertContinuousStateStmt.executeUpdate();
+				this.storage.getConnection().commit();
 
-			// execute the insert query
-			this.insertContinuousStateStmt.executeUpdate();
-			this.storage.getConnection().commit();
-
-			// turn the insertion flag to true
-			inserted = true;
+				// turn the insertion flag to true
+				inserted = true;
+			}
 		}
 		catch (SQLException e)
 		{
@@ -225,24 +225,25 @@ public class StateDao
 		try
 		{
 			// check if the device is already available
-			if (!this.devDao.isDevicePresent(deviceURI))
-				this.devDao.insertDevice(deviceURI);
+			if (this.devDao.isDevicePresent(deviceURI))
+			{
 
-			// Insert the real event in the right table
+				// Insert the real event in the right table
 
-			// fill the prepared statement
-			this.insertDiscreteStateStmt.setTimestamp(1, new Timestamp(
-					eventTimestamp.getTime()));
-			this.insertDiscreteStateStmt.setString(2, eventValue);
-			this.insertDiscreteStateStmt.setString(3, name);
-			this.insertDiscreteStateStmt.setString(4, deviceURI);
+				// fill the prepared statement
+				this.insertDiscreteStateStmt.setTimestamp(1, new Timestamp(
+						eventTimestamp.getTime()));
+				this.insertDiscreteStateStmt.setString(2, eventValue);
+				this.insertDiscreteStateStmt.setString(3, name);
+				this.insertDiscreteStateStmt.setString(4, deviceURI);
 
-			// execute the insert query
-			this.insertDiscreteStateStmt.executeUpdate();
-			this.storage.getConnection().commit();
+				// execute the insert query
+				this.insertDiscreteStateStmt.executeUpdate();
+				this.storage.getConnection().commit();
 
-			// turn the insertion flag to true
-			inserted = true;
+				// turn the insertion flag to true
+				inserted = true;
+			}
 		}
 		catch (SQLException e)
 		{
@@ -621,54 +622,63 @@ public class StateDao
 		{
 			try
 			{
-				// the insert counter
-				int i = 0;
-
-				// iterate over the data points
-				for (EventDataPoint currentDataPoint : currentStream
-						.getDatapoints())
+				if (this.devDao.isDevicePresent(currentStream.getDeviceUri()))
 				{
-					if (i % H2Storage.MAX_BATCH_SIZE == 0)
+					this.storage.getConnection().setAutoCommit(
+							false);
+					// the insert counter
+					int i = 0;
+
+					// iterate over the data points
+					for (EventDataPoint currentDataPoint : currentStream
+							.getDatapoints())
 					{
-						// exclude the first time
-						if (i > 0)
+						if (i % H2Storage.MAX_BATCH_SIZE == 0)
 						{
-							// execute the insertion batch
-							// TODO: check if synchronization is required
-							// (should be carried by the db)
-							this.storage.getConnection().setAutoCommit(false);
-							this.insertContinuousStateStmt.executeBatch();
-							this.storage.getConnection().setAutoCommit(true);
+							// exclude the first time
+							if (i > 0)
+							{
+								// execute the insertion batch
+								// TODO: check if synchronization is required
+								// (should be carried by the db)
+								
+								this.insertContinuousStateStmt.executeBatch();
+								this.storage.getConnection().commit();
+							}
 						}
+
+						// add the notification to the batch
+						// fill the prepared statement
+						this.insertContinuousStateStmt.setTimestamp(1,
+								new Timestamp(currentDataPoint.getAt()
+										.getTime()));
+						this.insertContinuousStateStmt.setString(2,
+								currentDataPoint.getUnit());
+						this.insertContinuousStateStmt.setDouble(3,
+								Double.valueOf(currentDataPoint.getValue()));
+						this.insertContinuousStateStmt.setString(4,
+								currentStream.getName());
+						this.insertContinuousStateStmt.setString(5,
+								currentStream.getParameters());
+						this.insertContinuousStateStmt.setString(6,
+								currentStream.getDeviceUri());
+
+						// execute the insert query
+						this.insertContinuousStateStmt.addBatch();
+						// increments the insert counter
+						i++;
 					}
 
-					// add the notification to the batch
-					// fill the prepared statement
-					this.insertContinuousStateStmt.setTimestamp(1,
-							new Timestamp(currentDataPoint.getAt().getTime()));
-					this.insertContinuousStateStmt.setString(2,
-							currentDataPoint.getUnit());
-					this.insertContinuousStateStmt.setDouble(3,
-							Double.valueOf(currentDataPoint.getValue()));
-					this.insertContinuousStateStmt.setString(4,
-							currentStream.getName());
-					this.insertContinuousStateStmt.setString(5,
-							currentStream.getParameters());
-					this.insertContinuousStateStmt.setString(6,
-							currentStream.getDeviceUri());
-
-					// execute the insert query
-					this.insertContinuousStateStmt.addBatch();
-					// increments the insert counter
-					i++;
-				}
-
-				// execute the remaining batch
-				if (i % H2Storage.MAX_BATCH_SIZE > 0)
-				{
-					this.storage.getConnection().setAutoCommit(false);
-					this.insertContinuousStateStmt.executeBatch();
-					this.storage.getConnection().setAutoCommit(true);
+					// execute the remaining batch
+					if (i % H2Storage.MAX_BATCH_SIZE > 0)
+					{
+						this.storage.getConnection().setAutoCommit(false);
+						this.insertContinuousStateStmt.executeBatch();
+						this.storage.getConnection().setAutoCommit(true);
+					}
+					
+					this.storage.getConnection()
+					.setAutoCommit(true);
 				}
 			}
 			catch (SQLException e)
@@ -677,6 +687,7 @@ public class StateDao
 						"Unable to store event stream of parametric notifications for the device: "
 								+ currentStream.getDeviceUri(), e);
 			}
+
 		}
 	}
 
@@ -687,50 +698,56 @@ public class StateDao
 		{
 			try
 			{
-				// the insert counter
-				int i = 0;
-
-				// iterate over the data points
-				for (EventDataPoint currentDataPoint : currentStream
-						.getDatapoints())
+				if (this.devDao.isDevicePresent(currentStream.getDeviceUri()))
 				{
-					if (i % H2Storage.MAX_BATCH_SIZE == 0)
+					// the insert counter
+					int i = 0;
+
+					// iterate over the data points
+					for (EventDataPoint currentDataPoint : currentStream
+							.getDatapoints())
 					{
-						// exclude the first time
-						if (i > 0)
+						if (i % H2Storage.MAX_BATCH_SIZE == 0)
 						{
-							// execute the insertion batch
-							// TODO: check if synchronization is required
-							// (should be carried by the db)
-							this.storage.getConnection().setAutoCommit(false);
-							this.insertDiscreteStateStmt.executeBatch();
-							this.storage.getConnection().setAutoCommit(true);
+							// exclude the first time
+							if (i > 0)
+							{
+								// execute the insertion batch
+								// TODO: check if synchronization is required
+								// (should be carried by the db)
+								this.storage.getConnection().setAutoCommit(
+										false);
+								this.insertDiscreteStateStmt.executeBatch();
+								this.storage.getConnection()
+										.setAutoCommit(true);
+							}
 						}
+
+						// add the notification to the batch
+						// fill the prepared statement
+						this.insertDiscreteStateStmt.setTimestamp(1,
+								new Timestamp(currentDataPoint.getAt()
+										.getTime()));
+						this.insertDiscreteStateStmt.setString(2,
+								currentDataPoint.getValue());
+						this.insertDiscreteStateStmt.setString(3,
+								currentStream.getName());
+						this.insertDiscreteStateStmt.setString(4,
+								currentStream.getDeviceUri());
+
+						// execute the insert query
+						this.insertDiscreteStateStmt.addBatch();
+						// increments the insert counter
+						i++;
 					}
 
-					// add the notification to the batch
-					// fill the prepared statement
-					this.insertDiscreteStateStmt.setTimestamp(1, new Timestamp(
-							currentDataPoint.getAt().getTime()));
-					this.insertDiscreteStateStmt.setString(2,
-							currentDataPoint.getValue());
-					this.insertDiscreteStateStmt.setString(3,
-							currentStream.getName());
-					this.insertDiscreteStateStmt.setString(4,
-							currentStream.getDeviceUri());
-
-					// execute the insert query
-					this.insertDiscreteStateStmt.addBatch();
-					// increments the insert counter
-					i++;
-				}
-
-				// execute the remaining batch
-				if (i % H2Storage.MAX_BATCH_SIZE > 0)
-				{
-					this.storage.getConnection().setAutoCommit(false);
-					this.insertDiscreteStateStmt.executeBatch();
-					this.storage.getConnection().setAutoCommit(true);
+					// execute the remaining batch
+					if (i % H2Storage.MAX_BATCH_SIZE > 0)
+					{
+						this.storage.getConnection().setAutoCommit(false);
+						this.insertDiscreteStateStmt.executeBatch();
+						this.storage.getConnection().setAutoCommit(true);
+					}
 				}
 			}
 			catch (SQLException e)

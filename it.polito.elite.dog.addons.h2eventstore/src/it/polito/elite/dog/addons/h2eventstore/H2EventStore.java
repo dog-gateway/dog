@@ -25,6 +25,8 @@ import it.polito.elite.dog.addons.storage.EventDataStream;
 import it.polito.elite.dog.addons.storage.EventDataStreamSet;
 import it.polito.elite.dog.addons.storage.EventStore;
 import it.polito.elite.dog.addons.storage.EventStoreInfo;
+import it.polito.elite.dog.core.housemodel.api.HouseModel;
+import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.notification.NonParametricNotification;
 import it.polito.elite.dog.core.library.model.notification.ParametricNotification;
@@ -43,6 +45,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.measure.Measure;
 
@@ -150,6 +154,9 @@ public class H2EventStore implements EventHandler, ManagedService,
 	// bundle
 	private ServiceRegistration<EventStore> storageService;
 	private ServiceRegistration<EventHandler> eventHandler;
+	
+	// the reference to the Dog House Model interface
+	private AtomicReference<HouseModel> houseModel;
 
 	// the data store limit expressed as number of rows, initially unlimited
 	// (-1)
@@ -178,6 +185,8 @@ public class H2EventStore implements EventHandler, ManagedService,
 	public H2EventStore()
 	{
 		// initialize the inner data structures
+		
+		this.houseModel = new AtomicReference<>();
 
 		// by default store neither notifications nor states
 		this.storeNotifications = false;
@@ -252,6 +261,25 @@ public class H2EventStore implements EventHandler, ManagedService,
 
 		// detach the logger
 		// this.logger = null;
+	}
+	
+	/**
+	 * Bind the {@link HouseModel} service
+	 * 
+	 * @param houseModel
+	 */
+	public void addedHouseModel(HouseModel houseModel)
+	{
+		this.houseModel.set(houseModel);
+	}
+	
+	/**
+	 * Remove binding to the {@link HouseModel} service
+	 * @param houseModel
+	 */
+	public void removedHouseModel(HouseModel houseModel)
+	{
+		this.houseModel.compareAndSet(houseModel, null);
 	}
 
 	@Override
@@ -451,6 +479,9 @@ public class H2EventStore implements EventHandler, ManagedService,
 					this.context);
 			this.stateDao = new StateDao(this.devDao, this.h2Storage,
 					this.context);
+			
+			//intialize the set of devices
+			this.initializePermittedDevices();
 		}
 		catch (SQLException e)
 		{
@@ -458,6 +489,30 @@ public class H2EventStore implements EventHandler, ManagedService,
 			this.logger.log(LogService.LOG_ERROR,
 					"Impossible to create the EventStore DAO", e);
 		}
+	}
+
+	private void initializePermittedDevices()
+	{
+		//get all devices from the house model
+		HouseModel hModel = this.houseModel.get();
+		
+		//check not null
+		if(hModel!=null)
+		{
+			//get the device list
+			Vector<DeviceDescriptor> allDevices = hModel.getConfiguration();
+			
+			//iterate over the device set
+			for(DeviceDescriptor device : allDevices)
+			{
+				if (!this.devDao.isDevicePresent(device.getDeviceURI()))
+				{
+					this.devDao.insertDevice(device.getDeviceURI(), device.getDeviceCategory(), null);
+					this.logger.log(LogService.LOG_DEBUG, "Added device "+device.getDeviceURI()+" to storage");
+				}
+			}
+		}
+		
 	}
 
 	@Override

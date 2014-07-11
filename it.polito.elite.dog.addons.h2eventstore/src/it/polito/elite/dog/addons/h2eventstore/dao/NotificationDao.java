@@ -203,32 +203,32 @@ public class NotificationDao
 		try
 		{
 
-			if (!this.devDao.isDevicePresent(deviceURI))
-				this.devDao.insertDevice(deviceURI);
+			if (this.devDao.isDevicePresent(deviceURI))
+			{
+				// Insert the real event in the right table
 
-			// Insert the real event in the right table
+				// fill the prepared statement
+				this.insertParametricNotificationStmt.setTimestamp(1,
+						new Timestamp(eventTimestamp.getTime()));
+				DecimalMeasure<? extends Quantity> measure = DecimalMeasure
+						.valueOf(eventValue.toString());
+				this.insertParametricNotificationStmt.setString(2, eventValue
+						.getUnit().toString());
+				this.insertParametricNotificationStmt.setDouble(3, measure
+						.getValue().doubleValue());
+				this.insertParametricNotificationStmt.setString(4,
+						notificationName);
+				this.insertParametricNotificationStmt.setString(5,
+						notificationParams);
+				this.insertParametricNotificationStmt.setString(6, deviceURI);
 
-			// fill the prepared statement
-			this.insertParametricNotificationStmt.setTimestamp(1,
-					new Timestamp(eventTimestamp.getTime()));
-			DecimalMeasure<? extends Quantity> measure = DecimalMeasure
-					.valueOf(eventValue.toString());
-			this.insertParametricNotificationStmt.setString(2, eventValue
-					.getUnit().toString());
-			this.insertParametricNotificationStmt.setDouble(3, measure
-					.getValue().doubleValue());
-			this.insertParametricNotificationStmt
-					.setString(4, notificationName);
-			this.insertParametricNotificationStmt.setString(5,
-					notificationParams);
-			this.insertParametricNotificationStmt.setString(6, deviceURI);
+				// execute the insert query
+				this.insertParametricNotificationStmt.executeUpdate();
+				this.storage.getConnection().commit();
 
-			// execute the insert query
-			this.insertParametricNotificationStmt.executeUpdate();
-			this.storage.getConnection().commit();
-
-			// turn the insertion flag to true
-			inserted = true;
+				// turn the insertion flag to true
+				inserted = true;
+			}
 		}
 		catch (SQLException e)
 		{
@@ -248,24 +248,27 @@ public class NotificationDao
 		try
 		{
 			// check if the device is already available
-			if (!this.devDao.isDevicePresent(deviceURI))
-				this.devDao.insertDevice(deviceURI);
+			if (this.devDao.isDevicePresent(deviceURI))
+			{
 
-			// Insert the real event in the right table
+				// Insert the real event in the right table
 
-			// fill the prepared statement
-			this.insertNonParametricNotificationStmt.setTimestamp(1,
-					new Timestamp(eventTimestamp.getTime()));
-			this.insertNonParametricNotificationStmt.setString(2, eventValue);
-			this.insertNonParametricNotificationStmt.setString(3, name);
-			this.insertNonParametricNotificationStmt.setString(4, deviceURI);
+				// fill the prepared statement
+				this.insertNonParametricNotificationStmt.setTimestamp(1,
+						new Timestamp(eventTimestamp.getTime()));
+				this.insertNonParametricNotificationStmt.setString(2,
+						eventValue);
+				this.insertNonParametricNotificationStmt.setString(3, name);
+				this.insertNonParametricNotificationStmt
+						.setString(4, deviceURI);
 
-			// execute the insert query
-			this.insertNonParametricNotificationStmt.executeUpdate();
-			this.storage.getConnection().commit();
+				// execute the insert query
+				this.insertNonParametricNotificationStmt.executeUpdate();
+				this.storage.getConnection().commit();
 
-			// turn the insertion flag to true
-			inserted = true;
+				// turn the insertion flag to true
+				inserted = true;
+			}
 		}
 		catch (SQLException e)
 		{
@@ -741,59 +744,66 @@ public class NotificationDao
 	public void insertParametricNotifications(EventDataStreamSet notificationSet)
 	{
 		// iterate over the stream sets
-		for (EventDataStream currentStream : notificationSet
-				.getDatastreams())
+		for (EventDataStream currentStream : notificationSet.getDatastreams())
 		{
 			try
 			{
-				// the insert counter
-				int i = 0;
-
-				// iterate over the data points
-				for (EventDataPoint currentDataPoint : currentStream
-						.getDatapoints())
-				{
-					if (i % H2Storage.MAX_BATCH_SIZE == 0)
-					{
-						// exclude the first time
-						if (i > 0)
-						{
-							// execute the insertion batch
-							// TODO: check if synchronization is required
-							// (should be carried by the db)
-							this.storage.getConnection().setAutoCommit(false);
-							this.insertParametricNotificationStmt
-									.executeBatch();
-							this.storage.getConnection().setAutoCommit(true);
-						}
-					}
-
-					// add the notification to the batch
-					// fill the prepared statement
-					this.insertParametricNotificationStmt.setTimestamp(1,
-							new Timestamp(currentDataPoint.getAt().getTime()));
-					this.insertParametricNotificationStmt.setString(2,
-							currentDataPoint.getUnit());
-					this.insertParametricNotificationStmt.setDouble(3,
-							Double.valueOf(currentDataPoint.getValue()));
-					this.insertParametricNotificationStmt.setString(4,
-							currentStream.getName());
-					this.insertParametricNotificationStmt.setString(5,
-							currentStream.getParameters());
-					this.insertParametricNotificationStmt.setString(6,
-							currentStream.getDeviceUri());
-
-					// execute the insert query
-					this.insertParametricNotificationStmt.addBatch();
-					// increments the insert counter
-					i++;
-				}
-
-				// execute the remaining batch
-				if (i % H2Storage.MAX_BATCH_SIZE > 0)
+				if (this.devDao.isDevicePresent(currentStream.getDeviceUri()))
 				{
 					this.storage.getConnection().setAutoCommit(false);
-					this.insertParametricNotificationStmt.executeBatch();
+					// the insert counter
+					int i = 0;
+
+					// iterate over the data points
+					for (EventDataPoint currentDataPoint : currentStream
+							.getDatapoints())
+					{
+						if (i % H2Storage.MAX_BATCH_SIZE == 0)
+						{
+							// exclude the first time
+							if (i > 0)
+							{
+								// execute the insertion batch
+								// TODO: check if synchronization is required
+								// (should be carried by the db)
+
+								this.insertParametricNotificationStmt
+										.executeBatch();
+								this.storage.getConnection().commit();
+
+							}
+						}
+
+						// add the notification to the batch
+						// fill the prepared statement
+						this.insertParametricNotificationStmt.setTimestamp(1,
+								new Timestamp(currentDataPoint.getAt()
+										.getTime()));
+						this.insertParametricNotificationStmt.setString(2,
+								currentDataPoint.getUnit());
+						this.insertParametricNotificationStmt.setDouble(3,
+								Double.valueOf(currentDataPoint.getValue()));
+						this.insertParametricNotificationStmt.setString(4,
+								currentStream.getName());
+						this.insertParametricNotificationStmt.setString(5,
+								currentStream.getParameters());
+						this.insertParametricNotificationStmt.setString(6,
+								currentStream.getDeviceUri());
+
+						// execute the insert query
+						this.insertParametricNotificationStmt.addBatch();
+						// increments the insert counter
+						i++;
+					}
+
+					// execute the remaining batch
+					if (i % H2Storage.MAX_BATCH_SIZE > 0)
+					{
+						this.storage.getConnection().setAutoCommit(false);
+						this.insertParametricNotificationStmt.executeBatch();
+						this.storage.getConnection().setAutoCommit(true);
+					}
+
 					this.storage.getConnection().setAutoCommit(true);
 				}
 			}
@@ -810,55 +820,61 @@ public class NotificationDao
 			EventDataStreamSet notificationSet)
 	{
 		// iterate over the stream sets
-		for (EventDataStream currentStream : notificationSet
-				.getDatastreams())
+		for (EventDataStream currentStream : notificationSet.getDatastreams())
 		{
 			try
 			{
-				// the insert counter
-				int i = 0;
-
-				// iterate over the data points
-				for (EventDataPoint currentDataPoint : currentStream
-						.getDatapoints())
-				{
-					if (i % H2Storage.MAX_BATCH_SIZE == 0)
-					{
-						// exclude the first time
-						if (i > 0)
-						{
-							// execute the insertion batch
-							// TODO: check if synchronization is required
-							// (should be carried by the db)
-							this.storage.getConnection().setAutoCommit(false);
-							this.insertNonParametricNotificationStmt
-									.executeBatch();
-							this.storage.getConnection().setAutoCommit(true);
-						}
-					}
-
-					// add the notification to the batch
-					// fill the prepared statement
-					this.insertNonParametricNotificationStmt.setTimestamp(1,
-							new Timestamp(currentDataPoint.getAt().getTime()));
-					this.insertNonParametricNotificationStmt.setString(2,
-							currentDataPoint.getValue());
-					this.insertNonParametricNotificationStmt.setString(3,
-							currentStream.getName());
-					this.insertNonParametricNotificationStmt.setString(4,
-							currentStream.getDeviceUri());
-
-					// execute the insert query
-					this.insertNonParametricNotificationStmt.addBatch();
-					// increments the insert counter
-					i++;
-				}
-
-				// execute the remaining batch
-				if (i % H2Storage.MAX_BATCH_SIZE > 0)
+				if (this.devDao.isDevicePresent(currentStream.getDeviceUri()))
 				{
 					this.storage.getConnection().setAutoCommit(false);
-					this.insertNonParametricNotificationStmt.executeBatch();
+					// the insert counter
+					int i = 0;
+
+					// iterate over the data points
+					for (EventDataPoint currentDataPoint : currentStream
+							.getDatapoints())
+					{
+						if (i % H2Storage.MAX_BATCH_SIZE == 0)
+						{
+							// exclude the first time
+							if (i > 0)
+							{
+								// execute the insertion batch
+								// TODO: check if synchronization is required
+								// (should be carried by the db)
+
+								this.insertNonParametricNotificationStmt
+										.executeBatch();
+								this.storage.getConnection().commit();
+
+							}
+						}
+
+						// add the notification to the batch
+						// fill the prepared statement
+						this.insertNonParametricNotificationStmt.setTimestamp(
+								1, new Timestamp(currentDataPoint.getAt()
+										.getTime()));
+						this.insertNonParametricNotificationStmt.setString(2,
+								currentDataPoint.getValue());
+						this.insertNonParametricNotificationStmt.setString(3,
+								currentStream.getName());
+						this.insertNonParametricNotificationStmt.setString(4,
+								currentStream.getDeviceUri());
+
+						// execute the insert query
+						this.insertNonParametricNotificationStmt.addBatch();
+						// increments the insert counter
+						i++;
+					}
+
+					// execute the remaining batch
+					if (i % H2Storage.MAX_BATCH_SIZE > 0)
+					{
+						this.storage.getConnection().setAutoCommit(false);
+						this.insertNonParametricNotificationStmt.executeBatch();
+						this.storage.getConnection().setAutoCommit(true);
+					}
 					this.storage.getConnection().setAutoCommit(true);
 				}
 			}

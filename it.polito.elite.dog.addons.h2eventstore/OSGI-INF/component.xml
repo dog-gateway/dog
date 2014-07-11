@@ -5,4 +5,5 @@
       <provide interface="org.osgi.service.cm.ManagedService"/>
    </service>
       <property name="service.pid" type="String" value="it.polito.elite.dog.addons.h2eventstore"/>
+      <reference bind="addedHouseModel" cardinality="1..1" interface="it.polito.elite.dog.core.housemodel.api.HouseModel" name="HouseModel" policy="dynamic" unbind="removedHouseModel"/>
 </scr:component>

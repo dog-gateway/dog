@@ -151,14 +151,14 @@ public class DeviceDao
 		return isPresent;
 	}
 
-	public void insertDevice(String deviceURI)
+	public void insertDevice(String deviceURI, String ontClass, String name)
 	{
 		try
 		{
 		// create the device
 		this.insertDeviceStmt.setString(1, deviceURI);
-		this.insertDeviceStmt.setString(2, "");
-		this.insertDeviceStmt.setString(3, "");
+		this.insertDeviceStmt.setString(2, ontClass!=null?ontClass:"");
+		this.insertDeviceStmt.setString(3, name!=null?name:"");
 
 		this.insertDeviceStmt.executeUpdate();
 		this.storage.getConnection().commit();
