@@ -38,7 +38,7 @@ public class EventDataStream
 
 	// the uid of the data stream as url-like concatenation of name and
 	// additional parameters
-	private String uid;
+	private String id;
 
 	// the data points
 	private ArrayList<EventDataPoint> datapoints;
@@ -73,7 +73,7 @@ public class EventDataStream
 		this.name = notificationName;
 		this.additionalParameters = notificationParameters;
 		this.deviceUri = deviceUri;
-		this.uid = this.deviceUri
+		this.id = this.deviceUri
 				+ "/"
 				+ name
 				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
@@ -118,7 +118,7 @@ public class EventDataStream
 		this.name = notificationName;
 		this.additionalParameters = notificationParameters;
 		this.deviceUri = deviceUri;
-		this.uid = this.deviceUri
+		this.id = this.deviceUri
 				+ "/"
 				+ name
 				+ ((!this.additionalParameters.isEmpty()) ? ("/" + this.additionalParameters)
@@ -146,7 +146,7 @@ public class EventDataStream
 	public void setName(String notificationName)
 	{
 		this.name = notificationName;
-		this.uid = this.deviceUri
+		this.id = this.deviceUri
 				+ "/"
 				+ name
 				+ ((!this.additionalParameters.isEmpty()) ? ("?" + this.additionalParameters)
@@ -176,7 +176,7 @@ public class EventDataStream
 	public void setParameters(String notificationParameters)
 	{
 		this.additionalParameters = notificationParameters;
-		this.uid = this.deviceUri
+		this.id = this.deviceUri
 				+ "/"
 				+ name
 				+ ((!this.additionalParameters.isEmpty()) ? ("/" + this.additionalParameters)
@@ -201,7 +201,7 @@ public class EventDataStream
 	public void setDeviceUri(String deviceUri)
 	{
 		this.deviceUri = deviceUri;
-		this.uid = this.deviceUri
+		this.id = this.deviceUri
 				+ "/"
 				+ name
 				+ ((!this.additionalParameters.isEmpty()) ? ("/" + this.additionalParameters)
@@ -213,9 +213,9 @@ public class EventDataStream
 	 * 
 	 * @return the uid
 	 */
-	public String getUid()
+	public String getId()
 	{
-		return uid;
+		return id;
 	}
 
 	/**
@@ -255,7 +255,7 @@ public class EventDataStream
 	{
 		StringBuffer asStringBuffer = new StringBuffer();
 
-		asStringBuffer.append(" {'uid':'" + this.uid + "', 'deviceuri':'"
+		asStringBuffer.append(" {'uid':'" + this.id + "', 'deviceuri':'"
 				+ this.deviceUri + "', 'name':'" + this.name + "', ");
 		asStringBuffer.append("'additionalparams':'"
 				+ this.additionalParameters + "', 'datapoints':'[");

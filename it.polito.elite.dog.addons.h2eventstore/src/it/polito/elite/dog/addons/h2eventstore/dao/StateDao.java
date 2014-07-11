@@ -44,7 +44,7 @@ public class StateDao
 	private final String discreteStateTableCreateQuery = "CREATE TABLE "
 			+ this.discreteStateTableName
 			+ "(id int(11) NOT NULL AUTO_INCREMENT, timestamp TIMESTAMP, value VARCHAR(100), "
-			+ "name VARCHAR(100), deviceuri VARCHAR(255), PRIMARY KEY(id), "
+			+ "name VARCHAR(255), deviceuri VARCHAR(255), PRIMARY KEY(id), "
 			+ "FOREIGN KEY (deviceuri) REFERENCES Device(uri) ON DELETE CASCADE);";
 
 	// --------- commonly used statements ------------
@@ -324,7 +324,7 @@ public class StateDao
 							currentParams, deviceUri);
 
 					// add the stream to the event set
-					streamSet.addEventDataStream(currentStream);
+					streamSet.addDatastream(currentStream);
 
 					// update the previous values
 					previousName = currentName;
@@ -428,7 +428,7 @@ public class StateDao
 							deviceUri);
 
 					// add the stream to the event set
-					streamSet.addEventDataStream(currentStream);
+					streamSet.addDatastream(currentStream);
 
 					// update the previous values only if not aggregated
 					previousName = currentName;
@@ -617,7 +617,7 @@ public class StateDao
 	public void insertContinuousStates(EventDataStreamSet stateSet)
 	{
 		// iterate over the stream sets
-		for (EventDataStream currentStream : stateSet.getEventDataStreams())
+		for (EventDataStream currentStream : stateSet.getDatastreams())
 		{
 			try
 			{
@@ -683,7 +683,7 @@ public class StateDao
 	public void insertDiscreteStates(EventDataStreamSet stateSet)
 	{
 		// iterate over the stream sets
-		for (EventDataStream currentStream : stateSet.getEventDataStreams())
+		for (EventDataStream currentStream : stateSet.getDatastreams())
 		{
 			try
 			{

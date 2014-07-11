@@ -1014,11 +1014,11 @@ public class H2EventStore implements EventHandler, ManagedService,
 
 	@Override
 	public EventDataStream getSpecificDeviceContinuousStates(String deviceURI,
-			String notificationName, String notificationParams, Date startDate,
+			String stateName, String stateParams, Date startDate,
 			Date endDate, int startCount, int nResults)
 	{
 		return this.stateDao.getSpecificDeviceContinuousStates(deviceURI,
-				notificationName, notificationParams, startDate, endDate,
+				stateName, stateParams, startDate, endDate,
 				startCount, nResults);
 	}
 

@@ -20,9 +20,6 @@ package it.polito.elite.dog.addons.storage;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.measure.DecimalMeasure;
-import javax.measure.quantity.Quantity;
-
 /**
  * @author bonino
  * 
@@ -117,14 +114,6 @@ public class EventDataPoint
 	{
 		this.unit = unit;
 	}
-
-	/**
-	 * Get the event value as a measure
-	 */
-	/*public DecimalMeasure<Quantity> getValueAsMeasure()
-	{
-		return DecimalMeasure.valueOf(this.value + this.unit);
-	}*/
 
 	@Override
 	public String toString()

@@ -348,7 +348,7 @@ public class NotificationDao
 							currentParams, deviceUri);
 
 					// add the stream to the event set
-					streamSet.addEventDataStream(currentStream);
+					streamSet.addDatastream(currentStream);
 
 					// update the previous values
 					previousName = currentName;
@@ -452,7 +452,7 @@ public class NotificationDao
 							deviceUri);
 
 					// add the stream to the event set
-					streamSet.addEventDataStream(currentStream);
+					streamSet.addDatastream(currentStream);
 
 					// update the previous values only if not aggregated
 					previousName = currentName;
@@ -730,7 +730,7 @@ public class NotificationDao
 		// iterate over all streams
 		for (String streamName : notificationNames.keySet())
 		{
-			streamSet.addEventDataStream(this
+			streamSet.addDatastream(this
 					.getSpecificDeviceNonParametricNotifications(deviceURI,
 							notificationNames.get(streamName), streamName,
 							startDate, endDate, startCount, nResults));
@@ -742,7 +742,7 @@ public class NotificationDao
 	{
 		// iterate over the stream sets
 		for (EventDataStream currentStream : notificationSet
-				.getEventDataStreams())
+				.getDatastreams())
 		{
 			try
 			{
@@ -811,7 +811,7 @@ public class NotificationDao
 	{
 		// iterate over the stream sets
 		for (EventDataStream currentStream : notificationSet
-				.getEventDataStreams())
+				.getDatastreams())
 		{
 			try
 			{

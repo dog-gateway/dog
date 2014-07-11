@@ -52,7 +52,7 @@ public class EventDataStreamSet
 	 * 
 	 * @param stream
 	 */
-	public void addEventDataStream(EventDataStream stream)
+	public void addDatastream(EventDataStream stream)
 	{
 		this.eventDataStreams.add(stream);
 	}
@@ -62,7 +62,7 @@ public class EventDataStreamSet
 	 * 
 	 * @return
 	 */
-	public HashSet<EventDataStream> getEventDataStreams()
+	public HashSet<EventDataStream> getDatastreams()
 	{
 		return eventDataStreams;
 	}
