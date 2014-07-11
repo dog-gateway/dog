@@ -121,10 +121,10 @@ public class EventDataPoint
 	/**
 	 * Get the event value as a measure
 	 */
-	public DecimalMeasure<Quantity> getValueAsMeasure()
+	/*public DecimalMeasure<Quantity> getValueAsMeasure()
 	{
 		return DecimalMeasure.valueOf(this.value + this.unit);
-	}
+	}*/
 
 	@Override
 	public String toString()
