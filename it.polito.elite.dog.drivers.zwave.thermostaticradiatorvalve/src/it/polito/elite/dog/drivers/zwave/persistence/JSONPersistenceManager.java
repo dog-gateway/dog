@@ -25,6 +25,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 
 /**
  * @author bonino
@@ -37,7 +38,11 @@ public class JSONPersistenceManager
 	private static ObjectMapper getMapperInstance()
 	{
 		if (JSONPersistenceManager.theMapper == null)
+		{
 			JSONPersistenceManager.theMapper = new ObjectMapper();
+			//set the date format
+			JSONPersistenceManager.theMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+		}
 
 		return JSONPersistenceManager.theMapper;
 	}
