@@ -324,7 +324,8 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 					// (network-related), i.e., preserve only the
 					// "notificationName" and "notificationParamName" props
 					if ((!param.getName().equalsIgnoreCase("notificationName"))
-							&& (!param.getName().equalsIgnoreCase("notificationParamName")))
+							&& (!param.getName().equalsIgnoreCase("notificationParamName"))
+							&& (!param.getName().equalsIgnoreCase("unitOfMeasure")))
 					{
 						paramsToRemove.add(param);
 					}
