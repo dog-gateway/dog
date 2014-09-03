@@ -90,7 +90,23 @@ public class CommandClassesData
     	if(ii != null)
     		return ii.getValue();
     	else
-    		return null;
+    	{
+    		// another chance, if Z-Way version is greater than 1.7.2
+    		// sensors values are inside another dataelemobject, now
+    		for(String key : this.data.keySet())
+    		{
+    			if(this.isInteger(key))
+    			{
+    				DataElemObject container = this.data.get(key);
+    				ii = container.getDataElem(name);
+    				if(ii != null)
+    	        		return ii.getValue();
+    			}
+    		}
+    	}
+    	
+    	// null, in the end
+    	return ii;
     }
     
 	/**
@@ -161,5 +177,20 @@ public class CommandClassesData
 	 */
 	public void setInvalidateTime(Integer invalidateTime) {
 		this.invalidateTime = invalidateTime;
+	}
+	
+	
+	private boolean isInteger(String number)
+	{
+		try
+		{
+			Integer.parseInt(number);
+		}
+		catch (NumberFormatException e)
+		{
+			return false;
+		}
+		
+		return true;
 	}
 }
