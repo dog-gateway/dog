@@ -286,7 +286,6 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 				paramsToRemove.add(deviceParam);
 			}
 		}
-		
 		// effectively remove the parameters
 		for (Configparam param : paramsToRemove)
 		{
