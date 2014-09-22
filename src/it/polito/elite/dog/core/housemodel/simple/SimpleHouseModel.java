@@ -273,8 +273,26 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 		// store the parameters to be removed from the current device
 		Vector<Configparam> paramsToRemove = new Vector<Configparam>();
 		
-		// remove all the "first-level" params, since they are network-related
-		device.getParam().clear();
+		// the type value in the XML configuration
+		final String network = "network";
+		
+		// check, for the "first-level" params, if they are network-related or
+		// not
+		for (Configparam deviceParam : device.getParam())
+		{
+			if ((deviceParam.getType() != null) && (!deviceParam.getType().isEmpty())
+					&& (deviceParam.getType().equalsIgnoreCase(network)))
+			{
+				paramsToRemove.add(deviceParam);
+			}
+		}
+		
+		// effectively remove the parameters
+		for (Configparam param : paramsToRemove)
+		{
+			device.getParam().remove(param);
+		}
+		paramsToRemove.clear();
 		
 		// clean the description field
 		String description = device.getDescription().trim();
@@ -291,10 +309,9 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			{
 				for (Configparam param : command.getParam())
 				{
-					// get all the command parameters to remove
-					// (network-related), i.e., preserve only the
-					// "realCommandName" prop
-					if (!param.getName().equalsIgnoreCase("realCommandName"))
+					// get all the network-related params
+					if ((param.getType() != null) && (!param.getType().isEmpty())
+							&& (param.getType().equalsIgnoreCase(network)))
 					{
 						paramsToRemove.add(param);
 					}
@@ -320,12 +337,9 @@ public class SimpleHouseModel implements HouseModel, EnvironmentModel, ManagedSe
 			{
 				for (Configparam param : notification.getParam())
 				{
-					// get all the notification parameters to remove
-					// (network-related), i.e., preserve only the
-					// "notificationName" and "notificationParamName" props
-					if ((!param.getName().equalsIgnoreCase("notificationName"))
-							&& (!param.getName().equalsIgnoreCase("notificationParamName"))
-							&& (!param.getName().equalsIgnoreCase("unitOfMeasure")))
+					// get all the network-related params
+					if ((param.getType() != null) && (!param.getType().isEmpty())
+							&& (param.getType().equalsIgnoreCase(network)))
 					{
 						paramsToRemove.add(param);
 					}
