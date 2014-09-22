@@ -44,7 +44,7 @@ public final class EchelonIlonInfo
 	public static String DATAPOINT_ID = "datapointId";
 	
 	//the datapoint unit of measure
-	public static String DATAPOINT_UOM = "unitOfMeasure";
+	public static String DATAPOINT_UOM = "measuredIn";
 	
 	//the datapoint alias
 	public static String DATAPOINT_ALIAS = "datapointAlias";
