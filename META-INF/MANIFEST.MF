@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: it.polito.elite.dog.core.library.jaxb
 Bundle-SymbolicName: it.polito.elite.dog.core.library.jaxb
-Bundle-Version: 1.2.0
+Bundle-Version: 1.2.1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: it.polito.elite.dog.core.library.jaxb;version="1.1.1"
 Bundle-ClassPath: .
