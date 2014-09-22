@@ -86,7 +86,7 @@
 						name="SinglePhaseActivePowerMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newActivePowerValue" />
-						<dhc:param name="unitOfMeasure" value="W" />
+						<dhc:param name="measuredIn" value="W" />
 						<dhc:param name="notificationParamName" value="value"
 							type="Measure" />
 					</dhc:notification>
