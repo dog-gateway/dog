@@ -56,12 +56,16 @@
 			</dhc:notificationFunctionality>
 			<dhc:state class="TemperatureState">
 				<dhc:statevalues>
-					<dhc:statevalue class="TemperatureStateValue" name="" />
+					<dhc:statevalue class="TemperatureStateValue" name="" >
+						<dhc:param name="measuredIn" value="C" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="HumidityMeasurementState">
 				<dhc:statevalues>
-					<dhc:statevalue class="HumidityStateValue" name="" />
+					<dhc:statevalue class="HumidityStateValue" name="" >
+						<dhc:param name="measuredIn" value="%" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 		</dhc:device>

@@ -234,38 +234,62 @@
 			</dhc:notificationFunctionality>
 			<dhc:state class="ThreePhaseVoltageState">
 				<dhc:statevalues>
-					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" />
-					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" />
-					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" />
+					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" >
+						<dhc:param name="measuredIn" value="V" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" >
+						<dhc:param name="measuredIn" value="V" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" >
+						<dhc:param name="measuredIn" value="V" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="FrequencyMeasurementState">
 				<dhc:statevalues>
-					<dhc:statevalue name="" class="FrequencyStateValue" />
+					<dhc:statevalue name="" class="FrequencyStateValue" >
+						<dhc:param name="measuredIn" value="Hz" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="SinglePhaseActiveEnergyState">
 				<dhc:statevalues>
-					<dhc:statevalue name="" class="ActiveEnergyStateValue" />
+					<dhc:statevalue name="" class="ActiveEnergyStateValue" >
+						<dhc:param name="measuredIn" value="Wh" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="SinglePhaseReactiveEnergyState">
 				<dhc:statevalues>
-					<dhc:statevalue name="" class="ReactiveEnergyStateValue" />
+					<dhc:statevalue name="" class="ReactiveEnergyStateValue" >
+						<dhc:param name="measuredIn" value="varh" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="ThreePhaseCurrentState">
 				<dhc:statevalues>
-					<dhc:statevalue name="" class="CurrentStateValue" />
-					<dhc:statevalue name="" class="CurrentStateValue" />
-					<dhc:statevalue name="" class="CurrentStateValue" />
+					<dhc:statevalue name="" class="CurrentStateValue" >
+						<dhc:param name="measuredIn" value="A" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="CurrentStateValue" >
+						<dhc:param name="measuredIn" value="A" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="CurrentStateValue" >
+						<dhc:param name="measuredIn" value="A" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="ThreePhaseApparentPowerMeasurementState">
 				<dhc:statevalues>
-					<dhc:statevalue name="" class="ApparentPowerStateValue" />
-					<dhc:statevalue name="" class="ApparentPowerStateValue" />
-					<dhc:statevalue name="" class="ApparentPowerStateValue" />
+					<dhc:statevalue name="" class="ApparentPowerStateValue" >
+						<dhc:param name="measuredIn" value="VA" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="ApparentPowerStateValue" >
+						<dhc:param name="measuredIn" value="VA" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="ApparentPowerStateValue" >
+						<dhc:param name="measuredIn" value="VA" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="PowerFactorMeasurementState">
@@ -275,16 +299,28 @@
 			</dhc:state>
 			<dhc:state class="ThreePhaseReactivePowerMeasurementState">
 				<dhc:statevalues>
-					<dhc:statevalue name="" class="ReactivePowerStateValue" />
-					<dhc:statevalue name="" class="ReactivePowerStateValue" />
-					<dhc:statevalue name="" class="ReactivePowerStateValue" />
+					<dhc:statevalue name="" class="ReactivePowerStateValue" >
+						<dhc:param name="measuredIn" value="var" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="ReactivePowerStateValue" >
+						<dhc:param name="measuredIn" value="var" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="ReactivePowerStateValue" >
+						<dhc:param name="measuredIn" value="var" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="ThreePhaseActivePowerMeasurementState">
 				<dhc:statevalues>
-					<dhc:statevalue name="" class="ActivePowerStateValue" />
-					<dhc:statevalue name="" class="ActivePowerStateValue" />
-					<dhc:statevalue name="" class="ActivePowerStateValue" />
+					<dhc:statevalue name="" class="ActivePowerStateValue" >
+						<dhc:param name="measuredIn" value="W" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="ActivePowerStateValue" >
+						<dhc:param name="measuredIn" value="W" />
+					</dhc:statevalue>
+					<dhc:statevalue name="" class="ActivePowerStateValue" >
+						<dhc:param name="measuredIn" value="W" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 		</dhc:device>

@@ -103,8 +103,9 @@
 			</dhc:state>
 			<dhc:state class="SinglePhaseActivePowerMeasurementState">
 				<dhc:statevalues>
-					<dhc:statevalue class="SinglePhaseActivePowerStateValue"
-						name="" />
+					<dhc:statevalue class="SinglePhaseActivePowerStateValue" name="" >
+						<dhc:param name="measuredIn" value="W" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 		</dhc:device>
