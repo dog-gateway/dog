@@ -172,6 +172,8 @@ public class ControllablesBuilder
 				for (String value : deviceParams.get(paramName))
 				{
 					Configparam parameter = this.createConfigParams(factory, paramName, value);
+					// these parameters are network-related information
+					parameter.setType("network");
 					device.getParam().add(parameter);
 				}
 			}
@@ -229,9 +231,11 @@ public class ControllablesBuilder
 						Statevalue statevalueElement = factory.createStatevalue();
 						statevalueElement.setClazz(stateValue);
 						statevalueElement.setName(allStateValues.get(stateValue));
+						
+						// store the state value
 						stateValues.getStatevalue().add(statevalueElement);
 					}
-					// add the state value
+					// add the state values
 					stateElement.setStatevalues(stateValues);
 				}
 				// add the state

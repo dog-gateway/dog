@@ -40,6 +40,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLDataExactCardinalityImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLDataHasValueImpl;
+import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImpl;
+import uk.ac.manchester.cs.owl.owlapi.OWLObjectUnionOfImpl;
 
 /**
  * The DogOnt Controllable model
@@ -250,7 +252,8 @@ public class ControllableModel
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Set<String> controlledObjectValues = new HashSet<String>();
 		
-		Set<OWLNamedIndividual> controlledObject = this.owlWrapper.getMultipleObjectProperties(individual, ":", "controlledObject");
+		Set<OWLNamedIndividual> controlledObject = this.owlWrapper.getMultipleObjectProperties(individual, ":",
+				"controlledObject");
 		if (controlledObject != null)
 		{
 			for (OWLNamedIndividual singleProp : controlledObject)
@@ -279,8 +282,8 @@ public class ControllableModel
 		{
 			for (OWLNamedIndividual singleState : hasState)
 			{
-				String stateClass = this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleState.getTypes(this.owlWrapper.getOntModel())
-						.iterator().next());
+				String stateClass = this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleState
+						.getTypes(this.owlWrapper.getOntModel()).iterator().next());
 				String stateIRI = this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) singleState);
 				states.put(stateClass, stateIRI);
 			}
@@ -305,13 +308,16 @@ public class ControllableModel
 		if (state != null)
 		{
 			// get state values
-			Set<OWLNamedIndividual> hasStateValue = this.owlWrapper.getMultipleObjectProperties(state, ":", "hasStateValue");
+			Set<OWLNamedIndividual> hasStateValue = this.owlWrapper.getMultipleObjectProperties(state, ":",
+					"hasStateValue");
 			for (OWLIndividual stateValue : hasStateValue)
 			{
-				OWLClass stateValueClass = stateValue.getTypes(this.owlWrapper.getOntModel()).iterator().next().asOWLClass();
+				OWLClass stateValueClass = stateValue.getTypes(this.owlWrapper.getOntModel()).iterator().next()
+						.asOWLClass();
 				
 				OWLDataHasValueImpl realStateValue = null;
-				Set<OWLClassExpression> superc = stateValueClass.getSuperClasses(this.owlWrapper.getOntModel().getDirectImports());
+				Set<OWLClassExpression> superc = stateValueClass.getSuperClasses(this.owlWrapper.getOntModel()
+						.getDirectImports());
 				for (OWLClassExpression restriction : superc)
 				{
 					if (restriction instanceof OWLDataHasValue)
@@ -372,20 +378,24 @@ public class ControllableModel
 	 * @return a {@link Map} with all the requested functionalities class and
 	 *         sub-functionalities names
 	 */
-	private Map<String, Set<String>> getFunctionalities(String individualName, String prefixName, String suffix, boolean isCommand)
+	private Map<String, Set<String>> getFunctionalities(String individualName, String prefixName, String suffix,
+			boolean isCommand)
 	{
 		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
 		Map<String, Set<String>> functionalities = new HashMap<String, Set<String>>();
 		
-		Set<OWLNamedIndividual> hasFunctionality = this.owlWrapper.getMultipleObjectProperties(individual, prefixName, "hasFunctionality");
+		Set<OWLNamedIndividual> hasFunctionality = this.owlWrapper.getMultipleObjectProperties(individual, prefixName,
+				"hasFunctionality");
 		if (hasFunctionality != null)
 		{
 			for (OWLNamedIndividual singleFunc : hasFunctionality)
 			{
-				String functionalityClass = this.owlWrapper.getSpecificType(singleFunc, prefixName, "NotificationFunctionality", isCommand);
+				String functionalityClass = this.owlWrapper.getSpecificType(singleFunc, prefixName,
+						"NotificationFunctionality", isCommand);
 				
 				Set<String> names = new HashSet<String>();
-				Set<OWLNamedIndividual> hasSomething = this.owlWrapper.getMultipleObjectProperties(singleFunc, prefixName, suffix);
+				Set<OWLNamedIndividual> hasSomething = this.owlWrapper.getMultipleObjectProperties(singleFunc,
+						prefixName, suffix);
 				if (hasSomething != null && !hasSomething.isEmpty())
 				{
 					for (OWLIndividual something : hasSomething)
@@ -460,8 +470,10 @@ public class ControllableModel
 		Map<OWLDataPropertyExpression, Set<OWLLiteral>> properties = new HashMap<OWLDataPropertyExpression, Set<OWLLiteral>>();
 		Set<OWLDataHasValueImpl> hasValueRestrictions = new HashSet<OWLDataHasValueImpl>();
 		Set<OWLDataExactCardinalityImpl> exactCardinalityRestrictions = new HashSet<OWLDataExactCardinalityImpl>();
-		OWLClass parameterClass = new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager().getDefaultPrefix() + individualClass));
+		OWLClass parameterClass = new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager().getDefaultPrefix()
+				+ individualClass));
 		OWLOntology ontModel = this.owlWrapper.getOntModel();
+		
 		// get all the superclasses from all the direct import (dogont)
 		Set<OWLClassExpression> superc = parameterClass.getSuperClasses(ontModel.getDirectImports());
 		for (OWLClassExpression clazz : superc)
@@ -474,8 +486,7 @@ public class ControllableModel
 			else if (clazz instanceof OWLClass)
 			{
 				// look for a exactCardinality restriction
-				for (OWLClassExpression ancestorClass : clazz.asOWLClass().getSuperClasses(
-						this.owlWrapper.getOntModel().getDirectImports()))
+				for (OWLClassExpression ancestorClass : clazz.asOWLClass().getSuperClasses(ontModel.getDirectImports()))
 				{
 					if (ancestorClass instanceof OWLDataExactCardinality)
 					{
@@ -500,14 +511,17 @@ public class ControllableModel
 			for (OWLDataExactCardinalityImpl exactCardinalityRestriction : exactCardinalityRestrictions)
 			{
 				Set<OWLLiteral> literalSet = new HashSet<OWLLiteral>();
-				literalSet.add(ontModel.getOWLOntologyManager().getOWLDataFactory().getOWLLiteral(
-						exactCardinalityRestriction.getCardinality()));
+				literalSet.add(ontModel.getOWLOntologyManager().getOWLDataFactory()
+						.getOWLLiteral(exactCardinalityRestriction.getCardinality()));
 				properties.put(exactCardinalityRestriction.getProperty().asOWLDataProperty(), literalSet);
 			}
 		}
 		
 		// get the parameters from the entry ontology
-		properties.putAll(individual.getDataPropertyValues(ontModel));
+		Map<OWLDataPropertyExpression, Set<OWLLiteral>> instancesDP = individual.getDataPropertyValues(ontModel);
+		
+		// update all the network-related properties
+		properties.putAll(this.discriminateNetworkParameters(instancesDP));
 		
 		// return only the needed values in the proper format
 		HashMap<String, Set<String>> parameters = new HashMap<String, Set<String>>();
@@ -522,6 +536,68 @@ public class ControllableModel
 		}
 		
 		return parameters;
+	}
+	
+	/**
+	 * Given a {@link Map} of OWL DataProperties, look for network-related
+	 * information and append the work "network" as the DataProperty type.
+	 * 
+	 * @param dataProperties
+	 *            the {@link Map} storing the DataProperties to evaluate
+	 * @return a {@link Map} with the modified DataProperties (or the original
+	 *         set)
+	 */
+	private Map<OWLDataPropertyExpression, Set<OWLLiteral>> discriminateNetworkParameters(
+			Map<OWLDataPropertyExpression, Set<OWLLiteral>> dataProperties)
+	{
+		// init
+		Map<OWLDataPropertyExpression, Set<OWLLiteral>> properties = new HashMap<OWLDataPropertyExpression, Set<OWLLiteral>>();
+		OWLOntology ontModel = this.owlWrapper.getOntModel();
+		
+		// discriminate network-related properties
+		for (OWLDataPropertyExpression property : dataProperties.keySet())
+		{
+			Set<OWLClassExpression> domains = property.getDomains(ontModel.getDirectImports());
+			OWLClassExpression networkClass = null;
+			boolean network = false;
+			
+			// get the current data property domain
+			if ((domains != null) && (!domains.isEmpty()))
+			{
+				networkClass = domains.iterator().next();
+				if (networkClass instanceof OWLObjectUnionOfImpl)
+				{
+					networkClass = ((OWLObjectUnionOfImpl) networkClass).getOperands().iterator().next();
+				}
+				
+				// is a network-related property?
+				Set<OWLClassExpression> superClasses = networkClass.asOWLClass().getSuperClasses(
+						ontModel.getDirectImports());
+				if ((superClasses.contains(new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager()
+						.getDefaultPrefix() + "NetworkComponent"))))
+						|| (superClasses.contains(new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager()
+								.getDefaultPrefix() + "NetworkSpecificCommand")))))
+				{
+					Set<OWLLiteral> paramValue = new HashSet<OWLLiteral>();
+					network = true;
+					
+					for (OWLLiteral propertyValue : dataProperties.get(property))
+					{
+						// append "network" as a type
+						String value = propertyValue.getLiteral().concat("^^network");
+						paramValue.add(new OWLLiteralImpl(value, propertyValue.getLang(), propertyValue.getDatatype()));
+						
+					}
+					// store the updated property
+					properties.put(property, paramValue);
+				}
+			}
+			
+			if (!network)
+				properties.put(property, dataProperties.get(property));
+		}
+		
+		return properties;
 	}
 	
 }
