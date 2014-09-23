@@ -168,7 +168,7 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 			{
 				// log the update data received
 				this.logger.log(LogService.LOG_INFO, "Received ontology configuration...");
-				System.err.println("sono qui" + this.logger);
+
 				try
 				{
 					this.jaxbContext = JAXBContext.newInstance(Ontologies.class.getPackage().getName());
