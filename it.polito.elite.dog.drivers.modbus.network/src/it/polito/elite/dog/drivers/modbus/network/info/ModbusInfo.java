@@ -49,7 +49,7 @@ public class ModbusInfo extends ConfigurationConstants
 	public static String SLAVE_ID = "slaveId";
 	
 	//the unit of measure associated to the register value
-	public static String REGISTER_UOM = "measuredIn";
+	public static String REGISTER_UOM = "unitOfMeasure";
 
 	//the scale factor
 	public static String SCALE_FACTOR = "scaleFactor";
