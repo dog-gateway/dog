@@ -32,8 +32,10 @@
             <div class="col-sm-12 col-md-12 text-center commands">
               <div class="btn-toolbar" ng-repeat="controlFunctionality in device.controlFunctionality">
                 <div class="btn-group btn-group-justified" >
-                  <a type="button" class="btn btn-primary text-wrap" ng-class="(!device.active) ? 'disabled' : ''" ng-repeat="command in controlFunctionality.commands | filter:'!get' | filter:'!set'" ng-click="sendCommand(device.id, command.param[0].value)">
+                  <a ng-repeat="command in controlFunctionality.commands | filter:'!get' | filter:'!set'" ng-if="command.param[0].name!='nParams'" type="button" class="btn btn-primary text-wrap" ng-class="(!device.active) ? 'disabled' : ''" ng-click="sendCommand(device.id, command.param[0].value)">
                     {{command.param[0].value}}</a>
+                  <a ng-repeat="command in controlFunctionality.commands | filter:'!get' | filter:'!set'" ng-if="command.param[0].name=='nParams'" type="button" class="btn btn-primary text-wrap" ng-class="(!device.active) ? 'disabled' : ''" ng-click="sendCommand(device.id, command.param[1].value)">
+                    {{command.param[1].value}}</a>
                 </div>
               </div>
             </div>
