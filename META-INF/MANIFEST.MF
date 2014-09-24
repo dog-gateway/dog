@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: it.polito.elite.dog.core.library.semantic
 Bundle-SymbolicName: it.polito.elite.dog.core.library.semantic
-Bundle-Version: 2.0.0
+Bundle-Version: 2.0.1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: it.polito.elite.dog.core.library.semantic;version="1.0.0",
  it.polito.elite.dog.core.library.semantic.xml;version="1.0.0"
