@@ -127,6 +127,24 @@ public class ControllableModel
 	}
 	
 	/**
+	 * Get the unitOfMeasure property
+	 * 
+	 * @param individualName
+	 *            the short name of a {@link OWLIndividual}
+	 * @return the unitOfMeasure property value as a {@link String}
+	 */
+	public String getUnitOfMeasure(String individualName)
+	{
+		OWLNamedIndividual individual = this.owlWrapper.getOWLIndividual(individualName);
+		
+		OWLIndividual unitOfMeasure = this.owlWrapper.getSingleObjectProperty(individual, ":", "unitOfMeasure");
+		if (unitOfMeasure != null)
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) unitOfMeasure);
+		else
+			return null;
+	}
+	
+	/**
 	 * Get the hasGateway property
 	 * 
 	 * @param individualName
@@ -335,6 +353,24 @@ public class ControllableModel
 		}
 		
 		return allStateValues;
+	}
+	
+	/**
+	 * Get the hasStateValue property for a given state
+	 * 
+	 * @param stateName
+	 *            the short name of a {@link OWLIndividual}
+	 * @return the hasStateValue property value as a {@link String}
+	 */
+	public String getSingleStateValue(String stateName)
+	{
+		OWLNamedIndividual state = this.owlWrapper.getOWLIndividual(stateName);
+		
+		OWLIndividual stateValue = this.owlWrapper.getSingleObjectProperty(state, ":", "hasStateValue");
+		if (stateValue != null)
+			return this.owlWrapper.getShortFormWithoutPrefix((OWLEntity) stateValue);
+		else
+			return null;
 	}
 	
 	/**
@@ -576,7 +612,11 @@ public class ControllableModel
 				if ((superClasses.contains(new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager()
 						.getDefaultPrefix() + "NetworkComponent"))))
 						|| (superClasses.contains(new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager()
-								.getDefaultPrefix() + "NetworkSpecificCommand")))))
+								.getDefaultPrefix() + "NetworkSpecificCommand"))))
+						|| (superClasses.contains(new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager()
+								.getDefaultPrefix() + "NetworkSpecificStateValue"))))
+						|| (superClasses.contains(new OWLClassImpl(IRI.create(this.owlWrapper.getPrefixManager()
+								.getDefaultPrefix() + "NetworkSpecificNotification")))))
 				{
 					Set<OWLLiteral> paramValue = new HashSet<OWLLiteral>();
 					network = true;

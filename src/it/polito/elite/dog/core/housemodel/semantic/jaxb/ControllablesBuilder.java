@@ -33,6 +33,8 @@ import it.polito.elite.dog.core.library.jaxb.Statevalue;
 import it.polito.elite.dog.core.library.jaxb.Statevalues;
 import it.polito.elite.dog.core.library.semantic.OWLWrapper;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -230,8 +232,45 @@ public class ControllablesBuilder
 					{
 						Statevalue statevalueElement = factory.createStatevalue();
 						statevalueElement.setClazz(stateValue);
-						statevalueElement.setName(allStateValues.get(stateValue));
+						String currentStateValue = allStateValues.get(stateValue);
+						statevalueElement.setName(currentStateValue);
 						
+						// is a continuous state value?
+						if (currentStateValue.isEmpty())
+						{
+							// get the current state value instance
+							String stateId = deviceStates.get(state);
+							String stateValueId = this.cModel.getSingleStateValue(stateId);
+							
+							// prepare the map for additional properties
+							Map<String, Set<String>> properties = new HashMap<String, Set<String>>();
+							
+							// get unitOfMeasure
+							String unitOfMeasure = this.cModel.getUnitOfMeasure(stateValueId);
+							if (unitOfMeasure != null)
+							{
+								// create a set with the unitOfMeasure value
+								// (uom)
+								HashSet<String> uom = new HashSet<String>();
+								uom.add(unitOfMeasure);
+								// add the unitOfMeasure property to the
+								// additional properties
+								properties.put("unitOfMeasure", uom);
+							}
+							
+							if (properties != null && !properties.isEmpty())
+							{
+								for (String property : properties.keySet())
+								{
+									Set<String> params = properties.get(property);
+									for (String param : params)
+									{
+										Configparam parameter = this.createConfigParams(factory, property, param);
+										statevalueElement.getParam().add(parameter);
+									}
+								}
+							}
+						}
 						// store the state value
 						stateValues.getStatevalue().add(statevalueElement);
 					}
@@ -285,8 +324,8 @@ public class ControllablesBuilder
 							configCmd.setClazz(commandClass);
 						
 						// set additional properties
-						Map<String, Set<String>> properties = this.cModel.getParameters(associatedCommand,
-								commandClass);
+						Map<String, Set<String>> properties = this.cModel
+								.getParameters(associatedCommand, commandClass);
 						if (properties != null && !properties.isEmpty())
 						{
 							for (String property : properties.keySet())
@@ -313,6 +352,7 @@ public class ControllablesBuilder
 		}
 		
 	}
+	
 	/**
 	 * Get the notification information.
 	 * 
@@ -354,6 +394,20 @@ public class ControllablesBuilder
 						// set additional properties
 						Map<String, Set<String>> properties = this.cModel.getParameters(associatedNotification,
 								notificationClass);
+						
+						// get unitOfMeasure
+						String unitOfMeasure = this.cModel.getUnitOfMeasure(associatedNotification);
+						if (unitOfMeasure != null)
+						{
+							// create a set with the unitOfMeasure value
+							// (uom)
+							HashSet<String> uom = new HashSet<String>();
+							uom.add(unitOfMeasure);
+							// add the unitOfMeasure property to the
+							// additional properties
+							properties.put("unitOfMeasure", uom);
+						}
+						
 						if (properties != null && !properties.isEmpty())
 						{
 							for (String property : properties.keySet())
