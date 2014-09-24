@@ -19,7 +19,7 @@
 						<dhc:param value="newPhaseNeutralVoltageValue" name="notificationName" />
 						<dhc:param value="L1N" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="V" />
+						<dhc:param name="unitOfMeasure" value="V" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -29,7 +29,7 @@
 						<dhc:param value="newPhaseNeutralVoltageValue" name="notificationName" />
 						<dhc:param value="L2N" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="V" />
+						<dhc:param name="unitOfMeasure" value="V" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -39,7 +39,7 @@
 						<dhc:param value="newPhaseNeutralVoltageValue" name="notificationName" />
 						<dhc:param value="L3N" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="V" />
+						<dhc:param name="unitOfMeasure" value="V" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 				</dhc:notifications>
@@ -52,7 +52,7 @@
 						class="FrequencyMeasurementNotification">
 						<dhc:param value="2" name="nParams" />
 						<dhc:param value="newFrequencyValue" name="notificationName" />
-						<dhc:param name="measuredIn" value="Hz" />
+						<dhc:param name="unitOfMeasure" value="Hz" />
 						<dhc:param type="Measure" value="frequency" name="notificationParamName" />
 					</dhc:notification>
 				</dhc:notifications>
@@ -64,7 +64,7 @@
 						id="TotalReactiveEnergyMeasurementNotification$name"
 						class="SinglePhaseReactiveEnergyMeasurementNotification">
 						<dhc:param value="newReactiveEnergyValue" name="notificationName" />
-						<dhc:param name="measuredIn" value="varh" />
+						<dhc:param name="unitOfMeasure" value="varh" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 				</dhc:notifications>
@@ -76,7 +76,7 @@
 						id="TotalActiveEnergyMeasurementNotification$name"
 						class="SinglePhaseActiveEnergyMeasurementNotification">
 						<dhc:param value="newActiveEnergyValue" name="notificationName" />
-						<dhc:param name="measuredIn" value="Wh" />
+						<dhc:param name="unitOfMeasure" value="Wh" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 				</dhc:notifications>
@@ -91,7 +91,7 @@
 						<dhc:param value="newCurrentValue" name="notificationName" />
 						<dhc:param value="L1" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="A" />
+						<dhc:param name="unitOfMeasure" value="A" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -101,7 +101,7 @@
 						<dhc:param value="newCurrentValue" name="notificationName" />
 						<dhc:param value="L2" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="A" />
+						<dhc:param name="unitOfMeasure" value="A" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -111,7 +111,7 @@
 						<dhc:param value="newCurrentValue" name="notificationName" />
 						<dhc:param value="L3" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="A" />
+						<dhc:param name="unitOfMeasure" value="A" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 				</dhc:notifications>
@@ -126,7 +126,7 @@
 						<dhc:param value="newApparentPowerValue" name="notificationName" />
 						<dhc:param value="L1" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="VA" />
+						<dhc:param name="unitOfMeasure" value="VA" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -136,7 +136,7 @@
 						<dhc:param value="newApparentPowerValue" name="notificationName" />
 						<dhc:param value="L2" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="VA" />
+						<dhc:param name="unitOfMeasure" value="VA" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -146,7 +146,7 @@
 						<dhc:param value="newApparentPowerValue" name="notificationName" />
 						<dhc:param value="L3" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="VA" />
+						<dhc:param name="unitOfMeasure" value="VA" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 				</dhc:notifications>
@@ -172,7 +172,7 @@
 						<dhc:param value="newReactivePowerValue" name="notificationName" />
 						<dhc:param value="L1" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="var" />
+						<dhc:param name="unitOfMeasure" value="var" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -182,7 +182,7 @@
 						<dhc:param value="newReactivePowerValue" name="notificationName" />
 						<dhc:param value="L2" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="var" />
+						<dhc:param name="unitOfMeasure" value="var" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -192,7 +192,7 @@
 						<dhc:param value="newReactivePowerValue" name="notificationName" />
 						<dhc:param value="L3" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="var" />
+						<dhc:param name="unitOfMeasure" value="var" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 				</dhc:notifications>
@@ -207,7 +207,7 @@
 						<dhc:param value="newActivePowerValue" name="notificationName" />
 						<dhc:param value="L1" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="W" />
+						<dhc:param name="unitOfMeasure" value="W" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -217,7 +217,7 @@
 						<dhc:param value="newActivePowerValue" name="notificationName" />
 						<dhc:param value="L2" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="W" />
+						<dhc:param name="unitOfMeasure" value="W" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 					<dhc:notification
@@ -227,7 +227,7 @@
 						<dhc:param value="newActivePowerValue" name="notificationName" />
 						<dhc:param value="L3" name="phaseID" />
 						<dhc:param type="String" value="phaseID" name="notificationParamName" />
-						<dhc:param name="measuredIn" value="W" />
+						<dhc:param name="unitOfMeasure" value="W" />
 						<dhc:param type="Measure" value="value" name="notificationParamName" />
 					</dhc:notification>
 				</dhc:notifications>
@@ -235,60 +235,60 @@
 			<dhc:state class="ThreePhaseVoltageState">
 				<dhc:statevalues>
 					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" >
-						<dhc:param name="measuredIn" value="V" />
+						<dhc:param name="unitOfMeasure" value="V" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" >
-						<dhc:param name="measuredIn" value="V" />
+						<dhc:param name="unitOfMeasure" value="V" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="ThreePhaseVoltageStateValue" >
-						<dhc:param name="measuredIn" value="V" />
+						<dhc:param name="unitOfMeasure" value="V" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="FrequencyMeasurementState">
 				<dhc:statevalues>
 					<dhc:statevalue name="" class="FrequencyStateValue" >
-						<dhc:param name="measuredIn" value="Hz" />
+						<dhc:param name="unitOfMeasure" value="Hz" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="SinglePhaseActiveEnergyState">
 				<dhc:statevalues>
 					<dhc:statevalue name="" class="ActiveEnergyStateValue" >
-						<dhc:param name="measuredIn" value="Wh" />
+						<dhc:param name="unitOfMeasure" value="Wh" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="SinglePhaseReactiveEnergyState">
 				<dhc:statevalues>
 					<dhc:statevalue name="" class="ReactiveEnergyStateValue" >
-						<dhc:param name="measuredIn" value="varh" />
+						<dhc:param name="unitOfMeasure" value="varh" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="ThreePhaseCurrentState">
 				<dhc:statevalues>
 					<dhc:statevalue name="" class="CurrentStateValue" >
-						<dhc:param name="measuredIn" value="A" />
+						<dhc:param name="unitOfMeasure" value="A" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="CurrentStateValue" >
-						<dhc:param name="measuredIn" value="A" />
+						<dhc:param name="unitOfMeasure" value="A" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="CurrentStateValue" >
-						<dhc:param name="measuredIn" value="A" />
+						<dhc:param name="unitOfMeasure" value="A" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="ThreePhaseApparentPowerMeasurementState">
 				<dhc:statevalues>
 					<dhc:statevalue name="" class="ApparentPowerStateValue" >
-						<dhc:param name="measuredIn" value="VA" />
+						<dhc:param name="unitOfMeasure" value="VA" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="ApparentPowerStateValue" >
-						<dhc:param name="measuredIn" value="VA" />
+						<dhc:param name="unitOfMeasure" value="VA" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="ApparentPowerStateValue" >
-						<dhc:param name="measuredIn" value="VA" />
+						<dhc:param name="unitOfMeasure" value="VA" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
@@ -300,26 +300,26 @@
 			<dhc:state class="ThreePhaseReactivePowerMeasurementState">
 				<dhc:statevalues>
 					<dhc:statevalue name="" class="ReactivePowerStateValue" >
-						<dhc:param name="measuredIn" value="var" />
+						<dhc:param name="unitOfMeasure" value="var" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="ReactivePowerStateValue" >
-						<dhc:param name="measuredIn" value="var" />
+						<dhc:param name="unitOfMeasure" value="var" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="ReactivePowerStateValue" >
-						<dhc:param name="measuredIn" value="var" />
+						<dhc:param name="unitOfMeasure" value="var" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="ThreePhaseActivePowerMeasurementState">
 				<dhc:statevalues>
 					<dhc:statevalue name="" class="ActivePowerStateValue" >
-						<dhc:param name="measuredIn" value="W" />
+						<dhc:param name="unitOfMeasure" value="W" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="ActivePowerStateValue" >
-						<dhc:param name="measuredIn" value="W" />
+						<dhc:param name="unitOfMeasure" value="W" />
 					</dhc:statevalue>
 					<dhc:statevalue name="" class="ActivePowerStateValue" >
-						<dhc:param name="measuredIn" value="W" />
+						<dhc:param name="unitOfMeasure" value="W" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>

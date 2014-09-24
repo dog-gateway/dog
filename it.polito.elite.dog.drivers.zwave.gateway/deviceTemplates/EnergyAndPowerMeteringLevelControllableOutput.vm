@@ -94,7 +94,7 @@
 						name="SinglePhaseActivePowerMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newActivePowerValue" />
-						<dhc:param name="measuredIn" value="W" />
+						<dhc:param name="unitOfMeasure" value="W" />
 						<dhc:param name="notificationParamName" value="value"
 							type="Measure" />
 					</dhc:notification>
@@ -107,7 +107,7 @@
 						name="SinglePhaseActiveEnergyMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newActiveEnergyValue" />
-						<dhc:param name="measuredIn" value="Wh" />
+						<dhc:param name="unitOfMeasure" value="Wh" />
 						<dhc:param name="notificationParamName" value="value"
 							type="Measure" />
 					</dhc:notification>
@@ -127,14 +127,14 @@
 			<dhc:state class="SinglePhaseEnergyMeasurementState">
 				<dhc:statevalues>
 					<dhc:statevalue class="SinglePhaseActiveEnergyStateValue" name="" >
-						<dhc:param name="measuredIn" value="Wh" />
+						<dhc:param name="unitOfMeasure" value="Wh" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="SinglePhaseActivePowerMeasurementState">
 				<dhc:statevalues>
 					<dhc:statevalue class="SinglePhaseActivePowerStateValue" name="" >
-						<dhc:param name="measuredIn" value="W" />
+						<dhc:param name="unitOfMeasure" value="W" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>

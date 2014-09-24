@@ -35,7 +35,7 @@
 						id="TemperatureMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="newTemperatureValue" />
-						<dhc:param name="measuredIn" value="C" />
+						<dhc:param name="unitOfMeasure" value="C" />
 						<dhc:param name="notificationParamName" value="temperatureValue"
 							type="Measure" />
 					</dhc:notification>
@@ -48,7 +48,7 @@
 						id="HumidityMeasurementNotification_$name">
 						<dhc:param name="nParams" value="2" />
 						<dhc:param name="notificationName" value="changedRelativeHumidity" />
-						<dhc:param name="measuredIn" value="%" />
+						<dhc:param name="unitOfMeasure" value="%" />
 						<dhc:param name="notificationParamName" value="relativeHumidity"
 							type="Measure" />
 					</dhc:notification>
@@ -57,14 +57,14 @@
 			<dhc:state class="TemperatureState">
 				<dhc:statevalues>
 					<dhc:statevalue class="TemperatureStateValue" name="" >
-						<dhc:param name="measuredIn" value="C" />
+						<dhc:param name="unitOfMeasure" value="C" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="HumidityMeasurementState">
 				<dhc:statevalues>
 					<dhc:statevalue class="HumidityStateValue" name="" >
-						<dhc:param name="measuredIn" value="%" />
+						<dhc:param name="unitOfMeasure" value="%" />
 					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
