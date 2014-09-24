@@ -134,7 +134,7 @@ public class OWLWrapper
 		}
 		
 		// set the prefixes of the declared ontologies
-		for (OWLOntology ont : ontModel.getDirectImports())
+		for (OWLOntology ont : ontModel.getImports())
 		{
 			PrefixOWLOntologyFormat pf = ontModel.getOWLOntologyManager().getOntologyFormat(ont)
 					.asPrefixOWLOntologyFormat();
@@ -383,6 +383,11 @@ public class OWLWrapper
 	public String getShortFormWithoutPrefix(OWLEntity individual)
 	{
 		String shortForm = this.prefixManager.getShortForm(individual);
+		if (shortForm.equals(individual.toString()))
+		{
+			// the prefix mapping goes wrong... alternative way...
+			shortForm = individual.getIRI().getFragment();
+		}
 		return shortForm.substring(shortForm.indexOf(':') + 1);
 	}
 	
