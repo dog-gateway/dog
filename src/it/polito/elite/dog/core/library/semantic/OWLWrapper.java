@@ -370,7 +370,7 @@ public class OWLWrapper
 			String property)
 	{
 		return this.reasoner.getDataPropertyValues(individual,
-				new OWLDataPropertyImpl(IRI.create(prefixName + property)));
+				new OWLDataPropertyImpl(IRI.create(this.prefixManager.getPrefix(prefixName) + property)));
 	}
 	
 	/**
