@@ -53,6 +53,8 @@ public class DeviceDescriptor
 	private Set<String> meterOf;
 	private Set<String> controlledObjects;
 	private String pluggedIn;
+	// TODO Add plugOf to the XSD
+	private String plugOf;
 	private String sensorOf;
 	private String actuatorOf;
 	private String location;
@@ -249,7 +251,8 @@ public class DeviceDescriptor
 	}
 	
 	/**
-	 * @param meterOf the meterOf to set
+	 * @param meterOf
+	 *            the meterOf to set
 	 */
 	public void setMeterOf(Set<String> meterOf)
 	{
@@ -258,7 +261,7 @@ public class DeviceDescriptor
 		// update the JAXB device
 		this.jaxbDevice.getMeterOf().addAll(meterOf);
 	}
-
+	
 	/**
 	 * @return the hasMeter information
 	 */
@@ -288,7 +291,8 @@ public class DeviceDescriptor
 	}
 	
 	/**
-	 * @param controlledObjects the controlledObjects to set
+	 * @param controlledObjects
+	 *            the controlledObjects to set
 	 */
 	public void setControlledObjects(Set<String> controlledObjects)
 	{
@@ -297,7 +301,7 @@ public class DeviceDescriptor
 		// update the JAXB device
 		this.jaxbDevice.getControls().addAll(controlledObjects);
 	}
-
+	
 	/**
 	 * @return the pluggedIn device URI
 	 */
@@ -316,6 +320,23 @@ public class DeviceDescriptor
 		
 		// update the JAXB device
 		this.jaxbDevice.setPluggedIn(pluggedIn);
+	}
+	
+	/**
+	 * @return the plugOf device URI
+	 */
+	public String getPlugOf()
+	{
+		return this.plugOf;
+	}
+	
+	/**
+	 * @param plugOf
+	 *            the plugOf to set
+	 */
+	public void setPlugOf(String plugOf)
+	{
+		this.plugOf = plugOf;
 	}
 	
 	/**
