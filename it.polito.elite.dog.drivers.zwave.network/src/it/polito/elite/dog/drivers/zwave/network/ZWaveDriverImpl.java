@@ -1,7 +1,7 @@
 /*
- * Dog  - Z-Wave
+ * Dog - Network Driver
  * 
- * Copyright 2013 Davide Aimone  and Dario Bonino 
+ * Copyright 2013-2014 Davide Aimone and Dario Bonino 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,10 +44,6 @@ import org.osgi.service.log.LogService;
 
 public class ZWaveDriverImpl implements ZWaveNetwork, ManagedService
 {
-	// path to certificate for SSL connection with the server. This is due
-	// because used certificate is self-signed
-	public static String TRUSTSTORE_PATH = "cert/jssecacerts";
-
 	// the log identifier, unique for the class
 	public static String LOG_ID = "[ZWaveDriverImpl]: ";
 
