@@ -55,7 +55,6 @@ import java.util.concurrent.Executors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
@@ -282,21 +281,6 @@ public class SemanticHouseModel implements HouseModel, OntologyModel, ManagedSer
 				// finish!
 				logger.log(LogService.LOG_DEBUG, "The JAXB configuration has been successfully generated in "
 						+ ((float) (System.currentTimeMillis() - time) / 1000) + " seconds!");
-				
-				try {
-		            JAXBContext context = JAXBContext.newInstance(DogHomeConfiguration.class);
-		            Marshaller m = context.createMarshaller();
-		            //for pretty-print XML in JAXB
-		            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		 
-		            // Write to System.out for debugging
-		            // m.marshal(emp, System.out);
-		 
-		            // Write to File
-		            m.marshal(xmlConfiguration, System.out);
-		        } catch (JAXBException e) {
-		            e.printStackTrace();
-		        }
 				
 				// create the JAXB object representing the device list without
 				// their network-related properties
