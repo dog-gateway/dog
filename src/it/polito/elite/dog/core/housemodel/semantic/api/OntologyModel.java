@@ -52,7 +52,7 @@ public interface OntologyModel
 	/**
 	 * Requires the class implementing this interface to update the inner model
 	 * by loading and merging the model whose location is specified in the
-	 * message parameter
+	 * parameter
 	 * 
 	 * @param
 	 */
