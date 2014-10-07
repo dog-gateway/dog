@@ -28,6 +28,7 @@ import it.polito.elite.dog.addons.storage.EventStoreInfo;
 import it.polito.elite.dog.core.housemodel.api.HouseModel;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.notification.EventNotification;
 import it.polito.elite.dog.core.library.model.notification.NonParametricNotification;
 import it.polito.elite.dog.core.library.model.notification.ParametricNotification;
 import it.polito.elite.dog.core.library.model.notification.annotation.NotificationParam;
@@ -564,7 +565,7 @@ public class H2EventStore implements EventHandler, ManagedService,
 				{
 					// handle parametric notifications
 
-					if (eventContent instanceof ParametricNotification)
+					if ((eventContent instanceof ParametricNotification) && !(eventContent instanceof EventNotification))
 					{
 						this.handleParametricNotification((ParametricNotification) eventContent);
 					}
