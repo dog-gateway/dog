@@ -34,6 +34,7 @@ import it.polito.elite.dog.drivers.zwave.model.commandclasses.ThermostatMode;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClassesData;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.DataElemObject;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
@@ -323,12 +324,13 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 			CommandClasses thermostatCC = instanceNode
 					.getCommandClass(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT);
 
-			// get the last update time if any
-			long globalUpdateTime = thermostatCC.getUpdateTime();
+			// get the last update time if any (from the set point)
+			DataElemObject setPointElem = thermostatCC.getCommandClassesData().getAllData().get("1");
+			long globalUpdateTime = setPointElem.getUpdateTime();
 
 			// check if the instance contains only one value
 			if (globalUpdateTime > 0)
-			{
+			{	
 				// check if the values are up-to-date
 				if (this.lastUpdateTime < globalUpdateTime)
 				{
@@ -336,8 +338,7 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 					this.lastUpdateTime = globalUpdateTime;
 
 					// read the current set point
-					double setPoint = ((Number) thermostatCC
-							.getCommandClassesData().getAllData().get("1")
+					double setPoint = ((Number) setPointElem
 							.getDataElemValue(CommandClassesData.FIELD_VAL))
 							.doubleValue();
 
