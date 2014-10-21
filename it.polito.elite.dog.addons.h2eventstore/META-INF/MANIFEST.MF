@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: it.polito.elite.dog.addons.h2eventstore
 Bundle-SymbolicName: it.polito.elite.dog.addons.h2eventstore
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: it.polito.elite.dog.core.housemodel.api;version="1.2.0",
  it.polito.elite.dog.core.library.model;version="1.1.0",
