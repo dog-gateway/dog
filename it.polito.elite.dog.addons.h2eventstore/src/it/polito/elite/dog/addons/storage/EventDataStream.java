@@ -258,7 +258,7 @@ public class EventDataStream
 		asStringBuffer.append(" {'uid':'" + this.id + "', 'deviceuri':'"
 				+ this.deviceUri + "', 'name':'" + this.name + "', ");
 		asStringBuffer.append("'additionalparams':'"
-				+ this.additionalParameters + "', 'datapoints':'[");
+				+ this.additionalParameters + "', 'datapoints':[");
 		boolean first = true;
 		for (EventDataPoint datapoint : this.datapoints)
 		{
