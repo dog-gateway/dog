@@ -102,9 +102,9 @@ public class MqttAsyncDispatcher implements MqttCallback
 	 * @param password
 	 *            The password to adopt for connecting to the broker.
 	 */
-	public MqttAsyncDispatcher(String brokerUrl, String clientId, String username, String password)
+	public MqttAsyncDispatcher(String brokerUrl, String clientId, String username, String password, LogHelper logger)
 	{
-		this.initCommon(brokerUrl, clientId, username, password, true);
+		this.initCommon(brokerUrl, clientId, username, password, true, logger);
 	}
 	
 	/**
@@ -132,18 +132,18 @@ public class MqttAsyncDispatcher implements MqttCallback
 	 *            attempts re-connection.
 	 */
 	public MqttAsyncDispatcher(String brokerUrl, String clientId, String username, String password,
-			boolean autoReconnect)
+			boolean autoReconnect, LogHelper logger)
 	{
-		this.initCommon(brokerUrl, clientId, username, password, autoReconnect);
+		this.initCommon(brokerUrl, clientId, username, password, autoReconnect, logger);
 	}
 	
-	private void initCommon(String brokerUrl, String clientId, String username, String password, boolean autoReconnect)
+	private void initCommon(String brokerUrl, String clientId, String username, String password, boolean autoReconnect, LogHelper logger)
 	{
 		this.brokerUrl = brokerUrl;
 		this.clientId = clientId;
 		this.username = username;
 		this.password = password;
-		this.logger =new LogHelper(null); //TODO handle context here
+		this.logger = logger; //TODO handle context here
 		
 		// initialize the reconnection timer
 		this.reconnectionTimer = new Timer();
