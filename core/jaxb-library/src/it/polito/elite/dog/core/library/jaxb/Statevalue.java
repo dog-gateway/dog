@@ -24,6 +24,10 @@
 
 package it.polito.elite.dog.core.library.jaxb;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -53,10 +57,10 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "statevalue")
+@XmlType(name = "statevalue", propOrder = { "param" })
 public class Statevalue implements Cloneable
 {
-	
+	protected List<Configparam> param;
 	@XmlAttribute(name = "class", required = true)
 	@JsonProperty("class")
 	protected String clazz;
@@ -91,10 +95,47 @@ public class Statevalue implements Cloneable
 		{
 			throw new NullPointerException("Cannot create a copy of 'Statevalue' from 'null'.");
 		}
+		// 'Param' collection.
+		if (o.param != null)
+		{
+			copyParam(o.getParam(), this.getParam());
+		}
 		// CBuiltinLeafInfo: java.lang.String
 		this.clazz = ((o.clazz == null) ? null : o.getClazz());
 		// CBuiltinLeafInfo: java.lang.String
 		this.name = ((o.name == null) ? null : o.getName());
+	}
+	
+	/**
+	 * Gets the value of the param property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a
+	 * snapshot. Therefore any modification you make to the returned list will
+	 * be present inside the JAXB object. This is why there is not a
+	 * <CODE>set</CODE> method for the param property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getParam().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list
+	 * {@link Configparam }
+	 * 
+	 * 
+	 */
+	public List<Configparam> getParam()
+	{
+		if (param == null)
+		{
+			param = new ArrayList<Configparam>();
+		}
+		return this.param;
 	}
 	
 	/**
@@ -144,6 +185,39 @@ public class Statevalue implements Cloneable
 	}
 	
 	/**
+	 * Copies all values of property {@code Param} deeply.
+	 * 
+	 * @param source
+	 *            The source to copy from.
+	 * @param target
+	 *            The target to copy {@code source} to.
+	 * @throws NullPointerException
+	 *             if {@code target} is {@code null}.
+	 */
+	private static void copyParam(final List<Configparam> source, final List<Configparam> target)
+	{
+		// CC-XJC Version 2.0.1 Build 2012-03-02T12:09:12+0000
+		if ((source != null) && (!source.isEmpty()))
+		{
+			for (final Iterator<?> it = source.iterator(); it.hasNext();)
+			{
+				final Object next = it.next();
+				if (next instanceof Configparam)
+				{
+					// CClassInfo:
+					// it.polito.elite.dog.core.library.jaxb.Configparam
+					target.add(((Configparam) next).clone());
+					continue;
+				}
+				// Please report this at
+				// https://apps.sourceforge.net/mantisbt/ccxjc/
+				throw new AssertionError(
+						(("Unexpected instance '" + next) + "' for property 'Param' of class 'it.polito.elite.dog.core.library.jaxb.Statevalue'."));
+			}
+		}
+	}
+	
+	/**
 	 * Creates and returns a deep copy of this object.
 	 * 
 	 * 
@@ -157,6 +231,12 @@ public class Statevalue implements Cloneable
 			{
 				// CC-XJC Version 2.0.1 Build 2012-03-02T12:09:12+0000
 				final Statevalue clone = ((Statevalue) super.clone());
+				// 'Param' collection.
+				if (this.param != null)
+				{
+					clone.param = null;
+					copyParam(this.getParam(), clone.getParam());
+				}
 				// CBuiltinLeafInfo: java.lang.String
 				clone.clazz = ((this.clazz == null) ? null : this.getClazz());
 				// CBuiltinLeafInfo: java.lang.String
