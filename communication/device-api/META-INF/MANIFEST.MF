@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: it.polito.elite.dog.communication.rest.device.api
 Bundle-SymbolicName: it.polito.elite.dog.communication.rest.device.api
-Bundle-Version: 1.1.0
+Bundle-Version: 1.1.1
 Bundle-Vendor: it.polito.elite
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
@@ -11,6 +11,7 @@ Import-Package: it.polito.elite.dog.core.devicefactory.api;version="1.0.0",
  it.polito.elite.dog.core.library.jaxb;version="1.1.1",
  it.polito.elite.dog.core.library.model,
  it.polito.elite.dog.core.library.model.climate,
+ it.polito.elite.dog.core.library.model.color,
  it.polito.elite.dog.core.library.model.devicecategory,
  it.polito.elite.dog.core.library.model.state,
  it.polito.elite.dog.core.library.model.statevalue,
@@ -28,3 +29,4 @@ Import-Package: it.polito.elite.dog.core.devicefactory.api;version="1.0.0",
  org.osgi.framework,
  org.osgi.service.device;version="1.1.0",
  org.osgi.service.log;version="1.3.0"
+Export-Package: it.polito.elite.dog.communication.rest.device.api;version="1.0.0"
