@@ -1,7 +1,7 @@
 /*
- * Dog - Admin
+ * Dog - Core
  * 
- * Copyright (c) 2013 Dario Bonino
+ * Copyright (c) 2009-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package it.polito.elite.dog.admin.system.bundlemanager.util;
-
-import java.util.Comparator;
-
-import org.osgi.framework.Bundle;
+package it.polito.elite.dog.core.housemodel.semantic.loader;
 
 /**
+ * Enum for possible loading modalities.
+ * 
  * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
  * @see <a href="http://elite.polito.it">http://elite.polito.it</a>
- *
+ * 
  */
-public class BundleNameComparator implements Comparator<Bundle>
+public enum LoadingModes
 {
-	
-	/**
-	 * 
-	 */
-	public BundleNameComparator()
-	{
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	public int compare(Bundle b1, Bundle b2)
-	{
-		return (b1.getSymbolicName().compareTo(b2.getSymbolicName()));
-	}
-	
+	LOAD_REPLACE, LOAD_MERGE, UNDEFINED;
 }
