@@ -1,7 +1,7 @@
 /*
  * Dog - Environment REST Endpoint
  * 
- * Copyright (c) 2013 Luigi De Russis
+ * Copyright (c) 2013-2014 Luigi De Russis and Teodoro Montanaro
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
