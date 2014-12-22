@@ -1,5 +1,19 @@
-/**
+/*
+ * Dog - Addons - Mqtt
  * 
+ * Copyright (c) 2013-2014 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package it.polito.elite.dog.addons.mqtt.bridge;
 
@@ -37,7 +51,16 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * Implements a bridge between inner monitor (states) and notification events
+ * and externally specified Mqtt brokers. For each connected broker, a specific
+ * translator can be specified allowing for simultaneous delivery of events to
+ * different channels, each having a different format.
+ * 
+ * While base translators are provided, specific translator implementations can
+ * easily be provided by registering instances of {@link NotificationTranslator}
+ * or {@link StateTranslator} services in the osgi framework.
+ * 
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
  *
  */
 public class MqttBridge implements EventHandler, ManagedService
@@ -98,7 +121,7 @@ public class MqttBridge implements EventHandler, ManagedService
 
 	// the service registration handler
 	private ServiceRegistration<EventHandler> eventHandler;
-	
+
 	// the message delivery service
 	private ExecutorService messageDeliveryService;
 
@@ -123,7 +146,7 @@ public class MqttBridge implements EventHandler, ManagedService
 		// initialize the default translators
 		this.defaultNotificationTranslator = new SimpleNotificationTranslator();
 		this.defaultStateTranslator = new SimpleStateTranslator();
-		
+
 		// initialize the message dispatching thread pool
 		this.messageDeliveryService = Executors.newFixedThreadPool(4);
 	}
@@ -258,25 +281,27 @@ public class MqttBridge implements EventHandler, ManagedService
 			// dispatcher
 			MqttAsyncDispatcher dispatcher = this.broker2Client
 					.get(brokerAddress);
-			
+
 			// get the translator class
-			String translatorClass = this.brokerSpecificNotificationTranslatorClasses.get(brokerAddress);
-			
-			//use default if null
-			if(translatorClass == null)
+			String translatorClass = this.brokerSpecificNotificationTranslatorClasses
+					.get(brokerAddress);
+
+			// use default if null
+			if (translatorClass == null)
 				translatorClass = this.baseNotificationTranslatorClass;
 
 			// check that all needed information is available
 			if ((dispatcher != null) && (notificationType != null)
-					&& (deviceUri != null) && (topic != null) && (translatorClass!=null))
+					&& (deviceUri != null) && (topic != null)
+					&& (translatorClass != null))
 			{
-				//create the delivery task
+				// create the delivery task
 				MqttNotificationDeliveryTask task = new MqttNotificationDeliveryTask(
 						dispatcher, this.mqttQos, topic, translatorClass,
 						this.defaultNotificationTranslator, eventContent,
 						this.context);
-				
-				//submit for delivery
+
+				// submit for delivery
 				this.messageDeliveryService.execute(task);
 			}
 
@@ -295,30 +320,32 @@ public class MqttBridge implements EventHandler, ManagedService
 			String deviceUri = currentDeviceState.getDeviceURI();
 
 			// topic
-			String topic = this.mqttRootTopic + "/"
-					+ this.mqttStateRootTopic + "/"+ deviceUri;
+			String topic = this.mqttRootTopic + "/" + this.mqttStateRootTopic
+					+ "/" + deviceUri;
 
 			// dispatcher
 			MqttAsyncDispatcher dispatcher = this.broker2Client
 					.get(brokerAddress);
-			
+
 			// get the translator class
-			String translatorClass = this.brokerSpecificStateTranslatorClasses.get(brokerAddress);
-			
-			//use default if null
-			if(translatorClass == null)
+			String translatorClass = this.brokerSpecificStateTranslatorClasses
+					.get(brokerAddress);
+
+			// use default if null
+			if (translatorClass == null)
 				translatorClass = this.baseStateTranslatorClass;
 
 			// check that all needed information is available
-			if ((dispatcher != null) && (deviceUri != null) && (topic != null) && (translatorClass!=null))
+			if ((dispatcher != null) && (deviceUri != null) && (topic != null)
+					&& (translatorClass != null))
 			{
-				//create the delivery task
+				// create the delivery task
 				MqttStateDeliveryTask task = new MqttStateDeliveryTask(
 						dispatcher, this.mqttQos, topic, translatorClass,
 						this.defaultStateTranslator, currentDeviceState,
 						this.context);
-				
-				//submit for delivery
+
+				// submit for delivery
 				this.messageDeliveryService.execute(task);
 			}
 
@@ -437,9 +464,11 @@ public class MqttBridge implements EventHandler, ManagedService
 			String stateTranslator = null;
 			for (String brokerAddress : this.brokerAddresses)
 			{
-				notificationTranslator = (String) properties.get(brokerAddress.replaceAll(":", "-")
+				notificationTranslator = (String) properties.get(brokerAddress
+						.replaceAll(":", "-")
 						+ MqttBridge.MQTT_NOTIFICATION_TRANSLATOR_SUFFIX);
-				stateTranslator = (String) properties.get(brokerAddress.replaceAll(":", "-")
+				stateTranslator = (String) properties.get(brokerAddress
+						.replaceAll(":", "-")
 						+ MqttBridge.MQTT_STATE_TRANSLATOR_SUFFIX);
 
 				// check not null nor empty

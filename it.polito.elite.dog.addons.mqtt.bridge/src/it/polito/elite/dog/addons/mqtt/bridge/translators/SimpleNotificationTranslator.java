@@ -1,3 +1,20 @@
+/*
+ * Dog - Addons - Mqtt
+ * 
+ * Copyright (c) 2013-2014 Dario Bonino
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
+ */
 package it.polito.elite.dog.addons.mqtt.bridge.translators;
 
 import it.polito.elite.dog.core.library.model.notification.Notification;
@@ -14,6 +31,14 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.osgi.service.log.LogService;
 
+/**
+ * A simple implementation of {@link NotificationTranslator} supporting basic
+ * {@link HashMap} representation of notification contents and relative
+ * serialization in JSON.
+ * 
+ * @author <a href="mailto:dario.bonino@polito.it">Dario Bonino</a>
+ *
+ */
 public class SimpleNotificationTranslator implements NotificationTranslator
 {
 	private ObjectMapper mapper;
@@ -104,7 +129,8 @@ public class SimpleNotificationTranslator implements NotificationTranslator
 		String translatedNotification = null;
 		try
 		{
-			translatedNotification = this.mapper.writeValueAsString(notificationContent);
+			translatedNotification = this.mapper
+					.writeValueAsString(notificationContent);
 		}
 		catch (IOException e)
 		{
@@ -118,7 +144,8 @@ public class SimpleNotificationTranslator implements NotificationTranslator
 				e.printStackTrace(System.err);
 		}
 
-		return (translatedNotification!=null)?translatedNotification.getBytes():new byte[0];
+		return (translatedNotification != null) ? translatedNotification
+				.getBytes() : new byte[0];
 	}
 
 }
