@@ -1,7 +1,7 @@
 /*
  * Dog - Device Driver
  * 
- * Copyright (c) 2012-2014 Dario Bonino
+ * Copyright (c) 2012-2014 Dario Bonino and Luigi De Russis
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.SinglePhaseActivePowerMeter;
 import it.polito.elite.dog.core.library.model.notification.SinglePhaseActivePowerMeasurementNotification;
 import it.polito.elite.dog.core.library.model.state.SinglePhaseActivePowerMeasurementState;
-import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
 import it.polito.elite.dog.drivers.echelon.ilon100.network.EchelonIlon100DriverInstance;
 import it.polito.elite.dog.drivers.echelon.ilon100.network.info.CmdNotificationInfo;
@@ -116,13 +115,6 @@ public class EchelonIlon100SinglePhaseActivePowerMeterDriverInstance extends Ech
 	}
 	
 	@Override
-	public void notifyStateChanged(State newState)
-	{
-		// probably unused...
-		((SinglePhaseActivePowerMeter) this.device).notifyStateChanged(newState);
-	}
-	
-	@Override
 	public void newMessageFromHouse(DataPointInfo dataPointInfo)
 	{
 		// check value
@@ -161,6 +153,9 @@ public class EchelonIlon100SinglePhaseActivePowerMeterDriverInstance extends Ech
 							+ "Unable to find a suitable notification method for the datapoint: " + dataPointInfo
 							+ ":\n" + e);
 				}
+				
+				// notify the monitor admin
+				this.updateStatus();
 				
 			}
 		}
@@ -216,6 +211,18 @@ public class EchelonIlon100SinglePhaseActivePowerMeterDriverInstance extends Ech
 		// add the datapoint to the network driver, no further operation needed
 		this.network.addDriver(dp, this);
 		
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.polito.elite.dog.core.library.model.devicecategory.
+	 * SinglePhaseActivePowerMeter#updateStatus()
+	 */
+	@Override
+	public void updateStatus()
+	{
+		((SinglePhaseActivePowerMeter) this.device).updateStatus();
 	}
 	
 }

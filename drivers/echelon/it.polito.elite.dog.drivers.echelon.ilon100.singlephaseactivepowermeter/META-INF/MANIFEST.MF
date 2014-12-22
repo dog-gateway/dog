@@ -2,15 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: it.polito.elite.dog.drivers.echelon.ilon100.singlephaseactivepowermeter
 Bundle-SymbolicName: it.polito.elite.dog.drivers.echelon.ilon100.singlephaseactivepowermeter
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.1
 Bundle-Activator: it.polito.elite.dog.drivers.echelon.ilon100.singlephaseactivepowermeter.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: it.polito.elite.dog.core.library.model,
- it.polito.elite.dog.core.library.model.devicecategory,
- it.polito.elite.dog.core.library.model.notification,
- it.polito.elite.dog.core.library.model.state,
- it.polito.elite.dog.core.library.model.statevalue;version="1.0.0",
- it.polito.elite.dog.core.library.util,
+Import-Package: it.polito.elite.dog.core.library.model;version="1.1.0",
+ it.polito.elite.dog.core.library.model.devicecategory;version="1.1.0",
+ it.polito.elite.dog.core.library.model.notification;version="1.1.0",
+ it.polito.elite.dog.core.library.model.state;version="1.1.0",
+ it.polito.elite.dog.core.library.model.statevalue;version="1.1.0",
+ it.polito.elite.dog.core.library.util;version="1.1.0",
  it.polito.elite.dog.drivers.echelon.ilon100.gateway,
  it.polito.elite.dog.drivers.echelon.ilon100.network,
  it.polito.elite.dog.drivers.echelon.ilon100.network.info,
