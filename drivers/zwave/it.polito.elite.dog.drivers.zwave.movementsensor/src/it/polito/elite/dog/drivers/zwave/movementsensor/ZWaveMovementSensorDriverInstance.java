@@ -42,15 +42,18 @@ import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance implements MovementSensor
+public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance
+		implements MovementSensor
 {
 	// the class logger
 	private LogHelper logger;
 
-	public ZWaveMovementSensorDriverInstance(ZWaveNetwork network, ControllableDevice device, int deviceId,
-			Set<Integer> instancesId, int gatewayNodeId, int updateTimeMillis, BundleContext context)
+	public ZWaveMovementSensorDriverInstance(ZWaveNetwork network,
+			ControllableDevice device, int deviceId, Set<Integer> instancesId,
+			int gatewayNodeId, int updateTimeMillis, BundleContext context)
 	{
-		super(network, device, deviceId, instancesId, gatewayNodeId, updateTimeMillis, context);
+		super(network, device, deviceId, instancesId, gatewayNodeId,
+				updateTimeMillis, context);
 
 		// create a logger
 		logger = new LogHelper(context);
@@ -65,10 +68,12 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 	private void initializeStates()
 	{
 		// initialize the state
-		this.currentState.setState(MovementState.class.getSimpleName(), new MovementState(new NotMovingStateValue()));
+		this.currentState.setState(MovementState.class.getSimpleName(),
+				new MovementState(new NotMovingStateValue()));
 
 		// get the initial state of the device
-		Runnable worker = new Runnable() {
+		Runnable worker = new Runnable()
+		{
 			public void run()
 			{
 				network.read(nodeInfo, true);
@@ -81,49 +86,79 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 	}
 
 	@Override
-	public void newMessageFromHouse(Device deviceNode, Instance instanceNode, 
+	public void newMessageFromHouse(Device deviceNode, Instance instanceNode,
 			Controller controllerNode, String sValue)
 	{
 		this.deviceNode = deviceNode;
 
 		// Read the value associated with the right CommandClass.
-		boolean bState = false;
-		CommandClasses ccEntry = instanceNode.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_BINARY);
+		CommandClasses ccEntry = instanceNode
+				.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_BINARY);
 
 		if (ccEntry != null)
-			bState = ccEntry.getLevelAsBoolean();
 
-		if (bState)
-			this.changeCurrentState(MovementState.ISMOVING);
-		else
-			this.changeCurrentState(MovementState.NOTMOVING);
-		
-		this.updateStatus();
+			// notify open/close only if changed
+			if (changeMovementState((ccEntry.getLevelAsBoolean() ? MovementState.ISMOVING
+					: MovementState.NOTMOVING)))
+				// notify state changed
+				this.updateStatus();
+
 	}
 
 	/**
 	 * Check if the current state has been changed. In that case, fire a state
 	 * change message, otherwise it does nothing
 	 * 
-	 * @param movementState.ISMOVING or MovementState.NOTMOVING
+	 * @param movementState
+	 *            .ISMOVING or MovementState.NOTMOVING
 	 */
-	private void changeCurrentState(String movementState)
+	private boolean changeMovementState(String movementState)
 	{
+		// the state change flag
+		boolean stateChanged = false;
+
+		// the current state
 		String currentStateValue = "";
-		State state = currentState.getState(MovementState.class.getSimpleName());
+		State state = currentState
+				.getState(MovementState.class.getSimpleName());
 
 		if (state != null)
-			currentStateValue = (String) state.getCurrentStateValue()[0].getValue();
+			currentStateValue = (String) state.getCurrentStateValue()[0]
+					.getValue();
 
 		// if the current states it is different from the new state
 		if (!currentStateValue.equalsIgnoreCase(movementState))
 		{
 			// set the new state to open or close...
 			if (movementState.equalsIgnoreCase(MovementState.ISMOVING))
-				notifyStartedMovement();
+			{
+				// update the state
+				MovementState movState = new MovementState(
+						new MovingStateValue());
+				currentState.setState(MovementState.class.getSimpleName(),
+						movState);
+
+				this.notifyStartedMovement(); // notify moving
+			}
 			else
-				notifyCeasedMovement();
+			{
+				// update the state
+				MovementState movState = new MovementState(
+						new NotMovingStateValue());
+				currentState.setState(MovementState.class.getSimpleName(),
+						movState);
+
+				this.notifyCeasedMovement(); // notify not moving
+
+			}
+
+			logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+					+ " value is now " + movementState);
+
+			stateChanged = true;
 		}
+
+		return stateChanged;
 	}
 
 	@Override
@@ -152,46 +187,33 @@ public class ZWaveMovementSensorDriverInstance extends ZWaveDriverInstance imple
 	}
 
 	@Override
-	protected ZWaveNodeInfo createNodeInfo(int deviceId, Set<Integer> instancesId, boolean isController) 
+	protected ZWaveNodeInfo createNodeInfo(int deviceId,
+			Set<Integer> instancesId, boolean isController)
 	{
-		HashMap<Integer,Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
+		HashMap<Integer, Set<Integer>> instanceCommand = new HashMap<Integer, Set<Integer>>();
 
 		HashSet<Integer> ccSet = new HashSet<Integer>();
 		ccSet.add(ZWaveAPI.COMMAND_CLASS_SENSOR_BINARY);
 
-		//binary switch has its own command class 
-		for(Integer instanceId : instancesId)
+		// binary switch has its own command class
+		for (Integer instanceId : instancesId)
 		{
 			instanceCommand.put(instanceId, ccSet);
 		}
-		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand, isController);
+		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand,
+				isController);
 		return nodeInfo;
 	}
 
 	@Override
-	public void notifyCeasedMovement() 
+	public void notifyCeasedMovement()
 	{
-		// update the state
-		MovementState movState = new MovementState(new NotMovingStateValue());
-		currentState.setState(MovementState.class.getSimpleName(), movState);
-
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " value is now " + ((MovementState) movState).getCurrentStateValue()[0].getValue());
-
 		((MovementSensor) device).notifyCeasedMovement();
-
 	}
 
 	@Override
-	public void notifyStartedMovement() 
+	public void notifyStartedMovement()
 	{
-		// update the state
-		MovementState movState = new MovementState(new MovingStateValue());
-		currentState.setState(MovementState.class.getSimpleName(), movState);
-
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " value is now " + ((MovementState) movState).getCurrentStateValue()[0].getValue());
-
 		((MovementSensor) device).notifyStartedMovement();
 	}
 

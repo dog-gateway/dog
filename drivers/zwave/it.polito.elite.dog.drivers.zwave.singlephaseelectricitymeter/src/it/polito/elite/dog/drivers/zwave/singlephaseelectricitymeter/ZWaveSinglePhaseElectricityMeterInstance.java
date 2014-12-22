@@ -31,6 +31,7 @@ import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
+import it.polito.elite.dog.drivers.zwave.model.zway.json.DataElemObject;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Device;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Instance;
 import it.polito.elite.dog.drivers.zwave.network.ZWaveDriverInstance;
@@ -131,31 +132,117 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends
 			CommandClasses ccElectricityEntry = instanceNode
 					.getCommandClasses().get(ZWaveAPI.COMMAND_CLASS_METER);
 
-			// Check if it is a real new value or if it is an old one
-			long updateTime = ccElectricityEntry.get("0").getDataElem("val")
-					.getUpdateTime();
+			// the energy updated flag
+			boolean energyUpdated = false;
 
-			// first time we only save update time, no more
-			if (lastUpdateTime == 0)
-				lastUpdateTime = updateTime;
-			else if (lastUpdateTime < updateTime)
+			// the power updated flag
+			boolean powerUpdated = false;
+
+			// Check if it is a real new value or if it is an old one. We can
+			// use
+			// one of the cc available
+			DataElemObject instance0 = ccElectricityEntry.get("0");
+
+			if (instance0 != null)
 			{
-				// update last update time
-				lastUpdateTime = updateTime;
-				nFailedUpdate = 0;
-				double activeEnergy = Double.valueOf(ccElectricityEntry
-						.get("0").getDataElemValue("val").toString());
-				notifyNewActiveEnergyValue(DecimalMeasure.valueOf(activeEnergy
-						+ " " + SI.KILO(SI.WATT.times(NonSI.HOUR))));
+				long updateTime = instance0.getDataElem("val").getUpdateTime();
 
-				double activePower = Double.valueOf(ccElectricityEntry.get("2")
-						.getDataElemValue("val").toString());
-				notifyNewActivePowerValue(DecimalMeasure.valueOf(activePower
-						+ " " + SI.WATT));
+				// first time we only save update time, no more
+				if (lastUpdateTime == 0)
+					lastUpdateTime = updateTime;
+
+				else if (lastUpdateTime < updateTime)
+				{
+					// update last update time
+					lastUpdateTime = updateTime;
+					nFailedUpdate = 0;
+
+					// handle energy data if available
+					DataElemObject energyEntry = ccElectricityEntry.get("0");
+					if (energyEntry != null)
+					{
+						this.changeActiveEnergyState(Double.valueOf(energyEntry
+								.getDataElemValue("val").toString()));
+
+						energyUpdated = true;
+
+					}
+
+					// handle power data if available
+					DataElemObject powerEntry = ccElectricityEntry.get("2");
+					if (powerEntry != null)
+					{
+						this.changeActivePowerState(Double.valueOf(powerEntry
+								.getDataElemValue("val").toString()));
+
+						powerUpdated = true;
+
+					}
+				}
+
+				if (energyUpdated || powerUpdated)
+					this.updateStatus();
 			}
-			
-			this.updateStatus();
 		}
+
+	}
+
+	/**
+	 * Manages the power state update (only updates if the current state value
+	 * is different from the given one)
+	 * 
+	 * @param activeEnergy
+	 * @return
+	 */
+	private void changeActiveEnergyState(double activeEnergy)
+	{
+		// build the energy measure
+		DecimalMeasure<?> value = DecimalMeasure.valueOf(activeEnergy + " "
+				+ SI.KILO(SI.WATT.times(NonSI.HOUR)).toString());
+
+		// update the state
+		ActiveEnergyStateValue pValue = new ActiveEnergyStateValue();
+		pValue.setValue(value);
+		currentState.setState(
+				SinglePhaseActiveEnergyState.class.getSimpleName(),
+				new SinglePhaseActiveEnergyState(pValue));
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " active energy " + value.toString());
+
+		// notify energy change
+		this.notifyNewActiveEnergyValue(value);
+
+	}
+
+	/**
+	 * Manages the energy state update (only updates if the current state value
+	 * is different from the given one)
+	 * 
+	 * @param activePower
+	 * @return
+	 */
+	private void changeActivePowerState(double activePower)
+	{
+		// build the power measure
+		DecimalMeasure<?> powerValue = DecimalMeasure.valueOf(activePower + " "
+				+ SI.WATT.toString());
+
+		// update the state
+		ActivePowerStateValue pValue = new ActivePowerStateValue();
+		pValue.setValue(powerValue);
+		currentState.setState(
+				SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
+				new SinglePhaseActivePowerMeasurementState(pValue));
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " active power " + powerValue.toString());
+
+		// notify the state change
+		this.notifyNewActivePowerValue(powerValue);
+
 	}
 
 	@Override
@@ -196,17 +283,6 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends
 	@Override
 	public void notifyNewActiveEnergyValue(Measure<?, ?> value)
 	{
-		// update the state
-		ActiveEnergyStateValue pValue = new ActiveEnergyStateValue();
-		pValue.setValue(value);
-		currentState.setState(
-				SinglePhaseActiveEnergyState.class.getSimpleName(),
-				new SinglePhaseActiveEnergyState(pValue));
-
-		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " active energy " + value.toString());
-
 		// notify the new measure
 		((SinglePhaseEnergyMeter) device).notifyNewActiveEnergyValue(value);
 	}
@@ -214,17 +290,6 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends
 	@Override
 	public void notifyNewActivePowerValue(Measure<?, ?> powerValue)
 	{
-		// update the state
-		ActivePowerStateValue pValue = new ActivePowerStateValue();
-		pValue.setValue(powerValue);
-		currentState.setState(
-				SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
-				new SinglePhaseActivePowerMeasurementState(pValue));
-
-		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " active power " + powerValue.toString());
-
 		// notify the new measure
 		((SinglePhaseActivePowerMeter) device)
 				.notifyNewActivePowerValue(powerValue);
@@ -347,7 +412,7 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends
 	{
 		// Nothing to do: not supported by device...
 	}
-	
+
 	@Override
 	public void updateStatus()
 	{

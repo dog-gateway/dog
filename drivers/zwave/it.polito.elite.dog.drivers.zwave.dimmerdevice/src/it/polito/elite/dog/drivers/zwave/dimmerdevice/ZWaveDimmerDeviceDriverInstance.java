@@ -57,10 +57,10 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 
 	// the step increase / decrease
 	private int stepPercentage = 5; // default
-	
+
 	// the group set
 	private HashSet<Integer> groups;
-	
+
 	// the scene set
 	private HashSet<Integer> scenes;
 
@@ -73,8 +73,8 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 				updateTimeMillis, context);
 
 		this.stepPercentage = stepPercentage;
-		
-		//build inner data structures
+
+		// build inner data structures
 		this.groups = new HashSet<Integer>();
 		this.scenes = new HashSet<Integer>();
 
@@ -122,40 +122,32 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 			lastUpdateTime = ccEntry.getLevelUpdateTime();
 			nFailedUpdate = 0;
 
-			if (ccEntry != null)
-			{
-				nLevel = ccEntry.getLevelAsInt();
+			nLevel = ccEntry.getLevelAsInt();
 
-				if (nLevel > 0)
-				{
-					changeCurrentState(OnOffState.ON, nLevel);
+			// the updated flags
+			boolean updatedOnOff = changeOnOffState((nLevel > 0) ? OnOffState.ON
+					: OnOffState.OFF);
+			boolean updatedLevel = changeLevelState(nLevel);
 
-					// notify on
-					this.notifyOn();
-
-				} else
-				{
-					changeCurrentState(OnOffState.OFF, nLevel);
-
-					// notify off
-					this.notifyOff();
-				}
-
+			if (updatedOnOff || updatedLevel)
 				// update the monitor admin
 				this.updateStatus();
-			}
+
 		}
 	}
 
 	/**
-	 * Check if the current state has been changed. In that case, fire a state
-	 * change message, otherwise it does nothing
+	 * Manages the {@link OnOffState} state changes
 	 * 
 	 * @param OnOffValue
 	 *            OnOffState.ON or OnOffState.OFF
 	 */
-	private void changeCurrentState(String OnOffValue, int nLevel)
+	private boolean changeOnOffState(String OnOffValue)
 	{
+		// flag for state changes
+		boolean stateChanged = false;
+
+		// get the current state value
 		String currentStateValue = "";
 		State state = currentState.getState(OnOffState.class.getSimpleName());
 
@@ -181,7 +173,9 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 								+ " is now "
 								+ ((OnOffState) onState).getCurrentStateValue()[0]
 										.getValue());
-			} else
+				this.notifyOn();
+			}
+			else
 			{
 				// update the state
 				OnOffState offState = new OnOffState(new OffStateValue());
@@ -195,24 +189,60 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 								+ " is now "
 								+ ((OnOffState) offState)
 										.getCurrentStateValue()[0].getValue());
-
+				this.notifyOff();
 			}
+
+			// set the state change flag at true
+			stateChanged = true;
 		}
 
-		// update the state
-		LevelStateValue pValue = new LevelStateValue();
-		pValue.setValue(nLevel);
+		return stateChanged;
 
-		currentState.setState(LevelState.class.getSimpleName(), new LevelState(
-				pValue));
+	}
 
-		// send the changed level notification
-		this.notifyChangedLevel(DecimalMeasure.valueOf(nLevel, Unit.ONE));
+	/**
+	 * Manages the state change operations for the level state
+	 * 
+	 * @param nLevel
+	 * @return
+	 */
+	private boolean changeLevelState(int nLevel)
+	{
+		// flag for state changes
+		boolean stateChanged = false;
+
+		// get the current state
+		// get the current state value
+		Integer currentStateValue = new Integer(0);
+		State state = currentState.getState(LevelState.class.getSimpleName());
+
+		if (state != null)
+			currentStateValue = (Integer) state.getCurrentStateValue()[0]
+					.getValue();
+
+		// check if the state is changed or not
+		if (currentStateValue.intValue() != nLevel)
+		{
+			// update the state
+			LevelStateValue pValue = new LevelStateValue();
+			pValue.setValue(nLevel);
+
+			// change the current level state
+			currentState.setState(LevelState.class.getSimpleName(),
+					new LevelState(pValue));
+
+			// send the changed level notification
+			this.notifyChangedLevel(DecimalMeasure.valueOf(nLevel, Unit.ONE));
+
+			// the state is changed
+			stateChanged = true;
+		}
 
 		// debug
 		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
 				+ " dimmer at " + nLevel);
 
+		return stateChanged;
 	}
 
 	@Override
@@ -326,8 +356,8 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	{
 		// Store the given scene id
 		this.scenes.add(sceneNumber);
-		
-		//notify
+
+		// notify
 		this.notifyStoredScene(sceneNumber);
 	}
 
@@ -336,8 +366,8 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	{
 		// Remove the given scene id
 		this.scenes.remove(sceneNumber);
-		
-		//notify
+
+		// notify
 		this.notifyDeletedScene(sceneNumber);
 	}
 
@@ -346,8 +376,8 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	{
 		// remove the given group id
 		this.groups.remove(groupID);
-		
-		//notify
+
+		// notify
 		this.notifyLeftGroup(groupID);
 	}
 
@@ -356,7 +386,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	{
 		// Store the given group id
 		this.groups.add(groupID);
-		
+
 		this.notifyJoinedGroup(groupID);
 	}
 
@@ -364,7 +394,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	public void notifyStoredScene(Integer sceneNumber)
 	{
 		// send the store scene notification
-		((LevelControllableOutput)this.device).notifyStoredScene(sceneNumber);
+		((LevelControllableOutput) this.device).notifyStoredScene(sceneNumber);
 
 	}
 
@@ -372,7 +402,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	public void notifyDeletedScene(Integer sceneNumber)
 	{
 		// send the delete scene notification
-		((LevelControllableOutput)this.device).notifyDeletedScene(sceneNumber);
+		((LevelControllableOutput) this.device).notifyDeletedScene(sceneNumber);
 
 	}
 
@@ -380,7 +410,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	public void notifyJoinedGroup(Integer groupNumber)
 	{
 		// send the joined group notification
-		((LevelControllableOutput)this.device).notifyJoinedGroup(groupNumber);
+		((LevelControllableOutput) this.device).notifyJoinedGroup(groupNumber);
 
 	}
 
@@ -388,7 +418,7 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 	public void notifyLeftGroup(Integer groupNumber)
 	{
 		// send the left group notification
-		((LevelControllableOutput)this.device).notifyLeftGroup(groupNumber);
+		((LevelControllableOutput) this.device).notifyLeftGroup(groupNumber);
 
 	}
 
@@ -409,7 +439,6 @@ public class ZWaveDimmerDeviceDriverInstance extends ZWaveDriverInstance
 		((LevelControllableOutput) this.device).notifyChangedLevel(newLevel);
 
 	}
-
 
 	@Override
 	public void notifyOff()

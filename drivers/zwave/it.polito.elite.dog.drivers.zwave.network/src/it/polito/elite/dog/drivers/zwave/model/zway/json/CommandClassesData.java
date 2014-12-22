@@ -25,8 +25,7 @@ import org.codehaus.jackson.annotate.JsonAnySetter;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-
-public class CommandClassesData 
+public class CommandClassesData
 {
 	public static final String FIELD_VAL = "val";
 	public static final String FIELD_UPDATETIME = "updateTime";
@@ -36,130 +35,174 @@ public class CommandClassesData
 	public static final String FIELD_SCALE = "scale";
 	public static final String FIELD_SCALESTRING = "scaleString";
 	
-	//static name properties
+	// static name properties
 	private long updateTime;
 	private String name;
 	private Object value;
 	private String type;
 	private Integer invalidateTime;
 	
-	//dynamic name prop are managed through this map
-	//and through @JsonAnyGetter and @JsonAnySetter annotation
-	private Map<String, DataElemObject> data = new HashMap<String, DataElemObject>(); 
+	// dynamic name prop are managed through this map
+	// and through @JsonAnyGetter and @JsonAnySetter annotation
+	private Map<String, DataElemObject> data = new HashMap<String, DataElemObject>();
 	
 	@JsonCreator
-    public CommandClassesData(@JsonProperty("updateTime") Integer updateTime,
-    		@JsonProperty("name") String name,
-    		@JsonProperty("value") Object value,
-    		@JsonProperty("type") String type,
-    		@JsonProperty("invalidateTime") Integer invalidateTime
-    		)
-    {
+	public CommandClassesData(@JsonProperty("updateTime") Integer updateTime, @JsonProperty("name") String name,
+			@JsonProperty("value") Object value, @JsonProperty("type") String type,
+			@JsonProperty("invalidateTime") Integer invalidateTime)
+	{
 		this.updateTime = updateTime;
 		this.name = name;
 		this.value = value;
 		this.type = type;
 		this.invalidateTime = invalidateTime;
-    }
+	}
 	
-	// "any getter" needed for serialization    
-    @JsonAnyGetter
-    public Map<String,DataElemObject> getAllData() {
-        return data;
-    }
-
-    @JsonAnySetter
-    public void setAllData(String name, DataElemObject value) {
-    	data.put(name, value);
-    }
-    
-    /**
-     * returns the property defined by name or null
-     */
-    public DataElemObject getDataElem(String name)
-    {
-    	return data.get(name);
-    }
-    
-    /**
-     * returns the value of the property defined by name
-     */
-    public Object getDataElemValue(String name)
-    {
-    	DataElemObject ii = data.get(name);
-    	if(ii != null)
-    		return ii.getValue();
-    	else
-    		return null;
-    }
-    
+	// "any getter" needed for serialization
+	@JsonAnyGetter
+	public Map<String, DataElemObject> getAllData()
+	{
+		return data;
+	}
+	
+	@JsonAnySetter
+	public void setAllData(String name, DataElemObject value)
+	{
+		data.put(name, value);
+	}
+	
+	/**
+	 * returns the property defined by name or null
+	 */
+	public DataElemObject getDataElem(String name)
+	{
+		return data.get(name);
+	}
+	
+	/**
+	 * returns the value of the property defined by name
+	 */
+	public Object getDataElemValue(String name)
+	{
+		DataElemObject ii = data.get(name);
+		if (ii != null)
+			return ii.getValue();
+		else
+		{
+			// another chance, if Z-Way version is greater than (or equal to)
+			// 1.7.2, sensors values are inside another dataelemobject
+			for (String key : this.data.keySet())
+			{
+				if (this.isInteger(key))
+				{
+					DataElemObject container = this.data.get(key);
+					ii = container.getDataElem(name);
+					if (ii != null)
+						return ii.getValue();
+				}
+			}
+		}
+		
+		// null, in the end
+		return ii;
+	}
+	
 	/**
 	 * @return the updateTime
 	 */
-	public long getUpdateTime() {
+	public long getUpdateTime()
+	{
 		return updateTime;
 	}
-
+	
 	/**
-	 * @param updateTime the updateTime to set
+	 * @param updateTime
+	 *            the updateTime to set
 	 */
-	public void setUpdateTime(Integer updateTime) {
+	public void setUpdateTime(Integer updateTime)
+	{
 		this.updateTime = updateTime;
 	}
-
+	
 	/**
 	 * @return the name
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
-
+	
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
-
+	
 	/**
 	 * @return the value
 	 */
-	public Object getValue() {
+	public Object getValue()
+	{
 		return value;
 	}
-
+	
 	/**
-	 * @param value the value to set
+	 * @param value
+	 *            the value to set
 	 */
-	public void setValue(Object value) {
+	public void setValue(Object value)
+	{
 		this.value = value;
 	}
-
+	
 	/**
 	 * @return the type
 	 */
-	public String getType() {
+	public String getType()
+	{
 		return type;
 	}
-
+	
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
-	public void setType(String type) {
+	public void setType(String type)
+	{
 		this.type = type;
 	}
-
+	
 	/**
 	 * @return the invalidateTime
 	 */
-	public Integer getInvalidateTime() {
+	public Integer getInvalidateTime()
+	{
 		return invalidateTime;
 	}
-
+	
 	/**
-	 * @param invalidateTime the invalidateTime to set
+	 * @param invalidateTime
+	 *            the invalidateTime to set
 	 */
-	public void setInvalidateTime(Integer invalidateTime) {
+	public void setInvalidateTime(Integer invalidateTime)
+	{
 		this.invalidateTime = invalidateTime;
+	}
+	
+	private boolean isInteger(String number)
+	{
+		try
+		{
+			Integer.parseInt(number);
+		}
+		catch (NumberFormatException e)
+		{
+			return false;
+		}
+		
+		return true;
 	}
 }

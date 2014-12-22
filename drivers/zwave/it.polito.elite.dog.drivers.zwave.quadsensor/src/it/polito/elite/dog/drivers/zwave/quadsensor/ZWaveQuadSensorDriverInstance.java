@@ -133,6 +133,10 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 	{
 		// update deviceNode
 		this.deviceNode = deviceNode;
+		
+		// the state change flags
+		boolean measureUpdated = false;
+		boolean movementUpdated = false;
 
 		// Read the value for temperature, humidity or light intensity.
 		CommandClasses ccInst = instanceNode
@@ -160,7 +164,7 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 						.getDataElemValue(CommandClassesData.FIELD_SCALESTRING);
 
 				// forward to the right method
-				this.forwardMeasure(measure, unitOfMeasure, sensorType,
+				measureUpdated = this.forwardMeasure(measure, unitOfMeasure, sensorType,
 						this.lastUpdateTime);
 
 			}
@@ -205,7 +209,7 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 							.getDataElemValue(CommandClassesData.FIELD_SCALESTRING);
 
 					// forward to the right method
-					this.forwardMeasure(measure, unitOfMeasure, sensorType,
+					measureUpdated = this.forwardMeasure(measure, unitOfMeasure, sensorType,
 							updateTime);
 
 				}
@@ -218,19 +222,17 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 		}
 
 		// Read the value for the movement data.
-		boolean bState = false;
+		// Read the value associated with the right CommandClass.
 		CommandClasses ccEntry = instanceNode
 				.getCommandClass(ZWaveAPI.COMMAND_CLASS_SENSOR_BINARY);
 
 		if (ccEntry != null)
-			bState = ccEntry.getLevelAsBoolean();
+			// notify open/close only if changed
+			movementUpdated = changeMovementState((ccEntry.getLevelAsBoolean() ? MovementState.ISMOVING
+					: MovementState.NOTMOVING));
 
-		if (bState)
-			this.changeCurrentState(MovementState.ISMOVING);
-		else
-			this.changeCurrentState(MovementState.NOTMOVING);
-
-		this.updateStatus();
+		if(measureUpdated || movementUpdated)
+			this.updateStatus();
 	}
 
 	/**
@@ -240,8 +242,12 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 	 * @param movementState
 	 *            .ISMOVING or MovementState.NOTMOVING
 	 */
-	private void changeCurrentState(String movementState)
+	private boolean changeMovementState(String movementState)
 	{
+		// the state change flag
+		boolean stateChanged = false;
+
+		// the current state
 		String currentStateValue = "";
 		State state = currentState
 				.getState(MovementState.class.getSimpleName());
@@ -255,9 +261,110 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 		{
 			// set the new state to open or close...
 			if (movementState.equalsIgnoreCase(MovementState.ISMOVING))
-				notifyStartedMovement();
+			{
+				// update the state
+				MovementState movState = new MovementState(
+						new MovingStateValue());
+				currentState.setState(MovementState.class.getSimpleName(),
+						movState);
+
+				this.notifyStartedMovement(); // notify moving
+			}
 			else
-				notifyCeasedMovement();
+			{
+				// update the state
+				MovementState movState = new MovementState(
+						new NotMovingStateValue());
+				currentState.setState(MovementState.class.getSimpleName(),
+						movState);
+
+				this.notifyCeasedMovement(); // notify not moving
+
+			}
+
+			logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+					+ " value is now " + movementState);
+
+			stateChanged = true;
+		}
+
+		return stateChanged;
+	}
+
+	private void changeTemperatureState(double measure, String unitOfMeasure)
+	{
+		// build the temperature measure
+		DecimalMeasure<?> temperatureValue = DecimalMeasure.valueOf(measure
+				+ " "
+				+ (unitOfMeasure.contains("C") ? SI.CELSIUS.toString()
+						: NonSI.FAHRENHEIT.toString()));
+
+		// if the given temperature is null, than the network-level
+		// value is not up-to-date
+		if (temperatureValue != null)
+		{
+			// update the state
+			TemperatureStateValue pValue = new TemperatureStateValue();
+			pValue.setValue(temperatureValue);
+			currentState.setState(TemperatureState.class.getSimpleName(),
+					new TemperatureState(pValue));
+		}
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " temperature " + temperatureValue.toString());
+
+		this.notifyNewTemperatureValue(temperatureValue);
+	}
+
+	private void changeHumidityState(double measure, String unitOfMeasure)
+	{
+		// build the humidity measure
+		DecimalMeasure<?> relativeHumidity = DecimalMeasure.valueOf(measure
+				+ " " + unitOfMeasure);
+		// if the given temperature is null, than the network-level
+		// value is not up-to-date
+		if (relativeHumidity != null)
+		{
+			// update the state
+			HumidityStateValue pValue = new HumidityStateValue();
+			pValue.setValue(relativeHumidity);
+			currentState.setState(
+					HumidityMeasurementState.class.getSimpleName(),
+					new HumidityMeasurementState(pValue));
+
+			this.notifyChangedRelativeHumidity(relativeHumidity);
+
+			// debug
+			logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+					+ " humidity " + relativeHumidity.toString());
+		}
+	}
+
+	private void changeLightIntensityState(double measure, String unitOfMeasure)
+	{
+		// build the luminosity value
+		DecimalMeasure<?> luminosityValue = DecimalMeasure.valueOf(measure
+				+ " " + unitOfMeasure);
+
+		// if the given light intensity is null, than the network-level
+		// value is
+		// not
+		// up-to-date
+		// and the currently stored value should be notified
+		if (luminosityValue != null)
+		{
+			// update the state
+			LevelStateValue pValue = new LevelStateValue();
+			pValue.setValue(luminosityValue);
+			currentState.setState(LightIntensityState.class.getSimpleName(),
+					new LightIntensityState(pValue));
+
+			// debug
+			logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+					+ " light-intensity " + luminosityValue.toString());
+
+			this.notifyNewLuminosityValue(luminosityValue);
 		}
 	}
 
@@ -340,37 +447,12 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyCeasedMovement()
 	{
-		// update the state
-		MovementState movState = new MovementState(new NotMovingStateValue());
-		currentState.setState(MovementState.class.getSimpleName(), movState);
-
-		logger.log(
-				LogService.LOG_DEBUG,
-				"Device "
-						+ device.getDeviceId()
-						+ " value is now "
-						+ ((MovementState) movState).getCurrentStateValue()[0]
-								.getValue());
-
 		((QuadSensor) device).notifyCeasedMovement();
-
 	}
 
 	@Override
 	public void notifyStartedMovement()
 	{
-		// update the state
-		MovementState movState = new MovementState(new MovingStateValue());
-		currentState.setState(MovementState.class.getSimpleName(), movState);
-
-		logger.log(
-				LogService.LOG_DEBUG,
-				"Device "
-						+ device.getDeviceId()
-						+ " value is now "
-						+ ((MovementState) movState).getCurrentStateValue()[0]
-								.getValue());
-
 		((QuadSensor) device).notifyStartedMovement();
 	}
 
@@ -384,23 +466,6 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyChangedRelativeHumidity(Measure<?, ?> relativeHumidity)
 	{
-		// if the given temperature is null, than the network-level value is not
-		// up-to-date
-		// and the currently stored value should be notified
-		if (relativeHumidity != null)
-		{
-			// update the state
-			HumidityStateValue pValue = new HumidityStateValue();
-			pValue.setValue(relativeHumidity);
-			currentState.setState(
-					HumidityMeasurementState.class.getSimpleName(),
-					new HumidityMeasurementState(pValue));
-		}
-
-		// debug
-		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-				+ " humidity " + relativeHumidity.toString());
-
 		// notify the new measure
 		((QuadSensor) device).notifyChangedRelativeHumidity(relativeHumidity);
 	}
@@ -449,9 +514,11 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 		return nodeInfo;
 	}
 
-	private void forwardMeasure(double measure, String unitOfMeasure,
+	private boolean forwardMeasure(double measure, String unitOfMeasure,
 			String sensorType, long updateTime)
 	{
+		boolean stateChanged = false;
+		
 		// check which value has been read
 		if (sensorType.equals(SensorType.SENSORTYPE_TEMPERATURE))
 		{
@@ -460,34 +527,11 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 			{
 				this.temperatureUpdateTime = updateTime;
 
-				// build the temperature measure
-				DecimalMeasure<?> temperatureValue = DecimalMeasure
-						.valueOf(measure
-								+ " "
-								+ (unitOfMeasure.contains("C") ? SI.CELSIUS
-										.toString() : NonSI.FAHRENHEIT
-										.toString()));
+				// change the state
+				this.changeTemperatureState(measure, unitOfMeasure);
 
-				// if the given temperature is null, than the network-level
-				// value is not
-				// up-to-date
-				// and the currently stored value should be notified
-				if (temperatureValue != null)
-				{
-					// update the state
-					TemperatureStateValue pValue = new TemperatureStateValue();
-					pValue.setValue(temperatureValue);
-					currentState.setState(
-							TemperatureState.class.getSimpleName(),
-							new TemperatureState(pValue));
-				}
-
-				// debug
-				logger.log(LogService.LOG_DEBUG,
-						"Device " + device.getDeviceId() + " temperature "
-								+ temperatureValue.toString());
-
-				this.notifyNewTemperatureValue(temperatureValue);
+				//changed
+				stateChanged = true;
 			}
 		}
 		else if (sensorType.equals(SensorType.SENSORTYPE_HUMIDITY))
@@ -497,30 +541,10 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 			{
 				this.humidityUpdateTime = updateTime;
 
-				// build the humidity measure
-				DecimalMeasure<?> relativeHumidity = DecimalMeasure
-						.valueOf(measure + " " + unitOfMeasure);
-				// if the given temperature is null, than the network-level
-				// value is not
-				// up-to-date
-				// and the currently stored value should be notified
-				if (relativeHumidity != null)
-				{
-					// update the state
-					HumidityStateValue pValue = new HumidityStateValue();
-					pValue.setValue(relativeHumidity);
-					currentState.setState(
-							HumidityMeasurementState.class.getSimpleName(),
-							new HumidityMeasurementState(pValue));
-
-					this.notifyChangedRelativeHumidity(relativeHumidity);
-
-					// debug
-					logger.log(LogService.LOG_DEBUG,
-							"Device " + device.getDeviceId() + " humidity "
-									+ relativeHumidity.toString());
-				}
-
+				this.changeHumidityState(measure, unitOfMeasure);
+				
+				//changed
+				stateChanged = true;
 			}
 		}
 		else if (sensorType.equals(SensorType.SENSORTYPE_LUMINISCENCE))
@@ -529,36 +553,15 @@ public class ZWaveQuadSensorDriverInstance extends ZWaveDriverInstance
 			if (this.luminiscenceUpdateTime < updateTime)
 			{
 				this.luminiscenceUpdateTime = updateTime;
-
-				// build the luminosity value
-				DecimalMeasure<?> luminosityValue = DecimalMeasure
-						.valueOf(measure + " " + unitOfMeasure);
-
-				// if the given light intensity is null, than the network-level
-				// value is
-				// not
-				// up-to-date
-				// and the currently stored value should be notified
-				if (luminosityValue != null)
-				{
-					// update the state
-					LevelStateValue pValue = new LevelStateValue();
-					pValue.setValue(luminosityValue);
-					currentState.setState(
-							LightIntensityState.class.getSimpleName(),
-							new LightIntensityState(pValue));
-
-					// debug
-					logger.log(
-							LogService.LOG_DEBUG,
-							"Device " + device.getDeviceId()
-									+ " light-intensity "
-									+ luminosityValue.toString());
-					this.notifyNewLuminosityValue(luminosityValue);
-				}
-
+				
+				this.changeLightIntensityState(measure, unitOfMeasure);
+				
+				//changed
+				stateChanged = true;
 			}
 		}
+		
+		return stateChanged;
 	}
 
 }

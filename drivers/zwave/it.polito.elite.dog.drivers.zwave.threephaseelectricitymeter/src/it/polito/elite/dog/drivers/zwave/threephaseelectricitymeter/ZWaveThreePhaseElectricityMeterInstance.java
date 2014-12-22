@@ -35,7 +35,6 @@ import it.polito.elite.dog.core.library.model.state.ThreePhaseVoltageState;
 import it.polito.elite.dog.core.library.model.statevalue.ActiveEnergyStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.ActivePowerStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
-//import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.ZWaveAPI;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.CommandClasses;
 import it.polito.elite.dog.drivers.zwave.model.zway.json.Controller;
@@ -53,7 +52,6 @@ import java.util.Set;
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
 import javax.measure.quantity.Power;
-import javax.measure.quantity.Quantity;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
@@ -61,8 +59,8 @@ import javax.measure.unit.UnitFormat;
 
 import org.osgi.framework.BundleContext;
 
-public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
-		implements ThreePhaseElectricityMeter
+public class ZWaveThreePhaseElectricityMeterInstance extends
+		ZWaveDriverInstance implements ThreePhaseElectricityMeter
 {
 
 	public ZWaveThreePhaseElectricityMeterInstance(ZWaveNetwork network,
@@ -95,13 +93,8 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 		uf.label(SI.KILO(VA), "kVA");
 
 		String activeEnergyUOM = SI.WATT.times(NonSI.HOUR).toString();
-		// String reactiveEnergyUOM = VAR.times(NonSI.HOUR).toString();
 		String activePowerUOM = SI.WATT.toString();
-		// String reactivePowerUOM = VAR.toString();
-		// String frequencyUOM = SI.HERTZ.toString();
-		// String currentUOM = SI.AMPERE.toString();
-		// String apparentPowerUOM = VA.toString();
-		// String voltageUOM = SI.VOLT.toString();
+
 
 		// ------------ Three Phase Active Power
 		// --------------------------------
@@ -123,28 +116,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 		this.currentState.setState(ThreePhaseActivePowerMeasurementState.class
 				.getSimpleName(), new ThreePhaseActivePowerMeasurementState(
 				activePowerStateL1, activePowerStateL2, activePowerStateL3));
-		// --------------------------------------------------------------------------
-
-		// ------------- Frequency -----------------------------------------
-		/*
-		 * FrequencyStateValue frequencyStateValue = new FrequencyStateValue();
-		 * frequencyStateValue.setValue(DecimalMeasure .valueOf("0 " +
-		 * frequencyUOM)); this.currentState.setState(
-		 * FrequencyMeasurementState.class.getSimpleName(), new
-		 * FrequencyMeasurementState(frequencyStateValue));
-		 */
-		// -----------------------------------------------------------------
-
-		// -------------- SinglePhaseActiveEnergy ---------------------------
-		/*
-		 * ActiveEnergyStateValue activeEnergyStateValue = new
-		 * ActiveEnergyStateValue();
-		 * activeEnergyStateValue.setValue(DecimalMeasure.valueOf("0 " +
-		 * activeEnergyUOM)); this.currentState.setState(
-		 * SinglePhaseActiveEnergyState.class.getSimpleName(), new
-		 * SinglePhaseActiveEnergyState(activeEnergyStateValue));
-		 */
-		// ------------------------------------------------------------------
 
 		// -------------- Three Phase Active Energy -------------------------
 		// ------------ Three Phase Active Power
@@ -167,139 +138,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 		this.currentState.setState(ThreePhaseActiveEnergyState.class
 				.getSimpleName(), new ThreePhaseActiveEnergyState(
 				activeEnergyStateL1, activeEnergyStateL2, activeEnergyStateL3));
-
-		// -------------- ThreePhaseCurrent ---------------------------------
-		/*
-		 * CurrentStateValue currentStateL1 = new CurrentStateValue();
-		 * currentStateL1.setFeature("phaseID", "L1");
-		 * currentStateL1.setValue(DecimalMeasure.valueOf("0 " + currentUOM));
-		 * 
-		 * CurrentStateValue currentStateL2 = new CurrentStateValue();
-		 * currentStateL2.setFeature("phaseID", "L2");
-		 * currentStateL2.setValue(DecimalMeasure.valueOf("0 " + currentUOM));
-		 * 
-		 * CurrentStateValue currentStateL3 = new CurrentStateValue();
-		 * currentStateL3.setFeature("phaseID", "L3");
-		 * currentStateL3.setValue(DecimalMeasure.valueOf("0 " + currentUOM));
-		 * 
-		 * this.currentState.setState(
-		 * ThreePhaseCurrentState.class.getSimpleName(), new
-		 * ThreePhaseCurrentState(currentStateL1, currentStateL2,
-		 * currentStateL3));
-		 */
-		// -------------------------------------------------------------------
-
-		// ------------- ThreePhaseReactivePower -----------------------------
-		/*
-		 * ReactivePowerStateValue reactivePowerStateL1 = new
-		 * ReactivePowerStateValue(); reactivePowerStateL1.setFeature("phaseID",
-		 * "L1"); reactivePowerStateL1.setValue(DecimalMeasure.valueOf("0 " +
-		 * reactivePowerUOM));
-		 * 
-		 * ReactivePowerStateValue reactivePowerStateL2 = new
-		 * ReactivePowerStateValue(); reactivePowerStateL2.setFeature("phaseID",
-		 * "L2"); reactivePowerStateL2.setValue(DecimalMeasure.valueOf("0 " +
-		 * reactivePowerUOM));
-		 * 
-		 * ReactivePowerStateValue reactivePowerStateL3 = new
-		 * ReactivePowerStateValue(); reactivePowerStateL3.setFeature("phaseID",
-		 * "L3"); reactivePowerStateL3.setValue(DecimalMeasure.valueOf("0 " +
-		 * reactivePowerUOM));
-		 * 
-		 * this.currentState.setState(
-		 * ThreePhaseReactivePowerMeasurementState.class.getSimpleName(), new
-		 * ThreePhaseReactivePowerMeasurementState( reactivePowerStateL1,
-		 * reactivePowerStateL2, reactivePowerStateL3));
-		 */
-		// --------------------------------------------------------------------
-
-		// ---------------------- Power Factor --------------------------------
-		/*
-		 * PowerFactorStateValue powerFactorStateValue = new
-		 * PowerFactorStateValue();
-		 * powerFactorStateValue.setValue(DecimalMeasure.valueOf("0 " +
-		 * Unit.ONE));
-		 * 
-		 * this.currentState.setState(
-		 * PowerFactorMeasurementState.class.getCanonicalName(), new
-		 * PowerFactorMeasurementState(powerFactorStateValue));
-		 */
-		// --------------------------------------------------------------------
-
-		// ---------------------- ThreePhaseApparentPower ---------------------
-		/*
-		 * ApparentPowerStateValue apparentPowerStateL1 = new
-		 * ApparentPowerStateValue(); apparentPowerStateL1.setFeature("phaseID",
-		 * "L1"); apparentPowerStateL1.setValue(DecimalMeasure.valueOf("0 " +
-		 * apparentPowerUOM));
-		 * 
-		 * ApparentPowerStateValue apparentPowerStateL2 = new
-		 * ApparentPowerStateValue(); apparentPowerStateL2.setFeature("phaseID",
-		 * "L2"); apparentPowerStateL2.setValue(DecimalMeasure.valueOf("0 " +
-		 * apparentPowerUOM));
-		 * 
-		 * ApparentPowerStateValue apparentPowerStateL3 = new
-		 * ApparentPowerStateValue(); apparentPowerStateL3.setFeature("phaseID",
-		 * "L3"); apparentPowerStateL3.setValue(DecimalMeasure.valueOf("0 " +
-		 * apparentPowerUOM));
-		 * 
-		 * this.currentState.setState(
-		 * ThreePhaseApparentPowerMeasurementState.class.getSimpleName(), new
-		 * ThreePhaseApparentPowerMeasurementState( apparentPowerStateL1,
-		 * apparentPowerStateL2, apparentPowerStateL3));
-		 */
-		// ----------------------------------------------------------------------
-
-		// ------------------------ Single Phase Reactive Energy
-		/*
-		 * ReactiveEnergyStateValue reactiveEnergyStateValue = new
-		 * ReactiveEnergyStateValue();
-		 * reactiveEnergyStateValue.setValue(DecimalMeasure.valueOf("0 " +
-		 * reactiveEnergyUOM)); this.currentState.setState(
-		 * SinglePhaseReactiveEnergyState.class.getSimpleName(), new
-		 * SinglePhaseReactiveEnergyState(reactiveEnergyStateValue));
-		 */
-		// -----------------------------------------------------------------------
-
-		// ------------------------ ThreePhaseLNVoltage
-		/*
-		 * VoltageStateValue voltageStateL1N = new VoltageStateValue();
-		 * voltageStateL1N.setFeature("phaseID", "L1");
-		 * voltageStateL1N.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
-		 * 
-		 * VoltageStateValue voltageStateL2N = new VoltageStateValue();
-		 * voltageStateL2N.setFeature("phaseID", "L2");
-		 * voltageStateL2N.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
-		 * 
-		 * VoltageStateValue voltageStateL3N = new VoltageStateValue();
-		 * voltageStateL3N.setFeature("phaseID", "L3");
-		 * voltageStateL3N.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
-		 * 
-		 * this.currentState.setState(
-		 * ThreePhaseVoltageState.class.getSimpleName(), new
-		 * ThreePhaseVoltageState(voltageStateL1N, voltageStateL2N,
-		 * voltageStateL3N));
-		 */
-		// ----------------------------------------------------------
-
-		// ------------------------ ThreePhaseLLVoltage
-		/*
-		 * VoltageStateValue voltageStateL12 = new VoltageStateValue();
-		 * voltageStateL12.setFeature("phaseID", "L12");
-		 * voltageStateL12.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
-		 * 
-		 * VoltageStateValue voltageStateL23 = new VoltageStateValue();
-		 * voltageStateL23.setFeature("phaseID", "L23");
-		 * voltageStateL23.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
-		 * 
-		 * VoltageStateValue voltageStateL31 = new VoltageStateValue();
-		 * voltageStateL31.setFeature("phaseID", "L31");
-		 * voltageStateL31.setValue(DecimalMeasure.valueOf("0 " + voltageUOM));
-		 * 
-		 * this.currentState.setState(ThreePhaseVoltageState.class.getSimpleName(
-		 * ) + "LL", new ThreePhaseVoltageState(voltageStateL12,
-		 * voltageStateL23, voltageStateL31));
-		 */
 
 		// get the initial state of the device
 		Runnable worker = new Runnable()
@@ -326,6 +164,10 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 			Controller controllerNode, String sValue)
 	{
 		this.deviceNode = deviceNode;
+		
+		//the state change flag
+		boolean energyUpdated = false;
+		boolean powerUpdated = false;
 
 		// Read the value associated with the right CommandClass
 		// instance 0 doesn't contains sensor data
@@ -349,10 +191,20 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 					{
 						double activeEnergy = Double.valueOf(data0Value
 								.toString());
-						notifyNewActiveEnergyValue(
-								"L" + instanceNode.getInstanceId(),
-								DecimalMeasure.valueOf(activeEnergy + " "
-										+ SI.KILO(SI.WATT.times(NonSI.HOUR))));
+
+						String phaseID = "L" + instanceNode.getInstanceId();
+						DecimalMeasure<?> value = DecimalMeasure
+								.valueOf(activeEnergy + " "
+										+ SI.KILO(SI.WATT.times(NonSI.HOUR)));
+
+						this.updateThreePhaseStateValue(
+								ThreePhaseActiveEnergyState.class
+										.getSimpleName(), phaseID, value);
+
+						notifyNewActiveEnergyValue(phaseID, value);
+						
+						//update the state change flag
+						energyUpdated = true;
 					}
 				}
 
@@ -365,15 +217,27 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 					{
 						double activePower = Double.valueOf(data2Value
 								.toString());
-						notifyNewActivePowerValue(
-								"L" + instanceNode.getInstanceId(),
-								DecimalMeasure.valueOf(activePower + " "
-										+ SI.WATT));
+
+						// update the state....
+						// the phase id
+						String phaseID = "L" + instanceNode.getInstanceId();
+						DecimalMeasure<?> value = DecimalMeasure
+								.valueOf(activePower + " " + SI.WATT);
+
+						this.updateThreePhaseStateValue(
+								ThreePhaseActivePowerMeasurementState.class
+										.getSimpleName(), phaseID, value);
+
+						notifyNewActivePowerValue(phaseID, value);
+						
+						//update the state change flag
+						powerUpdated = true;
 					}
 				}
 			}
-			
-			this.updateStatus();
+
+			if(energyUpdated||powerUpdated)
+				this.updateStatus();
 		}
 	}
 
@@ -501,11 +365,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewFrequencyValue(Measure<?, ?> frequency)
 	{
-		// update the state
-		((FrequencyMeasurementState) this.currentState
-				.getState(FrequencyMeasurementState.class.getSimpleName()))
-				.getCurrentStateValue()[0].setValue(frequency);
-
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device)
 				.notifyNewFrequencyValue(frequency);
@@ -515,11 +374,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewReactivePowerValue(String phaseID, Measure<?, ?> value)
 	{
-		// update the state....
-		this.updateThreePhaseStateValue(
-				ThreePhaseReactivePowerMeasurementState.class.getSimpleName(),
-				phaseID, value);
-
 		((ThreePhaseElectricityMeter) this.device).notifyNewReactivePowerValue(
 				phaseID, value);
 
@@ -528,11 +382,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewReactiveEnergyValue(Measure<?, ?> value)
 	{
-		// update the state
-		this.currentState.getState(
-				SinglePhaseReactiveEnergyState.class.getSimpleName())
-				.getCurrentStateValue()[0].setValue(value);
-
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device)
 				.notifyNewReactiveEnergyValue(value);
@@ -542,30 +391,17 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewActiveEnergyValue(Measure<?, ?> value)
 	{
-		// update the state
-		((SinglePhaseActiveEnergyState) this.currentState
-				.getState(SinglePhaseActiveEnergyState.class.getSimpleName()))
-				.getCurrentStateValue()[0].setValue(value);
-
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device)
 				.notifyNewActiveEnergyValue(value);
 	}
 
 	public void notifyNewActiveEnergyValue(String phaseID,
-			DecimalMeasure<Quantity> value)
+			DecimalMeasure<?> value)
 	{
-		// update the state....
-		this.updateThreePhaseStateValue(
-				ThreePhaseActiveEnergyState.class.getSimpleName(), phaseID,
-				value);
 
-		// TODO: to be implemented
-
-		/*
-		 * ((ThreePhaseElectricityMeter) this.device).notifyNewActivePowerValue(
-		 * phaseID, value);
-		 */
+		((ThreePhaseElectricityMeter) this.device).notifyNewActivePowerValue(
+				phaseID, value);
 
 	}
 
@@ -573,10 +409,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	public void notifyNewPhaseNeutralVoltageValue(String phaseID,
 			Measure<?, ?> value)
 	{
-		// update the state....
-		this.updateThreePhaseStateValue(
-				ThreePhaseVoltageState.class.getSimpleName(), phaseID, value);
-
 		((ThreePhaseElectricityMeter) this.device)
 				.notifyNewPhaseNeutralVoltageValue(phaseID, value);
 
@@ -587,10 +419,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 			Measure<?, ?> value)
 	{
 
-		this.updateThreePhaseStateValue(
-				ThreePhaseVoltageState.class.getSimpleName() + "LL", phaseID,
-				value);
-
 		((ThreePhaseElectricityMeter) this.device)
 				.notifyNewPhasePhaseVoltageValue(phaseID, value);
 
@@ -599,11 +427,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewApparentPowerValue(String phaseID, Measure<?, ?> value)
 	{
-		// update the state....
-
-		this.updateThreePhaseStateValue(
-				ThreePhaseApparentPowerMeasurementState.class.getSimpleName(),
-				phaseID, value);
 
 		((ThreePhaseElectricityMeter) this.device).notifyNewApparentPowerValue(
 				phaseID, value);
@@ -613,10 +436,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewPowerFactorValue(Measure<?, ?> powerFactor)
 	{
-		// update the state
-		this.currentState.getState(
-				PowerFactorMeasurementState.class.getSimpleName())
-				.getCurrentStateValue()[0].setValue(powerFactor);
 
 		// notify the new measure
 		((ThreePhaseElectricityMeter) this.device)
@@ -627,11 +446,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewActivePowerValue(String phaseID, Measure<?, ?> value)
 	{
-		// update the state....
-		this.updateThreePhaseStateValue(
-				ThreePhaseActivePowerMeasurementState.class.getSimpleName(),
-				phaseID, value);
-
 		((ThreePhaseElectricityMeter) this.device).notifyNewActivePowerValue(
 				phaseID, value);
 	}
@@ -639,15 +453,12 @@ public class ZWaveThreePhaseElectricityMeterInstance extends ZWaveDriverInstance
 	@Override
 	public void notifyNewCurrentValue(String phaseID, Measure<?, ?> value)
 	{
-		// update the state....
-		this.updateThreePhaseStateValue(
-				ThreePhaseCurrentState.class.getSimpleName(), phaseID, value);
 
 		((ThreePhaseElectricityMeter) this.device).notifyNewCurrentValue(
 				phaseID, value);
 
 	}
-	
+
 	@Override
 	public void updateStatus()
 	{

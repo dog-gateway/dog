@@ -2,10 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ZWaveDoorWindowSensorDriver
 Bundle-SymbolicName: it.polito.elite.dog.drivers.zwave.doorwindowsensor
-Bundle-Version: 1.1.0
+Bundle-Version: 1.1.1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
-Bundle-ActivationPolicy: lazy
 Import-Package: it.polito.elite.dog.core.library.model;version="1.1.0",
  it.polito.elite.dog.core.library.model.devicecategory;version="1.1.0",
  it.polito.elite.dog.core.library.model.state;version="1.1.0",

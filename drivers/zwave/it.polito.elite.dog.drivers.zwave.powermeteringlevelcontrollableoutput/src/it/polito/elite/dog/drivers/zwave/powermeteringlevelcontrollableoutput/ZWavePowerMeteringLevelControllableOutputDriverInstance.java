@@ -50,8 +50,10 @@ import java.util.Set;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
+import javax.measure.quantity.Dimensionless;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 
 import org.osgi.framework.BundleContext;
@@ -111,17 +113,27 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 		// only if MeteringDimmablePowerOutlet
 		if (this.device instanceof EnergyAndPowerMeteringLevelControllableOutput)
 		{
-			this.currentState.setState(SinglePhaseActiveEnergyState.class
-					.getSimpleName(), new SinglePhaseActiveEnergyState(
-					new ActiveEnergyStateValue()));
+			// initialize the energy state value
+			ActiveEnergyStateValue energyStateValue = new ActiveEnergyStateValue();
+			energyStateValue.setValue(DecimalMeasure.valueOf("0.0 "
+					+ SI.KILO(SI.WATT.times(NonSI.HOUR)).toString()));
+			this.currentState.setState(
+					SinglePhaseActiveEnergyState.class.getSimpleName(),
+					new SinglePhaseActiveEnergyState(energyStateValue));
 		}
 
-		this.currentState.setState(SinglePhaseActivePowerMeasurementState.class
-				.getSimpleName(), new SinglePhaseActivePowerMeasurementState(
-				new ActivePowerStateValue()));
+		// initialize the power state value
+		ActivePowerStateValue powerStateValue = new ActivePowerStateValue();
+		powerStateValue.setValue(DecimalMeasure.valueOf("0.0 "
+				+ SI.WATT.toString()));
+		this.currentState.setState(
+				SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
+				new SinglePhaseActivePowerMeasurementState(powerStateValue));
 
+		LevelStateValue levelValue = new LevelStateValue();
+		levelValue.setValue(DecimalMeasure.valueOf(0, Unit.ONE));
 		this.currentState.setState(LevelState.class.getSimpleName(),
-				new LevelState(new LevelStateValue()));
+				new LevelState(levelValue));
 
 		// get the initial state of the device
 		Runnable worker = new Runnable()
@@ -143,6 +155,18 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 	{
 		this.deviceNode = deviceNode;
 
+		// the on/off updated flag
+		boolean updatedOnOff = false;
+
+		// the level updated flag
+		boolean updatedLevel = false;
+
+		// the energy updated flag
+		boolean energyUpdated = false;
+
+		// the power updated flag
+		boolean powerUpdated = false;
+
 		// Read the value associated with the right CommandClass.
 
 		// switch multi-level
@@ -154,25 +178,13 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 		if (ccEntry != null)
 		{
 
-			if (ccEntry != null)
-			{
-				nLevel = ccEntry.getLevelAsInt();
+			nLevel = ccEntry.getLevelAsInt();
 
-				if (nLevel > 0)
-				{
-					this.changeCurrentState(OnOffState.ON, nLevel);
-					
-					//notify on
-					this.notifyOn();
-				}
-				else
-				{
-					this.changeCurrentState(OnOffState.OFF, nLevel);
-					
-					//notify off
-					this.notifyOff();
-				}
-			}
+			// change the state and update corresponding flags
+			updatedOnOff = changeOnOffState((nLevel > 0) ? OnOffState.ON
+					: OnOffState.OFF);
+			updatedLevel = changeLevelState(nLevel);
+
 		}
 
 		// meter
@@ -185,30 +197,100 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 
 		if (instance0 != null)
 		{
-			// handle energy data if available
-			DataElemObject energyEntry = ccElectricityEntry.get("0");
-			if (energyEntry != null)
-			{
-				double activeEnergy = Double.valueOf(energyEntry
-						.getDataElemValue("val").toString());
-				this.notifyNewActiveEnergyValue(DecimalMeasure
-						.valueOf(activeEnergy + " "
-								+ SI.KILO(SI.WATT.times(NonSI.HOUR)).toString()));
-			}
+			long updateTime = instance0.getDataElem("val").getUpdateTime();
 
-			// handle power data if available
-			DataElemObject powerEntry = ccElectricityEntry.get("2");
-			if (powerEntry != null)
-			{
-				double activePower = Double.valueOf(powerEntry
-						.getDataElemValue("val").toString());
-				this.notifyNewActivePowerValue(DecimalMeasure
-						.valueOf(activePower + " " + SI.WATT.toString()));
-			}
+			// first time we only save update time, no more
+			if (lastUpdateTime == 0)
+				lastUpdateTime = updateTime;
 
+			else if (lastUpdateTime < updateTime)
+			{
+				// update last update time
+				lastUpdateTime = updateTime;
+				nFailedUpdate = 0;
+
+				// handle energy data if available
+				DataElemObject energyEntry = ccElectricityEntry.get("0");
+				if (energyEntry != null)
+				{
+					this.changeActiveEnergyState(Double.valueOf(energyEntry
+							.getDataElemValue("val").toString()));
+					energyUpdated = true;
+				}
+
+				// handle power data if available
+				DataElemObject powerEntry = ccElectricityEntry.get("2");
+				if (powerEntry != null)
+				{
+					this.changeActivePowerState(Double.valueOf(powerEntry
+							.getDataElemValue("val").toString()));
+					powerUpdated = true;
+
+				}
+			}
 		}
 
-		this.updateStatus();
+		if (updatedLevel || updatedOnOff || powerUpdated || energyUpdated)
+			this.updateStatus();
+	}
+
+	/**
+	 * Manages the power state update (only updates if the current state value
+	 * is different from the given one)
+	 * 
+	 * @param activeEnergy
+	 * @return
+	 */
+	private void changeActiveEnergyState(double activeEnergy)
+	{
+
+		// build the energy measure
+		DecimalMeasure<?> value = DecimalMeasure.valueOf(activeEnergy + " "
+				+ SI.KILO(SI.WATT.times(NonSI.HOUR)).toString());
+
+		// update the state
+		ActiveEnergyStateValue pValue = new ActiveEnergyStateValue();
+		pValue.setValue(value);
+		currentState.setState(
+				SinglePhaseActiveEnergyState.class.getSimpleName(),
+				new SinglePhaseActiveEnergyState(pValue));
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " active energy " + value.toString());
+
+		// notify energy change
+		this.notifyNewActiveEnergyValue(value);
+	}
+
+	/**
+	 * Manages the energy state update (only updates if the current state value
+	 * is different from the given one)
+	 * 
+	 * @param activePower
+	 * @return
+	 */
+	private void changeActivePowerState(double activePower)
+	{
+
+		// build the power measure
+		DecimalMeasure<?> powerValue = DecimalMeasure.valueOf(activePower + " "
+				+ SI.WATT.toString());
+
+		// update the state
+		ActivePowerStateValue pValue = new ActivePowerStateValue();
+		pValue.setValue(powerValue);
+		currentState.setState(
+				SinglePhaseActivePowerMeasurementState.class.getSimpleName(),
+				new SinglePhaseActivePowerMeasurementState(pValue));
+
+		// debug
+		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
+				+ " active power " + powerValue.toString());
+
+		// notify the state change
+		this.notifyNewActivePowerValue(powerValue);
+
 	}
 
 	/**
@@ -218,75 +300,97 @@ public class ZWavePowerMeteringLevelControllableOutputDriverInstance extends
 	 * @param OnOffValue
 	 *            OnOffState.ON or OnOffState.OFF
 	 */
-	private void changeCurrentState(String OnOffValue, int nLevel)
+	private boolean changeOnOffState(String OnOffValue)
 	{
-		// --------- update the on-off state ----------
+		// state changed flag
+		boolean stateChanged = false;
+
+		// get the current state value
+		String currentStateValue = "";
 		State state = currentState.getState(OnOffState.class.getSimpleName());
 
 		if (state != null)
-		{
-			// get the current state value
-			String currentStateValue = (String) state.getCurrentStateValue()[0]
+			currentStateValue = (String) state.getCurrentStateValue()[0]
 					.getValue();
 
-			// if the current states it is different from the new state
-			if (!currentStateValue.equalsIgnoreCase(OnOffValue))
+		// if the current states it is different from the new state
+		if (!currentStateValue.equalsIgnoreCase(OnOffValue))
+		{
+			State newState;
+			// set the new state to on or off...
+			if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
 			{
-				// set the new state to on or off...
-				if (OnOffValue.equalsIgnoreCase(OnOffState.ON))
-				{
-					// update the state
-					OnOffState onState = new OnOffState(new OnStateValue());
-					currentState.setState(OnOffState.class.getSimpleName(),
-							onState);
+				newState = new OnOffState(new OnStateValue());
 
-					logger.log(
-							LogService.LOG_DEBUG,
-							"Device "
-									+ device.getDeviceId()
-									+ " is now "
-									+ ((OnOffState) onState)
-											.getCurrentStateValue()[0]
-											.getValue());
-				}
-				else
-				{
-					// update the state
-					OnOffState offState = new OnOffState(new OffStateValue());
-					currentState.setState(OnOffState.class.getSimpleName(),
-							offState);
+				// send the on notification
+				this.notifyOn();
+			}
+			else
+			{
+				newState = new OnOffState(new OffStateValue());
 
-					logger.log(
-							LogService.LOG_DEBUG,
-							"Device "
-									+ device.getDeviceId()
-									+ " is now "
-									+ ((OnOffState) offState)
-											.getCurrentStateValue()[0]
-											.getValue());
-
-				}
+				// send the off notification
+				this.notifyOff();
 			}
 
-		}
-		// -------- update the level state ---------
+			// ... then set the new state for the device and throw a state
+			// changed notification
+			currentState.setState(newState.getStateName(), newState);
 
-		// create the new state value
-		LevelStateValue pValue = new LevelStateValue();
-		pValue.setValue(nLevel);
+			// state changed
+			stateChanged = true;
+		}
+
+		return stateChanged;
+	}
+
+	/**
+	 * Manages the state change operations for the level state
+	 * 
+	 * @param nLevel
+	 * @return
+	 */
+
+	@SuppressWarnings("unchecked")
+	private boolean changeLevelState(int nLevel)
+	{
+		// flag for state changes
+		boolean stateChanged = false;
 
 		// get the current state
-		LevelState currentLevelState = (LevelState) currentState
-				.getState(LevelState.class.getSimpleName());
+		// get the current state value
 
-		// if not null update the state
-		if (currentLevelState != null)
-			currentLevelState.getCurrentStateValue()[0] = pValue;
+		Measure<?, Dimensionless> currentStateValue = null;
+		State state = currentState.getState(LevelState.class.getSimpleName());
+
+		if (state != null)
+			currentStateValue = (Measure<?, Dimensionless>) state
+					.getCurrentStateValue()[0].getValue();
+
+		// check if the state is changed or not
+		if ((currentStateValue != null)
+				&& (currentStateValue.intValue(Unit.ONE) != nLevel))
+		{
+			// update the state
+			LevelStateValue pValue = new LevelStateValue();
+			pValue.setValue(DecimalMeasure.valueOf(nLevel, Unit.ONE));
+
+			// change the current level state
+			currentState.setState(LevelState.class.getSimpleName(),
+					new LevelState(pValue));
+
+			// send the changed level notification
+			this.notifyChangedLevel(DecimalMeasure.valueOf(nLevel, Unit.ONE));
+
+			// the state is changed
+			stateChanged = true;
+		}
 
 		// debug
 		logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
 				+ " dimmer at " + nLevel);
 
+		return stateChanged;
 	}
 
 	@Override

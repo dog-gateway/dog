@@ -39,7 +39,6 @@ import java.util.Set;
 
 import javax.measure.DecimalMeasure;
 import javax.measure.Measure;
-import javax.measure.quantity.Illuminance;
 import javax.measure.unit.SI;
 
 import org.osgi.framework.BundleContext;
@@ -53,7 +52,6 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
 
 	// the group set
 	private HashSet<Integer> groups;
-
 
 	public ZWaveLightSensorDriverInstance(ZWaveNetwork network,
 			ControllableDevice device, int deviceId, Set<Integer> instancesId,
@@ -77,9 +75,11 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
 	 */
 	private void initializeStates()
 	{
-		// initialize the state
+		// initialize the state value at 0.0 lx
+		LevelStateValue value = new LevelStateValue();
+		value.setValue(DecimalMeasure.valueOf(0.0, SI.LUX));
 		currentState.setState(LightIntensityState.class.getSimpleName(),
-				new LightIntensityState(new LevelStateValue()));
+				new LightIntensityState(value));
 
 		// get the initial state of the device
 		Runnable worker = new Runnable()
@@ -108,6 +108,7 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
 		// first time we only save update time, no more
 		if (lastUpdateTime == 0)
 			lastUpdateTime = ccInst.getValUpdateTime();
+
 		// Check if it is a real new value or if it is an old one.
 		else if (lastUpdateTime < ccInst.getValUpdateTime())
 		{
@@ -118,26 +119,35 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
 			// Reads values and sensorType
 			double measure = ccInst.getVal();
 
-			// build the luminance value
-			Measure<Double, Illuminance> luminosityValue = DecimalMeasure
-					.valueOf(measure, SI.LUX);
+			this.changeLightIntensityState(measure, SI.LUX.getSymbol());
 
+			// update the state
+			this.updateStatus();
+
+		}
+	}
+
+	private void changeLightIntensityState(double measure, String unitOfMeasure)
+	{
+		// build the luminosity value
+		DecimalMeasure<?> luminosityValue = DecimalMeasure.valueOf(measure
+				+ " " + unitOfMeasure);
+
+		// if the given light intensity is null, than the network-level
+		// value is not up-to-date
+		if (luminosityValue != null)
+		{
 			// update the state
 			LevelStateValue pValue = new LevelStateValue();
 			pValue.setValue(luminosityValue);
-
 			currentState.setState(LightIntensityState.class.getSimpleName(),
 					new LightIntensityState(pValue));
 
 			// debug
 			logger.log(LogService.LOG_DEBUG, "Device " + device.getDeviceId()
-					+ " light intensity " + luminosityValue.toString());
+					+ " light-intensity " + luminosityValue.toString());
 
-			// call the notify method
 			this.notifyNewLuminosityValue(luminosityValue);
-
-			// update the state
-			this.updateStatus();
 		}
 	}
 
@@ -165,8 +175,8 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
 	{
 		// remove the given group id
 		this.groups.remove(groupID);
-		
-		//notify
+
+		// notify
 		this.notifyLeftGroup(groupID);
 	}
 
@@ -175,7 +185,7 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
 	{
 		// Store the given group id
 		this.groups.add(groupID);
-		
+
 		this.notifyJoinedGroup(groupID);
 	}
 
@@ -225,7 +235,7 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
 	public void notifyJoinedGroup(Integer groupNumber)
 	{
 		// send the joined group notification
-		((LightSensor)this.device).notifyJoinedGroup(groupNumber);
+		((LightSensor) this.device).notifyJoinedGroup(groupNumber);
 
 	}
 
@@ -233,13 +243,13 @@ public class ZWaveLightSensorDriverInstance extends ZWaveDriverInstance
 	public void notifyLeftGroup(Integer groupNumber)
 	{
 		// send the left group notification
-		((LightSensor)this.device).notifyLeftGroup(groupNumber);
+		((LightSensor) this.device).notifyLeftGroup(groupNumber);
 
 	}
 
 	@Override
 	public void updateStatus()
 	{
-		((Controllable)this.device).updateStatus();
+		((Controllable) this.device).updateStatus();
 	}
 }

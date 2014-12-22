@@ -5,7 +5,7 @@
 			domoticSystem="ZWave">
 			<dhc:description>$description</dhc:description>
 			<dhc:isIn>$location</dhc:isIn>
-			<dhc:param name="NodeID" value="$nodeId" type="network" />
+			<dhc:param name="nodeId" value="$nodeId" type="network" />
 			<dhc:controlFunctionality class="AssociateFunctionality">
 				<dhc:commands>
 					<dhc:command id="AssociateCommand_$name" name="AssociateCommand_$name"

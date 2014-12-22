@@ -25,10 +25,10 @@ public class ZWaveInfo extends ConfigurationConstants
 	public static String MANUFACTURER = "ZWave";	
 	
 	// the node ID
-	public static String NODE_ID = "NodeID";
+	public static String NODE_ID = "nodeId";
 	
 	// the instance ID
-	public static String INSTANCE_ID = "InstanceID";
+	public static String INSTANCE_ID = "instanceId";
 	
 	// constant for configuration
 	public static final String PROPERTY_UPDATETIME = "updateTimeMillis";

@@ -5,9 +5,9 @@
 			domoticSystem="ZWave" gateway="$gateway">
 			<dhc:description>$description</dhc:description>
 			<dhc:isIn>$location</dhc:isIn>
-			<dhc:param value="$nodeId" name="NodeID" type="network" />
+			<dhc:param value="$nodeId" name="nodeId" type="network" />
 			#foreach( $instanceId in $instanceIds )
-			<dhc:param value="$instanceId" name="InstanceID" type="network" />
+			<dhc:param value="$instanceId" name="instanceId" type="network" />
 			#end
 			<dhc:controlFunctionality class="TemperatureMeasurementFunctionality">
 				<dhc:commands>
@@ -98,17 +98,23 @@
 			</dhc:state>
 			<dhc:state class="TemperatureState">
 				<dhc:statevalues>
-					<dhc:statevalue class="TemperatureStateValue" name="" />
+					<dhc:statevalue class="TemperatureStateValue" name="" >
+						<dhc:param name="unitOfMeasure" value="C" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="HumidityMeasurementState">
 				<dhc:statevalues>
-					<dhc:statevalue class="HumidityStateValue" name="" />
+					<dhc:statevalue class="HumidityStateValue" name="" >
+						<dhc:param name="unitOfMeasure" value="%" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 			<dhc:state class="LightIntensityState">
 				<dhc:statevalues>
-					<dhc:statevalue class="LevelStateValue" name="" />
+					<dhc:statevalue class="LevelStateValue" name="" >
+						<dhc:param name="unitOfMeasure" value="Lux" />
+					</dhc:statevalue>
 				</dhc:statevalues>
 			</dhc:state>
 		</dhc:device>
