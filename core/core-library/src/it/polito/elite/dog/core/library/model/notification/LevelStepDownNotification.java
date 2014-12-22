@@ -34,6 +34,7 @@ public class LevelStepDownNotification implements NonParametricLevelNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/LevelStepDownNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

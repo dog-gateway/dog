@@ -33,8 +33,6 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
-import javax.measure.Measure;
-
 import it.polito.elite.dog.core.library.model.notification.*;
 public class DogPelletHeater extends AbstractDevice implements PelletHeater
 {
@@ -68,35 +66,11 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 		}
 	}
 
-	public void cool()
+	public void standBy()
 	{
 		if(this.driver!=null)
 		{
-			((PelletHeater) this.driver).cool();
-		}
-	}
-
-	public void stopHeatingOrCooling()
-	{
-		if(this.driver!=null)
-		{
-			((PelletHeater) this.driver).stopHeatingOrCooling();
-		}
-	}
-
-	public void setTemperatureAt(Measure<?,?>  temperature)
-	{
-		if(this.driver!=null)
-		{
-			((PelletHeater) this.driver).setTemperatureAt(temperature);
-		}
-	}
-
-	public void heat()
-	{
-		if(this.driver!=null)
-		{
-			((PelletHeater) this.driver).heat();
+			((PelletHeater) this.driver).standBy();
 		}
 	}
 
@@ -112,16 +86,16 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 
 	/*Generated Notifications*/
 
-	/*Notification: ChangedDesiredTemperatureNotification*/
-	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue){
-		ChangedDesiredTemperatureNotification notificationEvent=new ChangedDesiredTemperatureNotification(newTemperatureValue );
+	/*Notification: CoolNotification*/
+	public void notifyCool(){
+		CoolNotification notificationEvent=new CoolNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: CoolNotification*/
-	public void notifyCool(){
-		CoolNotification notificationEvent=new CoolNotification();
+	/*Notification: FiringUpNotification*/
+	public void notifyFiringUp(){
+		FiringUpNotification notificationEvent=new FiringUpNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -147,9 +121,9 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StopHeatingCoolingNotification*/
-	public void notifyStoppedHeatingOrCooling(){
-		StopHeatingCoolingNotification notificationEvent=new StopHeatingCoolingNotification();
+	/*Notification: StandByNotification*/
+	public void notifyStandby(){
+		StandByNotification notificationEvent=new StandByNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

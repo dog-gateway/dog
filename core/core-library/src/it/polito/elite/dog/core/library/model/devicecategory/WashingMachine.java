@@ -46,35 +46,46 @@ public interface WashingMachine extends WhiteGoods
 	public void pause();
 	public Object[] getEventsAndAlerts();
 	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
+	public void standBy();
 	public void off();
 	public Measure<?,?>  getStartTime();
 
 
 	/*Generated Notifications*/
 
+	/*Notification: StartedHeatingCycleNotification*/
+	public void notifyStartedHeatingCycle();
 	/*Notification: StartApplianceNotification*/
 	public void notifyStart();
+	/*Notification: StoppedHeatingCycleNotification*/
+	public void notifyStoppedHeatingCycle();
 	/*Notification: MultipleEventNotification*/
 	public void notifyNewEventSet(Object[] events);
-	/*Notification: EventNotification*/
-	public void notifyNewEvent(Object event);
 	/*Notification: MultipleAlertNotification*/
 	public void notifyNewAlertSet(Object[] alerts);
+	/*Notification: EventNotification*/
+	public void notifyNewEvent(Object event);
+	/*Notification: StartedWashingNotification*/
+	public void notifyStartedWashOrRinseCycle();
 	/*Notification: AlertNotification*/
 	public void notifyNewAlert(Object alert);
-	/*Notification: StartTimeChangedNotification*/
-	public void notifyChangedStartTime(Measure<?,?>  startTime);
-	/*Notification: OnNotification*/
-	public void notifyOn();
+	/*Notification: StoppedWashingNotification*/
+	public void notifyStoppedWashOrRinseCycle();
 	/*Notification: EndTimeChangedNotification*/
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: OffNotification*/
-	public void notifyOff();
 	/*Notification: StopApplianceNotification*/
 	public void notifyStop();
+	/*Notification: OffNotification*/
+	public void notifyOff();
+	/*Notification: StartTimeChangedNotification*/
+	public void notifyChangedStartTime(Measure<?,?>  startTime);
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: PauseApplianceNotification*/
 	public void notifyPause();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	public void updateStatus();
 }

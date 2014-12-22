@@ -36,6 +36,7 @@ public class EndTimeChangedNotification implements ApplianceCycleTimingNotificat
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/EndTimeChangedNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

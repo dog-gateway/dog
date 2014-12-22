@@ -36,6 +36,7 @@ public class RemainingTimeChangedNotification implements ApplianceCycleTimingNot
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/RemainingTimeChangedNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

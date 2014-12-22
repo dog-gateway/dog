@@ -37,19 +37,20 @@ public interface MicrowaveOven extends Oven
 	public static int MATCH_SUB_TYPE=50;
 	public static int MATCH_MANUFACTURER=0;
 
-	public void startSuperHeating();
-	public Measure<?,?>  getRemainingTime();
-	public void stop();
 	public DeviceStatus getState();
 	public Measure<?,?>  getEndTime();
 	public void on();
 	public void stopSuperHeating();
-	public void start();
-	public void pause();
-	public Object[] getEventsAndAlerts();
 	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
 	public void off();
+	public Measure<?,?>  getRemainingTime();
+	public void startSuperHeating();
+	public void stop();
+	public void start();
+	public Object[] getEventsAndAlerts();
+	public void pause();
 	public Measure<?,?>  getStartTime();
+	public void standBy();
 
 
 	/*Generated Notifications*/
@@ -68,19 +69,25 @@ public interface MicrowaveOven extends Oven
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: OffNotification*/
-	public void notifyOff();
 	/*Notification: StopApplianceNotification*/
 	public void notifyStop();
+	/*Notification: OffNotification*/
+	public void notifyOff();
 	/*Notification: StoppedSuperHeatingNotification*/
 	public void notifyStoppedSuperHeating();
 	/*Notification: StartTimeChangedNotification*/
 	public void notifyChangedStartTime(Measure<?,?>  startTime);
+	/*Notification: EmittingMicrowavesNotification*/
+	public void notifyEmittingMicrowaves();
+	/*Notification: NotEmittingMicrowavesNotification*/
+	public void notifyNotEmittingMicrowaves();
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: StartedSuperHeatingNotification*/
-	public void notifyStartedSuperHeating();
 	/*Notification: PauseApplianceNotification*/
 	public void notifyPause();
+	/*Notification: StartedSuperHeatingNotification*/
+	public void notifyStartedSuperHeating();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	public void updateStatus();
 }

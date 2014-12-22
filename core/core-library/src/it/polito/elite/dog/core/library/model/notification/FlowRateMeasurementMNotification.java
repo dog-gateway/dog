@@ -29,6 +29,7 @@ package it.polito.elite.dog.core.library.model.notification;
 
 import javax.measure.Measure;
 
+import it.polito.elite.dog.core.library.model.notification.annotation.NotificationParam;
 public class FlowRateMeasurementMNotification implements ParametricNotification
 {
 	public static String notificationName = "changedFlowRateAt";
@@ -36,6 +37,7 @@ public class FlowRateMeasurementMNotification implements ParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/FlowRateMeasurementMNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;
@@ -60,6 +62,7 @@ public class FlowRateMeasurementMNotification implements ParametricNotification
 	public Measure<?,?>  getFlowRateValue(){
 		return this.flowRateValue;
 }
+	@NotificationParam("sensorID")
 	public String getSensorID(){
 		return this.sensorID;
 }

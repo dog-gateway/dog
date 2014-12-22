@@ -29,6 +29,7 @@ package it.polito.elite.dog.core.library.model.notification;
 
 import javax.measure.Measure;
 
+import it.polito.elite.dog.core.library.model.notification.annotation.NotificationParam;
 public class PressureMeasurementMNotification implements ParametricNotification
 {
 	public static String notificationName = "changedPressureAt";
@@ -36,6 +37,7 @@ public class PressureMeasurementMNotification implements ParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/PressureMeasurementMNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;
@@ -60,6 +62,7 @@ public class PressureMeasurementMNotification implements ParametricNotification
 	public Measure<?,?>  getPressureValue(){
 		return this.pressureValue;
 }
+	@NotificationParam("sensorID")
 	public String getSensorID(){
 		return this.sensorID;
 }

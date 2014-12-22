@@ -34,6 +34,7 @@ public class TuningStepUpNotification implements NonParametricLevelNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/TuningStepUpNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

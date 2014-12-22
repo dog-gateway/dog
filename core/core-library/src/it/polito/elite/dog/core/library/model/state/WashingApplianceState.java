@@ -22,21 +22,12 @@
 package it.polito.elite.dog.core.library.model.state;
 
 
-import it.polito.elite.dog.core.library.model.statevalue.FailureStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.ConnectedStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.PauseStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.ProgramInterruptedStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.StandByStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.RunningStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.HeatingStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.RinseHoldStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.ProgrammedStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.ProgrammedAndWaitingToStartStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.IdleStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 
 
-import it.polito.elite.dog.core.library.model.statevalue.EndProgrammedStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.WashRinseStateValue;
 
 
 
@@ -54,48 +45,9 @@ public class WashingApplianceState extends GenericApplianceState
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String PAUSE = "pause";
-	public static final String FAILURE = "failure";
-	public static final String STANDBY = "standBy";
 	public static final String RINSEHOLD = "rinseHold";
-	public static final String IDLE = "idle";
-	public static final String PROGRAMMEDANDWAITINGTOSTART = "programmedAndWaitingToStart";
-	public static final String ENDPROGRAMMED = "endProgrammed";
-	public static final String PROGRAMINTERRUPTED = "programInterrupted";
-	public static final String PROGRAMMED = "programmed";
-	public static final String OFF = "off";
-	public static final String RUNNING = "running";
-	public static final String CONNECTED = "connected";
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(PauseStateValue pausestatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{pausestatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(FailureStateValue failurestatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{failurestatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(StandByStateValue standbystatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{standbystatevalue});
-	}
+	public static final String WASHORRINSE = "washOrRinse";
+	public static final String HEATING = "heating";
 
 
 	/**
@@ -111,97 +63,28 @@ public class WashingApplianceState extends GenericApplianceState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public WashingApplianceState(IdleStateValue idlestatevalue)
+	public WashingApplianceState(WashRinseStateValue washrinsestatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{idlestatevalue});
+		super(new StateValue[]{washrinsestatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public WashingApplianceState(ProgrammedAndWaitingToStartStateValue programmedandwaitingtostartstatevalue)
+	public WashingApplianceState(HeatingStateValue heatingstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{programmedandwaitingtostartstatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(EndProgrammedStateValue endprogrammedstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{endprogrammedstatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(ProgramInterruptedStateValue programinterruptedstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{programinterruptedstatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(ProgrammedStateValue programmedstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{programmedstatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(OffStateValue offstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{offstatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(RunningStateValue runningstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{runningstatevalue});
-	}
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public WashingApplianceState(ConnectedStateValue connectedstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{connectedstatevalue});
+		super(new StateValue[]{heatingstatevalue});
 	}
 
 	@Deprecated
 	private void initCommon()
 	{
-		this.old2NewMap.put(WashingApplianceState.PAUSE, new PauseStateValue());
-		this.old2NewMap.put(WashingApplianceState.FAILURE, new FailureStateValue());
-		this.old2NewMap.put(WashingApplianceState.STANDBY, new StandByStateValue());
 		this.old2NewMap.put(WashingApplianceState.RINSEHOLD, new RinseHoldStateValue());
-		this.old2NewMap.put(WashingApplianceState.IDLE, new IdleStateValue());
-		this.old2NewMap.put(WashingApplianceState.PROGRAMMEDANDWAITINGTOSTART, new ProgrammedAndWaitingToStartStateValue());
-		this.old2NewMap.put(WashingApplianceState.ENDPROGRAMMED, new EndProgrammedStateValue());
-		this.old2NewMap.put(WashingApplianceState.PROGRAMINTERRUPTED, new ProgramInterruptedStateValue());
-		this.old2NewMap.put(WashingApplianceState.PROGRAMMED, new ProgrammedStateValue());
-		this.old2NewMap.put(WashingApplianceState.OFF, new OffStateValue());
-		this.old2NewMap.put(WashingApplianceState.RUNNING, new RunningStateValue());
-		this.old2NewMap.put(WashingApplianceState.CONNECTED, new ConnectedStateValue());
+		this.old2NewMap.put(WashingApplianceState.WASHORRINSE, new WashRinseStateValue());
+		this.old2NewMap.put(WashingApplianceState.HEATING, new HeatingStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

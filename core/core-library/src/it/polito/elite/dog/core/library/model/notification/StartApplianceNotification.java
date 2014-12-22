@@ -34,6 +34,7 @@ public class StartApplianceNotification implements ApplianceRunNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/StartApplianceNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

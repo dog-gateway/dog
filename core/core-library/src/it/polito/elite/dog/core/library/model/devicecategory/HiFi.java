@@ -84,10 +84,10 @@ public interface HiFi extends Entertainment
 	public void notifyFwd();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
-	/*Notification: RewindNotification*/
-	public void notifyRew();
 	/*Notification: StopPlaybackNotification*/
 	public void notifyStop();
+	/*Notification: RewindNotification*/
+	public void notifyRew();
 	/*Notification: ChannelControlNotification*/
 	public void notifyChangedChannel(String channelId);
 	public void updateStatus();

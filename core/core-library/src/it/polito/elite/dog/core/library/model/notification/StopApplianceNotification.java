@@ -34,6 +34,7 @@ public class StopApplianceNotification implements ApplianceRunNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/StopApplianceNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

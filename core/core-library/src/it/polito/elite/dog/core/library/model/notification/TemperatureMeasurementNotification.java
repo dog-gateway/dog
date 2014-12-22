@@ -36,6 +36,7 @@ public class TemperatureMeasurementNotification implements ParametricNotificatio
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/TemperatureMeasurementNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

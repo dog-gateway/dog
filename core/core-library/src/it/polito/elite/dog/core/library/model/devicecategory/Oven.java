@@ -37,19 +37,20 @@ public interface Oven extends WhiteGoods
 	public static int MATCH_SUB_TYPE=50;
 	public static int MATCH_MANUFACTURER=0;
 
-	public void startSuperHeating();
-	public Measure<?,?>  getRemainingTime();
-	public void stop();
 	public DeviceStatus getState();
 	public Measure<?,?>  getEndTime();
 	public void on();
 	public void stopSuperHeating();
-	public void start();
-	public void pause();
-	public Object[] getEventsAndAlerts();
 	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
 	public void off();
+	public Measure<?,?>  getRemainingTime();
+	public void startSuperHeating();
+	public void stop();
+	public void start();
+	public Object[] getEventsAndAlerts();
+	public void pause();
 	public Measure<?,?>  getStartTime();
+	public void standBy();
 
 
 	/*Generated Notifications*/
@@ -62,25 +63,27 @@ public interface Oven extends WhiteGoods
 	public void notifyNewAlertSet(Object[] alerts);
 	/*Notification: EventNotification*/
 	public void notifyNewEvent(Object event);
+	/*Notification: StoppedSuperHeatingNotification*/
+	public void notifyStoppedSuperHeating();
 	/*Notification: AlertNotification*/
 	public void notifyNewAlert(Object alert);
+	/*Notification: StartTimeChangedNotification*/
+	public void notifyChangedStartTime(Measure<?,?>  startTime);
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: EndTimeChangedNotification*/
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
 	/*Notification: OffNotification*/
 	public void notifyOff();
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop();
-	/*Notification: StoppedSuperHeatingNotification*/
-	public void notifyStoppedSuperHeating();
-	/*Notification: StartTimeChangedNotification*/
-	public void notifyChangedStartTime(Measure<?,?>  startTime);
-	/*Notification: OnNotification*/
-	public void notifyOn();
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	/*Notification: StartedSuperHeatingNotification*/
 	public void notifyStartedSuperHeating();
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause();
 	public void updateStatus();
 }

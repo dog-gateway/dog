@@ -34,6 +34,7 @@ public class IdleNotification implements ZWaveNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/IdleNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

@@ -152,16 +152,16 @@ public class DogSinglePhaseElectricityMeter extends AbstractDevice implements Si
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SinglePhaseReactivePowerMeasurementNotification*/
-	public void notifyNewReactivePowerValue(Measure<?,?>  powerValue){
-		SinglePhaseReactivePowerMeasurementNotification notificationEvent=new SinglePhaseReactivePowerMeasurementNotification(powerValue );
+	/*Notification: SinglePhaseActivePowerMeasurementNotification*/
+	public void notifyNewActivePowerValue(Measure<?,?>  powerValue){
+		SinglePhaseActivePowerMeasurementNotification notificationEvent=new SinglePhaseActivePowerMeasurementNotification(powerValue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SinglePhaseActivePowerMeasurementNotification*/
-	public void notifyNewActivePowerValue(Measure<?,?>  powerValue){
-		SinglePhaseActivePowerMeasurementNotification notificationEvent=new SinglePhaseActivePowerMeasurementNotification(powerValue );
+	/*Notification: SinglePhaseReactivePowerMeasurementNotification*/
+	public void notifyNewReactivePowerValue(Measure<?,?>  powerValue){
+		SinglePhaseReactivePowerMeasurementNotification notificationEvent=new SinglePhaseReactivePowerMeasurementNotification(powerValue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

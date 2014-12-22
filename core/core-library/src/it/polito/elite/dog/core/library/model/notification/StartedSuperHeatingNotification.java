@@ -34,6 +34,7 @@ public class StartedSuperHeatingNotification implements SuperHeatingNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/StartedSuperHeatingNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

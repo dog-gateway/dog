@@ -33,9 +33,6 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
-import javax.measure.Measure;
-
-import it.polito.elite.dog.core.library.model.notification.*;
 public class DogGasHeater extends AbstractDevice implements GasHeater
 {
 
@@ -60,100 +57,10 @@ public class DogGasHeater extends AbstractDevice implements GasHeater
 		 return null;
 	}
 
-	public void on()
-	{
-		if(this.driver!=null)
-		{
-			((GasHeater) this.driver).on();
-		}
-	}
-
-	public void cool()
-	{
-		if(this.driver!=null)
-		{
-			((GasHeater) this.driver).cool();
-		}
-	}
-
-	public void stopHeatingOrCooling()
-	{
-		if(this.driver!=null)
-		{
-			((GasHeater) this.driver).stopHeatingOrCooling();
-		}
-	}
-
-	public void setTemperatureAt(Measure<?,?>  temperature)
-	{
-		if(this.driver!=null)
-		{
-			((GasHeater) this.driver).setTemperatureAt(temperature);
-		}
-	}
-
-	public void heat()
-	{
-		if(this.driver!=null)
-		{
-			((GasHeater) this.driver).heat();
-		}
-	}
-
-	public void off()
-	{
-		if(this.driver!=null)
-		{
-			((GasHeater) this.driver).off();
-		}
-	}
-
 
 
 	/*Generated Notifications*/
 
-	/*Notification: ChangedDesiredTemperatureNotification*/
-	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue){
-		ChangedDesiredTemperatureNotification notificationEvent=new ChangedDesiredTemperatureNotification(newTemperatureValue );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: CoolNotification*/
-	public void notifyCool(){
-		CoolNotification notificationEvent=new CoolNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: OnNotification*/
-	public void notifyOn(){
-		OnNotification notificationEvent=new OnNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: HeatNotification*/
-	public void notifyHeat(){
-		HeatNotification notificationEvent=new HeatNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: OffNotification*/
-	public void notifyOff(){
-		OffNotification notificationEvent=new OffNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: StopHeatingCoolingNotification*/
-	public void notifyStoppedHeatingOrCooling(){
-		StopHeatingCoolingNotification notificationEvent=new StopHeatingCoolingNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	@Override
 	public void updateStatus()
 	{

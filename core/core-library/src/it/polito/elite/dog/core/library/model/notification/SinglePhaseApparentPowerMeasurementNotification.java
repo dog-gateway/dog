@@ -36,6 +36,7 @@ public class SinglePhaseApparentPowerMeasurementNotification implements Parametr
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/SinglePhaseApparentPowerMeasurementNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

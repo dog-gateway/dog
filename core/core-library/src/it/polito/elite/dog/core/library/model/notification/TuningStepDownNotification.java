@@ -34,6 +34,7 @@ public class TuningStepDownNotification implements NonParametricLevelNotificatio
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/TuningStepDownNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

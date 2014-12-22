@@ -34,6 +34,7 @@ public class OpenNotification implements NonParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/OpenNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

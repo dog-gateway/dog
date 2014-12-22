@@ -56,14 +56,14 @@ public interface Tv extends Entertainment
 	public void notifyChannelStepUp();
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: TuningStepUpNotification*/
-	public void notifyChannelStepDown();
 	/*Notification: LevelControlNotification*/
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
-	/*Notification: StandByNotification*/
-	public void notifyStandby();
+	/*Notification: TuningStepUpNotification*/
+	public void notifyChannelStepDown();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	/*Notification: ChannelControlNotification*/
 	public void notifyChangedChannel(String channelId);
 	public void updateStatus();

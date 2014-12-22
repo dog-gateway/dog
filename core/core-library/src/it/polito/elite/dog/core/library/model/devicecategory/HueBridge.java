@@ -29,17 +29,22 @@ package it.polito.elite.dog.core.library.model.devicecategory;
 
 
 import it.polito.elite.dog.core.library.model.DeviceStatus;
-public interface HueBridge extends HomeGateway
+public interface HueBridge extends HueComponent
 {
 	public static int MATCH_TYPE=100;
 	public static int MATCH_SUB_TYPE=50;
 	public static int MATCH_MANUFACTURER=0;
 
 	public DeviceStatus getState();
-	public void link();
+	public void stopPushLinkAuth();
+	public void startPushLinkAuth();
 
 
 	/*Generated Notifications*/
 
+	/*Notification: PushLinkAuthenticationIdleNotification*/
+	public void notifyDeactivatedPushLinkAuth();
+	/*Notification: PushLinkAuthenticationActiveNotification*/
+	public void notifyActivatedPushLinkAuth();
 	public void updateStatus();
 }

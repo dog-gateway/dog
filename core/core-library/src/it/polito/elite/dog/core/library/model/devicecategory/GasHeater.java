@@ -29,8 +29,6 @@ package it.polito.elite.dog.core.library.model.devicecategory;
 
 
 import it.polito.elite.dog.core.library.model.DeviceStatus;
-import javax.measure.Measure;
-
 public interface GasHeater extends Heater
 {
 	public static int MATCH_TYPE=100;
@@ -38,27 +36,9 @@ public interface GasHeater extends Heater
 	public static int MATCH_MANUFACTURER=0;
 
 	public DeviceStatus getState();
-	public void on();
-	public void cool();
-	public void stopHeatingOrCooling();
-	public void setTemperatureAt(Measure<?,?>  temperature);
-	public void heat();
-	public void off();
 
 
 	/*Generated Notifications*/
 
-	/*Notification: ChangedDesiredTemperatureNotification*/
-	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
-	/*Notification: CoolNotification*/
-	public void notifyCool();
-	/*Notification: OnNotification*/
-	public void notifyOn();
-	/*Notification: HeatNotification*/
-	public void notifyHeat();
-	/*Notification: OffNotification*/
-	public void notifyOff();
-	/*Notification: StopHeatingCoolingNotification*/
-	public void notifyStoppedHeatingOrCooling();
 	public void updateStatus();
 }

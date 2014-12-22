@@ -33,6 +33,8 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
+import it.polito.elite.dog.core.library.model.color.RGBColor;
+import it.polito.elite.dog.core.library.model.color.HSBColor;
 import it.polito.elite.dog.core.library.model.notification.*;
 import javax.measure.Measure;
 
@@ -76,6 +78,14 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		 return null;
 	}
 
+	public void setColorRGB(RGBColor colorRGB)
+	{
+		if(this.driver!=null)
+		{
+			((ColorDimmableLight) this.driver).setColorRGB(colorRGB);
+		}
+	}
+
 	public void storeScene(Integer sceneNumber)
 	{
 		if(this.driver!=null)
@@ -116,6 +126,14 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		}
 	}
 
+	public void setColorHSB(HSBColor colorHSB)
+	{
+		if(this.driver!=null)
+		{
+			((ColorDimmableLight) this.driver).setColorHSB(colorHSB);
+		}
+	}
+
 	public void storeGroup(Integer groupID)
 	{
 		if(this.driver!=null)
@@ -150,13 +168,6 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: ColorNotification*/
-	public void notifyChangedColor(String colorRGB){
-		ColorNotification notificationEvent=new ColorNotification(colorRGB );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber){
 		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
@@ -178,6 +189,13 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	/*Notification: ColorRGBNotification*/
+	public void notifyChangedColorRGB(RGBColor colorRGB){
+		ColorRGBNotification notificationEvent=new ColorRGBNotification(colorRGB );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
 	/*Notification: OffNotification*/
 	public void notifyOff(){
 		OffNotification notificationEvent=new OffNotification();
@@ -188,6 +206,13 @@ public class DogColorDimmableLight extends AbstractDevice implements ColorDimmab
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber){
 		LeaveGroupNotification notificationEvent=new LeaveGroupNotification(groupNumber );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: ColorHSBNotification*/
+	public void notifyChangedColorHSB(HSBColor colorHSB){
+		ColorHSBNotification notificationEvent=new ColorHSBNotification(colorHSB );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

@@ -36,6 +36,7 @@ public class Co2MeasurementNotification implements ParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/Co2MeasurementNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

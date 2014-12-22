@@ -34,6 +34,7 @@ public class PressedUpNotification implements NonParametricNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/PressedUpNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

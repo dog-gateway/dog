@@ -36,6 +36,7 @@ public class SpeedControlNotification implements ParametricLevelNotification
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/SpeedControlNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;

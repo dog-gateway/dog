@@ -36,6 +36,7 @@ public class DailyClimateScheduleNotification implements ClimateScheduleNotifica
 	public static String notificationTopic="it/polito/elite/dog/core/library/model/notification/DailyClimateScheduleNotification";
 
 	private String deviceUri;
+
 	public String getDeviceUri()
 	{
 		return this.deviceUri;
