@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: EnOceanNetworkDriver
+Bundle-SymbolicName: org.doggateway.dog.drivers.enocean.network
+Bundle-Version: 1.0.0
+Bundle-Vendor: The Dog Gateway
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Service-Component: OSGI-INF/enocean-network-driver.xml
+Import-Package: it.polito.elite.enocean.enj.communication,
+ it.polito.elite.enocean.enj.eep
