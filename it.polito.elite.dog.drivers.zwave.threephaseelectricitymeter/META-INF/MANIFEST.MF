@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ZWaveThreephaseelectricitymeter
 Bundle-SymbolicName: it.polito.elite.dog.drivers.zwave.threephaseelectricitymeter
-Bundle-Version: 1.1.1
+Bundle-Version: 1.1.2
 Bundle-Vendor: it.polito.elite
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/component.xml
