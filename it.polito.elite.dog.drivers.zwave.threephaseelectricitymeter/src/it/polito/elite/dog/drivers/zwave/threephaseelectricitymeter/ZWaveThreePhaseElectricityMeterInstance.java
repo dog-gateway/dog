@@ -95,7 +95,6 @@ public class ZWaveThreePhaseElectricityMeterInstance extends
 		String activeEnergyUOM = SI.WATT.times(NonSI.HOUR).toString();
 		String activePowerUOM = SI.WATT.toString();
 
-
 		// ------------ Three Phase Active Power
 		// --------------------------------
 		ActivePowerStateValue activePowerStateL1 = new ActivePowerStateValue();
@@ -164,81 +163,76 @@ public class ZWaveThreePhaseElectricityMeterInstance extends
 			Controller controllerNode, String sValue)
 	{
 		this.deviceNode = deviceNode;
-		
-		//the state change flag
+
+		// the state change flag
 		boolean energyUpdated = false;
 		boolean powerUpdated = false;
 
 		// Read the value associated with the right CommandClass
-		// instance 0 doesn't contains sensor data
-		if (instanceNode.getInstanceId() != 0)
+
+		// meter values are in
+		// devices.X.instances.1.commandClasses.50.data.0 (KwH) and
+		// devices.X.instances.1.commandClasses.50.data.2 (W)
+		CommandClasses ccElectricityEntry = instanceNode.getCommandClasses()
+				.get(ZWaveAPI.COMMAND_CLASS_METER);
+
+		// tin pants...
+		if (ccElectricityEntry != null)
 		{
-			// meter values are in
-			// devices.X.instances.1.commandClasses.50.data.0 (KwH) and
-			// devices.X.instances.1.commandClasses.50.data.2 (W)
-			CommandClasses ccElectricityEntry = instanceNode
-					.getCommandClasses().get(ZWaveAPI.COMMAND_CLASS_METER);
-
-			// tin pants...
-			if (ccElectricityEntry != null)
+			// prevent errors on first inclusion
+			DataElemObject data0 = ccElectricityEntry.get("0");
+			if (data0 != null)
 			{
-				// prevent errors on first inclusion
-				DataElemObject data0 = ccElectricityEntry.get("0");
-				if (data0 != null)
+				Object data0Value = data0.getDataElemValue("val");
+				if (data0Value != null)
 				{
-					Object data0Value = data0.getDataElemValue("val");
-					if (data0Value != null)
-					{
-						double activeEnergy = Double.valueOf(data0Value
-								.toString());
+					double activeEnergy = Double.valueOf(data0Value.toString());
 
-						String phaseID = "L" + instanceNode.getInstanceId();
-						DecimalMeasure<?> value = DecimalMeasure
-								.valueOf(activeEnergy + " "
-										+ SI.KILO(SI.WATT.times(NonSI.HOUR)));
+					String phaseID = "L" + instanceNode.getInstanceId();
+					DecimalMeasure<?> value = DecimalMeasure
+							.valueOf(activeEnergy + " "
+									+ SI.KILO(SI.WATT.times(NonSI.HOUR)));
 
-						this.updateThreePhaseStateValue(
-								ThreePhaseActiveEnergyState.class
-										.getSimpleName(), phaseID, value);
+					this.updateThreePhaseStateValue(
+							ThreePhaseActiveEnergyState.class.getSimpleName(),
+							phaseID, value);
 
-						notifyNewActiveEnergyValue(phaseID, value);
-						
-						//update the state change flag
-						energyUpdated = true;
-					}
-				}
+					notifyNewActiveEnergyValue(phaseID, value);
 
-				// prevent errors on first inclusion
-				DataElemObject data2 = ccElectricityEntry.get("2");
-				if (data2 != null)
-				{
-					Object data2Value = data2.getDataElemValue("val");
-					if (data2Value != null)
-					{
-						double activePower = Double.valueOf(data2Value
-								.toString());
-
-						// update the state....
-						// the phase id
-						String phaseID = "L" + instanceNode.getInstanceId();
-						DecimalMeasure<?> value = DecimalMeasure
-								.valueOf(activePower + " " + SI.WATT);
-
-						this.updateThreePhaseStateValue(
-								ThreePhaseActivePowerMeasurementState.class
-										.getSimpleName(), phaseID, value);
-
-						notifyNewActivePowerValue(phaseID, value);
-						
-						//update the state change flag
-						powerUpdated = true;
-					}
+					// update the state change flag
+					energyUpdated = true;
 				}
 			}
 
-			if(energyUpdated||powerUpdated)
-				this.updateStatus();
+			// prevent errors on first inclusion
+			DataElemObject data2 = ccElectricityEntry.get("2");
+			if (data2 != null)
+			{
+				Object data2Value = data2.getDataElemValue("val");
+				if (data2Value != null)
+				{
+					double activePower = Double.valueOf(data2Value.toString());
+
+					// update the state....
+					// the phase id
+					String phaseID = "L" + instanceNode.getInstanceId();
+					DecimalMeasure<?> value = DecimalMeasure
+							.valueOf(activePower + " " + SI.WATT);
+
+					this.updateThreePhaseStateValue(
+							ThreePhaseActivePowerMeasurementState.class
+									.getSimpleName(), phaseID, value);
+
+					notifyNewActivePowerValue(phaseID, value);
+
+					// update the state change flag
+					powerUpdated = true;
+				}
+			}
 		}
+
+		if (energyUpdated || powerUpdated)
+			this.updateStatus();
 	}
 
 	@Override
