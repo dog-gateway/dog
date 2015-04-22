@@ -123,14 +123,16 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends
 		this.deviceNode = deviceNode;
 
 		// Read the value associated with the right CommandClass
-		// instance 0 doesn't contains sensor data
-		if (instanceNode.getInstanceId() != 0)
+
+		// meter values are in
+		// devices.X.instances.x.commandClasses.50.data.0 (KwH) and
+		// devices.X.instances.x.commandClasses.50.data.2 (W)
+		CommandClasses ccElectricityEntry = instanceNode.getCommandClasses()
+				.get(ZWaveAPI.COMMAND_CLASS_METER);
+
+		//
+		if (ccElectricityEntry != null)
 		{
-			// meter values are in
-			// devices.X.instances.1.commandClasses.50.data.0 (KwH) and
-			// devices.X.instances.1.commandClasses.50.data.2 (W)
-			CommandClasses ccElectricityEntry = instanceNode
-					.getCommandClasses().get(ZWaveAPI.COMMAND_CLASS_METER);
 
 			// the energy updated flag
 			boolean energyUpdated = false;
@@ -184,7 +186,6 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends
 					this.updateStatus();
 			}
 		}
-
 	}
 
 	/**
@@ -306,14 +307,11 @@ public class ZWaveSinglePhaseElectricityMeterInstance extends
 
 		for (Integer instanceId : instancesId)
 		{
-			// only trigger instance 1
-			if (instanceId == 1)
-			{
-				HashSet<Integer> ccSet = new HashSet<Integer>();
-				ccSet.add(ZWaveAPI.COMMAND_CLASS_METER);
-				ccSet.add(ZWaveAPI.COMMAND_CLASS_SENSOR_MULTILEVEL);
-				instanceCommand.put(instanceId, ccSet);
-			}
+			HashSet<Integer> ccSet = new HashSet<Integer>();
+			ccSet.add(ZWaveAPI.COMMAND_CLASS_METER);
+			ccSet.add(ZWaveAPI.COMMAND_CLASS_SENSOR_MULTILEVEL);
+			instanceCommand.put(instanceId, ccSet);
+
 		}
 		ZWaveNodeInfo nodeInfo = new ZWaveNodeInfo(deviceId, instanceCommand,
 				isController);
