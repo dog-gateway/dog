@@ -17,21 +17,32 @@
  */
 package org.doggateway.dog.drivers.enocean.network;
 
-import org.doggateway.dog.drivers.enocean.network.interfaces.EnOceanNetwork;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.StatefulDevice;
 
 /**
  * @author bonino
  *
  */
-public class EnOceanDriverImpl implements EnOceanNetwork
+public abstract class EnOceanDriverInstance implements StatefulDevice
 {
 
 	/**
 	 * 
 	 */
-	public EnOceanDriverImpl()
+	public EnOceanDriverInstance()
 	{
 		// TODO Auto-generated constructor stub
+	}
+
+	/* (non-Javadoc)
+	 * @see it.polito.elite.dog.core.library.model.StatefulDevice#getState()
+	 */
+	@Override
+	public DeviceStatus getState()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
