@@ -17,11 +17,15 @@
  */
 package org.doggateway.dog.drivers.enocean.network.interfaces;
 
+import org.doggateway.dog.drivers.enocean.network.info.EnOceanDeviceInfo;
+
 /**
  * @author bonino
  *
  */
 public interface EnOceanDeviceDiscoveryListener
 {
+
+	void addedEnOceanDevice(EnOceanDeviceInfo devInfo);
 
 }

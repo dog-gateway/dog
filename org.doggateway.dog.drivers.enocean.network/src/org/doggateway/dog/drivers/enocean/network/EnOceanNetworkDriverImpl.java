@@ -19,6 +19,10 @@ package org.doggateway.dog.drivers.enocean.network;
 
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.enocean.enj.communication.EnJConnection;
+import it.polito.elite.enocean.enj.communication.EnJDeviceListener;
+import it.polito.elite.enocean.enj.link.EnJLink;
+import it.polito.elite.enocean.enj.model.EnOceanDevice;
+import it.polito.elite.enocean.enj.util.ByteUtils;
 
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -37,8 +41,19 @@ import org.osgi.service.log.LogService;
  * @author bonino
  *
  */
-public class EnOceanNetworkDriverImpl implements EnOceanNetwork, ManagedService
+public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
+		ManagedService, EnJDeviceListener
 {
+	// -------- the configuration parameters ---------
+
+	// serial port
+	public static final String SERIAL_PORT = "serialPort";
+
+	// persistent low-level device db
+	public static final String DEVICE_DB = "deviceDB";
+
+	// ------------------------------------------------
+
 	// the bundle context
 	private BundleContext bundleContext;
 
@@ -60,7 +75,10 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork, ManagedService
 	private HashSet<EnOceanDeviceDiscoveryListener> deviceDiscoveryListeners;
 
 	// the low-level EnOcean communication library
-	private EnJConnection enOcean;
+	private EnJConnection enOceanConnection;
+
+	// the lowest-level EnOcean link
+	private EnJLink enOceanLink;
 
 	/**
 	 * Initializes the inner data structures, while not instantiating the
@@ -120,22 +138,68 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork, ManagedService
 	public void addDriver(EnOceanDeviceInfo devInfo,
 			EnOceanDriverInstance driver)
 	{
-		// TODO Auto-generated method stub
+		// "register" the driver for the given device
+		if (this.availableDevices.containsKey(devInfo.getUid()))
+		{
+			// the device is already known, just add the driver
+			this.connectedDrivers.put(devInfo, driver);
+		}
+		else
+		{
+			// the device does not exist, check if information is complete and
+			// in such a case, add the device,
+			// this will in principle trigger a "discovery cycle, to avoid such
+			// a trigger, register the device in the list of available devices.
+			String address = devInfo.getAddress();
+			String eep = devInfo.getEep();
+
+			if ((address != null) && (!address.isEmpty()) && (eep != null)
+					&& (!eep.isEmpty()))
+			{
+				// add the device to the set of available devices
+				this.availableDevices.put(devInfo.getUid(), devInfo);
+
+				// add the driver
+				this.connectedDrivers.put(devInfo, driver);
+
+				// create the device
+				this.enOceanConnection.addNewDevice(address, eep);
+			}
+
+		}
 
 	}
 
 	@Override
 	public void removeDriver(EnOceanDriverInstance driver)
 	{
-		// TODO Auto-generated method stub
+		// removes all subscriptions related to this driver (not the device as
+		// it might still be reachable on the network)
+		HashSet<EnOceanDeviceInfo> keysToRemove = new HashSet<EnOceanDeviceInfo>();
 
+		// find lines to remove
+		for (EnOceanDeviceInfo device : this.connectedDrivers.keySet())
+		{
+			if (this.connectedDrivers.get(device).equals(driver))
+				keysToRemove.add(device);
+		}
+
+		// remove
+		for (EnOceanDeviceInfo key : keysToRemove)
+		{
+			this.connectedDrivers.remove(key);
+		}
 	}
 
 	@Override
 	public void addDeviceDiscoveryListener(
 			EnOceanDeviceDiscoveryListener listener)
 	{
-		// TODO Auto-generated method stub
+		//add the listener to the set of device discovery listeners
+		if (this.deviceDiscoveryListeners != null)
+			this.deviceDiscoveryListeners.add(listener);
+		else
+			this.logger.log(LogService.LOG_ERROR, "The device discovery listener set has not been initialized.");
 
 	}
 
@@ -143,8 +207,9 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork, ManagedService
 	public void removeDeviceDiscoveryListener(
 			EnOceanDeviceDiscoveryListener listener)
 	{
-		// TODO Auto-generated method stub
-
+		// remove the listener from the list, if exists
+		if((this.deviceDiscoveryListeners!=null)&&(!this.deviceDiscoveryListeners.isEmpty()))
+			this.deviceDiscoveryListeners.remove(listener);
 	}
 
 	@Override
@@ -178,9 +243,138 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork, ManagedService
 		// database, if needed.
 		if (properties != null)
 		{
-			//debug log
+			// debug log
 			logger.log(LogService.LOG_DEBUG,
 					"Received configuration properties");
+
+			// get the serial port to which the physical gateway is connected
+			// TODO: implement a serial port scanner process to remove the need
+			// to
+			// explicitly set the serial port to connect to
+			String serialPort = (String) properties
+					.get(EnOceanNetworkDriverImpl.SERIAL_PORT);
+
+			// get the device db filename, can be empty
+			String deviceDB = (String) properties
+					.get(EnOceanNetworkDriverImpl.DEVICE_DB);
+
+			// check if needed parameters are available
+			if ((serialPort != null) && (!serialPort.isEmpty()))
+			{
+				try
+				{
+					// create the lowest link layer
+					this.enOceanLink = new EnJLink("/dev/ttyUSB0");
+
+					// check the low-level device db filename
+					if ((deviceDB != null) && (!deviceDB.isEmpty()))
+					{
+						this.enOceanConnection = new EnJConnection(
+								this.enOceanLink, deviceDB, this);
+					}
+					else
+					{
+						this.enOceanConnection = new EnJConnection(
+								this.enOceanLink, null, this);
+					}
+
+					// connect to the serial port, i.e. to the EnOcean gateway
+					this.enOceanLink.connect();
+
+					// update the service registration
+					this.registerNetworkService();
+				}
+				catch (Exception e)
+				{
+					this.logger
+							.log(LogService.LOG_ERROR,
+									"Unable to connect to the EnOcean serial interface.",
+									e);
+				}
+			}
+
+		}
+
+	}
+
+	/*************************************************
+	 * 
+	 * EnOcean EnJDeviceListener
+	 * 
+	 ************************************************/
+
+	@Override
+	public void addedEnOceanDevice(EnOceanDevice device)
+	{
+		// check if the device has already been seen
+		if (!this.availableDevices.containsKey(device.getDeviceUID()))
+		{
+			// build the corresponding device info
+			final EnOceanDeviceInfo devInfo = new EnOceanDeviceInfo(
+					device.getDeviceUID(), ByteUtils.toHexString(device
+							.getAddress()), device.getEEP().getEEPIdentifier()
+							.asEEPString());
+
+			// store the device info
+			this.availableDevices.put(device.getDeviceUID(), devInfo);
+
+			// trigger device discovery (separate thread to avoid locking)
+
+			// the triggering task
+			Runnable discoveryTask = new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					// iterate over all discovery listeners
+					for (EnOceanDeviceDiscoveryListener listener : deviceDiscoveryListeners)
+					{
+						// notify the addition
+						listener.addedEnOceanDevice(devInfo);
+					}
+
+				}
+			};
+
+			// the worker thread
+			Thread worker = new Thread(discoveryTask);
+
+			// start the task
+			worker.start();
+
+		}
+		/*
+		 * else { //handle device re-connection }
+		 */
+
+	}
+
+	@Override
+	public void modifiedEnOceanDevice(EnOceanDevice changedDevice)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removedEnOceanDevice(EnOceanDevice changedDevice)
+	{
+		// handle device removal
+
+		// check if the device is "registered"
+		if (this.availableDevices.containsKey(changedDevice.getDeviceUID()))
+		{
+			// check if any driver is "connected to the device"
+			EnOceanDriverInstance driverInstance = this.connectedDrivers
+					.get(this.availableDevices.get(changedDevice.getDeviceUID()));
+
+			// update the binding
+			// here the driver shall be informed that the device is no more
+			// connected
+			// possible actions: remove subscription fro network and "trigger" a
+			// device status change (more in the DAL view), do nothing
+
 		}
 
 	}
