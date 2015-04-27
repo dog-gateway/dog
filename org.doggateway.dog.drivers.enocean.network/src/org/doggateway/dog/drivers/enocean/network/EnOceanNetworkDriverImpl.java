@@ -195,11 +195,13 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 	public void addDeviceDiscoveryListener(
 			EnOceanDeviceDiscoveryListener listener)
 	{
-		//add the listener to the set of device discovery listeners
+		// add the listener to the set of device discovery listeners
 		if (this.deviceDiscoveryListeners != null)
 			this.deviceDiscoveryListeners.add(listener);
 		else
-			this.logger.log(LogService.LOG_ERROR, "The device discovery listener set has not been initialized.");
+			this.logger
+					.log(LogService.LOG_ERROR,
+							"The device discovery listener set has not been initialized.");
 
 	}
 
@@ -208,7 +210,8 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 			EnOceanDeviceDiscoveryListener listener)
 	{
 		// remove the listener from the list, if exists
-		if((this.deviceDiscoveryListeners!=null)&&(!this.deviceDiscoveryListeners.isEmpty()))
+		if ((this.deviceDiscoveryListeners != null)
+				&& (!this.deviceDiscoveryListeners.isEmpty()))
 			this.deviceDiscoveryListeners.remove(listener);
 	}
 
@@ -320,28 +323,39 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 
 			// trigger device discovery (separate thread to avoid locking)
 
-			// the triggering task
-			Runnable discoveryTask = new Runnable()
+			// *****************************
+			// enable discovery only if the new device was created upon a
+			// teach-in request. Remains to check if it is sufficient to verify
+			// the teach-in status of the lower-level library, and if does not
+			// generates issues at some point.
+			// *****************************
+			if (this.enOceanConnection.isTeachInEnabled()
+					|| this.enOceanConnection.isSmartTeachInEnabled())
 			{
 
-				@Override
-				public void run()
+				// the triggering task
+				Runnable discoveryTask = new Runnable()
 				{
-					// iterate over all discovery listeners
-					for (EnOceanDeviceDiscoveryListener listener : deviceDiscoveryListeners)
+
+					@Override
+					public void run()
 					{
-						// notify the addition
-						listener.addedEnOceanDevice(devInfo);
+						// iterate over all discovery listeners
+						for (EnOceanDeviceDiscoveryListener listener : deviceDiscoveryListeners)
+						{
+							// notify the addition
+							listener.addedEnOceanDevice(devInfo);
+						}
+
 					}
+				};
 
-				}
-			};
+				// the worker thread
+				Thread worker = new Thread(discoveryTask);
 
-			// the worker thread
-			Thread worker = new Thread(discoveryTask);
-
-			// start the task
-			worker.start();
+				// start the task
+				worker.start();
+			}
 
 		}
 		/*
