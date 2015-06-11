@@ -143,6 +143,14 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 		{
 			// the device is already known, just add the driver
 			this.connectedDrivers.put(devInfo, driver);
+
+			// get the low-level device described by the given device info
+			EnOceanDevice device = this.enOceanConnection.getDevice(devInfo
+					.getUid());
+
+			// connect the driver instance with the low-level device to enable
+			// direct attachment of EEPListeners and easier configuration set-up
+			driver.setEnoceanDevice(device);
 		}
 		else
 		{
@@ -218,7 +226,9 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 	@Override
 	public void enableTeachIn(int timeoutMillis, boolean smart)
 	{
-		// TODO Auto-generated method stub
+		// forward the command to the low-level library
+		this.enOceanConnection.setSmartTeachIn(smart);
+		this.enOceanConnection.enableTeachIn(timeoutMillis);
 
 	}
 
@@ -226,15 +236,40 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 	public void enableExplicitTeachIn(String deviceLowAddress,
 			String deviceEEP, int timeoutMillis)
 	{
-		// TODO Auto-generated method stub
+		// forward the command to the low-level library
+		this.enOceanConnection.enableTeachIn(deviceLowAddress, deviceEEP,
+				timeoutMillis);
 
 	}
 
 	@Override
 	public void addDevice(String deviceLowAddress, String deviceEEP)
 	{
-		// TODO Auto-generated method stub
+		// this actually should be performed as part of the device-specific
+		// driver "registration", if the given device is not yet available at
+		// the network level, however we decided to leave an open stub for any
+		// possible unforeseen cases in which device addition should be
+		// performed apart.
+		if ((deviceLowAddress != null) && (!deviceLowAddress.isEmpty())
+				&& (deviceEEP != null) && (!deviceEEP.isEmpty()))
+		{
+			// create the device
+			this.enOceanConnection.addNewDevice(deviceLowAddress, deviceEEP);
 
+			// this in turn should trigger a call to the registered
+			// EnJDeviceListener, i.e. this class instance.
+		}
+	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see org.doggateway.dog.drivers.enocean.network.interfaces.EnOceanNetwork#getConnection()
+	 */
+	@Override
+	public EnJConnection getConnection()
+	{
+		return this.enOceanConnection;
 	}
 
 	@Override
@@ -386,6 +421,8 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 			// update the binding
 			// here the driver shall be informed that the device is no more
 			// connected
+			driverInstance.unsetEnOceanDevice(changedDevice);
+			
 			// possible actions: remove subscription fro network and "trigger" a
 			// device status change (more in the DAL view), do nothing
 

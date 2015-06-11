@@ -17,6 +17,8 @@
  */
 package org.doggateway.dog.drivers.enocean.network.interfaces;
 
+import it.polito.elite.enocean.enj.communication.EnJConnection;
+
 import org.doggateway.dog.drivers.enocean.network.EnOceanDriverInstance;
 import org.doggateway.dog.drivers.enocean.network.info.EnOceanDeviceInfo;
 
@@ -124,4 +126,12 @@ public interface EnOceanNetwork
 	 *            device user manual.
 	 */
 	public void addDevice(String deviceLowAddress, String deviceEEP);
+
+	/**
+	 * Provides a "direct" pointer to the EnJConnection object managed by the
+	 * driver, permits single driver instances to send device-specific commands.
+	 * 
+	 * @return
+	 */
+	public EnJConnection getConnection();
 }

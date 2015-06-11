@@ -15,24 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package org.doggateway.dog.drivers.enocean.network.interfaces;
+package org.doggateway.dog.drivers.enocean.network.info;
 
-import org.doggateway.dog.drivers.enocean.network.info.EnOceanDeviceInfo;
+import it.polito.elite.dog.core.library.model.ConfigurationConstants;
 
 /**
  * @author bonino
  *
  */
-public interface EnOceanDeviceDiscoveryListener
+public class EnOceanInfo extends ConfigurationConstants
 {
-	/**
-	 * Handles the addition of a new enOcean device at the low-level, this might
-	 * correspond to the "generation" of a new device in Dog.
-	 * 
-	 * @param devInfo
-	 *            The {@link EnOceanDeviceInfo} describing the newly added
-	 *            device.
-	 */
-	public void addedEnOceanDevice(EnOceanDeviceInfo devInfo);
+	public static final String ENOCEAN_DEVICE_UID = "uid";
+	public static final String ENOCEAN_DEVICE_EEP = "eep";
+	public static final String ENOCEAD_DEVICE_ADDRESS = "address";
 
 }
