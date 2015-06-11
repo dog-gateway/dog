@@ -302,7 +302,7 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 				try
 				{
 					// create the lowest link layer
-					this.enOceanLink = new EnJLink("/dev/ttyUSB0");
+					this.enOceanLink = new EnJLink(serialPort);
 
 					// check the low-level device db filename
 					if ((deviceDB != null) && (!deviceDB.isEmpty()))
