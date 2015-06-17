@@ -318,6 +318,9 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 
 					// connect to the serial port, i.e. to the EnOcean gateway
 					this.enOceanLink.connect();
+					
+					//log
+					this.logger.log(LogService.LOG_INFO, "peristent device set size: "+this.enOceanConnection.getKnownDevices().size());
 
 					// update the service registration
 					this.registerNetworkService();
@@ -364,8 +367,8 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 			// the teach-in status of the lower-level library, and if does not
 			// generates issues at some point.
 			// *****************************
-			if (this.enOceanConnection.isTeachInEnabled()
-					|| this.enOceanConnection.isSmartTeachInEnabled())
+			if ((this.enOceanConnection!=null)&&((this.enOceanConnection.isTeachInEnabled()
+					|| this.enOceanConnection.isSmartTeachInEnabled())))
 			{
 
 				// the triggering task
