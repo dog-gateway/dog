@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package org.doggateway.dog.drivers.enocean.network.info;
+package org.doggateway.drivers.enocean.network.info;
 
 /**
  * @author bonino

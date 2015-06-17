@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package org.doggateway.dog.drivers.enocean.network.interfaces;
+package org.doggateway.drivers.enocean.network.interfaces;
 
 import it.polito.elite.enocean.enj.communication.EnJConnection;
 
-import org.doggateway.dog.drivers.enocean.network.EnOceanDriverInstance;
-import org.doggateway.dog.drivers.enocean.network.info.EnOceanDeviceInfo;
+import org.doggateway.drivers.enocean.network.EnOceanDriverInstance;
+import org.doggateway.drivers.enocean.network.info.EnOceanDeviceInfo;
 
 /**
  * @author bonino

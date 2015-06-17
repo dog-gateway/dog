@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package org.doggateway.dog.drivers.enocean.network;
+package org.doggateway.drivers.enocean.network;
 
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.enocean.enj.communication.EnJConnection;
@@ -28,9 +28,9 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.doggateway.dog.drivers.enocean.network.info.EnOceanDeviceInfo;
-import org.doggateway.dog.drivers.enocean.network.interfaces.EnOceanDeviceDiscoveryListener;
-import org.doggateway.dog.drivers.enocean.network.interfaces.EnOceanNetwork;
+import org.doggateway.drivers.enocean.network.info.EnOceanDeviceInfo;
+import org.doggateway.drivers.enocean.network.interfaces.EnOceanDeviceDiscoveryListener;
+import org.doggateway.drivers.enocean.network.interfaces.EnOceanNetwork;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -320,7 +320,7 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 					this.enOceanLink.connect();
 					
 					//log
-					this.logger.log(LogService.LOG_INFO, "peristent device set size: "+this.enOceanConnection.getKnownDevices().size());
+					this.logger.log(LogService.LOG_INFO, "persistent device set size: "+this.enOceanConnection.getKnownDevices().size());
 
 					// update the service registration
 					this.registerNetworkService();

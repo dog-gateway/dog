@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package org.doggateway.dog.drivers.enocean.network;
+package org.doggateway.drivers.enocean.network;
 
 import it.polito.elite.dog.core.library.model.CNParameters;
 import it.polito.elite.dog.core.library.model.ControllableDevice;
@@ -29,9 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.doggateway.dog.drivers.enocean.network.info.EnOceanDeviceInfo;
-import org.doggateway.dog.drivers.enocean.network.info.EnOceanInfo;
-import org.doggateway.dog.drivers.enocean.network.interfaces.EnOceanNetwork;
+import org.doggateway.drivers.enocean.network.info.EnOceanDeviceInfo;
+import org.doggateway.drivers.enocean.network.info.EnOceanInfo;
+import org.doggateway.drivers.enocean.network.interfaces.EnOceanNetwork;
 
 /**
  * @author bonino
