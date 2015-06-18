@@ -126,7 +126,7 @@ public abstract class EnOceanDriverInstance implements StatefulDevice,
 
 			// get the device address
 			Set<String> addresses = deviceConfigurationParams
-					.get(EnOceanInfo.ENOCEAD_DEVICE_ADDRESS);
+					.get(EnOceanInfo.ENOCEAN_DEVICE_ADDRESS);
 
 			// the only mandatory information is the uid
 			if ((uids != null) && (uids.size() == 1))

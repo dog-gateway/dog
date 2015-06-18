@@ -20,6 +20,7 @@ package org.doggateway.drivers.enocean.network;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.enocean.enj.communication.EnJConnection;
 import it.polito.elite.enocean.enj.communication.EnJDeviceListener;
+import it.polito.elite.enocean.enj.communication.EnJTeachInListener;
 import it.polito.elite.enocean.enj.link.EnJLink;
 import it.polito.elite.enocean.enj.model.EnOceanDevice;
 import it.polito.elite.enocean.enj.util.ByteUtils;
@@ -31,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.doggateway.drivers.enocean.network.info.EnOceanDeviceInfo;
 import org.doggateway.drivers.enocean.network.interfaces.EnOceanDeviceDiscoveryListener;
 import org.doggateway.drivers.enocean.network.interfaces.EnOceanNetwork;
+import org.doggateway.drivers.enocean.network.interfaces.EnOceanTeachInActivationListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -42,7 +44,7 @@ import org.osgi.service.log.LogService;
  *
  */
 public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
-		ManagedService, EnJDeviceListener
+		ManagedService, EnJDeviceListener, EnJTeachInListener
 {
 	// -------- the configuration parameters ---------
 
@@ -74,6 +76,9 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 	// the set of device discovery listeners
 	private HashSet<EnOceanDeviceDiscoveryListener> deviceDiscoveryListeners;
 
+	// the set of teach-in listeners
+	private HashSet<EnOceanTeachInActivationListener> teachInListeners;
+
 	// the low-level EnOcean communication library
 	private EnJConnection enOceanConnection;
 
@@ -95,6 +100,9 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 
 		// initialize the set of device discovery listeners
 		this.deviceDiscoveryListeners = new HashSet<EnOceanDeviceDiscoveryListener>();
+		
+		// initializa the set of teach-in activation listeners
+		this.teachInListeners = new HashSet<EnOceanTeachInActivationListener>();
 	}
 
 	/**
@@ -224,12 +232,36 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 	}
 
 	@Override
+	public void addTeachInActivationListener(
+			EnOceanTeachInActivationListener listener)
+	{
+		// add the listener to the set of device discovery listeners
+		if (this.teachInListeners != null)
+			this.teachInListeners.add(listener);
+		else
+			this.logger
+					.log(LogService.LOG_ERROR,
+							"The EnOcean teach-in listener set has not been initialized.");
+
+	}
+
+	@Override
+	public void removeTeachInActivationListener(
+			EnOceanTeachInActivationListener listener)
+	{
+		// remove the listener from the list, if exists
+		if ((this.teachInListeners != null)
+				&& (!this.teachInListeners.isEmpty()))
+			this.teachInListeners.remove(listener);
+	}
+
+	@Override
 	public void enableTeachIn(int timeoutMillis, boolean smart)
 	{
 		// forward the command to the low-level library
 		this.enOceanConnection.setSmartTeachIn(smart);
 		this.enOceanConnection.enableTeachIn(timeoutMillis);
-
+		this.notifyTeachIn(true);
 	}
 
 	@Override
@@ -239,6 +271,7 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 		// forward the command to the low-level library
 		this.enOceanConnection.enableTeachIn(deviceLowAddress, deviceEEP,
 				timeoutMillis);
+		this.notifyTeachIn(true);
 
 	}
 
@@ -260,16 +293,35 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 			// EnJDeviceListener, i.e. this class instance.
 		}
 	}
-	
-	
 
-	/* (non-Javadoc)
-	 * @see org.doggateway.dog.drivers.enocean.network.interfaces.EnOceanNetwork#getConnection()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.doggateway.dog.drivers.enocean.network.interfaces.EnOceanNetwork#
+	 * getConnection()
 	 */
 	@Override
 	public EnJConnection getConnection()
 	{
 		return this.enOceanConnection;
+	}
+
+	@Override
+	public void teachInEnabled(boolean smart)
+	{
+		// notify listeners
+		for (EnOceanTeachInActivationListener listener : this.teachInListeners)
+			listener.teachInEnabled();
+	}
+
+	@Override
+	public void teachInDisabled()
+	{
+		// notify listeners
+		for (EnOceanTeachInActivationListener listener : this.teachInListeners)
+			listener.teachInDisabled();
+
 	}
 
 	@Override
@@ -314,13 +366,20 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 					{
 						this.enOceanConnection = new EnJConnection(
 								this.enOceanLink, null, this);
+						
 					}
+					if(this.enOceanConnection != null)
+						//set this network driver as listener for teach-in status
+						this.enOceanConnection.addEnJTeachInListener(this);
 
 					// connect to the serial port, i.e. to the EnOcean gateway
 					this.enOceanLink.connect();
-					
-					//log
-					this.logger.log(LogService.LOG_INFO, "persistent device set size: "+this.enOceanConnection.getKnownDevices().size());
+
+					// log
+					this.logger.log(LogService.LOG_INFO,
+							"persistent device set size: "
+									+ this.enOceanConnection.getKnownDevices()
+											.size());
 
 					// update the service registration
 					this.registerNetworkService();
@@ -367,8 +426,9 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 			// the teach-in status of the lower-level library, and if does not
 			// generates issues at some point.
 			// *****************************
-			if ((this.enOceanConnection!=null)&&((this.enOceanConnection.isTeachInEnabled()
-					|| this.enOceanConnection.isSmartTeachInEnabled())))
+			if ((this.enOceanConnection != null)
+					&& ((this.enOceanConnection.isTeachInEnabled() || this.enOceanConnection
+							.isSmartTeachInEnabled())))
 			{
 
 				// the triggering task
@@ -425,7 +485,7 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 			// here the driver shall be informed that the device is no more
 			// connected
 			driverInstance.unsetEnOceanDevice(changedDevice);
-			
+
 			// possible actions: remove subscription fro network and "trigger" a
 			// device status change (more in the DAL view), do nothing
 
@@ -469,6 +529,16 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 			this.regServiceEnOceanDriverImpl.unregister();
 		}
 
+	}
+
+	private void notifyTeachIn(boolean teachIn)
+	{
+		// notify listeners
+		for (EnOceanTeachInActivationListener listener : this.teachInListeners)
+			if (teachIn)
+				listener.teachInEnabled();
+			else
+				listener.teachInDisabled();
 	}
 
 }

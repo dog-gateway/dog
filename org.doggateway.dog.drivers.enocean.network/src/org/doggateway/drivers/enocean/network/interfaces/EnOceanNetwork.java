@@ -72,6 +72,26 @@ public interface EnOceanNetwork
 	 */
 	public void removeDeviceDiscoveryListener(
 			EnOceanDeviceDiscoveryListener listener);
+	
+	/**
+	 * Adds a listener for handling the logic related to new device discovery,
+	 * and to carry the corresponding tasks, including steps needed to register
+	 * the new device in the OSGi framework.
+	 * 
+	 * @param listener
+	 *            The device discovery listener to be added.
+	 */
+	public void addTeachInActivationListener(
+			EnOceanTeachInActivationListener listener);
+
+	/**
+	 * Removes the given device discovery listener from the set of listeners
+	 * being notified when a new device is discovered at the network level.
+	 * 
+	 * @param listener
+	 */
+	public void removeTeachInActivationListener(
+			EnOceanTeachInActivationListener listener);
 
 	/**
 	 * Sets the EnOcean gateway device in "Teach In" mode which enables learning

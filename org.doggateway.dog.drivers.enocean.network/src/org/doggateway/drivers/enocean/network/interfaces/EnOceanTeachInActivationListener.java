@@ -15,20 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package org.doggateway.drivers.enocean.network.info;
-
-import it.polito.elite.dog.core.library.model.ConfigurationConstants;
+package org.doggateway.drivers.enocean.network.interfaces;
 
 /**
  * @author bonino
  *
  */
-public class EnOceanInfo extends ConfigurationConstants
+public interface EnOceanTeachInActivationListener
 {
-	public static final String ENOCEAN_DEVICE_UID = "uid";
-	public static final String ENOCEAN_DEVICE_EEP = "eep";
-	public static final String ENOCEAN_DEVICE_ADDRESS = "address";
-	public static final String MANUFACTURER = "EnOcean";
-	public static final String UPDATE_TIME = "updateTimeMillis";
-
+	/**
+	 * Called when the enocean network layer is in the teach-in mode
+	 **/
+	public void teachInEnabled();
+	
+	/**
+	 * called when the enocean network leaves the teach in mode
+	 **/
+	public void teachInDisabled();
 }
