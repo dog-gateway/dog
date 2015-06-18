@@ -28,5 +28,6 @@ public class EnOceanInfo extends ConfigurationConstants
 	public static final String ENOCEAN_DEVICE_UID = "uid";
 	public static final String ENOCEAN_DEVICE_EEP = "eep";
 	public static final String ENOCEAD_DEVICE_ADDRESS = "address";
+	public static final String MANUFACTURER = "EnOcean";
 
 }
