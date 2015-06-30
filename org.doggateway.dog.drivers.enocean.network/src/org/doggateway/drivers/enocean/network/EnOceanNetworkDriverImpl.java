@@ -368,6 +368,7 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 								this.enOceanLink, null, this);
 						
 					}
+					
 					if(this.enOceanConnection != null)
 						//set this network driver as listener for teach-in status
 						this.enOceanConnection.addEnJTeachInListener(this);
