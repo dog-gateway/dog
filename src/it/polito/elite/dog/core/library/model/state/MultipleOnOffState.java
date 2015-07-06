@@ -22,8 +22,8 @@
 package it.polito.elite.dog.core.library.model.state;
 
 
-import it.polito.elite.dog.core.library.model.statevalue.MultipleOffStateValue;
-import it.polito.elite.dog.core.library.model.statevalue.MultipleOnStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.OffStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.OnStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 
 
@@ -51,27 +51,27 @@ public class MultipleOnOffState extends DiscreteState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public MultipleOnOffState(MultipleOnStateValue multipleonstatevalue)
+	public MultipleOnOffState(OnStateValue onstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{multipleonstatevalue});
+		super(new StateValue[]{onstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public MultipleOnOffState(MultipleOffStateValue multipleoffstatevalue)
+	public MultipleOnOffState(OffStateValue offstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{multipleoffstatevalue});
+		super(new StateValue[]{offstatevalue});
 	}
 
 	@Deprecated
 	private void initCommon()
 	{
-		this.old2NewMap.put(MultipleOnOffState.ON, new MultipleOnStateValue());
-		this.old2NewMap.put(MultipleOnOffState.OFF, new MultipleOffStateValue());
+		this.old2NewMap.put(MultipleOnOffState.ON, new OnStateValue());
+		this.old2NewMap.put(MultipleOnOffState.OFF, new OffStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).
