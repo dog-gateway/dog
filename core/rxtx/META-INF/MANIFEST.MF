@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RXTX
 Bundle-SymbolicName: org.rxtx
-Bundle-Version: 2.1.7
+Bundle-Version: 2.2
 Bundle-ClassPath: lib/RXTXcomm.jar
-Export-Package: gnu.io;version="2.1.7"
+Export-Package: gnu.io
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-NativeCode: 
  nativelib/linux/i686-unknown-linux-gnu/librxtxParallel.so;
