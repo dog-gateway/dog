@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+	<dhc:controllables>
+		<dhc:device class="SingleTemperatureSensor" id="$name"
+			domoticSystem="EnOcean" gateway="$gateway">
+			<dhc:description>$description</dhc:description>
+			<dhc:isIn>$location</dhc:isIn>
+			<dhc:param value="$address" name="address" type="network" />
+			<dhc:param value="$eep" name="eep" type="network" />
+			<dhc:param value="$uid" name="uid" type="network" />
+			<dhc:controlFunctionality class="TemperatureMeasurementFunctionality">
+				<dhc:commands>
+					<dhc:command class="GetTemperatureCommand" name="GetTemperatureCommand_$name"
+						id="GetTemperatureCommand_$name">
+						<dhc:param name="realCommandName" value="getTemperature" />
+						<dhc:param name="returnType" value="Measure" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:notificationFunctionality
+				class="TemperatureMeasurementNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification class="TemperatureMeasurementNotification"
+						id="TemperatureMeasurementNotification_$name">
+						<dhc:param name="nParams" value="2" />
+						<dhc:param name="notificationName" value="newTemperatureValue" />
+						<dhc:param name="unitOfMeasure" value="C" />
+						<dhc:param name="notificationParamName" value="temperatureValue"
+							type="Measure" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:state class="TemperatureState">
+				<dhc:statevalues>
+					<dhc:statevalue class="TemperatureStateValue" name="">
+						<dhc:param name="unitOfMeasure" value="C" />
+					</dhc:statevalue>
+				</dhc:statevalues>
+			</dhc:state>
+		</dhc:device>
+	</dhc:controllables>
+</dhc:dogHomeConfiguration>
