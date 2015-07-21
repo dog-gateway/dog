@@ -22,6 +22,7 @@ import it.polito.elite.dog.communication.rest.device.command.ClimateSchedulePayl
 import it.polito.elite.dog.communication.rest.device.command.CommandPayload;
 import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedulePayload;
 import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
+import it.polito.elite.dog.communication.rest.device.command.ExplicitTeachInPayload;
 import it.polito.elite.dog.communication.rest.device.command.HSBColorPayload;
 import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
 import it.polito.elite.dog.communication.rest.device.command.RGBColorPayload;
@@ -40,6 +41,7 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
 import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
+import it.polito.elite.dog.core.library.model.technology.ExplicitTeachInData;
 import it.polito.elite.dog.core.library.util.Executor;
 import it.polito.elite.dog.core.library.util.LogHelper;
 
@@ -138,6 +140,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		this.payloads.add(MeasurePayload.class);
 		this.payloads.add(HSBColorPayload.class);
 		this.payloads.add(RGBColorPayload.class);
+		this.payloads.add(ExplicitTeachInPayload.class);
 		
 		// initialize the instance-wide object mapper
 		this.mapper = new ObjectMapper();
