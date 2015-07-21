@@ -33,7 +33,6 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
-import it.polito.elite.dog.core.library.model.notification.*;
 public class DogEnOceanComponent extends AbstractDevice implements EnOceanComponent
 {
 
@@ -49,14 +48,6 @@ public class DogEnOceanComponent extends AbstractDevice implements EnOceanCompon
 	}
 
 
-	public void teachIn()
-	{
-		if(this.driver!=null)
-		{
-			((EnOceanComponent) this.driver).teachIn();
-		}
-	}
-
 	public DeviceStatus getState()
 	{
 		if(this.driver!=null)
@@ -66,40 +57,10 @@ public class DogEnOceanComponent extends AbstractDevice implements EnOceanCompon
 		 return null;
 	}
 
-	public void explicitTeachIn(String deviceHexAddress, String deviceEEP)
-	{
-		if(this.driver!=null)
-		{
-			((EnOceanComponent) this.driver).explicitTeachIn(deviceHexAddress, deviceEEP);
-		}
-	}
-
-	public void smartTeachIn()
-	{
-		if(this.driver!=null)
-		{
-			((EnOceanComponent) this.driver).smartTeachIn();
-		}
-	}
-
 
 
 	/*Generated Notifications*/
 
-	/*Notification: TeachInEndedNotification*/
-	public void notifyDeactivatedTeachIn(){
-		TeachInEndedNotification notificationEvent=new TeachInEndedNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: TeachInActiveNotification*/
-	public void notifyActivatedTeachIn(){
-		TeachInActiveNotification notificationEvent=new TeachInActiveNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	@Override
 	public void updateStatus()
 	{

@@ -33,6 +33,7 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
+import it.polito.elite.dog.core.library.model.technology.ExplicitTeachInData;
 import it.polito.elite.dog.core.library.model.notification.*;
 public class DogEnOceanGateway extends AbstractDevice implements EnOceanGateway
 {
@@ -66,11 +67,11 @@ public class DogEnOceanGateway extends AbstractDevice implements EnOceanGateway
 		 return null;
 	}
 
-	public void explicitTeachIn(String deviceHexAddress, String deviceEEP)
+	public void explicitTeachIn(ExplicitTeachInData teachInData)
 	{
 		if(this.driver!=null)
 		{
-			((EnOceanGateway) this.driver).explicitTeachIn(deviceHexAddress, deviceEEP);
+			((EnOceanGateway) this.driver).explicitTeachIn(teachInData);
 		}
 	}
 

@@ -29,6 +29,7 @@ package it.polito.elite.dog.core.library.model.devicecategory;
 
 
 import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.technology.ExplicitTeachInData;
 public interface EnOceanGateway extends EnOceanComponent
 {
 	public static int MATCH_TYPE=100;
@@ -37,7 +38,7 @@ public interface EnOceanGateway extends EnOceanComponent
 
 	public void teachIn();
 	public DeviceStatus getState();
-	public void explicitTeachIn(String deviceHexAddress, String deviceEEP);
+	public void explicitTeachIn(ExplicitTeachInData teachInData);
 	public void smartTeachIn();
 
 
