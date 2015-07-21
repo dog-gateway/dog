@@ -28,6 +28,7 @@ import it.polito.elite.dog.core.library.model.state.State;
 import it.polito.elite.dog.core.library.model.state.TeachInState;
 import it.polito.elite.dog.core.library.model.statevalue.IdleStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.TeachingInStateValue;
+import it.polito.elite.dog.core.library.model.technology.ExplicitTeachInData;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.enocean.enj.eep.EEPAttribute;
 import it.polito.elite.enocean.enj.model.EnOceanDevice;
@@ -153,11 +154,11 @@ public class EnOceanGatewayDriverInstance extends EnOceanDriverInstance
 	}
 
 	@Override
-	public void explicitTeachIn(String deviceHexAddress, String deviceEEP)
+	public void explicitTeachIn(ExplicitTeachInData teachingData)
 	{
 		// enable explicit teach-in
 		// TODO: make timeout configurable in the gateway configuration file
-		this.network.enableExplicitTeachIn(deviceHexAddress, deviceEEP,
+		this.network.enableExplicitTeachIn(teachingData.getDeviceHexAddress(), teachingData.getDeviceEEP(),
 				EnOceanGatewayDriverInstance.DEFAULT_TEACH_IN_TIMEOUT);
 	}
 
