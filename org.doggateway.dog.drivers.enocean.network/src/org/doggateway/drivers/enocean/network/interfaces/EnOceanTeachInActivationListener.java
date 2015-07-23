@@ -18,7 +18,9 @@
 package org.doggateway.drivers.enocean.network.interfaces;
 
 /**
- * @author bonino
+ * Defines the interactions needed to react to teach-in status changes.
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public interface EnOceanTeachInActivationListener
@@ -27,7 +29,7 @@ public interface EnOceanTeachInActivationListener
 	 * Called when the enocean network layer is in the teach-in mode
 	 **/
 	public void teachInEnabled();
-	
+
 	/**
 	 * called when the enocean network leaves the teach in mode
 	 **/

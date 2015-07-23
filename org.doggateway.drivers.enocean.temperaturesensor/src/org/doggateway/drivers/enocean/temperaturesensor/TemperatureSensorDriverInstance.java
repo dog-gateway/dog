@@ -1,5 +1,19 @@
-/**
+/*
+ * Dog - EnOcean Temperature Sensor Driver
  * 
+ * Copyright 2015 Dario Bonino 
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package org.doggateway.drivers.enocean.temperaturesensor;
 
@@ -26,7 +40,14 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * <p>
+ * Implements the actual handling, in Dog, of EnOcean devices having an EEP in
+ * the A502XX family. Takes care of registering needed listeners and hooks to
+ * both the network and gateway driver and, handles status updates and
+ * notifications for corresponding devices in Dog.
+ * </p>
+ *
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
@@ -36,6 +57,13 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 	// the class logger
 	private LogHelper logger;
 
+	/**
+	 * Class constructor, builds a fully functional instance of Single Temperature Sensor driver
+	 * @param enOceanNetwork The EnOcean network driver used to access the low-level network infrastructure
+	 * @param device The Dog device to which this instance shall be connected
+	 * @param updateTimeMillis The required update time in millis (not needed inthis case)
+	 * @param context The bundle context to perform any needed operation involving the OSGi Framework (e.g., logging)
+	 */
 	public TemperatureSensorDriverInstance(EnOceanNetwork enOceanNetwork,
 			ControllableDevice device, int updateTimeMillis,
 			BundleContext context)
@@ -144,22 +172,22 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 	@Override
 	public Measure<?, ?> getTemperature()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		// provides back the current temperature
+		return (Measure<?, ?>) this.currentState.getState(
+				TemperatureState.class.getSimpleName()).getCurrentStateValue()[0]
+				.getValue();
 	}
 
 	@Override
 	public void deleteGroup(Integer groupID)
 	{
-		// TODO Auto-generated method stub
-
+		// Currently not supported
 	}
 
 	@Override
 	public void storeGroup(Integer groupID)
 	{
-		// TODO Auto-generated method stub
-
+		// Currently not supported
 	}
 
 	@Override
@@ -263,11 +291,11 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 						|| unit.equalsIgnoreCase("°C") || unit
 							.equalsIgnoreCase("C"))))
 		{
-			//treat the temperature as a measure
-			DecimalMeasure<?> temperature = DecimalMeasure.valueOf(value + " "
+			// treat the temperature as a measure
+			DecimalMeasure<?> temperature = DecimalMeasure.valueOf(String.format("%.2f", value) + " "
 					+ SI.CELSIUS);
-			
-			//update the current state
+
+			// update the current state
 			this.currentState.getState(TemperatureState.class.getSimpleName())
 					.getCurrentStateValue()[0].setValue(temperature);
 
@@ -276,10 +304,11 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 
 			// notify the change
 			this.notifyNewTemperatureValue(temperature);
-			
+
 			// log
-			this.logger.log(LogService.LOG_INFO, "Device " + device.getDeviceId()
-				+ " temperature " + temperature.toString());
+			this.logger.log(LogService.LOG_INFO,
+					"Device " + device.getDeviceId() + " temperature "
+							+ temperature.toString());
 
 		}
 	}

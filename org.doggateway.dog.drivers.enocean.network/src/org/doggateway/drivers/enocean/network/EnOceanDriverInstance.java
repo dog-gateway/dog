@@ -34,7 +34,11 @@ import org.doggateway.drivers.enocean.network.info.EnOceanInfo;
 import org.doggateway.drivers.enocean.network.interfaces.EnOceanNetwork;
 
 /**
- * @author bonino
+ * Thed template class enabling quick development of any EnOcean driver
+ * instance, for any device kind. It takes care of handling all the shared
+ * tasks, thus enabling developers to concentrate on device peculiarities, only.
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public abstract class EnOceanDriverInstance implements StatefulDevice,
@@ -63,7 +67,11 @@ public abstract class EnOceanDriverInstance implements StatefulDevice,
 	protected EnOceanDevice theLowLevelDevice;
 
 	/**
+	 * Class constructor, takes a reference to the network driver to exploit for
+	 * communication and to the Dog device instance to handle.
 	 * 
+	 * @param network The network driver service to use
+	 * @param device The Dog device to handle
 	 */
 	public EnOceanDriverInstance(EnOceanNetwork network,
 			ControllableDevice device)

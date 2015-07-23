@@ -18,7 +18,8 @@
 package org.doggateway.drivers.enocean.network.info;
 
 /**
- * @author bonino
+ * Describes the information needed to uniquely identify a device
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public class EnOceanDeviceInfo

@@ -42,7 +42,9 @@ import org.osgi.service.device.Driver;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * The OSGi driver for handling EnOcean gateways.
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public class EnOceanGatewayDriver implements Driver

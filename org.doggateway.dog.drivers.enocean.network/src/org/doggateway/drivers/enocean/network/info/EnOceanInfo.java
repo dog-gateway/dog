@@ -20,7 +20,10 @@ package org.doggateway.drivers.enocean.network.info;
 import it.polito.elite.dog.core.library.model.ConfigurationConstants;
 
 /**
- * @author bonino
+ * Defines constants to be used when developing classes related to handling of
+ * EnOcean devices.
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public class EnOceanInfo extends ConfigurationConstants

@@ -40,7 +40,12 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * <p>
+ * The EnOcean Network Driver service implementation, offers facilities to
+ * easily access and interface EnOcean networks, by exploiting the EnJ library.
+ * </p>
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
@@ -100,7 +105,7 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 
 		// initialize the set of device discovery listeners
 		this.deviceDiscoveryListeners = new HashSet<EnOceanDeviceDiscoveryListener>();
-		
+
 		// initializa the set of teach-in activation listeners
 		this.teachInListeners = new HashSet<EnOceanTeachInActivationListener>();
 	}
@@ -366,11 +371,12 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 					{
 						this.enOceanConnection = new EnJConnection(
 								this.enOceanLink, null, this);
-						
+
 					}
-					
-					if(this.enOceanConnection != null)
-						//set this network driver as listener for teach-in status
+
+					if (this.enOceanConnection != null)
+						// set this network driver as listener for teach-in
+						// status
 						this.enOceanConnection.addEnJTeachInListener(this);
 
 					// connect to the serial port, i.e. to the EnOcean gateway

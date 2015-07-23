@@ -1,5 +1,19 @@
-/**
+/*
+ * Dog - EnOcean Temperature Sensor Driver
  * 
+ * Copyright 2015 Dario Bonino 
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package org.doggateway.drivers.enocean.temperaturesensor;
 
@@ -12,14 +26,20 @@ import org.doggateway.drivers.enocean.network.interfaces.EnOceanNetwork;
 import org.osgi.framework.BundleContext;
 
 /**
- * @author bonino
+ * <p>
+ * This class implements the Single Temperature Sensor driver for the EnOcean
+ * network. It takes care of matching and attaching devices with EEP in the
+ * A502XX Family and to map them to {@link SingleTemperatureSensor} instances.
+ * </p>
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public class TemperatureSensorDriver extends EnOceanDeviceDriver
 {
 
 	/**
-	 * 
+	 * Class constructor with no arguments to respect the bean instantiation pattern
 	 */
 	public TemperatureSensorDriver()
 	{
@@ -74,8 +94,9 @@ public class TemperatureSensorDriver extends EnOceanDeviceDriver
 			EnOceanNetwork enOceanNetwork, ControllableDevice device,
 			int updateTimeMillis, BundleContext context)
 	{
-		// TODO Auto-generated method stub
-		return new TemperatureSensorDriverInstance(enOceanNetwork, device, updateTimeMillis, context);
+		// Creates a new instance of the actual implementation of the TemperatureSensor driver
+		return new TemperatureSensorDriverInstance(enOceanNetwork, device,
+				updateTimeMillis, context);
 	}
 
 }

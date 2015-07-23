@@ -23,7 +23,8 @@ import org.doggateway.drivers.enocean.network.EnOceanDriverInstance;
 import org.doggateway.drivers.enocean.network.info.EnOceanDeviceInfo;
 
 /**
- * @author bonino
+ * Definition of services provided by the EnOcean network driver.
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public interface EnOceanNetwork

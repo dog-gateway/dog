@@ -46,6 +46,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
+ * The actual implementation of the EnOcean Gateway driver. It handles all the
+ * functions of an EnOceanGateway device including teach-in, device discovery
+ * and device representation in Dog.
+ * 
  * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
@@ -158,7 +162,8 @@ public class EnOceanGatewayDriverInstance extends EnOceanDriverInstance
 	{
 		// enable explicit teach-in
 		// TODO: make timeout configurable in the gateway configuration file
-		this.network.enableExplicitTeachIn(teachingData.getDeviceHexAddress(), teachingData.getDeviceEEP(),
+		this.network.enableExplicitTeachIn(teachingData.getDeviceHexAddress(),
+				teachingData.getDeviceEEP(),
 				EnOceanGatewayDriverInstance.DEFAULT_TEACH_IN_TIMEOUT);
 	}
 
@@ -403,8 +408,10 @@ public class EnOceanGatewayDriverInstance extends EnOceanDriverInstance
 	 * device and the main Dog device class to be used for modeling such a
 	 * device.
 	 * 
-	 * @param devInfo The device information.
-	 * @param mainClass The class to use for representing the device inside Dog.
+	 * @param devInfo
+	 *            The device information.
+	 * @param mainClass
+	 *            The class to use for representing the device inside Dog.
 	 */
 	private void createDevice(EnOceanDeviceInfo devInfo, String mainClass)
 	{

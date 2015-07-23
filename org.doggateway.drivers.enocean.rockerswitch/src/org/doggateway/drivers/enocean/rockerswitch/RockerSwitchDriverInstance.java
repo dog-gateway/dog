@@ -1,5 +1,19 @@
-/**
+/*
+ * Dog - EnOcean RockerSwitch Driver
  * 
+ * Copyright 2015 Dario Bonino 
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
  */
 package org.doggateway.drivers.enocean.rockerswitch;
 
@@ -22,7 +36,14 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 /**
- * @author bonino
+ * <p>
+ * Implements the actual handling, in Dog, of EnOcean devices having an EEP in
+ * the F602XX family. Takes care of registering needed listeners and hooks to
+ * both the network and gateway driver and, handles status updates and
+ * notifications for corresponding devices in Dog.
+ * </p>
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public class RockerSwitchDriverInstance extends EnOceanDriverInstance implements
@@ -31,6 +52,13 @@ public class RockerSwitchDriverInstance extends EnOceanDriverInstance implements
 	// the class logger
 	private LogHelper logger;
 
+	/**
+	 * Class constructor, builds a fully functional instance of RockerSwitch driver
+	 * @param enOceanNetwork The EnOcean network driver used to access the low-level network infrastructure
+	 * @param device The Dog device to which this instance shall be connected
+	 * @param updateTimeMillis The required update time in millis (not needed inthis case)
+	 * @param context The bundle context to perform any needed operation involving the OSGi Framework (e.g., logging)
+	 */
 	public RockerSwitchDriverInstance(EnOceanNetwork enOceanNetwork,
 			ControllableDevice device, int updateTimeMillis,
 			BundleContext context)

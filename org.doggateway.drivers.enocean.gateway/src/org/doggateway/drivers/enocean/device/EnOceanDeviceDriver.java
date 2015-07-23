@@ -45,7 +45,11 @@ import org.osgi.service.device.Device;
 import org.osgi.service.device.Driver;
 
 /**
- * @author bonino
+ * Template class for all device drivers, takes care of all common activities
+ * thus simplifying the development of actual device drivers to few lines of
+ * code.
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public abstract class EnOceanDeviceDriver extends EnOceanDriver implements

@@ -20,7 +20,10 @@ package org.doggateway.drivers.enocean.network.interfaces;
 import org.doggateway.drivers.enocean.network.info.EnOceanDeviceInfo;
 
 /**
- * @author bonino
+ * Listener for reacting to the discovery of new EnOcean devices, typically
+ * triggered after a teach-in procedure
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public interface EnOceanDeviceDiscoveryListener

@@ -20,14 +20,19 @@ package org.doggateway.drivers.enocean.network;
 import org.doggateway.drivers.enocean.network.info.EnOceanDriverInfo;
 
 /**
- * @author bonino
+ * Abstract class specifying the minimum set of information that shall be made
+ * available by any EnOcean driver.
+ * 
+ * @author <a href="mailto:dario.bonino@gmail.com">Dario Bonino</a>
  *
  */
 public abstract class EnOceanDriver
 {
+	// The driver information object
 	protected EnOceanDriverInfo driverInfo;
 
 	/**
+	 * Sets the driver information object
 	 * @return the driverInfo
 	 */
 	public EnOceanDriverInfo getDriverInfo()
@@ -36,12 +41,13 @@ public abstract class EnOceanDriver
 	}
 
 	/**
-	 * @param driverInfo the driverInfo to set
+	 * Gets the driver information object
+	 * @param driverInfo
+	 *            the driverInfo to set
 	 */
 	public void setDriverInfo(EnOceanDriverInfo driverInfo)
 	{
 		this.driverInfo = driverInfo;
 	}
-	
-	
+
 }
