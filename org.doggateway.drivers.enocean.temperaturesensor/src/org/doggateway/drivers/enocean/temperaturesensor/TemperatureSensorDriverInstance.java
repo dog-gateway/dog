@@ -58,11 +58,19 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 	private LogHelper logger;
 
 	/**
-	 * Class constructor, builds a fully functional instance of Single Temperature Sensor driver
-	 * @param enOceanNetwork The EnOcean network driver used to access the low-level network infrastructure
-	 * @param device The Dog device to which this instance shall be connected
-	 * @param updateTimeMillis The required update time in millis (not needed inthis case)
-	 * @param context The bundle context to perform any needed operation involving the OSGi Framework (e.g., logging)
+	 * Class constructor, builds a fully functional instance of Single
+	 * Temperature Sensor driver
+	 * 
+	 * @param enOceanNetwork
+	 *            The EnOcean network driver used to access the low-level
+	 *            network infrastructure
+	 * @param device
+	 *            The Dog device to which this instance shall be connected
+	 * @param updateTimeMillis
+	 *            The required update time in millis (not needed inthis case)
+	 * @param context
+	 *            The bundle context to perform any needed operation involving
+	 *            the OSGi Framework (e.g., logging)
 	 */
 	public TemperatureSensorDriverInstance(EnOceanNetwork enOceanNetwork,
 			ControllableDevice device, int updateTimeMillis,
@@ -74,7 +82,7 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 		// create a logger
 		this.logger = new LogHelper(context);
 
-		// initialize the rocker switch states
+		// initialize the temperature sensor states
 		this.initializeStates();
 
 	}
@@ -274,7 +282,7 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 
 	/**
 	 * Updates the current status of the device handled by this driver instance
-	 * and notfies any change
+	 * and notifies any change
 	 * 
 	 * @param value
 	 *            The temperature value to use for updating the state
