@@ -28,6 +28,7 @@ import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.enocean.enj.eep.EEPAttribute;
 import it.polito.elite.enocean.enj.eep.eep26.attributes.EEP26Switching;
+import it.polito.elite.enocean.enj.eep.eep26.D5.D500.D50001;
 import it.polito.elite.enocean.enj.model.EnOceanDevice;
 
 import org.doggateway.drivers.enocean.network.EnOceanDriverInstance;
@@ -139,7 +140,7 @@ public class EnOceanDoorSensorDriverInstance extends EnOceanDriverInstance
 			this.theLowLevelDevice = device;
 
 			// register eep listeners
-			this.theLowLevelDevice.getEEP().addEEP26AttributeListener(0,
+			this.theLowLevelDevice.getEEP().addEEP26AttributeListener(D50001.CHANNEL,
 					EEP26Switching.NAME, this);
 		}
 
@@ -152,7 +153,7 @@ public class EnOceanDoorSensorDriverInstance extends EnOceanDriverInstance
 		if (device.getDeviceUID() == this.theManagedDevice.getUid())
 		{
 			// remove the listener
-			this.theLowLevelDevice.getEEP().removeEEP26AttributeListener(0,
+			this.theLowLevelDevice.getEEP().removeEEP26AttributeListener(D50001.CHANNEL,
 					EEP26Switching.NAME, this);
 
 			// null the low level device
@@ -167,7 +168,7 @@ public class EnOceanDoorSensorDriverInstance extends EnOceanDriverInstance
 		// handle the attribute change
 		if (attribute instanceof EEP26Switching)
 		{
-			this.updateAndNotify(((EEP26Switching) attribute).getValue());
+			this.updateAndNotify(!((EEP26Switching) attribute).getValue());
 		}
 
 	}
