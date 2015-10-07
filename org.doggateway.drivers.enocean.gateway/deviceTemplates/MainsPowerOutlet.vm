@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dhc:dogHomeConfiguration xmlns:dhc="http://elite.polito.it/dogHomeConfiguration">
+	<dhc:controllables>
+		<dhc:device domoticSystem="EnOcean" id="$name" class="MainsPowerOutlet"
+			gateway="$gateway">
+			<dhc:description>$description</dhc:description>
+			<dhc:isIn>$location</dhc:isIn>
+			<dhc:param value="$address" name="address" type="network" />
+			<dhc:param value="$eep" name="eep" type="network" />
+			<dhc:param value="$uid" name="uid" type="network" />
+			<dhc:controlFunctionality class="OnOffFunctionality">
+				<dhc:commands>
+					<dhc:command id="OffCommand_$name" name="OffCommand_$name"
+						class="OffCommand">
+						<dhc:param value="off" name="realCommandName" />
+					</dhc:command>
+					<dhc:command id="OnCommand_$name" name="OnCommand_$name"
+						class="OnCommand">
+						<dhc:param value="on" name="realCommandName" />
+					</dhc:command>
+				</dhc:commands>
+			</dhc:controlFunctionality>
+			<dhc:notificationFunctionality class="OnOffNotificationFunctionality">
+				<dhc:notifications>
+					<dhc:notification id="OnNotification_$name" class="OnNotification">
+						<dhc:param name="nParams" value="0" />
+						<dhc:param value="on" name="notificationName" />
+					</dhc:notification>
+					<dhc:notification id="OffNotification_$name"
+						class="OffNotification">
+						<dhc:param name="nParams" value="0" />
+						<dhc:param value="off" name="notificationName" />
+					</dhc:notification>
+				</dhc:notifications>
+			</dhc:notificationFunctionality>
+			<dhc:state class="OnOffState">
+				<dhc:statevalues>
+					<dhc:statevalue name="off" class="OffStateValue" />
+					<dhc:statevalue name="on" class="OnStateValue" />
+				</dhc:statevalues>
+			</dhc:state>
+		</dhc:device>
+	</dhc:controllables>
+</dhc:dogHomeConfiguration>
