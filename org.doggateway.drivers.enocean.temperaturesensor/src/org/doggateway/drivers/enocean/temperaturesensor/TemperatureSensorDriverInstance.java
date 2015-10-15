@@ -25,7 +25,7 @@ import it.polito.elite.dog.core.library.model.state.TemperatureState;
 import it.polito.elite.dog.core.library.model.statevalue.TemperatureStateValue;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.enocean.enj.eep.EEPAttribute;
-import it.polito.elite.enocean.enj.eep.eep26.attributes.EEP26TemperatureLinear;
+import it.polito.elite.enocean.enj.eep.eep26.attributes.EEP26TemperatureInverseLinear;
 import it.polito.elite.enocean.enj.model.EnOceanDevice;
 
 import javax.measure.DecimalMeasure;
@@ -151,7 +151,7 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 
 			// register eep listeners
 			this.theLowLevelDevice.getEEP().addEEP26AttributeListener(0,
-					EEP26TemperatureLinear.NAME, this);
+					EEP26TemperatureInverseLinear.NAME, this);
 		}
 	}
 
@@ -170,7 +170,7 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 		{
 			// remove the listener
 			this.theLowLevelDevice.getEEP().removeEEP26AttributeListener(0,
-					EEP26TemperatureLinear.NAME, this);
+					EEP26TemperatureInverseLinear.NAME, this);
 
 			// null the low level device
 			this.theLowLevelDevice = null;
@@ -227,10 +227,10 @@ public class TemperatureSensorDriverInstance extends EnOceanDriverInstance
 	public void handleAttributeChange(int channelId, EEPAttribute<?> attribute)
 	{
 		// handle the attribute change
-		if (attribute instanceof EEP26TemperatureLinear)
+		if (attribute instanceof EEP26TemperatureInverseLinear)
 		{
 			// get the attribute vakue
-			EEP26TemperatureLinear temperature = (EEP26TemperatureLinear) attribute;
+			EEP26TemperatureInverseLinear temperature = (EEP26TemperatureInverseLinear) attribute;
 
 			// the temperature value as a double
 			Double value = (Double) temperature.getValue();
