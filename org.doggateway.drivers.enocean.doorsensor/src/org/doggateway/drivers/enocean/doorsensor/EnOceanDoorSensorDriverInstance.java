@@ -143,6 +143,10 @@ public class EnOceanDoorSensorDriverInstance extends EnOceanDriverInstance
 			this.theLowLevelDevice.getEEP().addEEP26AttributeListener(D50001.CHANNEL,
 					EEP26Switching.NAME, this);
 		}
+		else
+		{
+			this.logger.log(LogService.LOG_ERROR, "Not corresponding device: "+device.getDeviceUID()+"-"+this.theManagedDevice.getUid());
+		}
 
 	}
 

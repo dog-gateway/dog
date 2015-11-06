@@ -150,6 +150,9 @@ public abstract class EnOceanDeviceDriver extends EnOceanDriver implements
 
 		// fill the device categories
 		this.properFillDeviceCategories(this.driverInstanceClass);
+		
+		//try registering the driver
+		this.registerEnOceanDeviceDriver();
 
 	}
 
@@ -323,6 +326,7 @@ public abstract class EnOceanDeviceDriver extends EnOceanDriver implements
 			if (manifacturer != null && (gateway != null)
 					&& (manifacturer.equals(EnOceanInfo.MANUFACTURER))
 					&& (this.deviceCategories.contains(deviceCategory))
+					&& (this.gateway.get()!=null)
 					&& (this.gateway.get().isGatewayAvailable(gateway)))
 			{
 				matchValue = Controllable.MATCH_MANUFACTURER

@@ -156,14 +156,6 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 		{
 			// the device is already known, just add the driver
 			this.connectedDrivers.put(devInfo, driver);
-
-			// get the low-level device described by the given device info
-			EnOceanDevice device = this.enOceanConnection.getDevice(devInfo
-					.getUid());
-
-			// connect the driver instance with the low-level device to enable
-			// direct attachment of EEPListeners and easier configuration set-up
-			driver.setEnoceanDevice(device);
 		}
 		else
 		{
@@ -188,6 +180,14 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 			}
 
 		}
+
+		// get the low-level device described by the given device info
+		EnOceanDevice device = this.enOceanConnection.getDevice(devInfo
+				.getUid());
+
+		// connect the driver instance with the low-level device to enable
+		// direct attachment of EEPListeners and easier configuration set-up
+		driver.setEnoceanDevice(device);
 
 	}
 
@@ -375,21 +375,24 @@ public class EnOceanNetworkDriverImpl implements EnOceanNetwork,
 					}
 
 					if (this.enOceanConnection != null)
+					{
 						// set this network driver as listener for teach-in
 						// status
 						this.enOceanConnection.addEnJTeachInListener(this);
 
-					// connect to the serial port, i.e. to the EnOcean gateway
-					this.enOceanLink.connect();
+						// connect to the serial port, i.e. to the EnOcean
+						// gateway
+						this.enOceanLink.connect();
 
-					// log
-					this.logger.log(LogService.LOG_INFO,
-							"persistent device set size: "
-									+ this.enOceanConnection.getKnownDevices()
-											.size());
+						// log
+						this.logger.log(LogService.LOG_INFO,
+								"persistent device set size: "
+										+ this.enOceanConnection
+												.getKnownDevices().size());
 
-					// update the service registration
-					this.registerNetworkService();
+						// update the service registration
+						this.registerNetworkService();
+					}
 				}
 				catch (Exception e)
 				{
