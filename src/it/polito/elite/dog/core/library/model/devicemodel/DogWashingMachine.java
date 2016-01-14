@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,11 +119,11 @@ public class DogWashingMachine extends AbstractDevice implements WashingMachine
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((WashingMachine) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((WashingMachine) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 
@@ -156,16 +156,16 @@ public class DogWashingMachine extends AbstractDevice implements WashingMachine
 
 	/*Generated Notifications*/
 
-	/*Notification: StartedHeatingCycleNotification*/
-	public void notifyStartedHeatingCycle(){
-		StartedHeatingCycleNotification notificationEvent=new StartedHeatingCycleNotification();
+	/*Notification: StartApplianceNotification*/
+	public void notifyStart(){
+		StartApplianceNotification notificationEvent=new StartApplianceNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StartApplianceNotification*/
-	public void notifyStart(){
-		StartApplianceNotification notificationEvent=new StartApplianceNotification();
+	/*Notification: StartedHeatingCycleNotification*/
+	public void notifyStartedHeatingCycle(){
+		StartedHeatingCycleNotification notificationEvent=new StartedHeatingCycleNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

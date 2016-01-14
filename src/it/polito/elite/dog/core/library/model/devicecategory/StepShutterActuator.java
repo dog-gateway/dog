@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,14 +45,14 @@ public interface StepShutterActuator extends ShutterActuator
 
 	/*Generated Notifications*/
 
-	/*Notification: RestDownNotification*/
-	public void notifyRestingDown();
 	/*Notification: RestNotification*/
 	public void notifyResting();
-	/*Notification: MovingDownNotification*/
-	public void notifyMovingDown();
+	/*Notification: RestDownNotification*/
+	public void notifyRestingDown();
 	/*Notification: RestUpNotification*/
 	public void notifyRestingUp();
+	/*Notification: MovingDownNotification*/
+	public void notifyMovingDown();
 	/*Notification: MovingUpNotification*/
 	public void notifyMovingUp();
 	public void updateStatus();

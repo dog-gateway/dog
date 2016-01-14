@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,15 @@ public class DogThermostaticRadiatorValve extends AbstractDevice implements Ther
 		if(this.driver!=null)
 		{
 			return ((ThermostaticRadiatorValve) this.driver).getState();
+		}
+		 return null;
+	}
+
+	public Measure<?,?>  getSetpointTemperature()
+	{
+		if(this.driver!=null)
+		{
+			return ((ThermostaticRadiatorValve) this.driver).getSetpointTemperature();
 		}
 		 return null;
 	}

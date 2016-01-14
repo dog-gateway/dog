@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,10 +43,10 @@ public interface eZ430Chronos extends Clock
 
 	/*Generated Notifications*/
 
-	/*Notification: PressedMNotification*/
-	public void notifyPressed(String buttonID);
 	/*Notification: TridimensionalAccelerationNotification*/
 	public void notifyNew3DAccelerationValue(Double accX, Double accY, Double accZ);
+	/*Notification: PressedMNotification*/
+	public void notifyPressed(String buttonID);
 	/*Notification: ReleasedMNotification*/
 	public void notifyReleased(String buttonID);
 	public void updateStatus();

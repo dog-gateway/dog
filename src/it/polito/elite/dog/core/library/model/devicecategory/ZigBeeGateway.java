@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,9 @@ public interface ZigBeeGateway extends ZigBeeComponent
 
 	/*Generated Notifications*/
 
-	/*Notification: NetworkOpenedNotification*/
-	public void notifyOpen();
 	/*Notification: NetworkClosedNotification*/
 	public void notifyClose();
+	/*Notification: NetworkOpenedNotification*/
+	public void notifyOpen();
 	public void updateStatus();
 }

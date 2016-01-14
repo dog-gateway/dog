@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,24 +51,6 @@ public class DogThermostat extends AbstractDevice implements Thermostat
 	}
 
 
-	public Boolean getOccupancy()
-	{
-		if(this.driver!=null)
-		{
-			return ((Thermostat) this.driver).getOccupancy();
-		}
-		 return null;
-	}
-
-	public Measure<?,?>  getTemperature()
-	{
-		if(this.driver!=null)
-		{
-			return ((Thermostat) this.driver).getTemperature();
-		}
-		 return null;
-	}
-
 	public DeviceStatus getState()
 	{
 		if(this.driver!=null)
@@ -78,20 +60,13 @@ public class DogThermostat extends AbstractDevice implements Thermostat
 		 return null;
 	}
 
-	public void storeScene(Integer sceneNumber)
+	public Measure<?,?>  getSetpointTemperature()
 	{
 		if(this.driver!=null)
 		{
-			((Thermostat) this.driver).storeScene(sceneNumber);
+			return ((Thermostat) this.driver).getSetpointTemperature();
 		}
-	}
-
-	public void deleteScene(Integer sceneNumber)
-	{
-		if(this.driver!=null)
-		{
-			((Thermostat) this.driver).deleteScene(sceneNumber);
-		}
+		 return null;
 	}
 
 	public void cool()
@@ -102,27 +77,11 @@ public class DogThermostat extends AbstractDevice implements Thermostat
 		}
 	}
 
-	public void deleteGroup(Integer groupID)
-	{
-		if(this.driver!=null)
-		{
-			((Thermostat) this.driver).deleteGroup(groupID);
-		}
-	}
-
 	public void stopHeatingOrCooling()
 	{
 		if(this.driver!=null)
 		{
 			((Thermostat) this.driver).stopHeatingOrCooling();
-		}
-	}
-
-	public void storeGroup(Integer groupID)
-	{
-		if(this.driver!=null)
-		{
-			((Thermostat) this.driver).storeGroup(groupID);
 		}
 	}
 
@@ -146,13 +105,6 @@ public class DogThermostat extends AbstractDevice implements Thermostat
 
 	/*Generated Notifications*/
 
-	/*Notification: SpeedStepUpNotification*/
-	public void notifySpeedUp(){
-		SpeedStepUpNotification notificationEvent=new SpeedStepUpNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: ChangedDesiredTemperatureNotification*/
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue){
 		ChangedDesiredTemperatureNotification notificationEvent=new ChangedDesiredTemperatureNotification(newTemperatureValue );
@@ -167,44 +119,9 @@ public class DogThermostat extends AbstractDevice implements Thermostat
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: JoinGroupNotification*/
-	public void notifyJoinedGroup(Integer groupNumber){
-		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: SpeedStepDownNotification*/
-	public void notifySpeedDown(){
-		SpeedStepDownNotification notificationEvent=new SpeedStepDownNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: HeatNotification*/
 	public void notifyHeat(){
 		HeatNotification notificationEvent=new HeatNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: HumidityMeasurementNotification*/
-	public void notifyChangedRelativeHumidity(Measure<?,?>  relativeHumidity){
-		HumidityMeasurementNotification notificationEvent=new HumidityMeasurementNotification(relativeHumidity );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: SpeedControlNotification*/
-	public void notifyChangedSpeed(Measure<?,?>  newSpeed){
-		SpeedControlNotification notificationEvent=new SpeedControlNotification(newSpeed );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: LeaveGroupNotification*/
-	public void notifyLeftGroup(Integer groupNumber){
-		LeaveGroupNotification notificationEvent=new LeaveGroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
