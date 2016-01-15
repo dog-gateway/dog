@@ -86,11 +86,27 @@ public class DogThermostatTemperatureSensor extends AbstractDevice implements Th
 		}
 	}
 
+	public void deleteGroup(Integer groupID)
+	{
+		if(this.driver!=null)
+		{
+			((ThermostatTemperatureSensor) this.driver).deleteGroup(groupID);
+		}
+	}
+
 	public void stopHeatingOrCooling()
 	{
 		if(this.driver!=null)
 		{
 			((ThermostatTemperatureSensor) this.driver).stopHeatingOrCooling();
+		}
+	}
+
+	public void storeGroup(Integer groupID)
+	{
+		if(this.driver!=null)
+		{
+			((ThermostatTemperatureSensor) this.driver).storeGroup(groupID);
 		}
 	}
 
@@ -128,6 +144,13 @@ public class DogThermostatTemperatureSensor extends AbstractDevice implements Th
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	/*Notification: JoinGroupNotification*/
+	public void notifyJoinedGroup(Integer groupNumber){
+		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
 	/*Notification: CoolNotification*/
 	public void notifyCool(){
 		CoolNotification notificationEvent=new CoolNotification();
@@ -138,6 +161,13 @@ public class DogThermostatTemperatureSensor extends AbstractDevice implements Th
 	/*Notification: HeatNotification*/
 	public void notifyHeat(){
 		HeatNotification notificationEvent=new HeatNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: LeaveGroupNotification*/
+	public void notifyLeftGroup(Integer groupNumber){
+		LeaveGroupNotification notificationEvent=new LeaveGroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

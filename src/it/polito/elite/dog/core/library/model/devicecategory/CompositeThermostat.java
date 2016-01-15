@@ -59,10 +59,10 @@ public interface CompositeThermostat extends Thermostat, HVACSystem
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
 	/*Notification: CoolNotification*/
 	public void notifyCool();
-	/*Notification: SpeedStepDownNotification*/
-	public void notifySpeedDown();
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
+	/*Notification: SpeedStepDownNotification*/
+	public void notifySpeedDown();
 	/*Notification: HeatNotification*/
 	public void notifyHeat();
 	/*Notification: HumidityMeasurementNotification*/

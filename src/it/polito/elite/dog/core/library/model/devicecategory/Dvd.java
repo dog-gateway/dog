@@ -66,10 +66,10 @@ public interface Dvd extends Entertainment
 	public void notifyChangedLevel(Measure<?,?>  newLevel);
 	/*Notification: ForwardNotification*/
 	public void notifyFwd();
-	/*Notification: OffNotification*/
-	public void notifyOff();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
+	/*Notification: OffNotification*/
+	public void notifyOff();
 	/*Notification: RewindNotification*/
 	public void notifyRew();
 	/*Notification: StopPlaybackNotification*/

@@ -151,16 +151,16 @@ public class DogEnergyMeteringPowerOutlet extends AbstractDevice implements Ener
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OnNotification*/
-	public void notifyOn(){
-		OnNotification notificationEvent=new OnNotification();
+	/*Notification: SinglePhaseReactiveEnergyMeasurementNotification*/
+	public void notifyNewReactiveEnergyValue(Measure<?,?>  value){
+		SinglePhaseReactiveEnergyMeasurementNotification notificationEvent=new SinglePhaseReactiveEnergyMeasurementNotification(value );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SinglePhaseReactiveEnergyMeasurementNotification*/
-	public void notifyNewReactiveEnergyValue(Measure<?,?>  value){
-		SinglePhaseReactiveEnergyMeasurementNotification notificationEvent=new SinglePhaseReactiveEnergyMeasurementNotification(value );
+	/*Notification: OnNotification*/
+	public void notifyOn(){
+		OnNotification notificationEvent=new OnNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

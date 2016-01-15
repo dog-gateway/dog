@@ -63,21 +63,21 @@ public interface Dishwasher extends WhiteGoods
 	public void notifyNewEvent(Object event);
 	/*Notification: AlertNotification*/
 	public void notifyNewAlert(Object alert);
-	/*Notification: StartTimeChangedNotification*/
-	public void notifyChangedStartTime(Measure<?,?>  startTime);
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: EndTimeChangedNotification*/
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: OffNotification*/
-	public void notifyOff();
-	/*Notification: StandByNotification*/
-	public void notifyStandby();
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause();
 	/*Notification: StopApplianceNotification*/
 	public void notifyStop();
+	/*Notification: OffNotification*/
+	public void notifyOff();
+	/*Notification: StartTimeChangedNotification*/
+	public void notifyChangedStartTime(Measure<?,?>  startTime);
+	/*Notification: OnNotification*/
+	public void notifyOn();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	public void updateStatus();
 }

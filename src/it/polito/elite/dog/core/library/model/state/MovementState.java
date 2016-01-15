@@ -44,18 +44,8 @@ public class MovementState extends DoubleValuedState
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String NOTMOVING = "notMoving";
 	public static final String ISMOVING = "isMoving";
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public MovementState(NotMovingStateValue notmovingstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{notmovingstatevalue});
-	}
+	public static final String NOTMOVING = "notMoving";
 
 
 	/**
@@ -67,11 +57,21 @@ public class MovementState extends DoubleValuedState
 		super(new StateValue[]{movingstatevalue});
 	}
 
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public MovementState(NotMovingStateValue notmovingstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{notmovingstatevalue});
+	}
+
 	@Deprecated
 	private void initCommon()
 	{
-		this.old2NewMap.put(MovementState.NOTMOVING, new NotMovingStateValue());
 		this.old2NewMap.put(MovementState.ISMOVING, new MovingStateValue());
+		this.old2NewMap.put(MovementState.NOTMOVING, new NotMovingStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

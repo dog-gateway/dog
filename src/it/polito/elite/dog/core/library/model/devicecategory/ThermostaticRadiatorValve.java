@@ -33,7 +33,7 @@ import it.polito.elite.dog.core.library.model.climate.DailyClimateSchedule;
 
 import javax.measure.Measure;
 
-public interface ThermostaticRadiatorValve extends Actuator, HVACSystem
+public interface ThermostaticRadiatorValve extends Actuator, Thermostat, HVACSystem
 {
 	public static int MATCH_TYPE=100;
 	public static int MATCH_SUB_TYPE=50;

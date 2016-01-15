@@ -64,23 +64,9 @@ public class DogPumpController extends AbstractDevice implements PumpController
 
 	/*Generated Notifications*/
 
-	/*Notification: StoreSceneNotification*/
-	public void notifyStoredScene(Integer sceneNumber){
-		StoreSceneNotification notificationEvent=new StoreSceneNotification(sceneNumber );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: DeleteSceneNotification*/
 	public void notifyDeletedScene(Integer sceneNumber){
 		DeleteSceneNotification notificationEvent=new DeleteSceneNotification(sceneNumber );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
-	/*Notification: TemperatureMeasurementNotification*/
-	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue){
-		TemperatureMeasurementNotification notificationEvent=new TemperatureMeasurementNotification(temperatureValue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -92,9 +78,9 @@ public class DogPumpController extends AbstractDevice implements PumpController
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: IdentifyNotification*/
-	public void notifyIdentifyMe(){
-		IdentifyNotification notificationEvent=new IdentifyNotification();
+	/*Notification: TemperatureMeasurementNotification*/
+	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue){
+		TemperatureMeasurementNotification notificationEvent=new TemperatureMeasurementNotification(temperatureValue );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -106,16 +92,16 @@ public class DogPumpController extends AbstractDevice implements PumpController
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: JoinGroupNotification*/
-	public void notifyJoinedGroup(Integer groupNumber){
-		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
+	/*Notification: IdentifyNotification*/
+	public void notifyIdentifyMe(){
+		IdentifyNotification notificationEvent=new IdentifyNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OnNotification*/
-	public void notifyOn(){
-		OnNotification notificationEvent=new OnNotification();
+	/*Notification: JoinGroupNotification*/
+	public void notifyJoinedGroup(Integer groupNumber){
+		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -134,13 +120,6 @@ public class DogPumpController extends AbstractDevice implements PumpController
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: PressureMeasurementNotification*/
-	public void notifyNewPressureValue(Measure<?,?>  pressureValue){
-		PressureMeasurementNotification notificationEvent=new PressureMeasurementNotification(pressureValue );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: OffNotification*/
 	public void notifyOff(){
 		OffNotification notificationEvent=new OffNotification();
@@ -148,9 +127,30 @@ public class DogPumpController extends AbstractDevice implements PumpController
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	/*Notification: PressureMeasurementNotification*/
+	public void notifyNewPressureValue(Measure<?,?>  pressureValue){
+		PressureMeasurementNotification notificationEvent=new PressureMeasurementNotification(pressureValue );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
 	/*Notification: LeaveGroupNotification*/
 	public void notifyLeftGroup(Integer groupNumber){
 		LeaveGroupNotification notificationEvent=new LeaveGroupNotification(groupNumber );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: StoreSceneNotification*/
+	public void notifyStoredScene(Integer sceneNumber){
+		StoreSceneNotification notificationEvent=new StoreSceneNotification(sceneNumber );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: OnNotification*/
+	public void notifyOn(){
+		OnNotification notificationEvent=new OnNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

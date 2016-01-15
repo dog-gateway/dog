@@ -48,10 +48,10 @@ public interface TripleSensor extends MovementSensor, SingleTemperatureSensor, L
 
 	/*Notification: LuminosityMeasurementNotification*/
 	public void notifyNewLuminosityValue(Measure<?,?>  luminosityValue);
-	/*Notification: SimpleNoMovementNotification*/
-	public void notifyCeasedMovement();
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
+	/*Notification: SimpleNoMovementNotification*/
+	public void notifyCeasedMovement();
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: SimpleMovementNotification*/

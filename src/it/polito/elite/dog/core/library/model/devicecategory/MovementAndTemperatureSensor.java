@@ -45,10 +45,10 @@ public interface MovementAndTemperatureSensor extends MovementSensor, SingleTemp
 
 	/*Generated Notifications*/
 
-	/*Notification: SimpleNoMovementNotification*/
-	public void notifyCeasedMovement();
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
+	/*Notification: SimpleNoMovementNotification*/
+	public void notifyCeasedMovement();
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: SimpleMovementNotification*/

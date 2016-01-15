@@ -100,13 +100,6 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OnNotification*/
-	public void notifyOn(){
-		OnNotification notificationEvent=new OnNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: HeatNotification*/
 	public void notifyHeat(){
 		HeatNotification notificationEvent=new HeatNotification();
@@ -114,9 +107,9 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OffNotification*/
-	public void notifyOff(){
-		OffNotification notificationEvent=new OffNotification();
+	/*Notification: OnNotification*/
+	public void notifyOn(){
+		OnNotification notificationEvent=new OnNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -124,6 +117,13 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 	/*Notification: StandByNotification*/
 	public void notifyStandby(){
 		StandByNotification notificationEvent=new StandByNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: OffNotification*/
+	public void notifyOff(){
+		OffNotification notificationEvent=new OffNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

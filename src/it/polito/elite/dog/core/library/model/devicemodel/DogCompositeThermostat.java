@@ -176,16 +176,16 @@ public class DogCompositeThermostat extends AbstractDevice implements CompositeT
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: SpeedStepDownNotification*/
-	public void notifySpeedDown(){
-		SpeedStepDownNotification notificationEvent=new SpeedStepDownNotification();
+	/*Notification: JoinGroupNotification*/
+	public void notifyJoinedGroup(Integer groupNumber){
+		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: JoinGroupNotification*/
-	public void notifyJoinedGroup(Integer groupNumber){
-		JoinGroupNotification notificationEvent=new JoinGroupNotification(groupNumber );
+	/*Notification: SpeedStepDownNotification*/
+	public void notifySpeedDown(){
+		SpeedStepDownNotification notificationEvent=new SpeedStepDownNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

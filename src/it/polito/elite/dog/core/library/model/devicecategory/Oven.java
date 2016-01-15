@@ -63,27 +63,27 @@ public interface Oven extends WhiteGoods
 	public void notifyNewAlertSet(Object[] alerts);
 	/*Notification: EventNotification*/
 	public void notifyNewEvent(Object event);
-	/*Notification: StoppedSuperHeatingNotification*/
-	public void notifyStoppedSuperHeating();
 	/*Notification: AlertNotification*/
 	public void notifyNewAlert(Object alert);
-	/*Notification: StartTimeChangedNotification*/
-	public void notifyChangedStartTime(Measure<?,?>  startTime);
-	/*Notification: OnNotification*/
-	public void notifyOn();
 	/*Notification: EndTimeChangedNotification*/
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop();
 	/*Notification: OffNotification*/
 	public void notifyOff();
-	/*Notification: StandByNotification*/
-	public void notifyStandby();
+	/*Notification: StoppedSuperHeatingNotification*/
+	public void notifyStoppedSuperHeating();
+	/*Notification: StartTimeChangedNotification*/
+	public void notifyChangedStartTime(Measure<?,?>  startTime);
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: StartedSuperHeatingNotification*/
 	public void notifyStartedSuperHeating();
 	/*Notification: PauseApplianceNotification*/
 	public void notifyPause();
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	public void updateStatus();
 }

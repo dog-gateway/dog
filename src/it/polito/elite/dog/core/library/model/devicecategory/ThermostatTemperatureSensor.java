@@ -31,7 +31,7 @@ package it.polito.elite.dog.core.library.model.devicecategory;
 import it.polito.elite.dog.core.library.model.DeviceStatus;
 import javax.measure.Measure;
 
-public interface ThermostatTemperatureSensor extends Thermostat, HVACSystem
+public interface ThermostatTemperatureSensor extends Thermostat, SingleTemperatureSensor, HVACSystem
 {
 	public static int MATCH_TYPE=100;
 	public static int MATCH_SUB_TYPE=50;
@@ -41,7 +41,9 @@ public interface ThermostatTemperatureSensor extends Thermostat, HVACSystem
 	public DeviceStatus getState();
 	public Measure<?,?>  getSetpointTemperature();
 	public void cool();
+	public void deleteGroup(Integer groupID);
 	public void stopHeatingOrCooling();
+	public void storeGroup(Integer groupID);
 	public void setTemperatureAt(Measure<?,?>  temperature);
 	public void heat();
 
@@ -52,10 +54,14 @@ public interface ThermostatTemperatureSensor extends Thermostat, HVACSystem
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
+	/*Notification: JoinGroupNotification*/
+	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: CoolNotification*/
 	public void notifyCool();
 	/*Notification: HeatNotification*/
 	public void notifyHeat();
+	/*Notification: LeaveGroupNotification*/
+	public void notifyLeftGroup(Integer groupNumber);
 	/*Notification: StopHeatingCoolingNotification*/
 	public void notifyStoppedHeatingOrCooling();
 	public void updateStatus();

@@ -70,10 +70,10 @@ public interface Boiler extends WhiteGoods
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: OffNotification*/
-	public void notifyOff();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
+	/*Notification: OffNotification*/
+	public void notifyOff();
 	/*Notification: StartedSuperHeatingNotification*/
 	public void notifyStartedSuperHeating();
 	public void updateStatus();
