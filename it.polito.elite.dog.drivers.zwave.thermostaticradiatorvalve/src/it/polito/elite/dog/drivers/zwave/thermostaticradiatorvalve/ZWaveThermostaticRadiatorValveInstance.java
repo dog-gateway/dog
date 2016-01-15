@@ -325,12 +325,13 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 					.getCommandClass(ZWaveAPI.COMMAND_CLASS_THERMOSTAT_SETPOINT);
 
 			// get the last update time if any (from the set point)
-			DataElemObject setPointElem = thermostatCC.getCommandClassesData().getAllData().get("1");
+			DataElemObject setPointElem = thermostatCC.getCommandClassesData()
+					.getAllData().get("1");
 			long globalUpdateTime = setPointElem.getUpdateTime();
 
 			// check if the instance contains only one value
 			if (globalUpdateTime > 0)
-			{	
+			{
 				// check if the values are up-to-date
 				if (this.lastUpdateTime < globalUpdateTime)
 				{
@@ -578,6 +579,14 @@ public class ZWaveThermostaticRadiatorValveInstance extends ZWaveDriverInstance
 	{
 		((ThermostaticRadiatorValve) this.device)
 				.notifyStoppedHeatingOrCooling();
+	}
+
+	@Override
+	public Measure<?, ?> getSetpointTemperature()
+	{
+		return (Measure<?, ?>) this.currentState.getState(
+				TemperatureState.class.getSimpleName()).getCurrentStateValue()[0]
+				.getValue();
 	}
 
 }
