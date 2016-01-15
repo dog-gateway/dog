@@ -48,8 +48,8 @@ public class MovingUpDownState extends MovementState
 
 	public static final String RAISING = "raising";
 	public static final String LOWERING = "lowering";
-	public static final String ISMOVING = "isMoving";
 	public static final String NOTMOVING = "notMoving";
+	public static final String ISMOVING = "isMoving";
 
 
 	/**
@@ -75,20 +75,20 @@ public class MovingUpDownState extends MovementState
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public MovingUpDownState(MovingStateValue movingstatevalue)
+	public MovingUpDownState(NotMovingStateValue notmovingstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{movingstatevalue});
+		super(new StateValue[]{notmovingstatevalue});
 	}
 
 
 	/**
 	 * Class constructor for states inheriting from DiscreteState.
 	 */
-	public MovingUpDownState(NotMovingStateValue notmovingstatevalue)
+	public MovingUpDownState(MovingStateValue movingstatevalue)
 	{
 		//call the super class constructor
-		super(new StateValue[]{notmovingstatevalue});
+		super(new StateValue[]{movingstatevalue});
 	}
 
 	@Deprecated
@@ -96,8 +96,8 @@ public class MovingUpDownState extends MovementState
 	{
 		this.old2NewMap.put(MovingUpDownState.RAISING, new RaisingStateValue());
 		this.old2NewMap.put(MovingUpDownState.LOWERING, new LoweringStateValue());
-		this.old2NewMap.put(MovingUpDownState.ISMOVING, new MovingStateValue());
 		this.old2NewMap.put(MovingUpDownState.NOTMOVING, new NotMovingStateValue());
+		this.old2NewMap.put(MovingUpDownState.ISMOVING, new MovingStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

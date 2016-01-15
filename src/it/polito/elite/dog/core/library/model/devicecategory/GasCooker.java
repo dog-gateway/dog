@@ -67,9 +67,9 @@ public interface GasCooker extends Cooker
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: StandByNotification*/
-	public void notifyStandby();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	public void updateStatus();
 }

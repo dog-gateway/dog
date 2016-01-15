@@ -70,10 +70,10 @@ public interface DeepFreezer extends WhiteGoods
 	public void notifyStartedSuperFreezing();
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: StandByNotification*/
-	public void notifyStandby();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	/*Notification: StoppedSuperFreezingNotification*/
 	public void notifyStoppedSuperFreezing();
 	public void updateStatus();

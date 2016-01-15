@@ -54,10 +54,10 @@ public interface ThermostatTemperatureSensor extends Thermostat, SingleTemperatu
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
-	/*Notification: JoinGroupNotification*/
-	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: CoolNotification*/
 	public void notifyCool();
+	/*Notification: JoinGroupNotification*/
+	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: HeatNotification*/
 	public void notifyHeat();
 	/*Notification: LeaveGroupNotification*/

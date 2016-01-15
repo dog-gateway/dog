@@ -79,10 +79,10 @@ public interface Oven extends WhiteGoods
 	public void notifyChangedStartTime(Measure<?,?>  startTime);
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: StartedSuperHeatingNotification*/
-	public void notifyStartedSuperHeating();
 	/*Notification: PauseApplianceNotification*/
 	public void notifyPause();
+	/*Notification: StartedSuperHeatingNotification*/
+	public void notifyStartedSuperHeating();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
 	public void updateStatus();

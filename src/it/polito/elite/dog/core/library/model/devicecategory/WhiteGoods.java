@@ -52,10 +52,10 @@ public interface WhiteGoods extends Appliances
 
 	/*Notification: MultipleEventNotification*/
 	public void notifyNewEventSet(Object[] events);
-	/*Notification: EventNotification*/
-	public void notifyNewEvent(Object event);
 	/*Notification: MultipleAlertNotification*/
 	public void notifyNewAlertSet(Object[] alerts);
+	/*Notification: EventNotification*/
+	public void notifyNewEvent(Object event);
 	/*Notification: AlertNotification*/
 	public void notifyNewAlert(Object alert);
 	/*Notification: StartTimeChangedNotification*/
@@ -66,9 +66,9 @@ public interface WhiteGoods extends Appliances
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: StandByNotification*/
-	public void notifyStandby();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	public void updateStatus();
 }

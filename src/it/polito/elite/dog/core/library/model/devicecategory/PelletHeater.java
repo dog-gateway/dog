@@ -43,17 +43,17 @@ public interface PelletHeater extends Heater
 
 	/*Generated Notifications*/
 
-	/*Notification: CoolNotification*/
-	public void notifyCool();
 	/*Notification: FiringUpNotification*/
 	public void notifyFiringUp();
+	/*Notification: CoolNotification*/
+	public void notifyCool();
 	/*Notification: HeatNotification*/
 	public void notifyHeat();
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: StandByNotification*/
-	public void notifyStandby();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StandByNotification*/
+	public void notifyStandby();
 	public void updateStatus();
 }

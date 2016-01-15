@@ -79,11 +79,11 @@ public interface ElectricalOven extends Oven
 	public void notifyChangedStartTime(Measure<?,?>  startTime);
 	/*Notification: OnNotification*/
 	public void notifyOn();
+	/*Notification: StartedSuperHeatingNotification*/
+	public void notifyStartedSuperHeating();
 	/*Notification: PauseApplianceNotification*/
 	public void notifyPause();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
-	/*Notification: StartedSuperHeatingNotification*/
-	public void notifyStartedSuperHeating();
 	public void updateStatus();
 }

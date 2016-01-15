@@ -75,19 +75,19 @@ public interface MicrowaveOven extends Oven
 	public void notifyOff();
 	/*Notification: StoppedSuperHeatingNotification*/
 	public void notifyStoppedSuperHeating();
-	/*Notification: StartTimeChangedNotification*/
-	public void notifyChangedStartTime(Measure<?,?>  startTime);
 	/*Notification: EmittingMicrowavesNotification*/
 	public void notifyEmittingMicrowaves();
 	/*Notification: NotEmittingMicrowavesNotification*/
 	public void notifyNotEmittingMicrowaves();
+	/*Notification: StartTimeChangedNotification*/
+	public void notifyChangedStartTime(Measure<?,?>  startTime);
 	/*Notification: OnNotification*/
 	public void notifyOn();
+	/*Notification: StartedSuperHeatingNotification*/
+	public void notifyStartedSuperHeating();
 	/*Notification: PauseApplianceNotification*/
 	public void notifyPause();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
-	/*Notification: StartedSuperHeatingNotification*/
-	public void notifyStartedSuperHeating();
 	public void updateStatus();
 }

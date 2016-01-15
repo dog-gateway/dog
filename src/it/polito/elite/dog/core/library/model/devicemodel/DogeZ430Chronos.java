@@ -86,16 +86,16 @@ public class DogeZ430Chronos extends AbstractDevice implements eZ430Chronos
 
 	/*Generated Notifications*/
 
-	/*Notification: TridimensionalAccelerationNotification*/
-	public void notifyNew3DAccelerationValue(Double accX, Double accY, Double accZ){
-		TridimensionalAccelerationNotification notificationEvent=new TridimensionalAccelerationNotification(accX , accY , accZ );
+	/*Notification: PressedMNotification*/
+	public void notifyPressed(String buttonID){
+		PressedMNotification notificationEvent=new PressedMNotification(buttonID );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: PressedMNotification*/
-	public void notifyPressed(String buttonID){
-		PressedMNotification notificationEvent=new PressedMNotification(buttonID );
+	/*Notification: TridimensionalAccelerationNotification*/
+	public void notifyNew3DAccelerationValue(Double accX, Double accY, Double accZ){
+		TridimensionalAccelerationNotification notificationEvent=new TridimensionalAccelerationNotification(accX , accY , accZ );
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

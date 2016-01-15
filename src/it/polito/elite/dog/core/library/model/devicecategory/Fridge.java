@@ -76,17 +76,17 @@ public interface Fridge extends WhiteGoods
 	public void notifyOff();
 	/*Notification: StartTimeChangedNotification*/
 	public void notifyChangedStartTime(Measure<?,?>  startTime);
-	/*Notification: HeatNotification*/
-	public void notifyHeat();
 	/*Notification: OnNotification*/
 	public void notifyOn();
+	/*Notification: HeatNotification*/
+	public void notifyHeat();
 	/*Notification: StartedSuperCoolingNotification*/
 	public void notifyStartedSuperCooling();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
-	/*Notification: StopHeatingCoolingNotification*/
-	public void notifyStoppedHeatingOrCooling();
 	/*Notification: StoppedSuperCoolingNotification*/
 	public void notifyStoppedSuperCooling();
+	/*Notification: StopHeatingCoolingNotification*/
+	public void notifyStoppedHeatingOrCooling();
 	public void updateStatus();
 }

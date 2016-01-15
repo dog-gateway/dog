@@ -44,9 +44,9 @@ public interface ZigBeeGateway extends ZigBeeComponent
 
 	/*Generated Notifications*/
 
-	/*Notification: NetworkClosedNotification*/
-	public void notifyClose();
 	/*Notification: NetworkOpenedNotification*/
 	public void notifyOpen();
+	/*Notification: NetworkClosedNotification*/
+	public void notifyClose();
 	public void updateStatus();
 }
