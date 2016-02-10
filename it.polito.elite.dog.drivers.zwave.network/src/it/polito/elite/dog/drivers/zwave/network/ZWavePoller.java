@@ -20,7 +20,10 @@ package it.polito.elite.dog.drivers.zwave.network;
 import it.polito.elite.dog.core.library.util.LogHelper;
 import it.polito.elite.dog.drivers.zwave.network.info.ZWaveNodeInfo;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.service.log.LogService;
@@ -50,7 +53,8 @@ public class ZWavePoller extends Thread
 	public static String logId = "[ZWavePoller]: ";
 	
 	// set of device to trigger for update
-	public ConcurrentHashMap<Integer,TriggerElem> deviceSet = new ConcurrentHashMap<Integer,TriggerElem>();
+	public Set<TriggerElem> deviceSet = Collections.newSetFromMap(new ConcurrentHashMap<TriggerElem, Boolean>());
+	//public ConcurrentHashMap<Integer,TriggerElem> deviceSet = new ConcurrentHashMap<Integer,TriggerElem>();
 
 	public ZWavePoller(ZWaveDriverImpl zwaveDriveImpl)
 	{		
@@ -77,7 +81,7 @@ public class ZWavePoller extends Thread
 			Date currentDate = new Date();
 			
 			//for each driver registered
-			for(TriggerElem elem : deviceSet.values())
+			for(TriggerElem elem : deviceSet)
 			{
 				//if its triggerTime is already past
 				if(elem.getTriggerTime() <= currentDate.getTime())
@@ -143,7 +147,7 @@ public class ZWavePoller extends Thread
 		
 		Date date = new Date();
 		TriggerElem elem = new TriggerElem(nodeInfo, date.getTime()+updateTimeMillis, updateTimeMillis);
-		deviceSet.put(nodeInfo.getDeviceNodeId(),elem);
+		deviceSet.add(elem);
 	}
 	
 	/**
@@ -153,7 +157,16 @@ public class ZWavePoller extends Thread
 	 */
 	public void removeDeviceFromQueue(int nodeId)
 	{
-		this.deviceSet.remove(nodeId);
+		//the list of triggers to remove
+		ArrayList<TriggerElem> toRemove = new ArrayList<TriggerElem>();
+		
+		//build the list of triggers to remove
+		for(TriggerElem elem : this.deviceSet)
+			if(elem.getNodeInfo().getDeviceNodeId() == nodeId)
+				toRemove.add(elem);
+		//remove
+		for(TriggerElem elem : toRemove)
+			this.deviceSet.remove(elem);
 	}
 	
 	public class TriggerElem
