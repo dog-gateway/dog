@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" enabled="true" name="org.doggateway.drivers.enocean.gateway">
+   <implementation class="org.doggateway.drivers.enocean.gateway.EnOceanGatewayDriver"/>
+   <reference bind="addedNetworkDriver" cardinality="1..1" interface="org.doggateway.drivers.enocean.network.interfaces.EnOceanNetwork" name="EnOceanNetwork" policy="dynamic" unbind="removedNetworkDriver"/>
+   <reference bind="addedDeviceFactory" cardinality="1..1" interface="it.polito.elite.dog.core.devicefactory.api.DeviceFactory" name="DeviceFactory" policy="dynamic" unbind="removedDeviceFactory"/>
+</scr:component>

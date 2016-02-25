@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.doggateway.drivers.enocean.temperaturesensor
+Bundle-SymbolicName: org.doggateway.drivers.enocean.temperaturesensor
+Bundle-Version: 1.0.0
+Bundle-Vendor: The Dog Gateway
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Service-Component: OSGI-INF/enocean-temperaturesensor-driver.xml
+Import-Package: it.polito.elite.dog.core.library.model;version="1.1.0",
+ it.polito.elite.dog.core.library.model.devicecategory;version="1.1.0",
+ it.polito.elite.dog.core.library.model.state;version="1.1.0",
+ it.polito.elite.dog.core.library.model.statevalue;version="1.1.0",
+ it.polito.elite.dog.core.library.util;version="1.1.0",
+ it.polito.elite.enocean.enj.eep,
+ it.polito.elite.enocean.enj.eep.eep26.attributes,
+ it.polito.elite.enocean.enj.model,
+ javax.measure;version="4.3.1",
+ javax.measure.unit;version="4.3.1",
+ org.doggateway.drivers.enocean.device,
+ org.doggateway.drivers.enocean.network,
+ org.doggateway.drivers.enocean.network.info,
+ org.doggateway.drivers.enocean.network.interfaces,
+ org.osgi.framework;version="1.8.0",
+ org.osgi.service.cm;version="1.5.0",
+ org.osgi.service.log;version="1.3.0"

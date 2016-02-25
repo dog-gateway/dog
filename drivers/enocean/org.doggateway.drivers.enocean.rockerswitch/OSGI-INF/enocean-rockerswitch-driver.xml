@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="org.doggateway.drivers.enocean.rockerswitch">
+   <implementation class="org.doggateway.drivers.enocean.rockerswitch.RockerSwitchDriver"/>
+   <reference bind="networkAdded" cardinality="1..1" interface="org.doggateway.drivers.enocean.network.interfaces.EnOceanNetwork" name="EnOceanNetwork" policy="dynamic" unbind="networkRemoved"/>
+   <reference bind="gatewayAdded" cardinality="1..1" interface="org.doggateway.drivers.enocean.gateway.EnOceanGatewayDriver" name="EnOceanGatewayDriver" policy="dynamic" unbind="gatewayRemoved"/>
+   <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
+   </service>
+   <property name="service.pid" type="String" value="org.doggateway.drivers.enocean.rockerswitch"/>
+</scr:component>
