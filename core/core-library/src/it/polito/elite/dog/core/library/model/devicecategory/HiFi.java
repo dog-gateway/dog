@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,17 +78,17 @@ public interface HiFi extends Entertainment
 	public void notifyOn();
 	/*Notification: PausePlaybackNotification*/
 	public void notifyPause();
-	/*Notification: TuningStepUpNotification*/
-	public void notifyChannelStepDown();
 	/*Notification: ForwardNotification*/
 	public void notifyFwd();
+	/*Notification: TuningStepUpNotification*/
+	public void notifyChannelStepDown();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
-	/*Notification: StopPlaybackNotification*/
-	public void notifyStop();
 	/*Notification: RewindNotification*/
 	public void notifyRew();
 	/*Notification: ChannelControlNotification*/
 	public void notifyChangedChannel(String channelId);
+	/*Notification: StopPlaybackNotification*/
+	public void notifyStop();
 	public void updateStatus();
 }

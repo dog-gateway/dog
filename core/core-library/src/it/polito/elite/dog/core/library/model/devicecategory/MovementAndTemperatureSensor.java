@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,10 +45,10 @@ public interface MovementAndTemperatureSensor extends MovementSensor, SingleTemp
 
 	/*Generated Notifications*/
 
-	/*Notification: SimpleNoMovementNotification*/
-	public void notifyCeasedMovement();
 	/*Notification: TemperatureMeasurementNotification*/
 	public void notifyNewTemperatureValue(Measure<?,?>  temperatureValue);
+	/*Notification: SimpleNoMovementNotification*/
+	public void notifyCeasedMovement();
 	/*Notification: JoinGroupNotification*/
 	public void notifyJoinedGroup(Integer groupNumber);
 	/*Notification: SimpleMovementNotification*/

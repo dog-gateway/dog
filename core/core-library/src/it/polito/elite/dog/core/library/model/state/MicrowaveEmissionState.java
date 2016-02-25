@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 package it.polito.elite.dog.core.library.model.state;
 
 
-import it.polito.elite.dog.core.library.model.statevalue.EmittingMicrowavesStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.NotEmittingMicrowavesStateValue;
+import it.polito.elite.dog.core.library.model.statevalue.EmittingMicrowavesStateValue;
 import it.polito.elite.dog.core.library.model.statevalue.StateValue;
 
 
@@ -44,18 +44,8 @@ public class MicrowaveEmissionState extends DoubleValuedState
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String NOTEMITTINGMICROWAVES = "notEmittingMicrowaves";
 	public static final String EMITTINGMICROWAVES = "emittingMicrowaves";
-
-
-	/**
-	 * Class constructor for states inheriting from DiscreteState.
-	 */
-	public MicrowaveEmissionState(NotEmittingMicrowavesStateValue notemittingmicrowavesstatevalue)
-	{
-		//call the super class constructor
-		super(new StateValue[]{notemittingmicrowavesstatevalue});
-	}
+	public static final String NOTEMITTINGMICROWAVES = "notEmittingMicrowaves";
 
 
 	/**
@@ -67,11 +57,21 @@ public class MicrowaveEmissionState extends DoubleValuedState
 		super(new StateValue[]{emittingmicrowavesstatevalue});
 	}
 
+
+	/**
+	 * Class constructor for states inheriting from DiscreteState.
+	 */
+	public MicrowaveEmissionState(NotEmittingMicrowavesStateValue notemittingmicrowavesstatevalue)
+	{
+		//call the super class constructor
+		super(new StateValue[]{notemittingmicrowavesstatevalue});
+	}
+
 	@Deprecated
 	private void initCommon()
 	{
-		this.old2NewMap.put(MicrowaveEmissionState.NOTEMITTINGMICROWAVES, new NotEmittingMicrowavesStateValue());
 		this.old2NewMap.put(MicrowaveEmissionState.EMITTINGMICROWAVES, new EmittingMicrowavesStateValue());
+		this.old2NewMap.put(MicrowaveEmissionState.NOTEMITTINGMICROWAVES, new NotEmittingMicrowavesStateValue());
 	}
 	/**
 	 * Creates a state object in the Dog2.0 old way (before May 2012).

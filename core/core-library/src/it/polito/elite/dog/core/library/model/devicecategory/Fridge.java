@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ public interface Fridge extends WhiteGoods
 	public Measure<?,?>  getEndTime();
 	public void on();
 	public void stopHeatingOrCooling();
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
 	public void off();
 	public Measure<?,?>  getRemainingTime();
 	public void startSuperCooling();
@@ -58,10 +58,10 @@ public interface Fridge extends WhiteGoods
 
 	/*Notification: MultipleEventNotification*/
 	public void notifyNewEventSet(Object[] events);
-	/*Notification: EventNotification*/
-	public void notifyNewEvent(Object event);
 	/*Notification: MultipleAlertNotification*/
 	public void notifyNewAlertSet(Object[] alerts);
+	/*Notification: EventNotification*/
+	public void notifyNewEvent(Object event);
 	/*Notification: ChangedDesiredTemperatureNotification*/
 	public void notifyChangedDesiredTemperatureSetting(Measure<?,?>  newTemperatureValue);
 	/*Notification: AlertNotification*/
@@ -76,10 +76,10 @@ public interface Fridge extends WhiteGoods
 	public void notifyOff();
 	/*Notification: StartTimeChangedNotification*/
 	public void notifyChangedStartTime(Measure<?,?>  startTime);
-	/*Notification: HeatNotification*/
-	public void notifyHeat();
 	/*Notification: OnNotification*/
 	public void notifyOn();
+	/*Notification: HeatNotification*/
+	public void notifyHeat();
 	/*Notification: StartedSuperCoolingNotification*/
 	public void notifyStartedSuperCooling();
 	/*Notification: StandByNotification*/

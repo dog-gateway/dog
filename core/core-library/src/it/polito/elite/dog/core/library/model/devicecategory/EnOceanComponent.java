@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2015 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,17 +35,10 @@ public interface EnOceanComponent extends NetworkComponent
 	public static int MATCH_SUB_TYPE=50;
 	public static int MATCH_MANUFACTURER=0;
 
-	public void teachIn();
 	public DeviceStatus getState();
-	public void explicitTeachIn(String deviceHexAddress, String deviceEEP);
-	public void smartTeachIn();
 
 
 	/*Generated Notifications*/
 
-	/*Notification: TeachInEndedNotification*/
-	public void notifyDeactivatedTeachIn();
-	/*Notification: TeachInActiveNotification*/
-	public void notifyActivatedTeachIn();
 	public void updateStatus();
 }

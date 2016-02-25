@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,11 +119,11 @@ public class DogWashingMachine extends AbstractDevice implements WashingMachine
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((WashingMachine) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((WashingMachine) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 
@@ -233,16 +233,16 @@ public class DogWashingMachine extends AbstractDevice implements WashingMachine
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop(){
-		StopApplianceNotification notificationEvent=new StopApplianceNotification();
+	/*Notification: OffNotification*/
+	public void notifyOff(){
+		OffNotification notificationEvent=new OffNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OffNotification*/
-	public void notifyOff(){
-		OffNotification notificationEvent=new OffNotification();
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop(){
+		StopApplianceNotification notificationEvent=new StopApplianceNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -261,16 +261,16 @@ public class DogWashingMachine extends AbstractDevice implements WashingMachine
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause(){
-		PauseApplianceNotification notificationEvent=new PauseApplianceNotification();
+	/*Notification: StandByNotification*/
+	public void notifyStandby(){
+		StandByNotification notificationEvent=new StandByNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StandByNotification*/
-	public void notifyStandby(){
-		StandByNotification notificationEvent=new StandByNotification();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause(){
+		PauseApplianceNotification notificationEvent=new PauseApplianceNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,13 +86,6 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 
 	/*Generated Notifications*/
 
-	/*Notification: CoolNotification*/
-	public void notifyCool(){
-		CoolNotification notificationEvent=new CoolNotification();
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: FiringUpNotification*/
 	public void notifyFiringUp(){
 		FiringUpNotification notificationEvent=new FiringUpNotification();
@@ -100,9 +93,9 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: OnNotification*/
-	public void notifyOn(){
-		OnNotification notificationEvent=new OnNotification();
+	/*Notification: CoolNotification*/
+	public void notifyCool(){
+		CoolNotification notificationEvent=new CoolNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
@@ -110,6 +103,13 @@ public class DogPelletHeater extends AbstractDevice implements PelletHeater
 	/*Notification: HeatNotification*/
 	public void notifyHeat(){
 		HeatNotification notificationEvent=new HeatNotification();
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
+	/*Notification: OnNotification*/
+	public void notifyOn(){
+		OnNotification notificationEvent=new OnNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);

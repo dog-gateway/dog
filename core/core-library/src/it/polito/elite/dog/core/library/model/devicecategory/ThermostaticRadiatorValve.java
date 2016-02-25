@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import it.polito.elite.dog.core.library.model.climate.DailyClimateSchedule;
 
 import javax.measure.Measure;
 
-public interface ThermostaticRadiatorValve extends Actuator, HVACSystem
+public interface ThermostaticRadiatorValve extends Actuator, Thermostat, HVACSystem
 {
 	public static int MATCH_TYPE=100;
 	public static int MATCH_SUB_TYPE=50;
@@ -41,6 +41,7 @@ public interface ThermostaticRadiatorValve extends Actuator, HVACSystem
 
 	public void setDailyClimateSchedule(DailyClimateSchedule daySchedule);
 	public DeviceStatus getState();
+	public Measure<?,?>  getSetpointTemperature();
 	public Object[] getDaySchedule(Integer weekDay);
 	public void cool();
 	public void stopHeatingOrCooling();

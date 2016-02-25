@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,14 +43,14 @@ public interface PelletHeater extends Heater
 
 	/*Generated Notifications*/
 
-	/*Notification: CoolNotification*/
-	public void notifyCool();
 	/*Notification: FiringUpNotification*/
 	public void notifyFiringUp();
-	/*Notification: OnNotification*/
-	public void notifyOn();
+	/*Notification: CoolNotification*/
+	public void notifyCool();
 	/*Notification: HeatNotification*/
 	public void notifyHeat();
+	/*Notification: OnNotification*/
+	public void notifyOn();
 	/*Notification: OffNotification*/
 	public void notifyOff();
 	/*Notification: StandByNotification*/

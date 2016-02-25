@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2015 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import it.polito.elite.dog.core.library.model.DeviceStatus;
 import it.polito.elite.dog.core.library.model.DeviceDescriptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.device.Device;
+import it.polito.elite.dog.core.library.model.technology.ExplicitTeachInData;
 import it.polito.elite.dog.core.library.model.notification.*;
 public class DogEnOceanGateway extends AbstractDevice implements EnOceanGateway
 {
@@ -66,11 +67,11 @@ public class DogEnOceanGateway extends AbstractDevice implements EnOceanGateway
 		 return null;
 	}
 
-	public void explicitTeachIn(String deviceHexAddress, String deviceEEP)
+	public void explicitTeachIn(ExplicitTeachInData teachInData)
 	{
 		if(this.driver!=null)
 		{
-			((EnOceanGateway) this.driver).explicitTeachIn(deviceHexAddress, deviceEEP);
+			((EnOceanGateway) this.driver).explicitTeachIn(teachInData);
 		}
 	}
 

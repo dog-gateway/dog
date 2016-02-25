@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,11 +111,11 @@ public class DogBoiler extends AbstractDevice implements Boiler
 		 return null;
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((Boiler) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((Boiler) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 

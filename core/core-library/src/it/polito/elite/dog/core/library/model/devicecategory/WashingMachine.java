@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ public interface WashingMachine extends WhiteGoods
 	public void start();
 	public void pause();
 	public Object[] getEventsAndAlerts();
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime);
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime);
 	public void standBy();
 	public void off();
 	public Measure<?,?>  getStartTime();
@@ -75,17 +75,17 @@ public interface WashingMachine extends WhiteGoods
 	public void notifyChangedEndTime(Measure<?,?>  endTime);
 	/*Notification: RemainingTimeChangedNotification*/
 	public void notifyChangedRemainingTime(Measure<?,?>  remainingTime);
-	/*Notification: StopApplianceNotification*/
-	public void notifyStop();
 	/*Notification: OffNotification*/
 	public void notifyOff();
+	/*Notification: StopApplianceNotification*/
+	public void notifyStop();
 	/*Notification: StartTimeChangedNotification*/
 	public void notifyChangedStartTime(Measure<?,?>  startTime);
 	/*Notification: OnNotification*/
 	public void notifyOn();
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause();
 	/*Notification: StandByNotification*/
 	public void notifyStandby();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause();
 	public void updateStatus();
 }

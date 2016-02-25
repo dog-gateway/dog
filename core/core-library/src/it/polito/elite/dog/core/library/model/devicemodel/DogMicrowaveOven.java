@@ -1,7 +1,7 @@
 /*
  * Dog - Core
  *
- * Copyright (c) 2011-2014 Dario Bonino and Luigi De Russis
+ * Copyright (c) 2011-2016 Dario Bonino and Luigi De Russis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,11 +85,11 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		}
 	}
 
-	public void setStartTime(Measure<?,?>  remainingTime, Measure<?,?>  endTime, Measure<?,?>  startTime)
+	public void setStartTime(Measure<?,?>  endTime, Measure<?,?>  remainingTime, Measure<?,?>  startTime)
 	{
 		if(this.driver!=null)
 		{
-			((MicrowaveOven) this.driver).setStartTime(remainingTime, endTime, startTime);
+			((MicrowaveOven) this.driver).setStartTime(endTime, remainingTime, startTime);
 		}
 	}
 
@@ -242,13 +242,6 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StartTimeChangedNotification*/
-	public void notifyChangedStartTime(Measure<?,?>  startTime){
-		StartTimeChangedNotification notificationEvent=new StartTimeChangedNotification(startTime );
-		notificationEvent.setDeviceUri(this.deviceId);
-		// Send the notification through the EventAdmin
-		notifyEventAdmin(notificationEvent);
-	}
 	/*Notification: EmittingMicrowavesNotification*/
 	public void notifyEmittingMicrowaves(){
 		EmittingMicrowavesNotification notificationEvent=new EmittingMicrowavesNotification();
@@ -263,6 +256,13 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
+	/*Notification: StartTimeChangedNotification*/
+	public void notifyChangedStartTime(Measure<?,?>  startTime){
+		StartTimeChangedNotification notificationEvent=new StartTimeChangedNotification(startTime );
+		notificationEvent.setDeviceUri(this.deviceId);
+		// Send the notification through the EventAdmin
+		notifyEventAdmin(notificationEvent);
+	}
 	/*Notification: OnNotification*/
 	public void notifyOn(){
 		OnNotification notificationEvent=new OnNotification();
@@ -270,16 +270,16 @@ public class DogMicrowaveOven extends AbstractDevice implements MicrowaveOven
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: PauseApplianceNotification*/
-	public void notifyPause(){
-		PauseApplianceNotification notificationEvent=new PauseApplianceNotification();
+	/*Notification: StartedSuperHeatingNotification*/
+	public void notifyStartedSuperHeating(){
+		StartedSuperHeatingNotification notificationEvent=new StartedSuperHeatingNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
 	}
-	/*Notification: StartedSuperHeatingNotification*/
-	public void notifyStartedSuperHeating(){
-		StartedSuperHeatingNotification notificationEvent=new StartedSuperHeatingNotification();
+	/*Notification: PauseApplianceNotification*/
+	public void notifyPause(){
+		PauseApplianceNotification notificationEvent=new PauseApplianceNotification();
 		notificationEvent.setDeviceUri(this.deviceId);
 		// Send the notification through the EventAdmin
 		notifyEventAdmin(notificationEvent);
