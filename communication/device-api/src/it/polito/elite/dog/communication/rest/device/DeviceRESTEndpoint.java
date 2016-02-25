@@ -17,32 +17,6 @@
  */
 package it.polito.elite.dog.communication.rest.device;
 
-import it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi;
-import it.polito.elite.dog.communication.rest.device.command.ClimateSchedulePayload;
-import it.polito.elite.dog.communication.rest.device.command.CommandPayload;
-import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedulePayload;
-import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
-import it.polito.elite.dog.communication.rest.device.command.HSBColorPayload;
-import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
-import it.polito.elite.dog.communication.rest.device.command.RGBColorPayload;
-import it.polito.elite.dog.communication.rest.device.status.AllDeviceStatesResponsePayload;
-import it.polito.elite.dog.communication.rest.device.status.DeviceStateResponsePayload;
-import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
-import it.polito.elite.dog.core.housemodel.api.HouseModel;
-import it.polito.elite.dog.core.library.jaxb.Controllables;
-import it.polito.elite.dog.core.library.jaxb.Device;
-import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
-import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
-import it.polito.elite.dog.core.library.model.ControllableDevice;
-import it.polito.elite.dog.core.library.model.DeviceCostants;
-import it.polito.elite.dog.core.library.model.DeviceDescriptor;
-import it.polito.elite.dog.core.library.model.DeviceStatus;
-import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
-import it.polito.elite.dog.core.library.model.state.State;
-import it.polito.elite.dog.core.library.model.statevalue.StateValue;
-import it.polito.elite.dog.core.library.util.Executor;
-import it.polito.elite.dog.core.library.util.LogHelper;
-
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,6 +48,33 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.device.Constants;
 import org.osgi.service.log.LogService;
+
+import it.polito.elite.dog.communication.rest.device.api.DeviceRESTApi;
+import it.polito.elite.dog.communication.rest.device.command.ClimateSchedulePayload;
+import it.polito.elite.dog.communication.rest.device.command.CommandPayload;
+import it.polito.elite.dog.communication.rest.device.command.DailyClimateSchedulePayload;
+import it.polito.elite.dog.communication.rest.device.command.DoublePayload;
+import it.polito.elite.dog.communication.rest.device.command.ExplicitTeachInPayload;
+import it.polito.elite.dog.communication.rest.device.command.HSBColorPayload;
+import it.polito.elite.dog.communication.rest.device.command.MeasurePayload;
+import it.polito.elite.dog.communication.rest.device.command.RGBColorPayload;
+import it.polito.elite.dog.communication.rest.device.status.AllDeviceStatesResponsePayload;
+import it.polito.elite.dog.communication.rest.device.status.DeviceStateResponsePayload;
+import it.polito.elite.dog.core.devicefactory.api.DeviceFactory;
+import it.polito.elite.dog.core.housemodel.api.HouseModel;
+import it.polito.elite.dog.core.library.jaxb.Controllables;
+import it.polito.elite.dog.core.library.jaxb.Device;
+import it.polito.elite.dog.core.library.jaxb.DogHomeConfiguration;
+import it.polito.elite.dog.core.library.jaxb.ObjectFactory;
+import it.polito.elite.dog.core.library.model.ControllableDevice;
+import it.polito.elite.dog.core.library.model.DeviceCostants;
+import it.polito.elite.dog.core.library.model.DeviceDescriptor;
+import it.polito.elite.dog.core.library.model.DeviceStatus;
+import it.polito.elite.dog.core.library.model.devicecategory.Controllable;
+import it.polito.elite.dog.core.library.model.state.State;
+import it.polito.elite.dog.core.library.model.statevalue.StateValue;
+import it.polito.elite.dog.core.library.util.Executor;
+import it.polito.elite.dog.core.library.util.LogHelper;
 
 /**
  * 
@@ -138,6 +139,7 @@ public class DeviceRESTEndpoint implements DeviceRESTApi
 		this.payloads.add(MeasurePayload.class);
 		this.payloads.add(HSBColorPayload.class);
 		this.payloads.add(RGBColorPayload.class);
+		this.payloads.add(ExplicitTeachInPayload.class);
 		
 		// initialize the instance-wide object mapper
 		this.mapper = new ObjectMapper();
