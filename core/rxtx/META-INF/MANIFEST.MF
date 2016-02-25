@@ -4,7 +4,7 @@ Bundle-Name: RXTX
 Bundle-SymbolicName: org.rxtx
 Bundle-Version: 2.2
 Bundle-ClassPath: lib/RXTXcomm.jar
-Export-Package: gnu.io
+Export-Package: gnu.io;version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-NativeCode: 
  nativelib/linux/i686-unknown-linux-gnu/librxtxParallel.so;
